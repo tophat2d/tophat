@@ -1,55 +1,35 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "../lib/stb/stb_image.h"
 
+#include <SDL2/SDL.h>
 #include <stdio.h>
 
-#define CNFG_IMPLEMENTATION
-#include "../lib/rawdraw/CNFG.h"
 
 #include "object.h"
 
-obj load(char path[]) {
-	int w, h, c;
+extern SDL_Window* win;
+extern SDL_Surface* surface;
 
-	unsigned char *data = stbi_load(path, &w, &h, &c, 3);
-
-	if (data == NULL) {
-		printf("error loading data");
-		exit(1);
+int load(char path[], obj *o) {
+	SDL_Surface *tr = SDL_LoadBMP(path);
+	if (tr == NULL) {
+		return 1;
 	}
-
-	uint32_t image[w*h]
-
-	size_t img_size = w * h * 3;
-
-	for (unsigned char *p = data; p != data + img_size; p += 3) {
-		image[]
-	}
-	
-
-	obj tr;
-	tr.image = data;
-	tr.w = w;
-	tr.h = h;
-
-	stbi_image_free(data);
-
-	return tr;
+	o->image = *tr;
+	return 0;
 }
 
-void draw(obj o/*, cam camera*/) {
-/*	if o.x < cam.sx || o.x > cam.ex {
-			return;
-	}
-	if o.y < cam.sy || o.y > cam.ey {
-			return;
-	}
+void draw(obj o) {
+	SDL_Rect dstrect, srcrect;
 
+	dstrect.x = o.px;
+	dstrect.y = o.py;
+	dstrect.w = o.image.w;
+	dstrect.h = o.image.h;
+	srcrect.x = 0;
+	srcrect.y = 0;
+	srcrect.w = o.image.w;
+	srcrect.h = o.image.h;
 
-	CNFGBlitImage(o.image, o.px-cam.sx, o.py-cam.sy, o.w, o.h);*/
-
-	
-
-	//CNFGBlitImage(&o.image, o.px, o.py, o.w, o.h);
+	SDL_BlitSurface(o.image, &srcrect, surface, &dstrect);
 }
-

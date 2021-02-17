@@ -4,12 +4,10 @@
 typedef struct {
 	int px;
 	int py;
-	int w;
-	int h;
-	char *image;
+	SDL_Surface image;
 } obj;
 
-obj load(char path[]);
+int load(char path[], obj *o);
 void draw(obj o);
 
 #endif
