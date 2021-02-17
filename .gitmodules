@@ -1,0 +1,6 @@
+[submodule "lib/rawdraw"]
+	path = lib/rawdraw
+	url = https://github.com/cntools/rawdraw
+[submodule "lib/stb"]
+	path = lib/stb
+	url = https://github.com/nothings/stb.git
