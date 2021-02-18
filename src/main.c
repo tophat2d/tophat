@@ -12,6 +12,7 @@ void HandleDestroy() { }
 
 int scaling;
 
+// this will be a init function or something
 int main() {
 	short w, h;
 
@@ -19,7 +20,9 @@ int main() {
 	rect cam = newrect(20, 70, 210, 120);
 
 	CNFGSetup( "Example App", 1024, 768 );
-	
+
+	CNFGGetDimensions(&w, &h);
+	scaling =	getscaling(w, h, cam.w, cam.h);
 
 	while (1) {
 		CNFGBGColor = 0x080808ff;

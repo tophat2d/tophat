@@ -3,3 +3,6 @@ build:
 
 run: build
 	./tophat
+
+clear:
+	rm tophat

@@ -46,6 +46,7 @@ void draw(entity o, rect camera) {
 	camx = camera.x - (camera.w / 2);
 	camy = camera.y - (camera.h / 2);
 
+	// it returns only if rect doesn't collide with camera.
 	if (o.r.x + o.r.w < camx || o.r.x > camx + camera.w) {
 		return;
 	}
@@ -61,7 +62,7 @@ void draw(entity o, rect camera) {
 		return;
 	}
 
-
+	// this doesn't work. entities support only rects now. i will probably use clengine's pixmaps or something instead of loading from png.
 	size_t img_size = o.r.w * o.r.h * o.c;
 	unsigned char *img = o.image;
 	int i;
