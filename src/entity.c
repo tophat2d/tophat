@@ -39,10 +39,22 @@ entity entityfromimage(char path[]) {
 	return tr;
 }
 
-void draw(entity o/*, cam camera*/) {
+void draw(entity o, rect camera) {
+	int camx, camy;
+	camx = camera.x - (camera.w / 2);
+	camy = camera.y - (camera.h / 2);
+
+	if (o.r.x + o.r.w < camx || o.r.x > camx + camera.w) {
+		return;
+	}
+
+	if (o.r.y + o.r.h < camy || o.r.y > camy + camera.h) {
+		return;
+	}
+
 	if (o.image == NULL) {
 		CNFGColor(o.color);
-		CNFGTackRectangle(o.r.x, o.r.y, o.r.w + o.r.x, o.r.h + o.r.y);
+		CNFGTackRectangle(o.r.x - camx, o.r.y - camy, o.r.w + o.r.x - camx, o.r.h + o.r.y - camy);
 
 		return;
 	}

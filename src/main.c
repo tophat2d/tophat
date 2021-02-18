@@ -1,5 +1,6 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "entity.h"
+#include "debug.h"
 
 #include <stdio.h>
 
@@ -10,6 +11,7 @@ void HandleDestroy() { }
 
 int main() {
 	entity o = entityfromrect(newrect(10, 20, 40, 40), 0xffffebff);
+	rect cam = newrect(20, 70, 210, 120);
 
 	CNFGSetup( "Example App", 1024, 768 );
 	
@@ -20,8 +22,8 @@ int main() {
 		CNFGClearFrame();
 		CNFGHandleInput();
 
-					
-		draw(o);
+		visualizecam(cam);
+		draw(o, cam);
 		CNFGSwapBuffers();
 	}
 

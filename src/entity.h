@@ -1,6 +1,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <stdint.h>
 #include "rect.h"
 
 typedef struct {
@@ -12,6 +13,6 @@ typedef struct {
 
 entity entityfromrect(rect r, uint32_t color);
 entity entityfromimage(char path[]);
-void draw(entity o);
+void draw(entity o, rect cam);
 
 #endif
