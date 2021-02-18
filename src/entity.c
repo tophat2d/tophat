@@ -9,6 +9,8 @@
 #include "entity.h"
 #include "rect.h"
 
+extern int scaling;
+
 entity entityfromrect(rect r, uint32_t color) {
 	entity e;
 	e.r = r;
@@ -54,7 +56,7 @@ void draw(entity o, rect camera) {
 
 	if (o.image == NULL) {
 		CNFGColor(o.color);
-		CNFGTackRectangle(o.r.x - camx, o.r.y - camy, o.r.w + o.r.x - camx, o.r.h + o.r.y - camy);
+		CNFGTackRectangle((o.r.x - camx) * scaling, (o.r.y - camy) * scaling, (o.r.w + o.r.x - camx) * scaling, (o.r.h + o.r.y - camy) * scaling);
 
 		return;
 	}
