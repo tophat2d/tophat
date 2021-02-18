@@ -9,13 +9,7 @@ void HandleMotion( int x, int y, int mask ) { }
 void HandleDestroy() { }
 
 int main() {
-	entity o;
-	o.w = 50;
-	o.h = 80;
-	o.color = 0xffffebff;
-	o.image = NULL;
-	o.px = 0;
-	o.py = 0;
+	entity o = entityfromrect(newrect(10, 20, 40, 40), 0xffffebff);
 
 	CNFGSetup( "Example App", 1024, 768 );
 	

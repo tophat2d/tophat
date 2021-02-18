@@ -1,17 +1,17 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include "rect.h"
+
 typedef struct {
-	int px;
-	int py;
-	int w;
-	int h;
+	rect r;
 	int c;
 	char *image;
 	uint32_t color;
 } entity;
 
-entity load(char path[]);
+entity entityfromrect(rect r, uint32_t color);
+entity entityfromimage(char path[]);
 void draw(entity o);
 
 #endif

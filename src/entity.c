@@ -7,8 +7,18 @@
 #include "../lib/rawdraw/CNFG.h"
 
 #include "entity.h"
+#include "rect.h"
 
-entity load(char path[]) {
+entity entityfromrect(rect r, uint32_t color) {
+	entity e;
+	e.r = r;
+	e.color = color;
+	e.image = NULL;
+
+	return e;
+}
+
+entity entityfromimage(char path[]) {
 	int w, h, c;
 
 	unsigned char *data = stbi_load(path, &w, &h, &c, 3);
@@ -20,8 +30,8 @@ entity load(char path[]) {
 
 	entity tr;
 	tr.image = data;
-	tr.w = w;
-	tr.h = h;
+	tr.r.w = w;
+	tr.r.h = h;
 	tr.c = c;
 
 	stbi_image_free(data);
@@ -32,13 +42,13 @@ entity load(char path[]) {
 void draw(entity o/*, cam camera*/) {
 	if (o.image == NULL) {
 		CNFGColor(o.color);
-		CNFGTackRectangle(o.px, o.py, o.w, o.h);
+		CNFGTackRectangle(o.r.x, o.r.y, o.r.w + o.r.x, o.r.h + o.r.y);
 
 		return;
 	}
 
 
-	size_t img_size = o.w * o.h * 3;
+	size_t img_size = o.r.w * o.r.h * o.c;
 	unsigned char *img = o.image;
 	int i;
 	short x, y;
@@ -46,7 +56,7 @@ void draw(entity o/*, cam camera*/) {
 	uint32_t multiplier = 1000000000;
 
 	for (unsigned char *p = img; p != img + img_size; p += o.c) {
-		if (y >= o.w) {
+		if (y >= o.r.w) {
 			x++;
 			y = 0;
 		}
