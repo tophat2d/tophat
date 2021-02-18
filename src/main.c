@@ -1,21 +1,35 @@
-#include "object.h"
+#include "../lib/rawdraw/CNFG.h"
+#include "entity.h"
 
 #include <stdio.h>
-#include <SDL2/SDL.h>
 
-SDL_Window* win;
-SDL_Surface* surface;
+void HandleKey( int keycode, int bDown ) { }
+void HandleButton( int x, int y, int button, int bDown ) { }
+void HandleMotion( int x, int y, int mask ) { }
+void HandleDestroy() { }
 
-// this will be replaced with init function
 int main() {
-	SDL_Init(SDL_INIT_VIDEO);
+	entity o;
+	o.w = 50;
+	o.h = 80;
+	o.color = 0xffffebff;
+	o.image = NULL;
+	o.px = 0;
+	o.py = 0;
 
-	win = SDL_CreateWindow("tophat", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 60, 60, SDL_WINDOW_SHOWN);
+	CNFGSetup( "Example App", 1024, 768 );
+	
 
-	surface = SDL_GetWindowSurface(win);
+	while (1) {
+		CNFGBGColor = 0x080808ff;
 
-	SDL_DestroyWindow(win);
-	SDL_Quit();
+		CNFGClearFrame();
+		CNFGHandleInput();
+
+					
+		draw(o);
+		CNFGSwapBuffers();
+	}
 
 	return 0;
 }
