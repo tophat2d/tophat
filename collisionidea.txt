@@ -1,0 +1,7 @@
+collisions:
+
+	idea1:
+		engine will have an array of entities. entity can either have it's own collider or use e.r for collider. collisions would then be checked linearly. every entity would have to have an id of sorts, so you can't collide with yourself.
+
+	idea2:
+		having a sorted array of entities based on o.r.x or o.r.y. then binary search could be used to find entities bigger than current that are in the range of o.r.w. this may actually be slower though, since you would have to sort the array every time you move.

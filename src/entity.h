@@ -1,5 +1,5 @@
-#ifndef OBJECT_H
-#define OBJECT_H
+#ifndef ENTITY_H
+#define ENTITY_H
 
 #include <stdint.h>
 #include "rect.h"
@@ -9,7 +9,13 @@ typedef struct {
 	int c;
 	char *image;
 	uint32_t color;
+	int id;
 } entity;
+
+typedef struct entnode {
+	entity *val;
+	struct entnode *next;
+} entnode_t;
 
 entity entityfromrect(rect r, uint32_t color);
 entity entityfromimage(char path[]);

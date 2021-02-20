@@ -2,6 +2,7 @@
 #include "../lib/stb/stb_image.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 #define CNFG_IMPLEMENTATION
 #include "../lib/rawdraw/CNFG.h"
@@ -16,6 +17,7 @@ entity entityfromrect(rect r, uint32_t color) {
 	e.r = r;
 	e.color = color;
 	e.image = NULL;
+	e.id = rand()%9999;
 
 	return e;
 }
