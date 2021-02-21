@@ -30,7 +30,7 @@ int main() {
 
 	short w, h;
 
-	entity o = entityfromrect(newrect(10, 20, 40, 40), 0xffffebff);
+	entity o = entityfromimage("test.bmp");//entityfromrect(newrect(10, 20, 40, 40), 0xffffebff);
 	entity player = entityfromrect(newrect(0, 0, 10, 10), 0x22ff22ff);
 	rect cam = newrect(20, 70, 210, 120);
 
@@ -59,9 +59,9 @@ int main() {
 
 		coll = collbyentity(&entities, &player);
 		if (coll != 0) {
-			printf("collision with id %d\n", coll);
+			player.color = 0xffff00ff;
 		} else {
-			printf("no collisions\n");
+			player.color = 0x22ff22ff;
 		}
 
 		CNFGSwapBuffers();

@@ -7,7 +7,7 @@
 typedef struct {
 	rect r;
 	int c;
-	char *image;
+	uint32_t *image;
 	uint32_t color;
 	int id;
 } entity;

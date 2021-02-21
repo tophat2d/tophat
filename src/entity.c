@@ -1,11 +1,10 @@
-#define STB_IMAGE_IMPLEMENTATION
-#include "../lib/stb/stb_image.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
 #define CNFG_IMPLEMENTATION
 #include "../lib/rawdraw/CNFG.h"
+
+#include "img/bmp.h"
 
 #include "entity.h"
 #include "rect.h"
@@ -23,24 +22,16 @@ entity entityfromrect(rect r, uint32_t color) {
 }
 
 entity entityfromimage(char path[]) {
-	int w, h, c;
+	img_t img;
 
-	unsigned char *data = stbi_load(path, &w, &h, &c, 3);
+	parsebmp(&path[0], &img);
 
-	if (data == NULL) {
-		printf("error loading data");
-		exit(1);
-	}
+	entity e;
+	e.r = newrect(0, 0, img.w, img.h);
+	e.image = img.content;
+	e.id = rand()%9999;
 
-	entity tr;
-	tr.image = data;
-	tr.r.w = w;
-	tr.r.h = h;
-	tr.c = c;
-
-	stbi_image_free(data);
-
-	return tr;
+	return e;
 }
 
 void draw(entity o, rect camera) {
@@ -64,32 +55,5 @@ void draw(entity o, rect camera) {
 		return;
 	}
 
-	// this doesn't work. entities support only rects now. i will probably use clengine's pixmaps or something instead of loading from png.
-	size_t img_size = o.r.w * o.r.h * o.c;
-	unsigned char *img = o.image;
-	int i;
-	short x, y;
-	uint32_t color = 0;
-	uint32_t multiplier = 1000000000;
-
-	for (unsigned char *p = img; p != img + img_size; p += o.c) {
-		if (y >= o.r.w) {
-			x++;
-			y = 0;
-		}
-		for (int tmp=0; tmp < o.c; tmp++) {
-			color += multiplier * (uint32_t)*(p + tmp);
-			printf("%d * %d\n", multiplier, *(p + tmp));
-			multiplier /= 1000;
-		}
-	
-		y++;
-		//CNFGColor(color);
-		//CNFGTackPixel(x, y);
-		if (color != 0) {
-			printf("color: %d, x: %d, y: %d\n", color, x, y);
-		}
-
-		i++;
-	}
+	CNFGBlitImage(o.image, o.r.x, o.r.y, o.r.w, o.r.h);
 }
