@@ -53,7 +53,7 @@ int main() {
 		player.r.x = mx/scaling + cam.x - cam.w/2;
 		player.r.y = my/scaling + cam.y - cam.h/2;
 
-		visualizecam(cam);
+		//visualizecam(cam);
 		draw(o, cam);
 		draw(player, cam);
 
