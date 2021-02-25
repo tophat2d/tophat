@@ -3,9 +3,10 @@
 
 #include <stdint.h>
 #include "rect.h"
+#include "poly.h"
 
 typedef struct {
-	rect r;
+	poly *p;
 	int c;
 	uint32_t *image;
 	uint32_t color;
@@ -17,7 +18,7 @@ typedef struct entnode {
 	struct entnode *next;
 } entnode_t;
 
-entity entityfromrect(rect r, uint32_t color);
+entity entityfrompoly(poly *p, uint32_t color);
 entity entityfromimage(char path[]);
 void draw(entity o, rect cam);
 

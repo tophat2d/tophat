@@ -1,8 +1,9 @@
 #include "entity.h"
+#include <stdio.h>
+
 #include "collisions.h"
 #include "main.h"
-
-#include <stdio.h>
+#include "poly.h"
 
 extern int entitycount;
 
@@ -24,12 +25,12 @@ int collbyentity(entnode_t *a, entity *e) {
 		next = current->next;
 		current = next;
 
-		if (id == aid) {
+		if (e->id == current->val->id) {
 			continue;
 		}
 
-		if ((result = polytopoly(a->p, current->p)) != 0) {
-			return result;
+		if (polytopoly(e->p, current->val->p) != 0) {
+			return current->val->id;
 		}
 	}
 }
@@ -56,13 +57,13 @@ int polytopoly(poly *a, poly *b) {
 			
 			// this is some kind of black magic i found on the internet. idk how it works, but it does the job
 			if (((vcy >= py && vny < py) || (vcy < py && vny >= py)) && (px < (vnx-vcx)*(py-vcy) / (vny-vcy)+vcx)) {
-				return b->id;
+				return 1;
 			}
 		}
 	}
 }
 
-
+/*
 int collbyentity(entnode_t *a, entity *e) {
 	int id, aid, x, y, w, h, ax, ay, aw, ah;
 	entnode_t *current, *next;
@@ -117,5 +118,5 @@ int collbyentity(entnode_t *a, entity *e) {
 	}
 
 	return 0;
-}
+}*/
 
