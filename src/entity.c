@@ -40,17 +40,24 @@ void draw(entity o, rect camera) {
 	camy = camera.y - (camera.h / 2);
 
 	// it returns only if rect doesn't collide with camera.
-	if (o.r.x + o.r.w < camx || o.r.x > camx + camera.w) {
+	if (o.p.x < camx || o.p.x > camx + camera.w) {
 		return;
 	}
 
-	if (o.r.y + o.r.h < camy || o.r.y > camy + camera.h) {
+	if (o.p.y < camy || o.p.y > camy + camera.h) {
 		return;
 	}
 
 	if (o.image == NULL) {
+		RDPoint points[o.p.vc];
+
+		points = polytordpoint(o.p.v, o.p.vc);
+
+
+		/*
 		CNFGColor(o.color);
 		CNFGTackRectangle((o.r.x - camx) * scaling, (o.r.y - camy) * scaling, (o.r.w + o.r.x - camx) * scaling, (o.r.h + o.r.y - camy) * scaling);
+		*/
 
 		return;
 	}
