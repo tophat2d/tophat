@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #define CNFG_IMPLEMENTATION
+#define CNFGRASTERIZER
 #include "../lib/rawdraw/CNFG.h"
 
 #include "img/bmp.h"
@@ -53,11 +54,11 @@ void draw(entity o, rect camera) {
 	camy = camera.y - (camera.h / 2);
 
 	// it returns only if rect doesn't collide with camera.
-	if (o.p->x < camx || o.p->x > camx + camera.w) {
+	if (o.p->x + o.p->w < camx || o.p->x > camx + camera.w) {
 		return;
 	}
 
-	if (o.p->y < camy || o.p->y > camy + camera.h) {
+	if (o.p->y + o.p->h < camy || o.p->y > camy + camera.h) {
 		return;
 	}
 

@@ -10,6 +10,7 @@ extern int entitycount;
 int collbyentity(entnode_t *a, entity *e) {
 	entnode_t *next, *current;
 	int result;	
+	int i = 0;
 
 	next = a;
 	current = a;
@@ -20,19 +21,20 @@ int collbyentity(entnode_t *a, entity *e) {
 
 	while (next != NULL) {
 
-		next = current->next;
-		current = next;
-	
+		i++;
+		printf("iteration %d\n", i);
+
 		if (current->val == NULL) {
+			if (current->next == NULL) {
+				break;
+			}
 			next = current->next;
 			current = next;
 			continue;
 		}
 
-		if (current == NULL) {
-			continue;
-		}
-
+		next = current->next;
+		current = next;
 
 		if (e->id == current->val->id) {
 			continue;

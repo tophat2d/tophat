@@ -31,8 +31,8 @@ int main() {
 
 	short w, h;
 
-	entity o = entityfrompoly(newpoly(10, 20, 3, 40, 40, 40, 60, 80, 70), 0xffffebff);
-	entity player = entityfrompoly(newpoly(0, 0, 3, 10, 10, 20, 20, 20, 10), 0x22ff22ff);
+	entity o = entityfrompoly(newpoly(10, 20, 4, 0, 0, 20, 0, 20, 20, 0, 20), 0xffffebff);
+	entity player = entityfrompoly(newpoly(0, 0, 6, 0, 0, 10, 20, 20, 20, 30, 10, 20, 0, 10, 0), 0x22ff22ff);
 	rect cam = newrect(20, 70, 210, 120);
 
 	addentity(&entities, &o);
@@ -54,13 +54,15 @@ int main() {
 		player.p->x = mx/scaling + cam.x - cam.w/2;
 		player.p->y = my/scaling + cam.y - cam.h/2;
 
-		//visualizecam(cam);
+		visualizecam(cam);
 		draw(o, cam);
 		draw(player, cam);
 
 		coll = collbyentity(&entities, &player);
 		if (coll != 0) {
 			player.color = 0xffff00ff;
+		} else if (coll == 1) {
+			player.color = 0xff2200ff;
 		} else {
 			player.color = 0x22ff22ff;
 		}

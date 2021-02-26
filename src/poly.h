@@ -8,6 +8,8 @@ typedef struct {
 	int x;
 	int y;
 	int *v;
+	int w;
+	int h;
 	int vc;
 } poly;
 
