@@ -14,16 +14,25 @@ int collbyentity(entnode_t *a, entity *e) {
 	next = a;
 	current = a;
 
+	if (e == NULL) {
+		return 1;
+	}
+
 	while (next != NULL) {
 
+		next = current->next;
+		current = next;
+	
 		if (current->val == NULL) {
 			next = current->next;
 			current = next;
 			continue;
 		}
 
-		next = current->next;
-		current = next;
+		if (current == NULL) {
+			continue;
+		}
+
 
 		if (e->id == current->val->id) {
 			continue;

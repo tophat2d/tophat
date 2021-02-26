@@ -62,11 +62,12 @@ void draw(entity o, rect camera) {
 	}
 
 	if (o.image == NULL) {
-		RDPoint points[o.p->vc];
+		RDPoint *points;
 
 		points = polytordpoint(o.p, camx, camy);
 		CNFGColor(o.color);
 		CNFGTackPoly(points, o.p->vc);
+		free(points);
 
 		/*
 		CNFGColor(o.color);

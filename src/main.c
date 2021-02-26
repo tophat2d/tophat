@@ -1,13 +1,14 @@
+#include <stdio.h>
+#include <time.h>
+#include <stdlib.h>
+
 #include "../lib/rawdraw/CNFG.h"
 #include "entity.h"
 #include "debug.h"
 #include "misc.h"
 #include "main.h"
 #include "collisions.h"
-
-#include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
+#include "poly.h"
 
 int mx, my;
 
@@ -30,8 +31,8 @@ int main() {
 
 	short w, h;
 
-	entity o = entityfromimage("test.bmp");//entityfromrect(newrect(10, 20, 40, 40), 0xffffebff);
-	entity player = entityfromrect(newrect(0, 0, 10, 10), 0x22ff22ff);
+	entity o = entityfrompoly(newpoly(10, 20, 3, 40, 40, 40, 60, 80, 70), 0xffffebff);
+	entity player = entityfrompoly(newpoly(0, 0, 3, 10, 10, 20, 20, 20, 10), 0x22ff22ff);
 	rect cam = newrect(20, 70, 210, 120);
 
 	addentity(&entities, &o);
@@ -50,8 +51,8 @@ int main() {
 		CNFGGetDimensions(&w, &h);
 		scaling = getscaling(w, h, cam.w, cam.h); 
 
-		player.r.x = mx/scaling + cam.x - cam.w/2;
-		player.r.y = my/scaling + cam.y - cam.h/2;
+		player.p->x = mx/scaling + cam.x - cam.w/2;
+		player.p->y = my/scaling + cam.y - cam.h/2;
 
 		//visualizecam(cam);
 		draw(o, cam);
@@ -81,6 +82,8 @@ void freeentnodes(entnode_t *s) {
 	while (next != NULL) {
 		current = next;
 		next = current->next;
+		free(current->val->p->v);
+		free(current->val->p);
 		free(current);
 	}
 }
