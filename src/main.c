@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "../lib/rawdraw/CNFG.h"
 #include "entity.h"
@@ -26,12 +27,16 @@ int entitycount;
 // this will be a init function or something
 int main() {
 	srand(time(NULL));
-	int coll;	
+	int coll = 0;	
+	time_t start;
+	double delta;
 
+	char *fpstext = malloc(sizeof(char) * 40);
 
 	short w, h;
 
 	entity o = entityfrompoly(newpoly(10, 20, 4, 0, 0, 20, 0, 20, 20, 0, 20), 0xffffebff);
+	entity p = entityfrompoly(newpoly(-40, 20, 4, 0, 0, 1, 0, 41, 20, 40, 20), 0xffffebff);
 	entity player = entityfrompoly(newpoly(0, 0, 6, 0, 0, 10, 20, 20, 20, 30, 10, 20, 0, 10, 0), 0x22ff22ff);
 	rect cam = newrect(20, 70, 210, 120);
 
@@ -44,6 +49,8 @@ int main() {
 	scaling =	getscaling(w, h, cam.w, cam.h);
 
 	while (1) {
+		start = time(NULL);
+
 		CNFGBGColor = 0x080808ff;
 
 		CNFGClearFrame();
@@ -51,28 +58,35 @@ int main() {
 		CNFGGetDimensions(&w, &h);
 		scaling = getscaling(w, h, cam.w, cam.h); 
 
+		CNFGPenX = 1;
+		CNFGPenY = 1;
+		sprintf(fpstext, "fps: %d", 1/delta);
+		//printf("fps: %d\n", 1/delta);
+		CNFGDrawText(fpstext, 2);
+
 		player.p->x = mx/scaling + cam.x - cam.w/2;
 		player.p->y = my/scaling + cam.y - cam.h/2;
 
 		visualizecam(cam);
 		draw(o, cam);
 		draw(player, cam);
+		draw(p, cam);
 
 		coll = collbyentity(&entities, &player);
 		if (coll != 0) {
 			player.color = 0xffff00ff;
-		} else if (coll == 1) {
-			player.color = 0xff2200ff;
 		} else {
 			player.color = 0x22ff22ff;
 		}
+		coll = 0;
 
 		CNFGSwapBuffers();
 
+		delta = difftime(time(NULL), start);
 	}
 
 
-
+	free(fpstext);
 	freeentnodes(&entities);
 	return 0;
 }
@@ -95,6 +109,8 @@ void addentity(entnode_t *s, entity *e) {
 	entnode_t *next, *current;
 	next = s;
 
+	int len = 0;
+
 	if (next == NULL) {
 		entnode_t ta;
 		ta.next == NULL;
@@ -107,8 +123,9 @@ void addentity(entnode_t *s, entity *e) {
 	while (next != NULL) {
 		current = next;
 		next = current->next;
+		len++;
 	}
-
+	printf("lenght %d\n", len);
 	entnode_t *ta = malloc(sizeof(entnode_t));
 	ta->next = NULL;
 	ta->val = e;

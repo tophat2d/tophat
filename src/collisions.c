@@ -8,70 +8,78 @@
 extern int entitycount;
 
 int collbyentity(entnode_t *a, entity *e) {
-	entnode_t *next, *current;
+	entnode_t *current, *next;
 	int result;	
 	int i = 0;
+	int coll;
 
-	next = a;
 	current = a;
+	next = a;
 
 	if (e == NULL) {
 		return 1;
 	}
 
+	i = 0;
+
 	while (next != NULL) {
 
+		current = next;
+		next = current->next;
+		
 		i++;
-		printf("iteration %d\n", i);
 
 		if (current->val == NULL) {
-			if (current->next == NULL) {
-				break;
-			}
-			next = current->next;
-			current = next;
+			current = current->next;
 			continue;
 		}
-
-		next = current->next;
-		current = next;
 
 		if (e->id == current->val->id) {
 			continue;
 		}
 
-		if (polytopoly(e->p, current->val->p) != 0) {
+		coll = polytopoly(current->val->p, e->p);
+		if (coll) {
 			return current->val->id;
 		}
+
+		if (current->next == NULL) {
+			return 0;
+		}
 	}
+	return 0;
 }
 
 int polytopoly(poly *a, poly *b) {
-	
+	int result = 0;	
 	int current, next;
 	int px, py;
 	int vcx, vnx, vcy, vny;
-	for (int i=0; i < b->vc*2; i += 2) {
-		px = b->v[i];
-		py = b->v[i+1];
-		for (current = 0; current < a->vc*2; current += 2) {
+	for (int i=0; i <= b->vc*2; i += 2) {
+		px = b->v[i] + b->x;
+		py = b->v[i+1] + b->y;
+		for (current = 0; current <= a->vc*2; current += 2) {
 			next = current + 2;
   
 			if (next >= a->vc*2) {
 				next = 0;
 			}
-  
-			vcx = a->v[current];
-			vnx = a->v[next];
-			vcy = a->v[current+1];
-			vny = a->v[next+1];
+
+			vcx = a->v[current] + a->x;
+			vnx = a->v[next] + a->y;
+			vcy = a->v[current+1] + a->x;
+			vny = a->v[next+1] + a->y;
 			
-			// this is some kind of black magic i found on the internet. idk how it works, but it does the job
+			// this is some kind of black magic i found on the internet.
 			if (((vcy >= py && vny < py) || (vcy < py && vny >= py)) && (px < (vnx-vcx)*(py-vcy) / (vny-vcy)+vcx)) {
-				return 1;
+				result = !result;
 			}
 		}
+		if (result) {
+			return result;
+		}
 	}
+	return result;
 }
 
 /*
