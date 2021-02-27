@@ -1,14 +1,14 @@
 # tophat
-A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw)
+A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw).
 
 ## features
 
 - basic entity
-- rect to rect collisions
+- polygon to polygon collisions
 
 ## TODO
 
-- replace rectangles with polygons
+- fix collisions
 - wren scripting
 - image support (already in progress)
 - image operation (scaling, flipping, rotating)
