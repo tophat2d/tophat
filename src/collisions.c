@@ -1,3 +1,6 @@
+//
+// largely inpired by (copied from :]) this guide: http://jeffreythompson.org/collision-detection/table_of_contents.php
+//
 #include "entity.h"
 #include <stdio.h>
 
@@ -50,33 +53,92 @@ int collbyentity(entnode_t *a, entity *e) {
 	return 0;
 }
 
-int polytopoly(poly *a, poly *b) {
+int polytopoly(poly *p1, poly *p2) {
+	int next = 0;
+	int vcx, vcy, vnx, vny;
+	int coll = 0;
+
+	for (int current = 0; current < p1->vc * 2; current += 2) {
+		next = current + 2;
+
+		if (next >= p1->vc) {
+			next = 0;
+		}
+
+		vcx = p1->v[current] + p1->x;
+		vcy = p1->v[current + 1] + p1->y;
+		vnx = p1->v[next] + p1->x;
+		vny = p1->v[next + 1] + p1->y;
+
+		coll = polytoline(p2, vcx, vcy, vnx, vny);
+		if (coll) {
+			return 1;
+		}
+
+		coll = polytopoint(p1, p2->v[0], p2->v[1]);
+		if (coll) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int polytoline(poly *a, int sx, int sy, int ex, int ey) {
+	int next = 0;
+	int csx, csy, cex, cey;
+	int coll = 0;
+
+	for (int current = 0; current < a->vc*2; current += 2) {
+		next = current + 2;
+
+		csx = a->v[current] + a->x;
+		csy = a->v[current + 1] + a->y;
+		cex = a->v[next] + a->x;
+		cey = a->v[next + 1] + a->y;
+
+		coll = linetoline(sx, sy, ex, ey, csx, csy, cex, cey);
+		if (coll) {
+			return 1;
+		}
+	}
+
+	return 0;
+}
+
+int linetoline(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
+  float uA = (float)((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+  float uB = (float)((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+
+	if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
+		return 1;
+	}
+
+	return 0;
+}
+
+int polytopoint(poly *a, int px, int py) {
 	int result = 0;	
 	int current, next;
-	int px, py;
 	int vcx, vnx, vcy, vny;
-	for (int i=0; i <= b->vc*2; i += 2) {
-		px = b->v[i] + b->x;
-		py = b->v[i+1] + b->y;
-		for (current = 0; current <= a->vc*2; current += 2) {
-			next = current + 2;
-  
-			if (next >= a->vc*2) {
-				next = 0;
-			}
+	
+	next = 0;
 
-			vcx = a->v[current] + a->x;
-			vnx = a->v[next] + a->y;
-			vcy = a->v[current+1] + a->x;
-			vny = a->v[next+1] + a->y;
-			
-			// this is some kind of black magic i found on the internet.
-			if (((vcy >= py && vny < py) || (vcy < py && vny >= py)) && (px < (vnx-vcx)*(py-vcy) / (vny-vcy)+vcx)) {
-				result = !result;
-			}
+	for (current = 0; current <= a->vc*2; current += 2) {
+		next = current + 2;
+
+		if (next = a->vc*2) {
+			next = 0;
 		}
-		if (result) {
-			return result;
+
+		vcx = a->v[current] + a->x;
+		vnx = a->v[next] + a->y;
+		vcy = a->v[current+1] + a->x;
+		vny = a->v[next+1] + a->y;
+		
+		// this is some kind of black magic i found on the internet.
+		if (((vcy >= py && vny < py) || (vcy < py && vny >= py)) && (px < (vnx-vcx)*(py-vcy) / (vny-vcy)+vcx)) {
+			result = !result;
 		}
 	}
 	return result;
