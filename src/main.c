@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <time.h>
+#include <sys/time.h>
 #include <stdlib.h>
 #include <time.h>
 
@@ -28,7 +28,7 @@ int entitycount;
 int main() {
 	srand(time(NULL));
 	int coll = 0;	
-	time_t start;
+	struct timeval start, stop;
 	double delta;
 
 	char *fpstext = malloc(sizeof(char) * 40);
@@ -36,12 +36,13 @@ int main() {
 	short w, h;
 
 	entity o = entityfrompoly(newpoly(10, 50, 4, 0, 0, 20, 0, 20, 20, 0, 20), 0xffffebff);
-	//entity p = entityfrompoly(newpoly(-40, 20, 4, 0, 0, 1, 0, 41, 20, 40, 20), 0xffffebff);
+	entity p = entityfrompoly(newpoly(60, 20, 4, 0, 0, 1, 0, 41, 20, 40, 20), 0xffffebff);
 	entity player = entityfrompoly(newpoly(0, 0, 6, 0, 0, 10, 20, 20, 20, 30, 10, 20, 0, 10, 0), 0x22ff22ff);
 	rect cam = newrect(20, 70, 210, 120);
 
 	addentity(&entities, &o);
 	addentity(&entities, &player);
+	addentity(&entities, &p);
 
 	CNFGSetup( "Example App", 1024, 768 );
 
@@ -49,7 +50,7 @@ int main() {
 	scaling =	getscaling(w, h, cam.w, cam.h);
 
 	while (1) {
-		start = time(NULL);
+		gettimeofday(&start, NULL);
 
 		CNFGBGColor = 0x080808ff;
 
@@ -58,19 +59,22 @@ int main() {
 		CNFGGetDimensions(&w, &h);
 		scaling = getscaling(w, h, cam.w, cam.h); 
 
-		CNFGPenX = 1;
-		CNFGPenY = 1;
-		sprintf(fpstext, "fps: %d", 1/delta);
-		//printf("fps: %d\n", 1/delta);
-		CNFGDrawText(fpstext, 2);
 
 		player.p->x = mx/scaling + cam.x - cam.w/2;
 		player.p->y = my/scaling + cam.y - cam.h/2;
 
 		visualizecam(cam);
+
+		CNFGColor(0xffffffff);
+		CNFGPenX = 1;
+		CNFGPenY = 1;
+		sprintf(fpstext, "fps: %d", (float)1/delta);
+		printf("fps: %d\n", (float)1/delta);
+		CNFGDrawText(fpstext, 2);
+
 		draw(o, cam);
 		draw(player, cam);
-		//draw(p, cam);
+		draw(p, cam);
 
 		coll = collbyentity(&entities, &player);
 		if (coll != 0) {
@@ -82,7 +86,8 @@ int main() {
 
 		CNFGSwapBuffers();
 
-		delta = difftime(time(NULL), start);
+		gettimeofday(&stop, NULL);
+		delta = (double)(stop.tv_usec - start.tv_usec) / 1000 + (double)(stop.tv_sec - start.tv_sec);;
 	}
 
 
