@@ -8,7 +8,6 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw).
 
 ## TODO
 
-- fix collisions
 - wren scripting
 - image support (already in progress)
 - image operation (scaling, flipping, rotating)
