@@ -9,8 +9,14 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGSetBgColor(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umCNFGSetColor(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umCNFGClearFrame(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umCNFGGetDimensions(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umCNFGSwapBuffers(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umCNFGHandleInput(UmkaStackSlot *p, UmkaStackSlot *r);
 
 #endif

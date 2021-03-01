@@ -33,12 +33,11 @@ int main() {
 		return 1;
 	}
 
-	printf("Initialized umka\n");
-
 	gamefunc = umkaGetFunc(umka, NULL, "game");
 
-	printf("Running umka");
 	umkaCall(umka, gamefunc, 0, NULL, NULL);
+
+	umkaFree(umka);
 
 	return 0;
 }

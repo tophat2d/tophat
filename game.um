@@ -1,15 +1,15 @@
 import "umka/tophat.um"
 
 fn game() {
-	printf("Running from umka\n")
+	var w, h: int;
 
-	tophat.cnfgsetup("Window from umka", 10, 10)
-
-	printf("Initialized rawdraw\n")
+	tophat.cnfgsetup("Window from umka", 500, 500)
 
 	for true {
 		tophat.cnfgsetbgcolor(0xffffffff)
 		tophat.cnfgclearframe()
+		tophat.cnfghandleinput()
+
 
 		tophat.cnfgswapbuffers()	
 	}
