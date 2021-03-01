@@ -4,3 +4,15 @@
 [submodule "lib/stb"]
 	path = lib/stb
 	url = https://github.com/nothings/stb.git
+[submodule "umka/umka-lang"]
+	path = umka/umka-lang
+	url = https://github.com/vtereshkov/umka-lang.git
+[submodule "wren/wren"]
+	path = wren/wren
+	url = https://github.com/wren-lang/wren.git
+[submodule "umka/umka"]
+	path = umka/umka
+	url = https://github.com/vtereshkov/umka-lang.git
+[submodule "lib/umka"]
+	path = lib/umka
+	url = https://github.com/vtereshkov/umka-lang.git

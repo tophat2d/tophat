@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define CNFG_IMPLEMENTATION
-#define CNFGRASTERIZER
 #include "../lib/rawdraw/CNFG.h"
 
 #include "img/bmp.h"

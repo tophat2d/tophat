@@ -1,0 +1,12 @@
+import "umka/tophat.um"
+
+fn game() {
+	tophat.CNFGSetup("Window from umka", 500, 500)
+
+	for {
+		tophat.CNFGSetBgColor(4294967295)
+		tophat.CNFGClearFrame()
+
+		tophat.CNFGSwapBuffers()	
+	}
+}
