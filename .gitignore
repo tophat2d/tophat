@@ -1,4 +1,3 @@
 tophat
-src/.vscode
-.vscode
-src/*.swp
+**/.vscode
+**.swp

@@ -23,13 +23,13 @@ entity entityfrompoly(poly *p, uint32_t color) {
 
 /*
 entity entityfromrect(rect r, uint32_t color) {
-	entity e;
-	e.r = r;
-	e.color = color;
-	e.image = NULL;
-	e.id = rand()%9999;
+entity e;
+e.r = r;
+e.color = color;
+e.image = NULL;
+e.id = rand()%9999;
 
-	return e;
+return e;
 }
 */
 
@@ -69,9 +69,9 @@ void draw(entity o, rect camera) {
 		free(points);
 
 		/*
-		CNFGColor(o.color);
-		CNFGTackRectangle((o.r.x - camx) * scaling, (o.r.y - camy) * scaling, (o.r.w + o.r.x - camx) * scaling, (o.r.h + o.r.y - camy) * scaling);
-		*/
+		   CNFGColor(o.color);
+		   CNFGTackRectangle((o.r.x - camx) * scaling, (o.r.y - camy) * scaling, (o.r.w + o.r.x - camx) * scaling, (o.r.h + o.r.y - camy) * scaling);
+		   */
 
 		return;
 	}

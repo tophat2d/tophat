@@ -10,7 +10,7 @@ typedef struct image {
 	unsigned int bitcount;
 	unsigned int sizeimage;
 	uint32_t *content;
-					
+
 } img_t;
 
 int peekn(FILE *file, unsigned int n);

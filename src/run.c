@@ -20,7 +20,7 @@ int main() {
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");
-		return 1;	
+		return 1;
 	}
 
 	bind(umka);

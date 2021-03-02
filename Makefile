@@ -1,5 +1,5 @@
 build:
-	cc src/*.c src/img/*.c src/*.a -lm -lX11 -o tophat -Lsrc -lumka -L /lib64 -ldl
+	cc src/*.c src/img/*.c src/*.a -Wall -lm -lX11 -o tophat -Lsrc -lumka -L /lib64 -ldl
 
 run: build
 	./tophat
