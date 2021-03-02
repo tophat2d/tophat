@@ -30,7 +30,7 @@ void parsebmp(char path[], img_t *img) {
 	while ((cb = fgetc(f)) != EOF) {
 		c = ftell(f);
 
-		printf("current byte: %d\n", c);
+		printf("current byte: %ld\n", c);
 
 		switch (c) {
 		case 2:
@@ -65,7 +65,7 @@ void parsebmp(char path[], img_t *img) {
 				break;
 			}
 
-			printf("starting img parsing\n");			
+			printf("starting img parsing\n");
 
 			img->content = malloc(img->sizeimage * sizeof(uint32_t));
 
@@ -78,7 +78,7 @@ void parsebmp(char path[], img_t *img) {
 				number *= 256;
 				number += (uint32_t)cb;
 				counter++;
-				
+
 				if (counter >= 3) {
 					number *= 256;
 					number += 255;
@@ -88,7 +88,7 @@ void parsebmp(char path[], img_t *img) {
 					counter = 0;
 
 					pixelsum++;
-				}	
+				}
 
 
 			}

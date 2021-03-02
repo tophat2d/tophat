@@ -12,7 +12,6 @@ extern int entitycount;
 
 int collbyentity(entnode_t *a, entity *e) {
 	entnode_t *current, *next;
-	int result;	
 	int i = 0;
 	int coll;
 
@@ -29,7 +28,7 @@ int collbyentity(entnode_t *a, entity *e) {
 
 		current = next;
 		next = current->next;
-		
+
 		i++;
 
 		if (current->val == NULL) {
@@ -118,16 +117,16 @@ int linetoline(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
 }
 
 int polytopoint(poly *a, int px, int py) {
-	int result = 0;	
+	int result = 0;
 	int current, next;
 	int vcx, vnx, vcy, vny;
-	
+
 	next = 0;
 
 	for (current = 0; current <= a->vc*2; current += 2) {
 		next = current + 2;
 
-		if (next = a->vc*2) {
+		if (next == a->vc*2) {
 			next = 0;
 		}
 
@@ -135,7 +134,7 @@ int polytopoint(poly *a, int px, int py) {
 		vnx = a->v[next] + a->y;
 		vcy = a->v[current+1] + a->x;
 		vny = a->v[next+1] + a->y;
-		
+
 		// this is some kind of black magic i found on the internet.
 		if (((vcy >= py && vny < py) || (vcy < py && vny >= py)) && (px < (vnx-vcx)*(py-vcy) / (vny-vcy)+vcx)) {
 			result = !result;
