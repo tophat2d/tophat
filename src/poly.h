@@ -3,7 +3,7 @@
 
 #include "../lib/rawdraw/CNFG.h"
 
-// basic polygon structure. the v variable holds all the vertices. they are like this: [x, y, x, y, ...]
+// basic polygon structure. The v variable holds all the verities. They are like this: [x, y, x, y, ...]
 typedef struct {
 	int x;
 	int y;

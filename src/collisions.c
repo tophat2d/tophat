@@ -1,5 +1,5 @@
 //
-// largely inpired by (copied from :]) this guide: http://jeffreythompson.org/collision-detection/table_of_contents.php
+// largely inspired by (copied from :]) this guide: http://jeffreythompson.org/collision-detection/table_of_contents.php
 //
 #include "entity.h"
 #include <stdio.h>
@@ -135,7 +135,7 @@ int polytopoint(poly *a, int px, int py) {
 		vcy = a->v[current+1] + a->x;
 		vny = a->v[next+1] + a->y;
 
-		// this is some kind of black magic i found on the internet.
+		// this is some kind of black magic I found on the internet.
 		if (((vcy >= py && vny < py) || (vcy < py && vny >= py)) && (px < (vnx-vcx)*(py-vcy) / (vny-vcy)+vcx)) {
 			result = !result;
 		}
