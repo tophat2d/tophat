@@ -1,0 +1,17 @@
+// no, this is not a rust file. is just use python, because it has similar keywords to umka, so i can get syntax highlighting. when i finnish this, i will rename it
+
+import "umka/import/std.um"
+
+fn setup*(title: str, w, h: int)
+
+fn setbgcolor*(color: int)
+
+fn setcolor*(color: int)
+
+fn clearframe*()
+
+fn getdimensions*(): (int, int)
+
+fn swapbuffers*()
+
+fn handleinput*()

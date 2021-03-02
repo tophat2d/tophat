@@ -1,17 +1,17 @@
-import "umka/tophat.um"
+import "umka/rawdraw.um"
 
 fn game() {
 	var w, h: int;
 
-	tophat.cnfgsetup("Window from umka", 500, 500)
+	rawdraw.setup("Window from umka", 500, 500)
 
 	for true {
-		tophat.cnfgsetbgcolor(0xffffffff)
-		tophat.cnfgclearframe()
-		tophat.cnfghandleinput()
+		rawdraw.setbgcolor(0x00ffffff)
+		rawdraw.clearframe()
+		rawdraw.handleinput()
 
 
-		tophat.cnfgswapbuffers()	
+		rawdraw.swapbuffers()	
 	}
 }
 

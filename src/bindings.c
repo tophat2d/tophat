@@ -7,13 +7,13 @@
 #include "bindings.h"
 
 void bind(void *umka) {
-	umkaAddFunc(umka, "cnfgsetup", &umCNFGSetup);
-	umkaAddFunc(umka, "cnfgsetbgcolor", &umCNFGSetBgColor);
-	umkaAddFunc(umka, "cnfgsetcolor", &umCNFGSetColor);
-	umkaAddFunc(umka, "cnfgclearframe", &umCNFGClearFrame);
-	umkaAddFunc(umka, "cnfggetdimensions", &umCNFGGetDimensions);
-	umkaAddFunc(umka, "cnfgswapbuffers", &umCNFGSwapBuffers);
-	umkaAddFunc(umka, "cnfghandleinput", &umCNFGHandleInput);
+	umkaAddFunc(umka, "setup", &umCNFGSetup);
+	umkaAddFunc(umka, "setbgcolor", &umCNFGSetBgColor);
+	umkaAddFunc(umka, "setcolor", &umCNFGSetColor);
+	umkaAddFunc(umka, "clearframe", &umCNFGClearFrame);
+	umkaAddFunc(umka, "getdimensions", &umCNFGGetDimensions);
+	umkaAddFunc(umka, "swapbuffers", &umCNFGSwapBuffers);
+	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
 }
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
