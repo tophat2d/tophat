@@ -106,8 +106,8 @@ int polytoline(poly *a, int sx, int sy, int ex, int ey) {
 }
 
 int linetoline(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4) {
-  float uA = (float)((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
-  float uB = (float)((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+	float uA = (float)((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
+	float uB = (float)((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
 
 	if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
 		return 1;
@@ -144,59 +144,59 @@ int polytopoint(poly *a, int px, int py) {
 }
 
 /*
-int collbyentity(entnode_t *a, entity *e) {
-	int id, aid, x, y, w, h, ax, ay, aw, ah;
-	entnode_t *current, *next;
+   int collbyentity(entnode_t *a, entity *e) {
+   int id, aid, x, y, w, h, ax, ay, aw, ah;
+   entnode_t *current, *next;
 
-	id = e->id;
-	x = e->r.x;
-	y = e->r.y;
-	w = e->r.w;
-	h = e->r.h;
+   id = e->id;
+   x = e->r.x;
+   y = e->r.y;
+   w = e->r.w;
+   h = e->r.h;
 
-	next = a;
-	current = a;
+   next = a;
+   current = a;
 
-	while (next != NULL) {
+   while (next != NULL) {
 
-		if (current->val == NULL) {
-			next = current->next;
-			current = next;
-			continue;
-		}
+   if (current->val == NULL) {
+   next = current->next;
+   current = next;
+   continue;
+   }
 
-		aid = current->val->id;
-		ax = current->val->r.x;
-		ay = current->val->r.y;
-		ah = current->val->r.h;
-		aw = current->val->r.w;
+   aid = current->val->id;
+   ax = current->val->r.x;
+   ay = current->val->r.y;
+   ah = current->val->r.h;
+   aw = current->val->r.w;
 
-		next = current->next;
-		current = next;
+   next = current->next;
+   current = next;
 
-		if (id == aid) {
-			continue;
-		}
+   if (id == aid) {
+   continue;
+   }
 
-		if (x + w <= ax) {
-			continue;
-		}
+   if (x + w <= ax) {
+   continue;
+   }
 
-		if (y + h <= ay) {
-			continue;
-		}
+   if (y + h <= ay) {
+   continue;
+   }
 
-		if (x >= ax+aw) {
-			continue;
-		}
+   if (x >= ax+aw) {
+   continue;
+   }
 
-		if (y >= ay+ah) {
-			continue;
-		}
+   if (y >= ay+ah) {
+   continue;
+   }
 
-		return aid;
-	}
+   return aid;
+   }
 
-	return 0;
-}*/
+   return 0;
+   }*/
 
