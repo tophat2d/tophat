@@ -15,9 +15,9 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It still i
 ## umka bindings status
 
 - rawdraw
-    working: CNFGSetup, CNFGBgColor, CNFGColor, CNFGClearFrame, CNFGSwapBuffers
-    issues: CNFGGetDimensions - segfaults in the umkavm
-    notes: I do not play on making full rawdraw bindings. these will only support stuff such as making a window. rest will be done through the engine.
+  - working: CNFGSetup, CNFGBgColor, CNFGColor, CNFGClearFrame, CNFGSwapBuffers
+  - issues: CNFGGetDimensions - segfaults in the umkavm
+  - notes: I do not play on making full rawdraw bindings. these will only support stuff such as making a window. rest will be done through the engine.
 - engine - nearly nothing
 
 ## TODO
