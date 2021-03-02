@@ -1,9 +1,14 @@
-import "umka/rawdraw.um"
+import (
+	"umka/rawdraw.um"
+	"umka/poly.um"
+)
 
 fn game() {
 	var w, h: int;
 
 	rawdraw.setup("Window from umka", 500, 500)
+
+	p := poly.newpoly(0, 0, 20, 20, 10, 10, 5, 5, 3)
 
 	for true {
 		rawdraw.setbgcolor(0x00ffffff)

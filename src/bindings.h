@@ -5,6 +5,14 @@
 
 void bind(void *umka);
 
+void umentityfrompoly(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umpolydraw(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umnewpoly(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umpolysetpos(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGSetBgColor(UmkaStackSlot *p, UmkaStackSlot *r);

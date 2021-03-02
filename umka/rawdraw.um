@@ -1,6 +1,4 @@
-// no, this is not a rust file. is just use python, because it has similar keywords to umka, so i can get syntax highlighting. when i finnish this, i will rename it
-
-import "umka/import/std.um"
+import "std/std.um"
 
 fn setup*(title: str, w, h: int)
 

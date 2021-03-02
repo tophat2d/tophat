@@ -1,0 +1,10 @@
+
+type ent int
+
+fn entityfrompoly(p: poly, color: int): ent
+
+fn (e ^ent) draw(cam: rect) {
+	centdraw(e, cam)
+}
+
+fn centdraw(e: ent, cam: rect)
