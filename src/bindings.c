@@ -9,9 +9,12 @@
 #include "poly.h"
 
 void bind(void *umka) {
+	// rectangles
+	umkaAddFunc(umka, "newrect", &umnewrect);
+				
 	// entities
-	umkaAddFunc(umka, "entityfrompoly", &umentityfrompoly);
-	umkaAddFunc(umka, "cpolydraw", &umpolydraw);
+	umkaAddFunc(umka, "entfrompoly", &umentityfrompoly);
+	umkaAddFunc(umka, "centdraw", &umentdraw);
 
 	// polygons
 	umkaAddFunc(umka, "newpoly", &umnewpoly);
@@ -27,10 +30,24 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
 }
 
-// entities
+// rectangles
+void umnewrect(UmkaStackSlot *p, UmkaStackSlot *r) {
+	rect *rc;
 
+	rc = malloc(sizeof(rect));
+
+	rc->x = p[3].intVal;
+	rc->y = p[2].intVal;
+	rc->w = p[1].intVal;
+	rc->h = p[0].intVal;
+
+	r[0].intVal = (intptr_t)rc;
+}
+
+// entities
 void umentityfrompoly(UmkaStackSlot *p, UmkaStackSlot *r) {
 	poly *pl = (poly *)p[0].intVal;
+	printf("%d\n", p[0].intVal);
 	uint32_t color = (uint32_t)p[0].intVal;
 
 	entity *e;
@@ -42,8 +59,11 @@ void umentityfrompoly(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r[0].intVal = (intptr_t)pl;
 }
 
-void umpolydraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	draw(*(entity *)p[1].intVal, *(rect *)p[0].intVal);
+void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
+	entity *e = (entity *)p[1].intVal;
+	rect *rc = (rect *)p[0].intVal;
+
+	draw(*e, *rc);
 }
 
 // polygons
@@ -63,7 +83,7 @@ void umnewpoly(UmkaStackSlot *p, UmkaStackSlot *r) {
 	}
 	pl->v = v;
 
-	r[0].intVal = (intptr_t)pl;
+	r[0].intVal = (int)pl;
 }
 
 void umpolysetpos(UmkaStackSlot *p, UmkaStackSlot *r) {

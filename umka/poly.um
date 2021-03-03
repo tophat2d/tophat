@@ -1,12 +1,13 @@
 
-type poly = int
+//type polygon* = int
 
-fn newpoly*(x, y: int, vertices: int..., verticecount: int): poly
+// this line causes the issue:
+fn newpoly*(x, y, vcount: int, v: []int): int
 
-fn (p ^poly) setpos*(x, y: int) {
+fn cpolysetpos(x, y: int, p: int)
+
+fn setpos*(p, x, y: int) {
 	cpolysetpos(x, y, p)
 }
-
-fn cpolysetpos(x, y: int, p: poly)
 
 //fn (p ^poly) getpos*(): (int, int)

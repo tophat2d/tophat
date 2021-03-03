@@ -1,10 +1,16 @@
 
-type ent int
+import (
+	"poly.um"
+	"rect.um"
+)
 
-fn entityfrompoly(p: poly, color: int): ent
+type ent* = int
 
-fn (e ^ent) draw(cam: rect) {
+fn entfrompoly*(p: int, color: int): ent
+
+fn centdraw(e: ent, cam: rect.rectangle)
+
+fn draw*(e: ent, cam: rect.rectangle) {
 	centdraw(e, cam)
 }
 
-fn centdraw(e: ent, cam: rect)

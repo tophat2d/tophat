@@ -1,0 +1,4 @@
+
+type rectangle* = int
+
+fn newrect*(x, y, w, h: int): rectangle
