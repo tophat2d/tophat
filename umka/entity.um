@@ -1,16 +1,31 @@
 
 import (
-	"poly.um"
-	"rect.um"
+	"polygon.um"
+	"scene.um"
+	"rectangle.um"
 )
 
-type ent* = int
-
-fn entfrompoly*(p: int, color: int): ent
-
-fn centdraw(e: ent, cam: rect.rectangle)
-
-fn draw*(e: ent, cam: rect.rectangle) {
-	centdraw(e, cam)
+type ent* = struct {
+	p: ^polygon.poly
+	image: []uint32	
+	color: uint32
+	id: int32
 }
 
+type cent = struct {
+	p: ^polygon.cpoly
+	image: ^uint32
+	color: uint32
+	id: int32
+}
+
+//fn (e: ^ent) getcoll(s: scene.scn)
+
+fn centdraw(e: cent, c: rectangle.rect)
+
+fn (e: ^ent) draw*(c: rectangle.rect) {
+	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.vc, e.p.w, e.p.h}
+	ce := cent{&cp, null, e.color, e.id}
+
+	centdraw(ce, c)
+}

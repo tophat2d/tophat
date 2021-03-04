@@ -1,0 +1,4 @@
+
+import "entity.um"
+
+//type scn* = []entity.ent

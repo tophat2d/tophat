@@ -5,15 +5,7 @@
 
 void bind(void *umka);
 
-void umnewrect(UmkaStackSlot *p, UmkaStackSlot *r);
-
-void umentityfrompoly(UmkaStackSlot *p, UmkaStackSlot *r);
-
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r);
-
-void umnewpoly(UmkaStackSlot *p, UmkaStackSlot *r);
-
-void umpolysetpos(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r);
 

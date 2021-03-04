@@ -9,16 +9,7 @@
 #include "poly.h"
 
 void bind(void *umka) {
-	// rectangles
-	umkaAddFunc(umka, "newrect", &umnewrect);
-				
-	// entities
-	umkaAddFunc(umka, "entfrompoly", &umentityfrompoly);
 	umkaAddFunc(umka, "centdraw", &umentdraw);
-
-	// polygons
-	umkaAddFunc(umka, "newpoly", &umnewpoly);
-	umkaAddFunc(umka, "cpolysetpos", &umpolysetpos);
 
 	// rawdraw
 	umkaAddFunc(umka, "setup", &umCNFGSetup);
@@ -30,68 +21,24 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
 }
 
-// rectangles
-void umnewrect(UmkaStackSlot *p, UmkaStackSlot *r) {
-	rect *rc;
-
-	rc = malloc(sizeof(rect));
-
-	rc->x = p[3].intVal;
-	rc->y = p[2].intVal;
-	rc->w = p[1].intVal;
-	rc->h = p[0].intVal;
-
-	r[0].intVal = (intptr_t)rc;
-}
-
-// entities
-void umentityfrompoly(UmkaStackSlot *p, UmkaStackSlot *r) {
-	poly *pl = (poly *)p[0].intVal;
-	printf("%d\n", p[0].intVal);
-	uint32_t color = (uint32_t)p[0].intVal;
-
-	entity *e;
-	e = malloc(sizeof(entity));
-
-	e->p = pl;
-	e->c = color;
-
-	r[0].intVal = (intptr_t)pl;
-}
-
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	entity *e = (entity *)p[1].intVal;
-	rect *rc = (rect *)p[0].intVal;
+	entity *e = (entity *)&p[1];
+	rect *rc = (rect *)&p[0];
 
-	draw(*e, *rc);
-}
-
-// polygons
-void umnewpoly(UmkaStackSlot *p, UmkaStackSlot *r) {
-	poly *pl;
-	pl = malloc(sizeof(poly));
-	int count = p[0].intVal * 2 + 3;
-	int *v;
-	v = malloc(sizeof(int) * count - 3);
-
-	pl->x = p[count-1].intVal;
-	pl->y = p[count-2].intVal;
-	pl->vc = count - 3;
-
-	for (int i=0; i < count - 3; i++) {
-		v[i] = p[i + 1].intVal;
+	if (e == NULL) {
+		printf("entity is null\n");
+		return;
 	}
-	pl->v = v;
 
-	r[0].intVal = (int)pl;
-}
+	printf("%d\n", rc->w);
 
-void umpolysetpos(UmkaStackSlot *p, UmkaStackSlot *r) {
-	poly *pl = (poly *)p[0].intVal;
+	if (rc->x == NULL) {
+		printf("rectangle is null\n");
+		return;
+	}
 
-	pl->y = p[1].intVal;
-	pl->x = p[2].intVal;
-}
+	//draw(*e, *rc);
+}	
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *title = (char *)p[2].ptrVal;

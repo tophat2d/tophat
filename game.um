@@ -1,8 +1,8 @@
 import (
 	"umka/rawdraw.um"
-	"umka/poly.um"
+	"umka/polygon.um"
 	"umka/entity.um"
-	"umka/rect.um"
+	"umka/rectangle.um"
 )
 
 fn game() {
@@ -10,18 +10,32 @@ fn game() {
 
 	rawdraw.setup("Window from umka", 500, 500)
 
-	p := poly.newpoly(0, 0, 3, []int{ 20, 20, 10, 10, 5, 5 })
-	cam := rect.newrect(60, 60, 120, 120)
-	e := entity.entfrompoly(p, 0x0)
+	p := polygon.poly{
+		x: 10,
+		y: 20,
+		v: []int32{20, 20, 10, 10, 0, 0},
+		vc: 3,
+		w: 20,
+		h: 20 }
 
-	printf("polygon: %d\n", p)
+	cam := rectangle.rect {
+		x: 10,
+		y: 10,
+		w: 40,
+		h: 40 }
+
+	e := entity.ent {
+		p: &p,
+		image: []uint32{0},
+		color: uint32(0xffff00ff),
+		id: 20 }
 
 	for true {
 		rawdraw.setbgcolor(0x00ffffff)
 		rawdraw.clearframe()
 		rawdraw.handleinput()
 
-		entity.draw(e, cam)
+		e.draw(cam)
 
 		rawdraw.swapbuffers()	
 	}

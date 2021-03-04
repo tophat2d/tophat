@@ -7,7 +7,6 @@
 
 typedef struct {
 	poly *p;
-	int c;
 	uint32_t *image;
 	uint32_t color;
 	int id;

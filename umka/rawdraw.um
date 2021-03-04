@@ -1,3 +1,5 @@
+// vim: filetype=rust
+
 import "std/std.um"
 
 fn setup*(title: str, w, h: int)
