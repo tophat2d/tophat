@@ -10,13 +10,15 @@ fn game() {
 
 	rawdraw.setup("Window from umka", 500, 500)
 
-	p := polygon.poly{
+/*	p := polygon.poly{
 		x: 10,
 		y: 20,
 		v: []int32{0, 0, 10, 10, 41, 20, 0, 20},
 		w: 42,
 		h: 43,
-		vc: 4 }
+		vc: 4 }*/
+
+	p := polygon.mk(0, 0, []int32{0, 0, 10, 10, 41, 20, 0, 20})
 
 	cam := rectangle.rect {
 		x: 10,
