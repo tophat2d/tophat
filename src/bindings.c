@@ -9,6 +9,8 @@
 #include "poly.h"
 
 void bind(void *umka) {
+	umkaAddFunc(umka, "debug", &umdebug);
+
 	umkaAddFunc(umka, "centdraw", &umentdraw);
 
 	// rawdraw
@@ -21,23 +23,37 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
 }
 
+void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
+	
+	entity *e = (entity *)&p[0];
+
+
+	//poly *pl = (poly *)&p[0];
+
+	//printf("x: %d, y: %d, vc: %d, v1x: %d, v1y: %d\n", pl->x, pl->y, pl->vc, &pl->v[0], &pl->v[1]);
+	//printf("comparison: %d, %d\n", pl->v, 0);//p[1].intVal);
+
+	printf("polyx: %d, polyy: %d, \n", e->p->x, e->p->y);
+
+	for (int i=0; i < e->p->vc * 2; i += 2) {
+		printf("x: %d, y: %d\n", e->p->v[i], e->p->v[i + 1]);
+	}
+
+	rect rc = newrect(20, 20, 100, 100);
+
+	draw(e, &rc);
+}
+
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	entity *e = (entity *)&p[1];
 	rect *rc = (rect *)&p[0];
 
-	if (e == NULL) {
-		printf("entity is null\n");
-		return;
-	}
+	//printf("polyx: %d, polyy: %d, \n", e->p->x, e->p->y);
 
-	printf("%d\n", rc->w);
+	/*for (int i=0; i < e->p->vc * 2; i += 2) {
+		printf("x: %d, y: %d\n", e->p->v[i], e->p->v[i + 1]);
+	}*/
 
-	if (rc->x == NULL) {
-		printf("rectangle is null\n");
-		return;
-	}
-
-	//draw(*e, *rc);
 }	
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {

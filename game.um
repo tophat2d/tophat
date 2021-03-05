@@ -13,10 +13,10 @@ fn game() {
 	p := polygon.poly{
 		x: 10,
 		y: 20,
-		v: []int32{20, 20, 10, 10, 0, 0},
-		vc: 3,
-		w: 20,
-		h: 20 }
+		v: []int32{0, 0, 10, 10, 41, 20, 0, 20},
+		w: 42,
+		h: 43,
+		vc: 4 }
 
 	cam := rectangle.rect {
 		x: 10,
@@ -27,7 +27,7 @@ fn game() {
 	e := entity.ent {
 		p: &p,
 		image: []uint32{0},
-		color: uint32(0xffff00ff),
+		color: 0xff00ffff,
 		id: 20 }
 
 	for true {

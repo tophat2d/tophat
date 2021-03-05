@@ -46,26 +46,32 @@ entity entityfromimage(char path[]) {
 	return e;
 }
 
-void draw(entity o, rect camera) {
+void draw(entity *o, rect *camera) {
 	int camx, camy;
-	camx = camera.x - (camera.w / 2);
-	camy = camera.y - (camera.h / 2);
+	camx = camera->x - (camera->w / 2);
+	camy = camera->y - (camera->h / 2);
+
+	printf("id: %d, cam pos: %d\n", o->id, camera->x);
 
 	// it returns only if rect doesn't collide with camera.
-	if (o.p->x + o.p->w < camx || o.p->x > camx + camera.w) {
+	if (o->p->x + o->p->w < camx || o->p->x > camx + camera->w) {
+		printf("returning 1\n");
 		return;
 	}
 
-	if (o.p->y + o.p->h < camy || o.p->y > camy + camera.h) {
+	if (o->p->y + o->p->h < camy || o->p->y > camy + camera->h) {
+		printf("returning 2\n");
 		return;
 	}
 
-	if (o.image == NULL) {
+	if (1 == 1) {
 		RDPoint *points;
 
-		points = polytordpoint(o.p, camx, camy);
-		CNFGColor(o.color);
-		CNFGTackPoly(points, o.p->vc);
+		printf("drawing\n");
+
+		points = polytordpoint(o->p, camx, camy);
+		CNFGColor(o->color);
+		CNFGTackPoly(points, o->p->vc);
 		free(points);
 
 		/*
@@ -75,6 +81,8 @@ void draw(entity o, rect camera) {
 
 		return;
 	}
+
+	printf("how did we get here\n");
 
 	//CNFGBlitImage(o.image, o.r.x, o.r.y, o.r.w, o.r.h);
 }
