@@ -51,38 +51,25 @@ void draw(entity *o, rect *camera) {
 	camx = camera->x - (camera->w / 2);
 	camy = camera->y - (camera->h / 2);
 
-	printf("id: %d, cam pos: %d\n", o->id, camera->x);
-
 	// it returns only if rect doesn't collide with camera.
 	if (o->p->x + o->p->w < camx || o->p->x > camx + camera->w) {
-		printf("returning 1\n");
 		return;
 	}
 
 	if (o->p->y + o->p->h < camy || o->p->y > camy + camera->h) {
-		printf("returning 2\n");
 		return;
 	}
 
-	if (1 == 1) {
+	if (o->image == NULL) {
 		RDPoint *points;
-
-		printf("drawing\n");
 
 		points = polytordpoint(o->p, camx, camy);
 		CNFGColor(o->color);
 		CNFGTackPoly(points, o->p->vc);
 		free(points);
 
-		/*
-		   CNFGColor(o.color);
-		   CNFGTackRectangle((o.r.x - camx) * scaling, (o.r.y - camy) * scaling, (o.r.w + o.r.x - camx) * scaling, (o.r.h + o.r.y - camy) * scaling);
-		   */
-
 		return;
 	}
-
-	printf("how did we get here\n");
 
 	//CNFGBlitImage(o.image, o.r.x, o.r.y, o.r.w, o.r.h);
 }

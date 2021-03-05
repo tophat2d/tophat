@@ -24,44 +24,25 @@ void bind(void *umka) {
 }
 
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
-	
-	entity *e = (entity *)&p[0];
-
-
-	//poly *pl = (poly *)&p[0];
-
-	//printf("x: %d, y: %d, vc: %d, v1x: %d, v1y: %d\n", pl->x, pl->y, pl->vc, &pl->v[0], &pl->v[1]);
-	//printf("comparison: %d, %d\n", pl->v, 0);//p[1].intVal);
-
-	printf("polyx: %d, polyy: %d, \n", e->p->x, e->p->y);
+	// prints polygon
+	/*printf("polyx: %d, polyy: %d, \n", e->p->x, e->p->y);
 
 	for (int i=0; i < e->p->vc * 2; i += 2) {
 		printf("x: %d, y: %d\n", e->p->v[i], e->p->v[i + 1]);
-	}
-
-	rect rc = newrect(20, 20, 100, 100);
-
-	draw(e, &rc);
+	}*/
 }
 
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	entity *e = (entity *)&p[1];
 	rect *rc = (rect *)&p[0];
+	entity *e = rc + sizeof(p)/sizeof(UmkaStackSlot); // this is weird solution, but it seems to work for now. TODO
 
-	//printf("polyx: %d, polyy: %d, \n", e->p->x, e->p->y);
-
-	/*for (int i=0; i < e->p->vc * 2; i += 2) {
-		printf("x: %d, y: %d\n", e->p->v[i], e->p->v[i + 1]);
-	}*/
-
+	draw(e, rc);
 }	
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *title = (char *)p[2].ptrVal;
 	int w = p[1].intVal;
 	int h = p[0].intVal;
-
-	printf("w: %d, h: %d\n", w, h);
 
 	int res = CNFGSetup(title, w, h);
 

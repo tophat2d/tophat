@@ -29,10 +29,5 @@ fn (e: ^ent) draw*(c: rectangle.rect) {
 	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
 	ce := cent{&cp, null, e.color, e.id}
 
-	//debug(cp)
-	debug(ce)
-
-	//printf("%d, %d", int(&e.p.v[0]), int(&e.p.v[1]))
-
 	centdraw(ce, c)
 }
