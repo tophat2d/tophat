@@ -18,7 +18,9 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It still i
   - working: CNFGSetup, CNFGBgColor, CNFGColor, CNFGClearFrame, CNFGSwapBuffers
   - issues: CNFGGetDimensions - segfaults in the umkavm
   - notes: I do not play on making full rawdraw bindings. these will only support stuff such as making a window. rest will be done through the engine.
-- engine - nearly nothing
+- engine
+  - rectangles
+  - issues: entities have problem transfering between c and umka. it doesn't make sense. why doesn't it work? [this video may help](https://www.youtube.com/watch?v=mciB1RU4At8).
 
 ## TODO
 

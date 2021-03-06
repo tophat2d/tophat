@@ -17,6 +17,7 @@ int main() {
 	void *umka = umkaAlloc();
 	int umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	int gamefunc = 0;
+	scaling = 1;
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");

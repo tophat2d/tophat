@@ -46,32 +46,27 @@ entity entityfromimage(char path[]) {
 	return e;
 }
 
-void draw(entity o, rect camera) {
+void draw(entity *o, rect *camera) {
 	int camx, camy;
-	camx = camera.x - (camera.w / 2);
-	camy = camera.y - (camera.h / 2);
+	camx = camera->x - (camera->w / 2);
+	camy = camera->y - (camera->h / 2);
 
 	// it returns only if rect doesn't collide with camera.
-	if (o.p->x + o.p->w < camx || o.p->x > camx + camera.w) {
+	if (o->p->x + o->p->w < camx || o->p->x > camx + camera->w) {
 		return;
 	}
 
-	if (o.p->y + o.p->h < camy || o.p->y > camy + camera.h) {
+	if (o->p->y + o->p->h < camy || o->p->y > camy + camera->h) {
 		return;
 	}
 
-	if (o.image == NULL) {
+	if (o->image == NULL) {
 		RDPoint *points;
 
-		points = polytordpoint(o.p, camx, camy);
-		CNFGColor(o.color);
-		CNFGTackPoly(points, o.p->vc);
+		points = polytordpoint(o->p, camx, camy);
+		CNFGColor(o->color);
+		CNFGTackPoly(points, o->p->vc);
 		free(points);
-
-		/*
-		   CNFGColor(o.color);
-		   CNFGTackRectangle((o.r.x - camx) * scaling, (o.r.y - camy) * scaling, (o.r.w + o.r.x - camx) * scaling, (o.r.h + o.r.y - camy) * scaling);
-		   */
 
 		return;
 	}

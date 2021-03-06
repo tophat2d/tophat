@@ -7,7 +7,6 @@
 
 typedef struct {
 	poly *p;
-	int c;
 	uint32_t *image;
 	uint32_t color;
 	int id;
@@ -20,6 +19,6 @@ typedef struct entnode {
 
 entity entityfrompoly(poly *p, uint32_t color);
 entity entityfromimage(char path[]);
-void draw(entity o, rect cam);
+void draw(entity *o, rect *cam);
 
 #endif

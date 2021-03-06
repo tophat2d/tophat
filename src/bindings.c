@@ -1,12 +1,19 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "tophat.h"
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 
 #include "bindings.h"
+#include "poly.h"
 
 void bind(void *umka) {
+	umkaAddFunc(umka, "debug", &umdebug);
+
+	umkaAddFunc(umka, "centdraw", &umentdraw);
+
+	// rawdraw
 	umkaAddFunc(umka, "setup", &umCNFGSetup);
 	umkaAddFunc(umka, "setbgcolor", &umCNFGSetBgColor);
 	umkaAddFunc(umka, "setcolor", &umCNFGSetColor);
@@ -16,12 +23,26 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
 }
 
+void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
+	// prints polygon
+	/*printf("polyx: %d, polyy: %d, \n", e->p->x, e->p->y);
+
+	for (int i=0; i < e->p->vc * 2; i += 2) {
+		printf("x: %d, y: %d\n", e->p->v[i], e->p->v[i + 1]);
+	}*/
+}
+
+void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
+	rect *rc = (rect *)&p[0];
+	entity *e = rc + sizeof(p)/sizeof(UmkaStackSlot); // this is weird solution, but it seems to work for now. TODO
+
+	draw(e, rc);
+}	
+
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *title = (char *)p[2].ptrVal;
 	int w = p[1].intVal;
 	int h = p[0].intVal;
-
-	printf("w: %d, h: %d\n", w, h);
 
 	int res = CNFGSetup(title, w, h);
 
