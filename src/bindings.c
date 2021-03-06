@@ -64,10 +64,14 @@ void umCNFGClearFrame(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGGetDimensions(UmkaStackSlot *p, UmkaStackSlot *r) {
-	short w, h;
-	CNFGGetDimensions(&w, &h);
-	r[0].intVal = (int)h;
-	r[1].intVal = (int)w;
+	int *w = p[1].ptrVal;
+	int *h = p[0].ptrVal;
+	short ws, hs;
+
+	CNFGGetDimensions(&ws, &hs);
+
+	*w = ws;
+	*h = hs;
 }
 
 void umCNFGSwapBuffers(UmkaStackSlot *p, UmkaStackSlot *r) {

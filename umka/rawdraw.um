@@ -1,5 +1,3 @@
-// vim: filetype=rust
-
 import "std/std.um"
 
 fn setup*(title: str, w, h: int)
@@ -10,7 +8,7 @@ fn setcolor*(color: int)
 
 fn clearframe*()
 
-fn getdimensions*(): (int, int)
+fn getdimensions*(w, h: ^int32)
 
 fn swapbuffers*()
 

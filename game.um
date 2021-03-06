@@ -3,12 +3,11 @@ import (
 	"umka/polygon.um"
 	"umka/entity.um"
 	"umka/rectangle.um"
+	"umka/tophat.um"
 )
 
 fn game() {
-	var w, h: int;
-
-	rawdraw.setup("Window from umka", 500, 500)
+	tophat.setup("test game")
 
 /*	p := polygon.poly{
 		x: 10,
@@ -32,14 +31,12 @@ fn game() {
 		color: 0xff00ffff,
 		id: 20 }
 
+	var w, h: int32
+
 	for true {
-		rawdraw.setbgcolor(0x00ffffff)
-		rawdraw.clearframe()
-		rawdraw.handleinput()
+		tophat.cycle(&w, &h, 0xffffebff)
 
 		e.draw(cam)
-
-		rawdraw.swapbuffers()	
 	}
 }
 
