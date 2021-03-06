@@ -8,6 +8,8 @@
 #include "bindings.h"
 #include "poly.h"
 
+extern float scaling;
+
 void bind(void *umka) {
 	umkaAddFunc(umka, "debug", &umdebug);
 
@@ -21,6 +23,7 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "getdimensions", &umCNFGGetDimensions);
 	umkaAddFunc(umka, "swapbuffers", &umCNFGSwapBuffers);
 	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
+	umkaAddFunc(umka, "updatescaling", &umgetscaling);
 }
 
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -81,3 +84,17 @@ void umCNFGSwapBuffers(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umCNFGHandleInput(UmkaStackSlot *p, UmkaStackSlot *r) {
 	CNFGHandleInput();
 }
+
+void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int camh = p[0].intVal;
+	int camw = p[1].intVal;
+	int h = p[2].intVal;
+	int w = p[3].intVal;
+
+	if ((float)w/camw < (float)h/camh) {
+		scaling = ((float)w/camw);
+	} else {
+		scaling = ((float)h/camh);
+	}
+}
+

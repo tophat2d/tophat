@@ -11,7 +11,7 @@ void HandleButton( int x, int y, int button, int bDown ) { }
 void HandleMotion( int x, int y, int mask ) { }
 void HandleDestroy() { }
 
-int scaling;
+float scaling;
 
 int main() {
 	void *umka = umkaAlloc();

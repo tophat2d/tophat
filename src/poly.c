@@ -7,7 +7,7 @@
 
 #include "poly.h"
 
-extern int scaling;
+extern float scaling;
 
 poly *newpoly(int px, int py, int vertnum, ...) {
 	int mx, my;

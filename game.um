@@ -9,21 +9,13 @@ import (
 fn game() {
 	tophat.setup("test game")
 
-/*	p := polygon.poly{
-		x: 10,
-		y: 20,
-		v: []int32{0, 0, 10, 10, 41, 20, 0, 20},
-		w: 42,
-		h: 43,
-		vc: 4 }*/
-
 	p := polygon.mk(0, 0, []int32{0, 0, 10, 10, 41, 20, 0, 20})
 
 	cam := rectangle.rect {
 		x: 10,
 		y: 10,
-		w: 40,
-		h: 40 }
+		w: 80,
+		h: 80 }
 
 	e := entity.ent {
 		p: &p,
@@ -34,7 +26,7 @@ fn game() {
 	var w, h: int32
 
 	for true {
-		tophat.cycle(&w, &h, 0xffffebff)
+		tophat.cycle(&w, &h, 0x000000ff, cam)
 
 		e.draw(cam)
 	}

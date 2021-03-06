@@ -9,7 +9,7 @@
 #include "rect.h"
 #include "poly.h"
 
-extern int scaling;
+extern float scaling;
 
 entity entityfrompoly(poly *p, uint32_t color) {
 	entity e;

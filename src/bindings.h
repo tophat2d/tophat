@@ -23,4 +23,6 @@ void umCNFGSwapBuffers(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGHandleInput(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r);
+
 #endif

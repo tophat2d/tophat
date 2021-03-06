@@ -1,6 +1,7 @@
 
 import (
 	"rawdraw.um"
+	"rectangle.um"
 )
 
 fn setup*(title: str) {
@@ -9,10 +10,16 @@ fn setup*(title: str) {
 	rawdraw.clearframe()
 }
 
-fn cycle*(w, h: ^int32, bgcolor: uint32) {
+fn updatescaling(w, h, camw, camh: int32)
+
+fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 	rawdraw.swapbuffers()
 	rawdraw.setbgcolor(bgcolor)
 	rawdraw.clearframe()
 	rawdraw.handleinput()
 	rawdraw.getdimensions(w, h)
+	var ws, hs: int32
+	rawdraw.getdimensions(&ws, &hs)
+
+	updatescaling(ws, hs, cam.w, cam.h)
 }
