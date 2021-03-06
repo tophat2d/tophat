@@ -5,3 +5,14 @@ type rect* = struct {
 	w: int32
 	h: int32
 }
+
+fn mk*(x, y, w, h: int32): rect {
+	var r: rect
+
+	r.x = x
+	r.y = y
+	r.w = w
+	r.h = h
+
+	return r
+}
