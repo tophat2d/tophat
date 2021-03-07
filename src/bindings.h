@@ -9,6 +9,8 @@ void umdebug(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGSetBgColor(UmkaStackSlot *p, UmkaStackSlot *r);

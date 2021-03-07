@@ -9,28 +9,37 @@ import (
 fn game() {
 	tophat.setup("test game")
 
+
+	s := []^entity.ent{}
+
 	p := polygon.mk(0, 0, []int32{0, 0, 10, 10, 41, 20, 0, 20})
 
-	/*cam := rectangle.rect {
-		x: 10,
-		y: 10,
-		w: 80,
-		h: 80 }*/
-
-	cam := rectangle.mk(10, 10, 80, 80)
-
-	e := entity.ent {
+	player := entity.ent {
 		p: &p,
 		image: []uint32{0},
 		color: 0xff00ffff,
 		id: 20 }
+	
+	cam := rectangle.mk(10, 10, 80, 80)
+
+	objp := polygon.mk(5, -2, []int32{0, 0, 50, 50, 20, 10, 4, 8})
+	obj := entity.ent{&objp, []uint32{0}, 0x0000ffff, 10}
+
+	s = append(s, []^entity.ent{&player, &obj})
 
 	var w, h: int32
+
+	var coll: int32
 
 	for true {
 		tophat.cycle(&w, &h, 0x000000ff, cam)
 
-		e.draw(cam)
+		player.draw(cam)
+		obj.draw(cam)
+		coll = player.getcoll(s)
+		if coll > 0 {
+			printf("coll with %d\n", coll)
+		}
 	}
 }
 

@@ -1,7 +1,6 @@
 
 import (
 	"polygon.um"
-	"scene.um"
 	"rectangle.um"
 )
 
@@ -21,6 +20,13 @@ type cent = struct {
 
 //fn (e: ^ent) getcoll(s: scene.scn)
 
+fn tocent(e: ^ent): cent {
+	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
+	ce := cent{&cp, null, e.color, e.id}
+
+	return ce
+}
+
 fn centdraw(e: cent, c: rectangle.rect)
 
 fn debug(c: cent)
@@ -30,4 +36,16 @@ fn (e: ^ent) draw*(c: rectangle.rect) {
 	ce := cent{&cp, null, e.color, e.id}
 
 	centdraw(ce, c)
+}
+
+fn cgetcoll(count: int32, e: cent, s: ^cent): int32
+
+fn (e: ^ent) getcoll*(s: []^ent): int32 {
+	cscn := []cent{}
+
+	for e in s {
+		cscn = append(cscn, []cent{tocent(e)})
+	}
+
+	return cgetcoll(len(cscn), tocent(e), &cscn[0])
 }
