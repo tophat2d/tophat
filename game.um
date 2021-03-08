@@ -36,7 +36,6 @@ fn game() {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
 		if input.ispressed("w") {
-			printf("w is pressed\n")
 		}
 
 		if input.isjustpressed("s") {

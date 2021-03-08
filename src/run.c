@@ -28,7 +28,6 @@ void HandleKey(int keycode, int bDown) {
 		return;
 	}
 
-	printf("pass through\n");
 	justpressed[keycode] = 0;
 }
 void HandleButton( int x, int y, int button, int bDown ) { }
