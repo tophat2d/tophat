@@ -32,7 +32,7 @@ fn game() {
 	var coll: int32
 
 	for true {
-		tophat.cycle(&w, &h, 0x000000ff, cam)
+		tophat.cycle(&w, &h, 0xffffffff, cam)
 
 		player.draw(cam)
 		obj.draw(cam)

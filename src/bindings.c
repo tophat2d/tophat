@@ -16,6 +16,9 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "centdraw", &umentdraw);
 	umkaAddFunc(umka, "cgetcoll", &umgetcoll);
 
+	// misc
+	umkaAddFunc(umka, "visualizecam", &umvisualizecam);
+
 	// rawdraw
 	umkaAddFunc(umka, "setup", &umCNFGSetup);
 	umkaAddFunc(umka, "setbgcolor", &umCNFGSetBgColor);
@@ -63,6 +66,15 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 		}
 	}
 	r->intVal = 0;
+}
+
+void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int w = p[2].intVal;
+	int h = p[1].intVal;
+	int color = p[0].uintVal;
+
+	CNFGColor((uint32_t)color);
+	CNFGTackRectangle(0, 0, w * scaling, h * scaling);
 }
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {

@@ -19,8 +19,7 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It still i
   - issues: CNFGGetDimensions - segfaults in the umkavm
   - notes: I do not play on making full rawdraw bindings. these will only support stuff such as making a window. rest will be done through the engine.
 - engine
-  - working: rectangles, polygons, entities
-  - issues: collisions - problem with arrays or something
+  - working: rectangles, polygons, entities, collisions
 
 ## TODO
 
