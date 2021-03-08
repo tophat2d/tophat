@@ -7,6 +7,10 @@ void bind(void *umka);
 
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umispressed(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);

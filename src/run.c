@@ -6,18 +6,45 @@
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"
 
-void HandleKey( int keycode, int bDown ) { }
+float scaling;
+int *pressed;
+int *justpressed;
+
+void HandleKey(int keycode, int bDown) {
+	if (keycode > 255) {
+		//TODO: switch case with another options
+		return;
+	}
+
+	if (!bDown) {
+		pressed[keycode] = 0;
+		justpressed[keycode] = 0;
+		return;
+	}
+
+	if (!pressed[keycode]) {
+		pressed[keycode] = 1;
+		justpressed[keycode] = 1;
+		return;
+	}
+
+	printf("pass through\n");
+	justpressed[keycode] = 0;
+}
 void HandleButton( int x, int y, int button, int bDown ) { }
 void HandleMotion( int x, int y, int mask ) { }
 void HandleDestroy() { }
-
-float scaling;
 
 int main() {
 	void *umka = umkaAlloc();
 	int umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	int gamefunc = 0;
 	scaling = 1;
+
+	int pa[255];
+	int jpa[255];
+	pressed = &pa[0];
+	justpressed = &jpa[0];
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");

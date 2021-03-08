@@ -4,6 +4,7 @@ import (
 	"umka/entity.um"
 	"umka/rectangle.um"
 	"umka/tophat.um"
+	"umka/input.um"
 )
 
 fn game() {
@@ -34,11 +35,19 @@ fn game() {
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
+		if input.ispressed("w") {
+			printf("w is pressed\n")
+		}
+
+		if input.isjustpressed("s") {
+			printf("s is just pressed\n")
+		}
+
 		player.draw(cam)
 		obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
-			printf("coll with %d\n", coll)
+			//printf("coll with %d\n", coll)
 		}
 		rawdraw.drawtext("sample text", 10, 10, 0x000000ff, 1)
 	}

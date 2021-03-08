@@ -9,10 +9,18 @@
 #include "poly.h"
 
 extern float scaling;
+extern int *pressed;
+extern int *justpressed;
 
 void bind(void *umka) {
+	// etc
 	umkaAddFunc(umka, "debug", &umdebug);
+	
+	// input
+	umkaAddFunc(umka, "cispressed", &umispressed);
+	umkaAddFunc(umka, "cisjustpressed", &umisjustpressed);
 
+	// entities
 	umkaAddFunc(umka, "centdraw", &umentdraw);
 	umkaAddFunc(umka, "cgetcoll", &umgetcoll);
 
@@ -31,6 +39,7 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "updatescaling", &umgetscaling);
 }
 
+// etc
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
 	// prints polygon
 	/*printf("polyx: %d, polyy: %d, \n", e->p->x, e->p->y);
@@ -40,6 +49,22 @@ void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
 	}*/
 }
 
+// input
+void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int keycode = p[0].intVal;
+
+	//printf("%d\n", pressed[keycode]);
+
+	r[0].intVal = pressed[keycode];
+}
+
+void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int keycode = p[0].intVal;
+
+	r[0].intVal = justpressed[keycode];
+}
+
+// entities
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	rect *rc = (rect *)&p[0];
 	entity *e = rc + sizeof(UmkaStackSlot *)/sizeof(UmkaStackSlot); // this is weird solution, but it seems to work for now. TODO
@@ -69,6 +94,7 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = 0;
 }
 
+// misc
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int w = p[2].intVal;
 	int h = p[1].intVal;
@@ -78,6 +104,7 @@ void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
 	CNFGTackRectangle(0, 0, w * scaling, h * scaling);
 }
 
+// rawdraw
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	float size = p[0].realVal;
 	uint32_t color = (uint32_t)p[1].uintVal;

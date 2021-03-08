@@ -2,6 +2,7 @@
 import (
 	"rawdraw.um"
 	"rectangle.um"
+	"input.um"
 )
 
 fn setup*(title: str) {

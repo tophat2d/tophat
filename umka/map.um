@@ -1,0 +1,43 @@
+
+import "std/std.um"
+
+type mp* = struct {
+	size: int
+	vals: []str
+}
+
+fn mk*(size: int): mp {
+	vals := make([]str, size)
+	m := mp{size, []str{}}
+	return m
+}
+
+fn hash(s: str, size: int): int {
+	var val: int
+
+	for c in s {
+		val += (uint32(c) * 238) % size
+	}
+
+	return val
+}
+
+fn (m: ^mp) setstr*(key, val: str) {
+	m.vals[hash(key, m.size)] = val
+}
+
+fn (m: ^mp) setint*(key: str, val: int) {
+	m.setstr(key, std.itoa(val))
+}
+
+fn (m: ^mp) getstr*(key: str): str {
+	return m.vals[hash(key, m.size)]
+}
+
+fn (m: ^mp) getint*(key: str): int {
+	return std.atoi(m.getstr(key))
+}
+
+fn (m: ^mp) delete*(key: str) {
+	m.vals[hash(key, m.size)] = ""
+}
