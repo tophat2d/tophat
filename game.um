@@ -23,7 +23,7 @@ fn game() {
 	cam := rectangle.mk(10, 10, 80, 80)
 
 	objp := polygon.mk(5, -2, []int32{0, 0, 50, 50, 20, 10, 4, 8})
-	obj := entity.ent{&objp, []uint32{0}, 0x0000ffff, 10}
+	obj := entity.ent{&objp, []uint32{0}, 0x0000ebff, 10}
 
 	s = append(s, []^entity.ent{&player, &obj})
 

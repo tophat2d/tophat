@@ -38,34 +38,31 @@ void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	rect *rc = (rect *)&p[0];
-	entity *e = rc + sizeof(p)/sizeof(UmkaStackSlot); // this is weird solution, but it seems to work for now. TODO
+	entity *e = rc + sizeof(UmkaStackSlot *)/sizeof(UmkaStackSlot); // this is weird solution, but it seems to work for now. TODO
 
 	draw(e, rc);
 }
 
 void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	entity *scene = (entity *)p[0].ptrVal;
-	entity *e = (entity *)&p[1];
+	entity *e = (entity *)p[1].ptrVal;
 	int count = p[2].intVal;
 	int coll;
 
-	printf("%X, %X\n", scene[0].color, scene[1].p->x);
+	//printf("%d, %X, %d\n", e->p->x, e->color, sizeof(poly *));
 
 	for (int i=0; i < count; i++) {
-		printf("iteration %d\n", i);
 		if (e->id == scene[i].id) {
-			printf("returned because of same id\n");
 			continue;
 		}
 
 		coll = polytopoly(scene[i].p, e->p);
 		if (coll) {
-			printf("collsion valid");
-			r[0].intVal = coll;
-			break;
+			r->intVal = scene[i].id;
+			return;
 		}
 	}
-	r[0].intVal = 0;
+	r->intVal = 0;
 }
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {

@@ -38,14 +38,18 @@ fn (e: ^ent) draw*(c: rectangle.rect) {
 	centdraw(ce, c)
 }
 
-fn cgetcoll(count: int32, e: cent, s: ^cent): int32
+fn cgetcoll(count: int32, e: ^cent, s: ^cent): int32
 
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	cscn := []cent{}
 
 	for e in s {
-		cscn = append(cscn, []cent{tocent(e)})
+		cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
+		ce := cent{&cp, null, e.color, e.id}
+		cscn = append(cscn, []cent{ce})
 	}
 
-	return cgetcoll(len(cscn), tocent(e), &cscn[0])
+	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
+	ce := cent{&cp, null, e.color, e.id}
+	return cgetcoll(len(cscn), &ce, &cscn[0])
 }
