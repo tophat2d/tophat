@@ -5,6 +5,8 @@ import (
 	"input.um"
 )
 
+fn sleep*(t: int)
+
 fn setup*(title: str) {
 	rawdraw.setup(title, 500, 500)
 	rawdraw.setbgcolor(0x000000ff)

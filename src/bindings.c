@@ -25,6 +25,7 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "cgetcoll", &umgetcoll);
 
 	// misc
+	umkaAddFunc(umka, "sleep", &umsleep);
 	umkaAddFunc(umka, "visualizecam", &umvisualizecam);
 
 	// rawdraw
@@ -96,6 +97,13 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 // misc
+
+void umsleep(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int t = p[0].intVal;
+
+	slp(t);
+}
+
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int w = p[2].intVal;
 	int h = p[1].intVal;

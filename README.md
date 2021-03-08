@@ -24,7 +24,7 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It still i
 
 Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
-- fix just pressed function
+- fix cpu usage (i know, what the problem is, just have to wait for a fix in rawdraw)
 - image operation (scaling, flipping, rotating)
 - sounds
 - build tool

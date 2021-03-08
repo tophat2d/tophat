@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 #define CNFG_IMPLEMENTATION
-#define CNFGRASTERIZER
+#define CNFRASTERIZER
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"

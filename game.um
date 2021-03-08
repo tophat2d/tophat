@@ -10,7 +10,6 @@ import (
 fn game() {
 	tophat.setup("test game")
 
-
 	s := []^entity.ent{}
 
 	p := polygon.mk(0, 0, []int32{0, 0, 10, 10, 41, 20, 0, 20})
@@ -23,7 +22,7 @@ fn game() {
 	
 	cam := rectangle.mk(10, 10, 80, 80)
 
-	objp := polygon.mk(5, -2, []int32{0, 0, 50, 50, 20, 10, 4, 8})
+	objp := polygon.mk(-20, 20, []int32{0, 0, 50, 50, 20, 10, 4, 8})
 	obj := entity.ent{&objp, []uint32{0}, 0x0000ebff, 10}
 
 	s = append(s, []^entity.ent{&player, &obj})
@@ -36,10 +35,11 @@ fn game() {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
 		if input.ispressed("w") {
+			//printf("w is pressed\n")
 		}
 
-		if input.isjustpressed("s") {
-			printf("s is just pressed\n")
+		if input.isjustpressed("q") {
+			return
 		}
 
 		player.draw(cam)

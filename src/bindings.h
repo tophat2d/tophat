@@ -15,6 +15,8 @@ void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umsleep(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r);
