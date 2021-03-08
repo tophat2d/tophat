@@ -80,12 +80,14 @@ void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	float size = p[0].realVal;
-	int y = (int)p[1].intVal;
-	int x = (int)p[2].intVal;
-	char *text = (char *)p[3].ptrVal;
+	uint32_t color = (uint32_t)p[1].uintVal;
+	int y = (int)p[2].intVal;
+	int x = (int)p[3].intVal;
+	char *text = (char *)p[4].ptrVal;
 
 	CNFGPenX = x;
 	CNFGPenY = y;
+	CNFGColor(color);
 	CNFGDrawText(text, size * scaling);
 }
 
