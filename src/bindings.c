@@ -20,6 +20,7 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "visualizecam", &umvisualizecam);
 
 	// rawdraw
+	umkaAddFunc(umka, "drawtext", &umdrawtext);
 	umkaAddFunc(umka, "setup", &umCNFGSetup);
 	umkaAddFunc(umka, "setbgcolor", &umCNFGSetBgColor);
 	umkaAddFunc(umka, "setcolor", &umCNFGSetColor);
@@ -75,6 +76,17 @@ void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	CNFGColor((uint32_t)color);
 	CNFGTackRectangle(0, 0, w * scaling, h * scaling);
+}
+
+void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
+	float size = p[0].realVal;
+	int y = (int)p[1].intVal;
+	int x = (int)p[2].intVal;
+	char *text = (char *)p[3].ptrVal;
+
+	CNFGPenX = x;
+	CNFGPenY = y;
+	CNFGDrawText(text, size * scaling);
 }
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {

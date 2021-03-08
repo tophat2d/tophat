@@ -1,5 +1,7 @@
 import "std/std.um"
 
+fn drawtext*(text: str, x: int32, y: int32, size: real32)
+
 fn setup*(title: str, w, h: int)
 
 fn setbgcolor*(color: int)

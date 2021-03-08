@@ -40,6 +40,7 @@ fn game() {
 		if coll > 0 {
 			printf("coll with %d\n", coll)
 		}
+		rawdraw.drawtext("sample text", 10, 10, 1)
 	}
 }
 

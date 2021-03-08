@@ -13,6 +13,8 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGSetBgColor(UmkaStackSlot *p, UmkaStackSlot *r);
