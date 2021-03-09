@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+Path=/usr/share/tophat
+
+if [ "$1" == "get" ]; then
+	echo "downloading"
+	sudo curl "https://marekmaskarinec.github.io/files/tophat.tar.xz" -o /tmp/tophat.tar.xz
+	sudo rm -r $Path
+	sudo mkdir $Path
+	echo "extracting"
+	sudo tar -xf /tmp/tophat.tar.xz -C $Path
+	echo "copying"
+	sudo mv $Path/tophat-release/* $Path
+	sudo rm -r $Path/tophat-release
+	sudo rm -r /tmp/tophat.tar.xz
+	echo "done"
+fi
+
+if [ "$1" == "run" ]; then
+	$Path/bin/tophat-linuxx11 debug
+fi
+
+if [ "$1" == "package" ]; then
+	if [ "$2" == "" ]; then
+		echo "specify os"
+		exit 1
+	fi
+
+	if [ "$3" == "" ]; then
+		Name=game
+	else
+		Name=$3
+	fi
+
+	if [ "$2" == "linux" ]; then
+		Bin=tophat-linuxx11
+	fi
+
+	mkdir package-$2
+	mkdir package-$2/$Name.dat
+	cp -r ./* package-$2/$Name.dat
+	cp -r $Path/bin/$Bin ./package-$2/$Name
+	cp -r $Path/umka/* ./package-$2/$Name.dat
+	rm -r package-$2/$Name.dat/package
+
+	echo ""
+fi
