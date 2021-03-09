@@ -1,9 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "tophat.h"
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
+#include "../lib/stb/stb_image.h"
 
 #include "bindings.h"
 #include "poly.h"
@@ -12,10 +14,16 @@ extern float scaling;
 extern int *pressed;
 extern int *justpressed;
 
+extern char *respath;
+
 void bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "debug", &umdebug);
 	umkaAddFunc(umka, "debug2", &umdebug2);
+
+	// images
+	umkaAddFunc(umka, "loadimg", &umimgload);
+	umkaAddFunc(umka, "deleteimg", &umimgfree);
 
 	// input
 	umkaAddFunc(umka, "cispressed", &umispressed);
@@ -41,25 +49,27 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "updatescaling", &umgetscaling);
 }
 
-image *img;
-
 // etc
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
-	// prints polygon
-	/*printf("polyx: %d, polyy: %d, \n", e->p->x, e->p->y);
-
-	for (int i=0; i < e->p->vc * 2; i += 2) {
-		printf("x: %d, y: %d\n", e->p->v[i], e->p->v[i + 1]);
-	}*/
-
-
-	//testdraw(img);
-	CNFGBlitImage(img->rdimg, 0, 0, img->w, img->h);
 }
 
 void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r) {
-	img = loadimage("test.bmp");
+}
+
+// images
+void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char *path = (char *)p[0].ptrVal;
+
+	image *img = loadimage(strcat(respath, path));
 	rdimg(img, scaling);
+
+	r[0].ptrVal = (long int)img;
+}
+void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[0].ptrVal;
+
+	free(img->rdimg);
+	stbi_image_free(img);
 }
 
 // input

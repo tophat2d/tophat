@@ -1,0 +1,20 @@
+
+type img = struct {
+	raw: ^uchar
+	w: int32
+	h: int32
+	c: int32
+	rdimg: ^uint32
+}
+
+fn loadimg(path: ^char): ^img
+
+fn deleteimg(i: ^img)
+
+fn load*(path: str): ^img {
+	loadimg(&path[0])
+}
+
+fn (i: ^img) delete() {
+	deleteimg(i)
+}

@@ -5,6 +5,8 @@
 
 #include "../lib/rawdraw/CNFG.h"
 
+#include <GL/gl.h>
+
 #include "image.h"
 
 image *loadimage(char *path) {
@@ -24,7 +26,7 @@ image *loadimage(char *path) {
 	return img;
 }
 
-void testdraw(image *img) {
+void imgslowdraw(image *img) {
 	for (int y=0; y < img->h / img->c; y++) {
 		for (int x=0; x < img->w / img->c; x++) {
 			if (img->rdimg[(y * img->w) + x] != 1) {
@@ -53,10 +55,10 @@ void rdimg(image *img, float scaling) {
 				}
 			}
 
-			for (int i=0; i < 1 - img->c; i++) {
+			for (int i=0; i < 4 - img->c; i++) {
 				printf("adding\n");
-				current *= 16;
-				current += 15;
+				current *= 256;
+				current += 255;
 			}
 			if (current < 0) {
 				printf("%x\n", current);

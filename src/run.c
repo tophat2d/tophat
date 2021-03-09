@@ -10,6 +10,7 @@
 float scaling;
 int *pressed;
 int *justpressed;
+char *respath;
 
 void HandleKey(int keycode, int bDown) {
 	if (keycode > 255) {
@@ -47,8 +48,12 @@ int main(int argc, char *argv[]) {
 	justpressed = &jpa[0];
 
 	if (argc > 1) {
+		respath = malloc(sizeof(char) * 2);
+		strcpy(respath, "./");
 		umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	} else {
+		respath = malloc(sizeof(char) * strlen(strcat(argv[0], ".dat/")));
+		strcpy(respath, strcat(argv[0], ".dat/"));
 		umkaOK = umkaInit(umka, strcat(argv[0], ".dat/game.um"), NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	}
 

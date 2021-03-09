@@ -11,7 +11,7 @@ typedef struct {
 
 image *loadimage(char *path);
 
-void testdraw(image *img);
+void imgslowdraw(image *img);
 
 void rdimg(image *img, float scaling);
 
