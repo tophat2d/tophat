@@ -87,19 +87,19 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 			continue;
 		}
 
-		if (e->p->x > scene[i].p->x + scene[i].p->w) {
+		if (e->p->x < scene[i].p->x + scene[i].p->w) {
 			continue;
 		}
 
-		if (e->p->y > scene[i].p->y + scene[i].p->h) {
+		if (e->p->y < scene[i].p->y + scene[i].p->h) {
 			continue;
 		}
 
-		if (e->p->w + e->p->x < scene[i].x) {
+		if (e->p->w + e->p->x > scene[i].x) {
 			continue;
 		}
 
-		if (e->p->h + e->p->y < scene[i].y) {
+		if (e->p->h + e->p->y > scene[i].y) {
 			continue;
 		}
 
