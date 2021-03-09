@@ -20,6 +20,12 @@ if [ "$1" == "run" ]; then
 	$Path/bin/tophat-linuxx11 debug
 fi
 
+if [ "$1" == "init" ]; then
+	mkdir tophat
+	cp -r $Path/umka/* ./tophat
+	cp $Path/template.um ./game.um
+fi
+
 if [ "$1" == "package" ]; then
 	if [ "$2" == "" ]; then
 		echo "specify os"
@@ -40,7 +46,6 @@ if [ "$1" == "package" ]; then
 	mkdir package-$2/$Name.dat
 	cp -r ./* package-$2/$Name.dat
 	cp -r $Path/bin/$Bin ./package-$2/$Name
-	cp -r $Path/umka/* ./package-$2/$Name.dat
 	rm -r package-$2/$Name.dat/package
 
 	echo ""
