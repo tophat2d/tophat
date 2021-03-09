@@ -29,8 +29,6 @@ fn tocent(e: ^ent): cent {
 
 fn centdraw(e: cent, c: rectangle.rect)
 
-fn debug(c: cent)
-
 fn (e: ^ent) draw*(c: rectangle.rect) {
 	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
 	ce := cent{&cp, null, e.color, e.id}

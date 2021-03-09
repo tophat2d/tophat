@@ -8,5 +8,6 @@
 #include "main.h"
 #include "debug.h"
 #include "misc.h"
+#include "image.h"
 
 #endif

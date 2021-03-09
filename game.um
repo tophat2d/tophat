@@ -5,6 +5,7 @@ import (
 	"umka/rectangle.um"
 	"umka/tophat.um"
 	"umka/input.um"
+	"umka/std/std.um"
 )
 
 fn game() {
@@ -31,6 +32,10 @@ fn game() {
 
 	var coll: int32
 
+	tophat.debug2()
+
+	var imgstart, imgend: real
+
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
@@ -42,13 +47,18 @@ fn game() {
 			return
 		}
 
+
 		player.draw(cam)
 		obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
 			//printf("coll with %d\n", coll)
 		}
-		rawdraw.drawtext("sample text", 10, 10, 0x000000ff, 1)
+		rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
+		imgstart = std.clock()
+		tophat.debug()
+		imgend = std.clock()
+		printf("%f\n", imgend-imgstart)
 	}
 }
 

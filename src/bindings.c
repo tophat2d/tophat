@@ -15,7 +15,8 @@ extern int *justpressed;
 void bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "debug", &umdebug);
-	
+	umkaAddFunc(umka, "debug2", &umdebug2);
+
 	// input
 	umkaAddFunc(umka, "cispressed", &umispressed);
 	umkaAddFunc(umka, "cisjustpressed", &umisjustpressed);
@@ -40,6 +41,8 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "updatescaling", &umgetscaling);
 }
 
+image *img;
+
 // etc
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
 	// prints polygon
@@ -48,6 +51,15 @@ void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
 	for (int i=0; i < e->p->vc * 2; i += 2) {
 		printf("x: %d, y: %d\n", e->p->v[i], e->p->v[i + 1]);
 	}*/
+
+
+	//testdraw(img);
+	CNFGBlitImage(img->rdimg, 0, 0, img->w, img->h);
+}
+
+void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r) {
+	img = loadimage("test.bmp");
+	rdimg(img, scaling);
 }
 
 // input

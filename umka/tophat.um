@@ -18,6 +18,9 @@ fn setup*(title: str) {
 	start = std.clock()
 }
 
+fn debug*()
+fn debug2*()
+
 fn visualizecam(w, h: int32, color: uint32)
 
 fn updatescaling(w, h, camw, camh: int32)
