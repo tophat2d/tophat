@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #define CNFG_IMPLEMENTATION
 #define CNFRASTERIZER
@@ -34,9 +35,9 @@ void HandleButton( int x, int y, int button, int bDown ) { }
 void HandleMotion( int x, int y, int mask ) { }
 void HandleDestroy() { }
 
-int main() {
+int main(int argc, char *argv[]) {
 	void *umka = umkaAlloc();
-	int umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
+	int umkaOK;	
 	int gamefunc = 0;
 	scaling = 1;
 
@@ -44,6 +45,12 @@ int main() {
 	int jpa[255];
 	pressed = &pa[0];
 	justpressed = &jpa[0];
+
+	if (argc > 1) {
+		umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
+	} else {
+		umkaOK = umkaInit(umka, strcat(argv[0], ".dat/game.um"), NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
+	}
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");
