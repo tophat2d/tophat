@@ -1,0 +1,198 @@
+
+import (
+	"tophat/tophat.um"
+	"tophat/rectangle.um"
+	"tophat/rawdraw.um"
+	"tophat/polygon.um"
+	"tophat/entity.um"
+	"tophat/input.um"
+	"tophat/std/std.um"
+)
+
+// global variables
+var (
+	fruit: entity.ent
+	head: entity.ent
+	score: int
+	cam: rectangle.rect
+	tails: []entity.ent
+	s: []^entity.ent
+	dead: bool
+	direction: int
+)
+
+// function, that adds tail
+fn addtail() {
+	// making tail polygon
+	p := polygon.mk(-300, -300, []int32{2, 2, 2, 4, 4, 4, 4, 2})
+
+	// creating entity and appending it to the list of tails
+	tails = append(tails, []entity.ent{ entity.ent{p, []uint32{}, 0x000000ff, 4} })
+
+	// appending the new tail to scene
+	s = append(s, []^entity.ent{&tails[len(tails)-1]})
+}
+
+// this function is called on collision with food
+fn eatfruit() {
+	score++
+	
+	// setting fruit's position randomly
+	fruit.p.x = std.rand()%((cam.w/6-1)+1)*6
+	fruit.p.y = std.rand()%((cam.h/6-1)+1)*6
+
+	// adding tail
+	addtail()
+}
+
+// die function
+fn die() {
+	dead = true
+}
+
+fn deathscreen() {
+	rawdraw.drawtext("You died\nscore: " + std.itoa(score) + "\npress r to retry", 4, 4, 0x000000ff, 1.5)
+
+	if input.isjustpressed("r") {
+		score = 0
+		head.p.x = 24
+		head.p.y = 24
+		direction = 5
+		tails = []entity.ent{}
+		s = []^entity.ent{&head, &fruit}
+		dead = false
+	}
+}
+
+fn game() {
+
+	// opens window with title snake and sets up engine
+	tophat.setup("snake")
+
+	// create scene, that will be used for collisions
+	s = []^entity.ent{}
+
+	dead = false
+
+	// these values will be filled with screen dimensions
+	var w, h: int32
+
+	// creates camera. camera position is the center not top left corner
+	cam = rectangle.mk(48, 27, 96, 54)
+
+	// creates block polygon
+	headp := polygon.mk(12, 12, []int32{1, 1, 1, 5, 5, 5, 5, 1})
+	
+	// creates entity
+	head = entity.ent{headp, []uint32{}, 0x000000ff, 2}
+
+	// creates fruit polygon and entity
+	fruitp := polygon.mk(std.rand()%((cam.h/6-1)+1)*6, std.rand()%((cam.h/6-1)+1)*6, []int32{1, 3, 3, 5, 5, 3, 3, 1})
+	fruit = entity.ent{fruitp, []uint32{}, 0x000000ff, 1}
+
+	// list of tail blocks
+	tails = []entity.ent{}	
+
+	// direction the snake is heading
+	direction = 4
+
+	// time, when snake moved last
+	var lastmove: int
+
+	// move speed in seconds
+	speed := 1
+
+	// adding entities to scene
+	s = append(s, []^entity.ent{&head, &fruit})
+
+	// variable, we will use for storing collision
+	var coll: int32
+
+	for true {
+		// performs important stuff in engine
+		tophat.cycle(&w, &h, 0xffffffff, cam)
+
+		// running death screen. this isn't the way to do this. i will make another example on switching scenes soon.
+		if dead {
+			deathscreen()
+			continue
+		}
+
+		// input
+		if input.isjustpressed("a") && direction != 0 {
+			direction = 0
+			lastmove = 0
+		}
+		if input.isjustpressed("d") && direction != 2 {
+			direction = 2
+			lastmove = 0
+		}
+		if input.isjustpressed("w") && direction != 1 {
+			direction = 1
+			lastmove = 0
+		}
+		if input.isjustpressed("s") && direction != 3 {
+			direction = 3
+			lastmove = 0
+		}
+		if input.isjustpressed("q") {
+			break
+		}
+
+		// checks, if snake can move. if yes, it moves him
+		if (std.time() - lastmove) >= speed {
+			for i:=len(tails)-1; i >= 1; i-- {
+				tails[i].p.x = tails[i-1].p.x
+				tails[i].p.y = tails[i-1].p.y
+			}
+			if len(tails) > 0	{
+				tails[0].p.x = head.p.x
+				tails[0].p.y = head.p.y
+			}
+
+			switch direction {
+			case 0:
+				head.p.x -= 6
+			case 1:
+				head.p.y -= 6
+			case 2:
+				head.p.x += 6
+			case 3:
+				head.p.y += 6
+			}
+			lastmove = std.time()
+		}
+	
+		// checking, if snake is out of bounds to kill him
+		if head.p.x < 0 || head.p.x >= cam.w || head.p.y < 0 || head.p.y >= cam.h {
+			die()
+		}
+
+		// checks for collisions in scene s
+		coll = head.getcoll(s)
+		switch coll {
+		case 1:
+			eatfruit()
+		case 4:
+			die()
+		}	
+
+		// drawing entities
+		head.draw(cam)
+		fruit.draw(cam)
+		for i:=0; i < len(tails); i++ {
+			// checking collision of tail
+			coll = tails[i].getcoll(s)
+			if coll == 2 {
+				die()
+			}
+			tails[i].draw(cam)
+		}
+
+		// drawing score text
+		rawdraw.drawtext("SCORE: " + std.itoa(score), 2, 2, 0x000000ff, 1)
+	}
+}
+
+
+fn main() { }
