@@ -2,7 +2,7 @@
 #include <string.h>
 
 #define CNFG_IMPLEMENTATION
-#define CNFRASTERIZER
+#define CNFGOGL
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"
@@ -46,6 +46,9 @@ int main(int argc, char *argv[]) {
 	int jpa[255];
 	pressed = &pa[0];
 	justpressed = &jpa[0];
+
+	memset(pressed, 0, 255 * sizeof(int));
+	memset(justpressed, 0, 255 * sizeof(int));
 
 	if (argc > 1) {
 		respath = malloc(sizeof(char) * 2);

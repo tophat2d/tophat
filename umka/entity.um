@@ -5,7 +5,7 @@ import (
 )
 
 type ent* = struct {
-	p: ^polygon.poly
+	p: polygon.poly
 	image: []uint32	
 	color: uint32
 	id: int32
@@ -40,11 +40,16 @@ fn cgetcoll(count: int32, e: ^cent, s: ^cent): int32
 
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	cscn := []cent{}
+	cps := []polygon.cpoly{}
 
 	for e in s {
-		cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
-		ce := cent{&cp, null, e.color, e.id}
+		cps = append(cps, []polygon.cpoly{polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}})
+		ce := cent{null, null, e.color, e.id}
 		cscn = append(cscn, []cent{ce})
+	}
+
+	for i:=0; i < len(cps); i++ {
+		cscn[i].p = &cps[i]
 	}
 
 	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}

@@ -16,15 +16,15 @@ fn game() {
 	p := polygon.mk(0, 0, []int32{0, 0, 10, 10, 41, 20, 0, 20})
 
 	player := entity.ent {
-		p: &p,
+		p: p,
 		image: []uint32{0},
 		color: 0xff00ffff,
 		id: 20 }
 	
 	cam := rectangle.mk(10, 10, 80, 80)
 
-	objp := polygon.mk(-20, 20, []int32{0, 0, 50, 50, 20, 10, 4, 8})
-	obj := entity.ent{&objp, []uint32{0}, 0x0000ebff, 10}
+	objp := polygon.mk(0, 0, []int32{0, 0, 50, 50, 20, 10, 4, 8})
+	obj := entity.ent{objp, []uint32{0}, 0x0000ebff, 10}
 
 	s = append(s, []^entity.ent{&player, &obj})
 
@@ -39,6 +39,8 @@ fn game() {
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
+		printf("%f\n", tophat.delta)
+
 		if input.ispressed("w") {
 			//printf("w is pressed\n")
 		}
@@ -52,7 +54,7 @@ fn game() {
 		obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
-			//printf("coll with %d\n", coll)
+			printf("coll with %d\n", coll)
 		}
 		rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
 		imgstart = std.clock()

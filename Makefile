@@ -4,9 +4,8 @@ build:
 run: build
 	./tophat debug
 
-umka:
-	cc umka/*.c -o umka/build
-	./umka/build
+install: build
+	sudo cp tophat /usr/share/tophat/bin/tophat-linuxx11
 
 clear:
 	rm tophat

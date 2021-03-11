@@ -109,7 +109,9 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 			continue;
 		}
 
-		if (e->p->x < scene[i].p->x + scene[i].p->w) {
+		//printf("%d\n", scene[i].p->x);
+
+		/*if (e->p->x < scene[i].p->x + scene[i].p->w) {
 			continue;
 		}
 
@@ -123,7 +125,7 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 		if (e->p->h + e->p->y > scene[i].p->y) {
 			continue;
-		}
+		}*/
 
 		coll = polytopoly(scene[i].p, e->p);
 		if (coll) {
@@ -159,9 +161,10 @@ void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int x = (int)p[3].intVal;
 	char *text = (char *)p[4].ptrVal;
 
-	CNFGPenX = x;
-	CNFGPenY = y;
+	CNFGPenX = x * scaling;
+	CNFGPenY = y * scaling;
 	CNFGColor(color);
+	CNFGSetLineWidth(0.6 * scaling);
 	CNFGDrawText(text, size * scaling);
 }
 
