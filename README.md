@@ -7,12 +7,6 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It still i
 - polygon to polygon collisions
 - bugs (this feature is hidden, and you will get a cake as a reward for discovering it)
 
-## currently working on
-
-- umka scripting
-- bitmap parser
-- polygon triangulation
-
 ## umka bindings status
 
 - rawdraw
@@ -25,6 +19,8 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It still i
 
 Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
+- docs
+- entity constructor
 - sounds
 - v0.1 release
 - image operation (scaling, flipping, rotating)
