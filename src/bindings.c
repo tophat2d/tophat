@@ -78,8 +78,8 @@ void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // input
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int *x = p[1].ptrVal;
-	int *y = p[0].ptrVal;
+	int *x = (int *)p[1].ptrVal;
+	int *y = (int *)p[0].ptrVal;
 
 	*x = mx / scaling;
 	*y = my / scaling;
@@ -103,7 +103,7 @@ void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 // entities
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	rect *rc = (rect *)&p[0];
-	entity *e = rc + sizeof(UmkaStackSlot *)/sizeof(UmkaStackSlot); // this is weird solution, but it seems to work for now. TODO
+	entity *e = (entity *)(rc + sizeof(UmkaStackSlot *)/sizeof(UmkaStackSlot)); // this is weird solution, but it seems to work for now. TODO
 
 	draw(e, rc);
 }
@@ -205,8 +205,8 @@ void umCNFGClearFrame(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGGetDimensions(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int *w = p[1].ptrVal;
-	int *h = p[0].ptrVal;
+	int *w = (int *)p[1].ptrVal;
+	int *h = (int *)p[0].ptrVal;
 	short ws, hs;
 
 	CNFGGetDimensions(&ws, &hs);
