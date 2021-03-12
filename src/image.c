@@ -56,14 +56,17 @@ void rdimg(image *img, float scaling) {
 			}
 
 			for (int i=0; i < 4 - img->c; i++) {
-				printf("adding\n");
-				current *= 256;
-				current += 255;
+				if (img->raw[(y * img->w + x) * img->c + img->c + i] == 1) {
+					current = 0x00 | current<<8;
+					continue;
+				}
+
+				current = 0xff | current<<8;
 			}
 			if (current < 0) {
 				printf("%x\n", current);
 			}
-			rd[(y * img->w + x)/img->c] = current;
+			rd[(y * img->w + x)] = current;
 		}
 	}
 

@@ -1,20 +1,15 @@
+// vim: filetype=umka
 
-type img = struct {
-	raw: ^uchar
-	w: int32
-	h: int32
-	c: int32
-	rdimg: ^uint32
-}
+type img* = int
 
-fn loadimg(path: ^char): ^img
+fn loadimg(path: ^char): img
 
-fn deleteimg(i: ^img)
+fn deleteimg(i: img)
 
-fn load*(path: str): ^img {
-	loadimg(&path[0])
+fn load*(path: str): img {
+	return loadimg(&path[0])
 }
 
 fn (i: ^img) delete() {
-	deleteimg(i)
+	deleteimg(i^)
 }

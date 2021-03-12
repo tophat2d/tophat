@@ -15,36 +15,24 @@ entity entityfrompoly(poly *p, uint32_t color) {
 	entity e;
 	e.p = p;
 	e.color = color;
-	e.image = NULL;
+	e.img = NULL;
 	e.id = rand()%9999 + 1;
 
 	return e;
 }
 
-/*
-entity entityfromrect(rect r, uint32_t color) {
-entity e;
-e.r = r;
-e.color = color;
-e.image = NULL;
-e.id = rand()%9999;
-
-return e;
-}
-*/
-
-entity entityfromimage(char path[]) {
+/*entity entityfromimage(char path[]) {
 	img_t img;
 
 	parsebmp(&path[0], &img);
 
 	entity e;
 	//e.r = newrect(0, 0, img.w, img.h);
-	e.image = img.content;
+	e.img = img.content;
 	e.id = rand()%9999;
 
 	return e;
-}
+}*/
 
 void draw(entity *o, rect *camera) {
 	int camx, camy;
@@ -60,7 +48,7 @@ void draw(entity *o, rect *camera) {
 		return;
 	}
 
-	if (o->image == NULL) {
+	if (o->img == NULL) {
 		RDPoint *points;
 
 		points = polytordpoint(o->p, camx, camy);
@@ -71,5 +59,5 @@ void draw(entity *o, rect *camera) {
 		return;
 	}
 
-	//CNFGBlitImage(o.image, o.r.x, o.r.y, o.r.w, o.r.h);
+	CNFGBlitImage(o->img->rdimg, o->p->x, o->p->y, o->img->w, o->img->h);
 }

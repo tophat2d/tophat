@@ -7,6 +7,7 @@ import (
 	"umka/rectangle.um"
 	"umka/tophat.um"
 	"umka/input.um"
+	"umka/image.um"
 	"umka/std/std.um"
 )
 
@@ -18,12 +19,12 @@ fn main() {
 
 	p := polygon.mk(0, 0, []int32{0, 0, 10, 10, 41, 20, 0, 20})
 
-	player := entity.ent {
-		p: p,
-		image: []uint32{0},
-		color: 0xff00ffff,
-		id: 20 }
-	
+	player := entity.mk(p, 0xff00ffff, 20)
+	img := image.load("test.bmp")
+	player.image = img	
+
+	printf("%u\n", player.image);
+
 	cam := rectangle.mk(10, 10, 80, 80)
 
 	objp := polygon.mk(0, 0, []int32{0, 0, 50, 50, 20, 10, 4, 8})
@@ -54,7 +55,6 @@ fn main() {
 		obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
-			printf("coll\n");
 		}
 		rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
 	}

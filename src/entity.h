@@ -4,10 +4,11 @@
 #include <stdint.h>
 #include "rect.h"
 #include "poly.h"
+#include "image.h"
 
 typedef struct {
 	poly *p;
-	uint32_t *image;
+	image *img;
 	uint32_t color;
 	int id;
 } entity;

@@ -4,18 +4,19 @@ import (
 	"polygon.um"
 	"rectangle.um"
 	"std/std.um"
+	"image.um"
 )
 
 type ent* = struct {
 	p: polygon.poly
-	image: []uint32	
+	image: image.img	
 	color: uint32
 	id: int32
 }
 
 type cent = struct {
 	p: ^polygon.cpoly
-	image: ^uint32
+	image: image.img
 	color: uint32
 	id: int32
 }
@@ -24,7 +25,7 @@ type cent = struct {
 
 fn tocent(e: ^ent): cent {
 	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
-	ce := cent{&cp, null, e.color, e.id}
+	ce := cent{&cp, 0, e.color, e.id}
 
 	return ce
 }
@@ -33,7 +34,7 @@ fn centdraw(e: cent, c: rectangle.rect)
 
 fn (e: ^ent) draw*(c: rectangle.rect) {
 	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
-	ce := cent{&cp, null, e.color, e.id}
+	ce := cent{&cp, e.image, e.color, e.id}
 
 	centdraw(ce, c)
 }
@@ -47,7 +48,7 @@ fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
 
 	var e: ent
 	e.p = p
-	e.image = []uint32{}
+	e.image = 0
 	e.color = color
 	e.id = id
 
@@ -60,7 +61,7 @@ fn (e: ^ent) getcoll*(s: []^ent): int32 {
 
 	for e in s {
 		cps = append(cps, []polygon.cpoly{polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}})
-		ce := cent{null, null, e.color, e.id}
+		ce := cent{null, e.image, e.color, e.id}
 		cscn = append(cscn, []cent{ce})
 	}
 
@@ -69,6 +70,6 @@ fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	}
 
 	cp := polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}
-	ce := cent{&cp, null, e.color, e.id}
+	ce := cent{&cp, e.image, e.color, e.id}
 	return cgetcoll(len(cscn), &ce, &cscn[0])
 }

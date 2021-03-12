@@ -16,7 +16,6 @@ extern int *justpressed;
 extern int mx;
 extern int my;
 
-
 extern char *respath;
 
 void bind(void *umka) {
@@ -104,6 +103,10 @@ void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	rect *rc = (rect *)&p[0];
 	entity *e = (entity *)(rc + sizeof(UmkaStackSlot *)/sizeof(UmkaStackSlot)); // this is weird solution, but it seems to work for now. TODO
+
+	if (e->img == 0) {
+		e->img = NULL;
+	}
 
 	draw(e, rc);
 }
