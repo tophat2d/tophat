@@ -13,6 +13,9 @@
 extern float scaling;
 extern int *pressed;
 extern int *justpressed;
+extern int mx;
+extern int my;
+
 
 extern char *respath;
 
@@ -26,6 +29,7 @@ void bind(void *umka) {
 	umkaAddFunc(umka, "deleteimg", &umimgfree);
 
 	// input
+	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
 	umkaAddFunc(umka, "cispressed", &umispressed);
 	umkaAddFunc(umka, "cisjustpressed", &umisjustpressed);
 
@@ -73,6 +77,14 @@ void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 // input
+void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int *x = p[1].ptrVal;
+	int *y = p[0].ptrVal;
+
+	*x = mx / scaling;
+	*y = my / scaling;
+}
+
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 

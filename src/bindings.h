@@ -13,6 +13,8 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r);

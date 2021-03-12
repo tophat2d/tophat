@@ -12,6 +12,9 @@ int *pressed;
 int *justpressed;
 char *respath;
 
+int mx;
+int my;
+
 void HandleKey(int keycode, int bDown) {
 	if (keycode > 255) {
 		//TODO: switch case with another options
@@ -33,7 +36,10 @@ void HandleKey(int keycode, int bDown) {
 	justpressed[keycode] = 0;
 }
 void HandleButton( int x, int y, int button, int bDown ) { }
-void HandleMotion( int x, int y, int mask ) { }
+void HandleMotion( int x, int y, int mask ) {
+	mx = x;
+	my = y;
+}
 void HandleDestroy() { }
 
 int main(int argc, char *argv[]) {

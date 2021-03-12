@@ -33,16 +33,14 @@ fn main() {
 
 	var w, h: int32
 
+	var mx, my: int32
+
 	var coll: int32
-
-	tophat.debug2()
-
-	var imgstart, imgend: real
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
-		printf("%f\n", tophat.delta)
+		printf("%f\n", std.clock())
 
 		if input.ispressed("w") {
 			//printf("w is pressed\n")
@@ -52,6 +50,9 @@ fn main() {
 			return
 		}
 
+		mx, my = input.getglobalmousepos(cam)
+
+		printf("%d, %d\n", mx, my)
 
 		player.draw(cam)
 		obj.draw(cam)
@@ -60,9 +61,5 @@ fn main() {
 			printf("coll with %d\n", coll)
 		}
 		rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
-		imgstart = std.clock()
-		tophat.debug()
-		imgend = std.clock()
-		printf("%f\n", imgend-imgstart)
 	}
 }

@@ -1,5 +1,9 @@
+// vim: filetype=umka
 
-import "std/map.um"
+import (
+	"std/map.um"
+	"rectangle.um"
+)
 
 var keycodes: map.Map
 
@@ -61,6 +65,22 @@ fn getkeycode(s: str): int32 {
 	}
 
 	return -1
+}
+
+fn cgetmouse(x, y: ^int32)
+
+fn getmousepos*(): (int32, int32) {
+	var w, h: int32
+
+	cgetmouse(&w, &h)
+
+	return w, h
+}
+
+fn getglobalmousepos*(cam: rectangle.rect): (int32, int32) {
+	w, h := getmousepos()
+
+	return w + cam.x - cam.w/2, h + cam.y - cam.h/2	
 }
 
 fn cispressed(keycode: int32): int32
