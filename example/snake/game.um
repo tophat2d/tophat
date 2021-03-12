@@ -64,7 +64,7 @@ fn deathscreen() {
 	}
 }
 
-fn game() {
+fn main() {
 
 	// opens window with title snake and sets up engine
 	tophat.setup("snake")
@@ -193,6 +193,3 @@ fn game() {
 		rawdraw.drawtext("SCORE: " + std.itoa(score), 2, 2, 0x000000ff, 1)
 	}
 }
-
-
-fn main() { }

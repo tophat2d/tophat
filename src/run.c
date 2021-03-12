@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	gamefunc = umkaGetFunc(umka, NULL, "game");
+	gamefunc = umkaGetFunc(umka, NULL, "main");
 
 	umkaCall(umka, gamefunc, 0, NULL, NULL);
 

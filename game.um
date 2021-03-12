@@ -1,3 +1,5 @@
+// vim: filetype=umka
+
 import (
 	"umka/rawdraw.um"
 	"umka/polygon.um"
@@ -8,7 +10,8 @@ import (
 	"umka/std/std.um"
 )
 
-fn game() {
+fn main() { 
+
 	tophat.setup("test game")
 
 	s := []^entity.ent{}
@@ -63,5 +66,3 @@ fn game() {
 		printf("%f\n", imgend-imgstart)
 	}
 }
-
-fn main() { }
