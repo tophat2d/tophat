@@ -41,7 +41,6 @@ fn main() {
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
-		printf("%f\n", std.clock())
 
 		if input.ispressed("w") {
 			//printf("w is pressed\n")
@@ -55,6 +54,7 @@ fn main() {
 		obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
+			printf("coll\n");
 		}
 		rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
 	}

@@ -123,23 +123,29 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 		//printf("%d\n", scene[i].p->x);
 
-		/*if (e->p->x < scene[i].p->x + scene[i].p->w) {
+		if (e->p->x > scene[i].p->x + scene[i].p->w) {
 			continue;
 		}
 
-		if (e->p->y < scene[i].p->y + scene[i].p->h) {
+		if (e->p->y > scene[i].p->y + scene[i].p->h) {
 			continue;
 		}
 
-		if (e->p->w + e->p->x > scene[i].p->x) {
+		if (e->p->w + e->p->x < scene[i].p->x) {
 			continue;
 		}
 
-		if (e->p->h + e->p->y > scene[i].p->y) {
+		if (e->p->h + e->p->y < scene[i].p->y) {
 			continue;
-		}*/
+		}
 
 		coll = polytopoly(scene[i].p, e->p);
+		if (coll) {
+			r->intVal = scene[i].id;
+			return;
+		}
+
+		coll = polytopoly(e->p, scene[i].p);
 		if (coll) {
 			r->intVal = scene[i].id;
 			return;
