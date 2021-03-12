@@ -3,6 +3,7 @@
 import (
 	"polygon.um"
 	"rectangle.um"
+	"std/std.um"
 )
 
 type ent* = struct {
@@ -38,6 +39,20 @@ fn (e: ^ent) draw*(c: rectangle.rect) {
 }
 
 fn cgetcoll(count: int32, e: ^cent, s: ^cent): int32
+
+fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
+	if id == 0 {
+		id = std.rand() + 1
+	}
+
+	var e: ent
+	e.p = p
+	e.image = []uint32{}
+	e.color = color
+	e.id = id
+
+	return e
+}
 
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	cscn := []cent{}

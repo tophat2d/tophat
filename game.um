@@ -27,7 +27,8 @@ fn main() {
 	cam := rectangle.mk(10, 10, 80, 80)
 
 	objp := polygon.mk(0, 0, []int32{0, 0, 50, 50, 20, 10, 4, 8})
-	obj := entity.ent{objp, []uint32{0}, 0x0000ebff, 10}
+
+	obj := entity.mk(objp, 0x0000ebff, 10)
 
 	s = append(s, []^entity.ent{&player, &obj})
 
@@ -50,15 +51,10 @@ fn main() {
 			return
 		}
 
-		mx, my = input.getglobalmousepos(cam)
-
-		printf("%d, %d\n", mx, my)
-
 		player.draw(cam)
 		obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
-			printf("coll with %d\n", coll)
 		}
 		rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
 	}
