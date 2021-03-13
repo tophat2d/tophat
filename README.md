@@ -12,28 +12,26 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to
 
 ## umka bindings status
 
-Umka binding currently lack only image support, but since images still aren't drawn efficiently enough to be used, I don't plan on making bindings for them.
+Bindings are currently on par with the engine. I would even say, they have more features.
 
 ## TODO
 
 Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
-- faster images
 - image transforming
 - docs
 - sounds
 - v0.1 release
-- project file
+- physics engine (some simple one)
 - simple UI toolkit
 - module support
+- particle system
+- tilemaps
 
 ## MIGHTDO
 
 This is an experimental territory. These features aren't important to the engine, but I want to implement them one day. They are unsorted.
 
 - doom-like 3d game
-- particle system
-- tilemaps
-- physics engine (some simple one)
 - ldtk parsing
 - game jam or something
