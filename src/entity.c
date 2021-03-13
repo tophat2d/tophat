@@ -59,5 +59,6 @@ void draw(entity *o, rect *camera) {
 		return;
 	}
 
-	CNFGBlitImage(o->img->rdimg, o->p->x, o->p->y, o->img->w, o->img->h);
+	CNFGBlitTex(o->img->tex, o->p->x, o->p->y, o->img->w * scaling, o->img->h * scaling);
+	//CNFGBlitImage(o->img->rdimg, o->p->x, o->p->y, o->img->w, o->img->h);
 }

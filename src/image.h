@@ -7,6 +7,7 @@ typedef struct {
 	int h;
 	int c;
 	uint32_t *rdimg;
+	unsigned int tex;
 } image;
 
 image *loadimage(char *path);

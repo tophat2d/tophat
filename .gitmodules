@@ -1,6 +1,6 @@
 [submodule "lib/rawdraw"]
 	path = lib/rawdraw
-	url = https://github.com/cntools/rawdraw
+	url = https://github.com/marekmaskarinec/rawdraw.git
 [submodule "lib/umka"]
 	path = lib/umka
 	url = https://github.com/vtereshkov/umka-lang.git

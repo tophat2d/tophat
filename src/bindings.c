@@ -65,6 +65,7 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	image *img = loadimage(strcat(respath, path));
 	rdimg(img, scaling);
+	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 
 	r[0].ptrVal = (long int)img;
 }
