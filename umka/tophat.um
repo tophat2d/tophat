@@ -7,16 +7,18 @@ import (
 	"std/std.um"
 )
 
-var start, end, delta*: real
+var start, end, delta*: int
 
 fn sleep*(t: int)
+
+fn gettime*(): int
 
 fn setup*(title: str) {
 	rawdraw.setup(title, 500, 500)
 	rawdraw.setbgcolor(0x000000ff)
 	rawdraw.clearframe()
 
-	start = std.clock()
+	start = gettime()
 }
 
 fn debug*()
@@ -29,9 +31,9 @@ fn updatescaling(w, h, camw, camh: int32)
 fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 	rawdraw.swapbuffers()
 
-	end = std.clock()
-	delta = end - start
-	start = std.clock()
+	end = gettime()
+	delta = (end - start)/1000
+	start = gettime()
 
 	rawdraw.setbgcolor(0x000000ff)
 	rawdraw.clearframe()

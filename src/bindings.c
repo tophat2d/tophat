@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/time.h>
 
 #include "tophat.h"
 #include "../lib/rawdraw/CNFG.h"
@@ -26,6 +27,7 @@ void bind(void *umka) {
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
 	umkaAddFunc(umka, "deleteimg", &umimgfree);
+	umkaAddFunc(umka, "imgsetscale", &umimgsetscale);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
@@ -39,6 +41,7 @@ void bind(void *umka) {
 	// misc
 	umkaAddFunc(umka, "sleep", &umsleep);
 	umkaAddFunc(umka, "visualizecam", &umvisualizecam);
+	umkaAddFunc(umka, "gettime", &umgettime);
 
 	// rawdraw
 	umkaAddFunc(umka, "drawtext", &umdrawtext);
@@ -66,6 +69,8 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = loadimage(strcat(respath, path));
 	rdimg(img, scaling);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
+	img->scalex = 1;
+	img->scaley = 1;
 
 	r[0].ptrVal = (long int)img;
 }
@@ -74,6 +79,14 @@ void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	free(img->rdimg);
 	stbi_image_free(img);
+}
+void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[0].ptrVal;
+	float x = p[1].intVal;
+	float y = p[0].intVal;
+
+	img->scalex = x;
+	img->scaley = y;
 }
 
 // input
@@ -173,6 +186,13 @@ void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	CNFGColor((uint32_t)color);
 	CNFGTackRectangle(0, 0, w * scaling, h * scaling);
+}
+
+void umgettime(UmkaStackSlot *p, UmkaStackSlot *r) {
+	struct timeval t;
+	gettimeofday(&t, NULL);
+
+	r->intVal = (long int)(t.tv_usec);
 }
 
 // rawdraw

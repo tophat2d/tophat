@@ -13,6 +13,8 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r);
@@ -26,6 +28,8 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
 void umsleep(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umgettime(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r);
 

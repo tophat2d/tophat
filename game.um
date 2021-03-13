@@ -21,9 +21,9 @@ fn main() {
 
 	player := entity.mk(p, 0xff00ffff, 20)
 	img := image.load("test.bmp")
-	player.image = img	
+	player.image = img
 
-	printf("%u\n", player.image);
+	//img.scale(0.2, 0.2)
 
 	cam := rectangle.mk(10, 10, 80, 80)
 
@@ -42,6 +42,7 @@ fn main() {
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
+		printf("%d\n", tophat.delta)
 
 		if input.ispressed("w") {
 			//printf("w is pressed\n")

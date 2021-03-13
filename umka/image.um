@@ -6,10 +6,16 @@ fn loadimg(path: ^char): img
 
 fn deleteimg(i: img)
 
+fn imgsetscale(x, y: real32, i: img)
+
 fn load*(path: str): img {
 	return loadimg(&path[0])
 }
 
-fn (i: ^img) delete() {
+fn (i: ^img) delete*() {
 	deleteimg(i^)
+}
+
+fn (i: ^img) scale*(x, y: real32) {
+	imgsetscale(x, y, i^)
 }

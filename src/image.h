@@ -6,6 +6,8 @@ typedef struct {
 	int w;
 	int h;
 	int c;
+	float scalex;
+	float scaley;
 	uint32_t *rdimg;
 	unsigned int tex;
 } image;
