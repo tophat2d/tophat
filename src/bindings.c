@@ -82,8 +82,8 @@ void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
-	float x = p[1].intVal;
-	float y = p[0].intVal;
+	float x = p[1].realVal;
+	float y = p[2].realVal;
 
 	img->scalex = x;
 	img->scaley = y;

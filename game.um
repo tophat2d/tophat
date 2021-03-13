@@ -23,6 +23,9 @@ fn main() {
 	img := image.load("test.bmp")
 	player.image = img
 
+	image.imgsetscale(0.05, 0.05, player.image)
+
+	// this doesn't work for some reason. waiting for response on issue
 	//img.scale(0.2, 0.2)
 
 	cam := rectangle.mk(10, 10, 80, 80)
@@ -41,8 +44,6 @@ fn main() {
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
-
-		printf("%d\n", tophat.delta)
 
 		if input.ispressed("w") {
 			//printf("w is pressed\n")
