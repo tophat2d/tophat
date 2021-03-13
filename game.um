@@ -61,3 +61,7 @@ fn main() {
 		rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
 	}
 }
+
+fn windowdestroy() {
+	printf("destroying window\n")
+}

@@ -15,6 +15,9 @@ char *respath;
 int mx;
 int my;
 
+int destroyfunc;
+void *umka;
+
 void HandleKey(int keycode, int bDown) {
 	if (keycode > 255) {
 		//TODO: switch case with another options
@@ -40,10 +43,12 @@ void HandleMotion( int x, int y, int mask ) {
 	mx = x;
 	my = y;
 }
-void HandleDestroy() { }
+void HandleDestroy() {
+	umkaCall(umka, destroyfunc, 0, NULL, NULL);
+}
 
 int main(int argc, char *argv[]) {
-	void *umka = umkaAlloc();
+	umka = umkaAlloc();
 	int umkaOK;	
 	scaling = 1;
 
@@ -79,6 +84,8 @@ int main(int argc, char *argv[]) {
 		printf("Umka error %s (%d, %d): %s\n", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}
+
+	destroyfunc = umkaGetFunc(umka, NULL, "windowdestroy");
 
 	umkaRun(umka);
 
