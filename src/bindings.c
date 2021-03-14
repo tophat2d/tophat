@@ -19,7 +19,7 @@ extern int my;
 
 extern char *respath;
 
-void bind(void *umka) {
+void umkabind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "debug", &umdebug);
 	umkaAddFunc(umka, "debug2", &umdebug2);

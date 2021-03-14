@@ -1,3 +1,4 @@
+// vim: filetype=umka
 
 import (
 	"tophat/tophat.um"
@@ -28,9 +29,6 @@ fn addtail() {
 
 	// creating entity and appending it to the list of tails
 	tails = append(tails, []entity.ent{ entity.ent{p, []uint32{}, 0x000000ff, 4} })
-
-	// appending the new tail to scene
-	s = append(s, []^entity.ent{&tails[len(tails)-1]})
 }
 
 // this function is called on collision with food
@@ -166,6 +164,12 @@ fn main() {
 		// checking, if snake is out of bounds to kill him
 		if head.p.x < 0 || head.p.x >= cam.w || head.p.y < 0 || head.p.y >= cam.h {
 			die()
+		}
+
+		// updating scene
+		s = []^entity.ent{&head, &fruit}
+		for t in tails {
+			s = append(s, &tails[t])
 		}
 
 		// checks for collisions in scene s

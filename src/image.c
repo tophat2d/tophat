@@ -56,7 +56,7 @@ void rdimg(image *img, float scaling) {
 			}
 
 			for (int i=0; i < 4 - img->c; i++) {
-				if (img->raw[(y * img->w + x) * img->c + img->c + i] == 1) {
+				if (current == 1) {
 					current = 0x00 | current<<8;
 					continue;
 				}

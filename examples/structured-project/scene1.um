@@ -1,0 +1,9 @@
+// vim: filetype=umka
+
+import (
+	"tophat/rawdraw.um"
+)
+
+fn run*() {
+ rawdraw.drawtext("scene 1", 2, 2, 0x000000ff, 2)
+}

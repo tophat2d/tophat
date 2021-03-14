@@ -1,0 +1,59 @@
+import (
+	"tophat/input.um"
+	"tophat/tophat.um"
+	"tophat/rectangle.um"
+	"scene1.um"
+	"scene2.um"
+	"scene3.um"
+)
+
+// we define scenes as constants. there are other ways to do this though. like an array
+const (
+	SCENE_1 = 0
+	SCENE_2 = 1
+	SCENE_3 = 2
+)
+
+// variable, which holds current scene
+var (
+	currentscene: int
+)
+
+fn main() {
+	// usual setup
+	tophat.setup("scene demo")
+	var w, h: int32
+	cam := rectangle.mk(0, 0, 80, 40)
+
+	// we define, which scene should be the appear, when we run the game
+	currentscene = SCENE_1
+
+	for true {
+		// cycle function
+		tophat.cycle(&w, &h, 0xffffffff, cam)
+
+		// choosing between scenes
+		switch currentscene {
+		case 0:
+			scene1.run()
+		case 1:
+			scene2.run()
+		case 2:
+			scene3.run()
+		}
+
+		// setting current scene
+		if input.isjustpressed("q") {
+			currentscene = SCENE_1
+		}
+
+		if input.isjustpressed("w") {
+			currentscene = SCENE_2
+		}
+
+		if input.isjustpressed("e") {
+			currentscene = SCENE_3
+		}
+
+	}
+}

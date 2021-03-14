@@ -3,7 +3,7 @@
 
 #include "../lib/umka/src/umka_api.h"
 
-void bind(void *umka);
+void umkabind(void *umka);
 
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r);
 

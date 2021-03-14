@@ -17,13 +17,13 @@ fn main() {
 
 	s := []^entity.ent{}
 
-	p := polygon.mk(0, 0, []int32{0, 0, 10, 10, 41, 20, 0, 20})
+	p := polygon.mk(50, 50, []int32{0, 0, 10, 10, 41, 20, 0, 20})
 
 	player := entity.mk(p, 0xff00ffff, 20)
 	img := image.load("test.bmp")
 	player.image = img
 
-	image.imgsetscale(0.05, 0.05, player.image)
+	image.imgsetscale(0.2, 0.2, player.image)
 
 	// this doesn't work for some reason. waiting for response on issue
 	//img.scale(0.2, 0.2)
@@ -54,7 +54,7 @@ fn main() {
 		}
 
 		player.draw(cam)
-		obj.draw(cam)
+		//obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
 		}

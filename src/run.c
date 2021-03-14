@@ -75,7 +75,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	bind(umka);
+	umkabind(umka);
 	umkaOK = umkaCompile(umka);
 
 	if (!umkaOK) {
