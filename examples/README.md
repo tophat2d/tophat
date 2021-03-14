@@ -9,6 +9,8 @@ Already made stuff in tophat to get you started faster.
 
 ## how to run
 
+**NOTE:** both of these assume, you are in the folder the example is in.
+
 ### 1. tophat cmd tool
 in blank directory run `tophat init`. then replace the default game file with this one. you can then use `tophat run` to run it or `tophat package linux snake` to package it.
 
