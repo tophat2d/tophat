@@ -18,7 +18,8 @@ Bindings are currently on par with the engine. I would even say, they have more 
 
 Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
-- image transforming
+- collisions accounting for transformation
+- image flipping
 - docs
 - sounds
 - v0.1 release
