@@ -139,6 +139,7 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	//printf("%d, %X, %d\n", e->p->x, e->color, sizeof(poly *));
 
 	int px, py, sx, sy;
+	int pw, ph, sw, sh;
 
 	for (int i=0; i < count; i++) {
 		if (e->id == scene[i]->id) {
@@ -148,23 +149,32 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 		px = e->p->x;
 		py = e->p->y;
 		rotatepoint(&px, &py, e->p->w/2, e->p->h/2, e->rot);
-		sx = e->p->x;
-		sy = e->p->y;
+		sx = scene[i]->p->x;
+		sy = scene[i]->p->y;
 		rotatepoint(&sx, &sy, scene[i]->p->w/2, scene[i]->p->h/2, scene[i]->rot);
 
-		if (px > (sx * e->sx + scene[i]->p->w) * scene[i]->sx) {
+		pw = e->p->w;
+		ph = e->p->h;
+		rotatepoint(&pw, &ph, e->p->w/2, e->p->h/2, e->rot);
+		sw = scene[i]->p->w;
+		sh = scene[i]->p->h;
+		rotatepoint(&sw, &sh, scene[i]->p->w/2, scene[i]->p->h/2, scene[i]->rot);
+
+		//printf("%d, %d, %f, %f\n%d, %d, %f, %f\n", px, py, px + pw * e->sx, px + ph * e->sy, sx, sy, sx + sw * scene[i]->sx, sy + sh * scene[i]->sy);
+
+		if (px > sx + sw * scene[i]->sx) {
 			continue;
 		}
 
-		if (py > sy * (e->sy + scene[i]->p->h) * scene[i]->sy) {
+		if (py > sy * e->sy + sh * scene[i]->sy) {
 			continue;
 		}
 
-		if ((e->p->w + px) * e->sx < sx * scene[i]->sx) {
+		if (e->sx * pw + px < sx) {
 			continue;
 		}
 
-		if ((e->p->h + py) * e->sx < sy * scene[i]->sy) {
+		if (ph * e->sx + py < sy) {
 			continue;
 		}
 
