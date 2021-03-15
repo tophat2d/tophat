@@ -31,6 +31,9 @@ fn main() {
 	objp := polygon.mk(0, 0, []int32{0, 0, 50, 50, 20, 10, 4, 8})
 
 	obj := entity.mk(objp, 0x0000ebff, 10)
+	obj.rot = 180
+	obj.sx = 0.3
+	obj.sy = 0.7
 
 	s = append(s, []^entity.ent{&player, &obj})
 
@@ -52,7 +55,7 @@ fn main() {
 		}
 
 		player.draw(cam)
-		//obj.draw(cam)
+		obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
 		}

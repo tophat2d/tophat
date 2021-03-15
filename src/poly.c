@@ -49,14 +49,24 @@ void freepoly(poly *p) {
 	free(p->v);
 }
 
-RDPoint *polytordpoint(poly *p, int camx, int camy) {
+RDPoint *polytordpoint(poly *p, int camx, int camy, double sx, double sy, int rot) {
 	RDPoint *tr;
 
 	tr = malloc(sizeof(int) * p->vc * 2);
 
+	int cx, cy;
+	int x, y;
+	cx = p->w/2;
+	cy = p->h/2;
+
 	for (int i=0; i < p->vc * 2; i += 2) {
-		tr[i/2].x = (p->x + p->v[i] - camx) * scaling;
-		tr[i/2].y = (p->y + p->v[i+1] - camy) * scaling;
+		x = p->v[i];
+		y = p->v[i+1];
+
+		rotatepoint(&x, &y, cx, cy, rot);
+
+		tr[i/2].x = (p->x + x * sx- camx) * scaling;
+		tr[i/2].y = (p->y + y * sy - camy) * scaling;
 	}
 
 	return tr;
