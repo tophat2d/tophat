@@ -1,6 +1,8 @@
 # tophat
 A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to be both lightweight and easy to use.
 
+Collision are broken rn. I will fix them soon.
+
 ## features
 
 - scripting with [umka](https://github.com/vtereshkov/umka-lang)
@@ -18,7 +20,6 @@ Bindings are currently on par with the engine. I would even say, they have more 
 
 Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
-- collisions accounting for transformation
 - image flipping
 - docs
 - sounds
