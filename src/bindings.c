@@ -27,7 +27,8 @@ void umkabind(void *umka) {
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
 	umkaAddFunc(umka, "deleteimg", &umimgfree);
-	umkaAddFunc(umka, "imgsetscale", &umimgsetscale);
+	//umkaAddFunc(umka, "imgsetscale", &umimgsetscale);
+	//umkaAddFunc(umka, "imgrotate", &umimgrotate);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
@@ -69,8 +70,6 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = loadimage(strcat(respath, path));
 	rdimg(img, scaling);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
-	img->scalex = 1;
-	img->scaley = 1;
 
 	r[0].ptrVal = (long int)img;
 }
@@ -80,14 +79,20 @@ void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 	free(img->rdimg);
 	stbi_image_free(img);
 }
-void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r) {
+/*void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
-	float x = p[1].realVal;
-	float y = p[2].realVal;
+	double x = p[1].realVal;
+	double y = p[2].realVal;
 
 	img->scalex = x;
 	img->scaley = y;
 }
+void umimgrotate(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[0].ptrVal;
+	int rot = p[1].intVal;
+
+	img->rot = rot;
+}*/
 
 // input
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -126,7 +131,7 @@ void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	entity *scene = (entity *)p[0].ptrVal;
+	entity **scene = (entity **)p[0].ptrVal;
 	entity *e = (entity *)p[1].ptrVal;
 	int count = p[2].intVal;
 	int coll;
@@ -134,37 +139,35 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	//printf("%d, %X, %d\n", e->p->x, e->color, sizeof(poly *));
 
 	for (int i=0; i < count; i++) {
-		if (e->id == scene[i].id) {
+		if (e->id == scene[i]->id) {
 			continue;
 		}
 
-		//printf("%d\n", scene[i].p->x);
-
-		if (e->p->x > scene[i].p->x + scene[i].p->w) {
+		if (e->p->x > scene[i]->p->x + scene[i]->p->w) {
 			continue;
 		}
 
-		if (e->p->y > scene[i].p->y + scene[i].p->h) {
+		if (e->p->y > scene[i]->p->y + scene[i]->p->h) {
 			continue;
 		}
 
-		if (e->p->w + e->p->x < scene[i].p->x) {
+		if (e->p->w + e->p->x < scene[i]->p->x) {
 			continue;
 		}
 
-		if (e->p->h + e->p->y < scene[i].p->y) {
+		if (e->p->h + e->p->y < scene[i]->p->y) {
 			continue;
 		}
 
-		coll = polytopoly(scene[i].p, e->p);
+		coll = polytopoly(scene[i]->p, e->p);
 		if (coll) {
-			r->intVal = scene[i].id;
+			r->intVal = scene[i]->id;
 			return;
 		}
 
-		coll = polytopoly(e->p, scene[i].p);
+		coll = polytopoly(e->p, scene[i]->p);
 		if (coll) {
-			r->intVal = scene[i].id;
+			r->intVal = scene[i]->id;
 			return;
 		}
 	}

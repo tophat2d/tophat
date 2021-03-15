@@ -1,21 +1,35 @@
 // vim: filetype=umka
 
-type img* = int
+type img* = struct {
+	handle: int
+}
 
-fn loadimg(path: ^char): img
+fn loadimg(path: ^char): int
 
-fn deleteimg(i: img)
+fn deleteimg(i: int)
 
-fn imgsetscale*(x, y: real32, i: img)
+/*fn imgsetscale(x, y: real32, i: int)
+
+fn imgrotate(rot: int32, i: int)
+
+fn imgcopy(img: int): int*/
 
 fn load*(path: str): img {
-	return loadimg(&path[0])
+	return img{loadimg(&path[0])}
 }
 
 fn (i: ^img) delete*() {
-	deleteimg(i^)
+	deleteimg(i.handle)
 }
 
-fn (i: ^img) scale*(x, y: real32) {
-	imgsetscale(x, y, i^)
+/*fn (i: ^img) scale*(x, y: real) {
+	imgsetscale(x, y, i.handle)
 }
+
+fn (i: ^img) rotate*(rot: int32) {
+	imgrotate(rot, i.handle)
+}
+
+fn (i: ^img) copy*(): img {
+	return img{imgcopy(i.handle)}
+}*/

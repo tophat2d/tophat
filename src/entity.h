@@ -9,6 +9,9 @@
 typedef struct {
 	poly *p;
 	image *img;
+	double sx;
+	double sy;
+	int rot;
 	uint32_t color;
 	int id;
 } entity;

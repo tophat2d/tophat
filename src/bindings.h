@@ -13,7 +13,9 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r);
 
-void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r);
+//void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r);
+
+//void umimgrotate(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r);
 
