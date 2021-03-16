@@ -1,6 +1,8 @@
 # tophat
 A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to be both lightweight and easy to use.
 
+Collisions seem to be a bit buggy, when you stretch your shape too much
+
 ## features
 
 - scripting with [umka](https://github.com/vtereshkov/umka-lang)
