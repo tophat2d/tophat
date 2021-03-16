@@ -80,7 +80,7 @@ int polytopoly(poly *p1, poly *p2, int r1, int r2, int sx1, int sy1, int sx2, in
 			return 1;
 		}
 
-		coll = polytopoint(p1, cpx * sx2, cpy * sy2, r1, sx1, sy1);
+		coll = polytopoint(p1, p2->v[0] * sx2, p2->v[1] * sy2, r1, sx1, sy1);
 		if (coll) {
 			return 1;
 		}
