@@ -15,6 +15,6 @@ typedef struct {
 
 poly *newpoly(int px, int py, int vertnum, ...);
 void freepoly(poly *p);
-RDPoint *polytordpoint(poly *e, int camx, int camy, double sx, double sy, int rot);
+RDPoint *polytordpoint(poly *e, int camx, int camy);
 
 #endif

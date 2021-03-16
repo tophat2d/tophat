@@ -1,8 +1,14 @@
+// vim: filetype=umka
+
+import "std/std.um"
 
 type poly* = struct {
     x: int32
     y: int32
     v: []int32
+		rv: []int32
+		rw: int32
+		rh: int32
     w: int32
     h: int32
     vc: int32
@@ -35,6 +41,54 @@ fn mk*(x, y: int32, v: []int32): poly {
 
 	p.w = maxx
 	p.h = maxy
+	p.rw = p.w
+	p.rh = p.h
+	p.rv = v
 
 	return p
+}
+
+fn rotatepoint(x, y, cx, cy, rot: int32): (int32, int32) {
+
+	angle := (rot * std.pi) / 180
+
+	x1 := x - cx;
+	y1 := y - cy;
+
+	x2 := round(x1 * cos(angle) - y1 * sin(angle));
+	y2 := round(x1 * sin(angle) + y1 * cos(angle));
+
+	return x2, y2
+}
+
+fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
+	var x, y, cx, cy: int32
+
+	cx = p.w/2
+	cy = p.h/2
+	
+	var w, h: int32
+
+	v := []int32{}
+
+	for i:=0; i<len(p.v); i+=2 {
+		x, y = rotatepoint(p.rv[i], p.rv[i+1], cx, cy, rot)
+
+		x = round(x * sx)
+		y = round(y * sy)
+
+		if x > w {
+			w = x
+		}
+		if y > h {
+			h = y
+		}
+
+		printf("%d, %d\n", x, y)
+		v = append(v, []int32{x, y})
+	}
+
+	p.v = v
+	p.w = w
+	p.h = h
 }

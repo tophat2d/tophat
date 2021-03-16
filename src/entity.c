@@ -51,7 +51,7 @@ void draw(entity *o, rect *camera) {
 	if (o->img == NULL) {
 		RDPoint *points;
 
-		points = polytordpoint(o->p, camx, camy, o->sx, o->sy, o->rot);
+		points = polytordpoint(o->p, camx, camy);
 		CNFGColor(o->color);
 		CNFGTackPoly(points, o->p->vc);
 		free(points);

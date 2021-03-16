@@ -57,6 +57,17 @@ fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
 	return e
 }
 
+fn (e: ^ent) setrot*(rot: int) {
+	e.rot = rot
+	e.p.transform(e.sx, e.sy, rot)
+}
+
+fn (e: ^ent) setscale*(sx, sy: real) {
+	e.sx = sx
+	e.sy = sy
+	e.p.transform(sx, sy, e.rot)
+}
+
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	cscn := []cent{}
 	cps := []polygon.cpoly{}

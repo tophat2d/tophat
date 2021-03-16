@@ -17,23 +17,21 @@ fn main() {
 
 	s := []^entity.ent{}
 
-	p := polygon.mk(10, 10, []int32{0, 0, 10, 10, 41, 20, 0, 20})
+	p := polygon.mk(10, 10, []int32{0, 0, 0, 10, 10, 10, 10, 0})
 
 	player := entity.mk(p, 0xff00ffff, 20)
 	img := image.load("test.bmp")
-	player.image = img
-	player.sx = 0.2
-	player.sy = 0.2
-	player.rot = 10
+	//player.image = img
+	//player.setscale(2, 2)
+	//player.setrot(10)
 
 	cam := rectangle.mk(10, 10, 80, 80)
 
-	objp := polygon.mk(0, 0, []int32{0, 0, 50, 50, 20, 10, 4, 8})
+	objp := polygon.mk(0, 0, []int32{0, 0, 0, 50, 50, 50, 50, 0})
 
 	obj := entity.mk(objp, 0x0000ebff, 10)
-	obj.rot = 180
-	obj.sx = 0.3
-	obj.sy = 0.7
+	obj.setrot(90)
+	//obj.setscale(0.3, 0.7)
 
 	s = append(s, []^entity.ent{&player, &obj})
 
@@ -54,10 +52,15 @@ fn main() {
 			return
 		}
 
-		player.draw(cam)
+		player.p.x, player.p.y = input.getglobalmousepos(cam)
+
 		obj.draw(cam)
+		player.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
+			player.color = 0xffff00ff
+		} else {
+			player.color = 0xff00ffff
 		}
 		//rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
 	}
