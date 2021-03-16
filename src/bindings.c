@@ -138,43 +138,34 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	//printf("%d, %X, %d\n", e->p->x, e->color, sizeof(poly *));
 
-	int px, py, sx, sy;
-
 	for (int i=0; i < count; i++) {
 		if (e->id == scene[i]->id) {
 			continue;
 		}
 
-		px = e->p->x;
-		py = e->p->y;
-		rotatepoint(&px, &py, e->p->w/2, e->p->h/2, e->rot);
-		sx = e->p->x;
-		sy = e->p->y;
-		rotatepoint(&sx, &sy, scene[i]->p->w/2, scene[i]->p->h/2, scene[i]->rot);
-
-		if (px > (sx * e->sx + scene[i]->p->w) * scene[i]->sx) {
+		if (e->p->x > scene[i]->p->x + scene[i]->p->w) {
 			continue;
 		}
 
-		if (py > sy * (e->sy + scene[i]->p->h) * scene[i]->sy) {
+		if (e->p->y > scene[i]->p->y + scene[i]->p->h) {
 			continue;
 		}
 
-		if ((e->p->w + px) * e->sx < sx * scene[i]->sx) {
+		if (e->p->w + e->p->x < scene[i]->p->x) {
 			continue;
 		}
 
-		if ((e->p->h + py) * e->sx < sy * scene[i]->sy) {
+		if (e->p->h + e->p->y < scene[i]->p->y) {
 			continue;
 		}
 
-		coll = polytopoly(scene[i]->p, e->p, scene[i]->rot, e->rot, scene[i]->sx, scene[i]->sy, e->sx, e->sy);
+		coll = polytopoly(scene[i]->p, e->p);
 		if (coll) {
 			r->intVal = scene[i]->id;
 			return;
 		}
 
-		coll = polytopoly(e->p, scene[i]->p, scene[i]->rot, e->rot, scene[i]->sx, scene[i]->sy, e->sx, e->sy);
+		coll = polytopoly(e->p, scene[i]->p);
 		if (coll) {
 			r->intVal = scene[i]->id;
 			return;
