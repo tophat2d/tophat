@@ -144,18 +144,22 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 		}
 
 		if (e->p->x > scene[i]->p->x + scene[i]->p->w) {
+			//printf("exit due to bounding box %d\n", rand());
 			continue;
 		}
 
 		if (e->p->y > scene[i]->p->y + scene[i]->p->h) {
+			//printf("exit due to bounding box %d\n", rand());
 			continue;
 		}
 
 		if (e->p->w + e->p->x < scene[i]->p->x) {
+			//printf("exit due to bounding box %d\n", rand());
 			continue;
 		}
 
 		if (e->p->h + e->p->y < scene[i]->p->y) {
+			//printf("exit due to bounding box %d\n", rand());
 			continue;
 		}
 

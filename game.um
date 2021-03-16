@@ -27,11 +27,11 @@ fn main() {
 
 	cam := rectangle.mk(10, 10, 80, 80)
 
-	objp := polygon.mk(0, 0, []int32{0, 0, 0, 50, 50, 50, 50, 0})
+	objp := polygon.mk(0, 0, []int32{0, 0, 0, 20, 20, 20, 20, 0})
 
 	obj := entity.mk(objp, 0x0000ebff, 10)
-	obj.setrot(90)
-	//obj.setscale(0.3, 0.7)
+	obj.setrot(45)
+	obj.setscale(2, 3)
 
 	s = append(s, []^entity.ent{&player, &obj})
 
@@ -62,7 +62,7 @@ fn main() {
 		} else {
 			player.color = 0xff00ffff
 		}
-		//rawdraw.drawtext("hello world", 10, 10, 0x000000ff, 1)
+		rawdraw.drawtext(std.itoa(player.p.x) + ", " + std.itoa(player.p.y), 10, 10, 0x000000ff, 1)
 	}
 	img.delete()
 }

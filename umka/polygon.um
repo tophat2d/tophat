@@ -58,14 +58,14 @@ fn rotatepoint(x, y, cx, cy, rot: int32): (int32, int32) {
 	x2 := round(x1 * cos(angle) - y1 * sin(angle));
 	y2 := round(x1 * sin(angle) + y1 * cos(angle));
 
-	return x2, y2
+	return x2 + cx, y2 + cy
 }
 
 fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 	var x, y, cx, cy: int32
 
-	cx = p.w/2
-	cy = p.h/2
+	cx = round(p.w/2 * sx)
+	cy = round(p.h/2 * sy)
 	
 	var w, h: int32
 
@@ -77,14 +77,13 @@ fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 		x = round(x * sx)
 		y = round(y * sy)
 
-		if x > w {
-			w = x
+		if x - p.x > w {
+			w = x - p.x
 		}
-		if y > h {
-			h = y
+		if y - p.y > h {
+			h = y - p.y
 		}
 
-		printf("%d, %d\n", x, y)
 		v = append(v, []int32{x, y})
 	}
 
