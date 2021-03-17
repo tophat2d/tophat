@@ -4,8 +4,7 @@ build:
 	$(cc) src/*.c src/img/*.c src/*.a -Wall -lm -lX11 -o tophat -Lsrc -lumka -L /lib64 -ldl -lGL -g
 
 windows:
-	x86_64-w64-mingw32-gcc src/*.c src/*.a -o tophat.exe -Wall -lm -Lsrc -lumka -Ldl -lopengl32
-
+	x86_64-w64-mingw32-gcc src/*.c lib/windows/*.a -o tophat.exe -Wall -lm -Llib/windows -lumka -Ldl -Ilib/rawdraw -lopengl32 -lgdi32
 run: build
 	./tophat debug
 

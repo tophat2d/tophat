@@ -30,8 +30,8 @@ fn main() {
 	objp := polygon.mk(0, 0, []int32{0, 0, 0, 20, 20, 20, 20, 0})
 
 	obj := entity.mk(objp, 0x0000ebff, 10)
-	obj.setrot(45)
-	obj.setscale(2, 3)
+	obj.setrot(90)
+	obj.setscale(1, 1)
 
 	s = append(s, []^entity.ent{&player, &obj})
 

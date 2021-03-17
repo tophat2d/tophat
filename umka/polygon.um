@@ -72,10 +72,11 @@ fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 	v := []int32{}
 
 	for i:=0; i<len(p.v); i+=2 {
-		x, y = rotatepoint(p.rv[i], p.rv[i+1], cx, cy, rot)
 
-		x = round(x * sx)
-		y = round(y * sy)
+		x = round(p.rv[i] * sx)
+		y = round(p.rv[i+1] * sy)
+
+		x, y = rotatepoint(x, y, cx, cy, rot)
 
 		if x - p.x > w {
 			w = x - p.x
