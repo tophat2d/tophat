@@ -1,7 +1,10 @@
 # tophat
 A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to be both lightweight and easy to use.
 
-Collisions seem to be a bit buggy, when you stretch your shape too much
+## issues
+
+ - collisions seem to be a bit buggy, when you stretch your shape too much
+ - images don't perform well. 55 of test.bmp are only possible at 60 fps full hd. on lower resolutions, images are ok. 
 
 ## features
 
