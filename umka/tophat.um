@@ -13,8 +13,8 @@ fn sleep*(t: int)
 
 fn gettime*(): int
 
-fn setup*(title: str) {
-	rawdraw.setup(title, 500, 500)
+fn setup*(title: str, w, h: int32) {
+	rawdraw.setup(title, w, h)
 	rawdraw.setbgcolor(0x000000ff)
 	rawdraw.clearframe()
 
