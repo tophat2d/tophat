@@ -204,7 +204,7 @@ void umgettime(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // rawdraw
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
-	float size = p[0].realVal;
+	double size = p[0].realVal;
 	uint32_t color = (uint32_t)p[1].uintVal;
 	int y = (int)p[2].intVal;
 	int x = (int)p[3].intVal;

@@ -1,6 +1,6 @@
 import "std/std.um"
 
-fn drawtext*(text: str, x: int32, y: int32, color: uint32, size: real32)
+fn drawtext*(text: str, x: int32, y: int32, color: uint32, size: real)
 
 fn setup*(title: str, w, h: int)
 
