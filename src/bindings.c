@@ -7,7 +7,9 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "../lib/stb/stb_image.h"
+#include "../lib/miniaudio/miniaudio.h"
 
+#include "audio.h"
 #include "bindings.h"
 #include "poly.h"
 
@@ -58,6 +60,9 @@ void umkabind(void *umka) {
 
 // etc
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
+	ma_decoder *dc;
+	dc = auload("test.wav");
+	auplay(dc);	
 }
 
 void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -223,6 +228,8 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int h = p[0].intVal;
 
 	int res = CNFGSetup(title, w, h);
+
+	auinit();
 
 	if (res) {
 		printf("could not initialize rawdraw\n");

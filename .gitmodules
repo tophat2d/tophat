@@ -4,3 +4,6 @@
 [submodule "lib/umka"]
 	path = lib/umka
 	url = https://github.com/vtereshkov/umka-lang.git
+[submodule "lib/miniaudio"]
+	path = lib/miniaudio
+	url = https://github.com/mackron/miniaudio.git

@@ -21,8 +21,8 @@ fn main() {
 
 	player := entity.mk(p, 0xff00ffff, 20)
 	img := image.load("test.bmp")
-	//player.image = img
-	//player.setscale(2, 2)
+	player.image = img
+	player.setscale(0.2, 0.2)
 	//player.setrot(10)
 
 	cam := rectangle.mk(10, 10, 80, 80)
@@ -35,6 +35,8 @@ fn main() {
 
 	s = append(s, []^entity.ent{&player, &obj})
 
+	//tophat.debug()
+
 	var w, h: int32
 
 	var mx, my: int32
@@ -44,8 +46,8 @@ fn main() {
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
-		if input.ispressed("w") {
-			//printf("w is pressed\n")
+		if input.isjustpressed("w") {
+			tophat.debug()
 		}
 
 		if input.isjustpressed("q") {
@@ -55,7 +57,9 @@ fn main() {
 		player.p.x, player.p.y = input.getglobalmousepos(cam)
 
 		obj.draw(cam)
+		//for i:=0; i<2000; i++ {
 		player.draw(cam)
+		//}
 		coll = player.getcoll(s)
 		if coll > 0 {
 			player.color = 0xffff00ff
