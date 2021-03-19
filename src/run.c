@@ -6,7 +6,7 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"
-#include "audio.h"
+//#include "audio.h"
 
 float scaling;
 int *pressed;
@@ -21,9 +21,34 @@ void *umka;
 
 void HandleKey(int keycode, int bDown) {
 	if (keycode > 255) {
-		//TODO: switch case with another options
-		return;
+		switch (keycode) {
+		case 65288:
+			keycode = 0;
+			break;
+		case 65307:
+			keycode = 1;
+			break;
+		case 65293:
+			keycode = 2;
+			break;
+		case 65362:
+			keycode = 3;
+			break;
+		case 65364:
+			keycode = 4;
+			break;
+		case 65361:
+			keycode = 5;
+			break;
+		case 65363:
+			keycode = 6;
+			break;
+		default:
+			return;
+		}
 	}
+
+	printf("%d\n", keycode);
 
 	if (!bDown) {
 		pressed[keycode] = 0;
@@ -45,7 +70,7 @@ void HandleMotion( int x, int y, int mask ) {
 	my = y;
 }
 void HandleDestroy() {
-	audeinit();
+	//audeinit();
 	umkaCall(umka, destroyfunc, 0, NULL, NULL);
 }
 

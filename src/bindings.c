@@ -7,9 +7,9 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "../lib/stb/stb_image.h"
-#include "../lib/miniaudio/miniaudio.h"
+//#include "../lib/miniaudio/miniaudio.h"
 
-#include "audio.h"
+//#include "audio.h"
 #include "bindings.h"
 #include "poly.h"
 
@@ -58,16 +58,16 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "updatescaling", &umgetscaling);
 }
 
-ma_decoder *dc;
+//ma_decoder *dc;
 
 // etc
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
-	auplay(dc);	
+	//auplay(dc);	
 }
 
 void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r) {
-	dc = auload("test.wav");
-	auinit();
+	//dc = auload("test.wav");
+	//auinit();
 }
 
 // images
@@ -76,6 +76,7 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	image *img = loadimage(strcat(respath, path));
 	rdimg(img, scaling);
+	//flipv(img);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 
 	r[0].ptrVal = (long int)img;

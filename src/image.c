@@ -37,6 +37,20 @@ void imgslowdraw(image *img) {
 	}
 }
 
+void flipv(image *img) {
+	uint32_t *f;
+	f = malloc(sizeof(img->rdimg));
+
+	for (int i=0; i < img->w; i++) {
+		for (int j=0; j < img->h; j++) {
+			f[(j + 1) * img->w - i] = img->rdimg[j * img->w + i];
+		}
+	}
+
+	img->rdimg = f;
+	free(f);
+}
+
 void rdimg(image *img, float scaling) {
 
 	uint32_t *rd;

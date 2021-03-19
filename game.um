@@ -52,7 +52,7 @@ fn main() {
 			tophat.debug()
 		}
 
-		if input.isjustpressed(input.KEY_Q) {
+		if input.isjustpressed(input.KEY_ESCAPE) {
 			return
 		}
 

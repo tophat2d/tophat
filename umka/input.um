@@ -6,6 +6,23 @@ import (
 )
 
 const (
+	KEY_BACKSPACE* = 0
+	KEY_ESCAPE* = 1
+	KEY_ENTER* = 2
+	ARROW_UP* = 3
+	ARROW_DOWN* = 4
+	ARROW_LEFT* = 5
+	ARROW_RIGHT* = 6
+	KEY_0* = 48
+	KEY_1* = 49
+	KEY_2* = 50
+	KEY_3* = 51
+	KEY_4* = 52
+	KEY_5* = 53
+	KEY_6* = 54
+	KEY_7* = 55
+	KEY_8* = 56
+	KEY_9* = 57
 	KEY_A* = 97
 	KEY_B* = 98
 	KEY_C* = 99
@@ -31,6 +48,9 @@ const (
 	KEY_X* = 120
 	KEY_Y* = 121
 	KEY_Z* = 122
+	KEY_MINUS* = 45
+	KEY_PlUS* = 61
+	KEY_SPACE* = 32
 )
 
 fn cgetmouse(x, y: ^int32)
