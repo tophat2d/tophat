@@ -83,26 +83,32 @@ function package() {
 
 if [ "$1" == "run" ]; then
 	$Path/bin/tophat-linux debug
+	exit 0
 fi
 
 if [ "$1" == "package" ]; then
 	package
+	exit 0
 fi
 
 if [ "$1" == "install" ]; then
 	setup $2
+	exit 0
 fi
 
 if [ "$1" == "update" ]; then
 	update
+	exit 0
 fi
 
 if [ "$1" == "uninstall" ]; then
 	clean
+	exit 0
 fi
 
 if [ "$1" == "get" ]; then
 	get
+	exit 0
 fi
 
 echo "invalid arguments. usage:"
