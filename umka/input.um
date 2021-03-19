@@ -5,67 +5,33 @@ import (
 	"rectangle.um"
 )
 
-var keycodes: map.Map
-
-fn getkeycode(s: str): int32 {
-
-	switch s[0] {
-	case 'a':
-		return 97
-	case 'b':
-		return 98
-	case 'c':
-		return 99
-	case 'd':
-		return 100
-	case 'e':
-		return 101
-	case 'f':
-		return 102
-	case 'g':
-		return 103
-	case 'h':
-		return 104
-	case 'i':
-		return 105
-	case 'j':
-		return 106
-	case 'k':
-		return 107
-	case 'l':
-		return 108
-	case 'm':
-		return 109
-	case 'n':
-		return 110
-	case 'o':
-		return 111
-	case 'p':
-		return 112
-	case 'q':
-		return 113
-	case 'r':
-		return 114
-	case 's':
-		return 115
-	case 't':
-		return 116
-	case 'u':
-		return 117
-	case 'v':
-		return 118
-	case 'w':
-		return 119
-	case 'x':
-		return 120
-	case 'y':
-		return 121
-	case 'z':
-		return 122
-	}
-
-	return -1
-}
+const (
+	KEY_A* = 97
+	KEY_B* = 98
+	KEY_C* = 99
+	KEY_D* = 100
+	KEY_E* = 101
+	KEY_F* = 102
+	KEY_G* = 103
+	KEY_H* = 104
+	KEY_I* = 106
+	KEY_K* = 107
+	KEY_L* = 108
+	KEY_M* = 109
+	KEY_N* = 110
+	KEY_O* = 111
+	KEY_P* = 112
+	KEY_Q* = 113
+	KEY_R* = 114
+	KEY_S* = 115
+	KEY_T* = 116
+	KEY_U* = 117
+	KEY_V* = 118
+	KEY_W* = 119
+	KEY_X* = 120
+	KEY_Y* = 121
+	KEY_Z* = 122
+)
 
 fn cgetmouse(x, y: ^int32)
 
@@ -87,18 +53,11 @@ fn cispressed(keycode: int32): int32
 
 fn cisjustpressed(key: int32): int32
 
-fn ispressed*(key: str): bool {
-	code := getkeycode(key)
-	if code == -1 {
-		return false
-	}
-
+fn ispressed*(code: int32): bool {
 	val := bool(cispressed(code))
 	return val
 }
 
-fn isjustpressed*(key: str): bool {
-	code := getkeycode(key)
-
+fn isjustpressed*(code: int32): bool {
 	return bool(cisjustpressed(code))
 }

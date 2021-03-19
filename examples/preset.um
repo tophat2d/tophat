@@ -7,7 +7,7 @@ import (
 )
 
 fn main() {
-	tophat.setup("title")
+	tophat.setup("title", 1280, 720)
 
 	var w, h: int32
 

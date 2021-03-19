@@ -65,7 +65,7 @@ fn deathscreen() {
 fn main() {
 
 	// opens window with title snake and sets up engine
-	tophat.setup("snake")
+	tophat.setup("snake", 960, 540)
 
 	// create scene, that will be used for collisions
 	s = []^entity.ent{}
@@ -117,23 +117,23 @@ fn main() {
 		}
 
 		// input
-		if input.isjustpressed("a") && direction != 0 {
+		if input.isjustpressed(input.KEY_A) && direction != 0 {
 			direction = 0
 			lastmove = 0
 		}
-		if input.isjustpressed("d") && direction != 2 {
+		if input.isjustpressed(input.KEY_D) && direction != 2 {
 			direction = 2
 			lastmove = 0
 		}
-		if input.isjustpressed("w") && direction != 1 {
+		if input.isjustpressed(input.KEY_W) && direction != 1 {
 			direction = 1
 			lastmove = 0
 		}
-		if input.isjustpressed("s") && direction != 3 {
+		if input.isjustpressed(input.KEY_S) && direction != 3 {
 			direction = 3
 			lastmove = 0
 		}
-		if input.isjustpressed("q") {
+		if input.isjustpressed(input.KEY_Q) {
 			break
 		}
 

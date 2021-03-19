@@ -48,11 +48,11 @@ fn main() {
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
-		if input.isjustpressed("w") {
+		if input.isjustpressed(input.KEY_W) {
 			tophat.debug()
 		}
 
-		if input.isjustpressed("q") {
+		if input.isjustpressed(input.KEY_Q) {
 			return
 		}
 

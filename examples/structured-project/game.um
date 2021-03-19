@@ -21,7 +21,7 @@ var (
 
 fn main() {
 	// usual setup
-	tophat.setup("scene demo")
+	tophat.setup("scene demo", 800, 400)
 	var w, h: int32
 	cam := rectangle.mk(0, 0, 80, 40)
 
@@ -43,15 +43,15 @@ fn main() {
 		}
 
 		// setting current scene
-		if input.isjustpressed("q") {
+		if input.isjustpressed(input.KEY_Q) {
 			currentscene = SCENE_1
 		}
 
-		if input.isjustpressed("w") {
+		if input.isjustpressed(input.KEY_W) {
 			currentscene = SCENE_2
 		}
 
-		if input.isjustpressed("e") {
+		if input.isjustpressed(input.KEY_E) {
 			currentscene = SCENE_3
 		}
 
