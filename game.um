@@ -49,27 +49,26 @@ fn main() {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
 		if input.isjustpressed(input.KEY_W) {
-			tophat.debug()
+			tophat.setwindowtitle(std.itoa(std.rand()))
 		}
 
 		if input.isjustpressed(input.KEY_ESCAPE) {
 			return
 		}
 
+
 		player.p.x, player.p.y = input.getglobalmousepos(cam)
 
-		obj.draw(cam)
-		//for i:=0; i<2000; i++ {
-		//start = tophat.gettime()
 		player.draw(cam)
-		//printf("%f\n", tophat.gettime()-start);
-		//}
+		obj.draw(cam)
 		coll = player.getcoll(s)
 		if coll > 0 {
 			player.color = 0xffff00ff
 		} else {
 			player.color = 0xff00ffff
 		}
+		rawdraw.setcolor(0x262626eb)
+		rawdraw.drawrect(20 - cam.x, 20 - cam.y, 40, 40)
 		rawdraw.drawtext(std.itoa(player.p.x) + ", " + std.itoa(player.p.y), 10, 10, 0x000000ff, 1)
 	}
 	img.delete()

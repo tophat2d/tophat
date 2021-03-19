@@ -8,6 +8,8 @@ fn loadimg(path: ^char): int
 
 fn deleteimg(i: int)
 
+fn iconset(i: int)
+
 /*fn imgsetscale(x, y: real32, i: int)
 
 fn imgrotate(rot: int32, i: int)
@@ -20,6 +22,10 @@ fn load*(path: str): img {
 
 fn (i: ^img) delete*() {
 	deleteimg(i.handle)
+}
+
+fn (i: ^img) setasicon*() {
+	iconset(i.handle)
 }
 
 /*fn (i: ^img) scale*(x, y: real) {

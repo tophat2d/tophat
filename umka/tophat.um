@@ -21,6 +21,8 @@ fn setup*(title: str, w, h: int32) {
 	start = gettime()
 }
 
+fn setwindowtitle*(title: str)
+
 fn debug*()
 fn debug2*()
 

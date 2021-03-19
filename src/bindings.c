@@ -56,6 +56,9 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "swapbuffers", &umCNFGSwapBuffers);
 	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
 	umkaAddFunc(umka, "updatescaling", &umgetscaling);
+	umkaAddFunc(umka, "drawrect", &umCNFGTackRectangle);
+	umkaAddFunc(umka, "setwindowtitle", &umCNFGChangeWindowTitle);
+	umkaAddFunc(umka, "iconset", &umCNFGSetWindowIconData);
 }
 
 //ma_decoder *dc;
@@ -283,3 +286,21 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 	}
 }
 
+void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int y2 = p[0].intVal;
+	int x2 = p[1].intVal;
+	int y1 = p[2].intVal;
+	int x1 = p[3].intVal;
+
+	CNFGTackRectangle(x1 * scaling, y1 * scaling, (x2 + x1) * scaling, (y2 + y1) * scaling);
+}
+
+void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r) {
+	CNFGChangeWindowTitle((char *)p->ptrVal);
+}
+
+void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[0].ptrVal;
+
+	CNFGSetWindowIconData(img->w, img->h, img->rdimg);
+}

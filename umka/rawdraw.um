@@ -15,3 +15,5 @@ fn getdimensions*(w, h: ^int32)
 fn swapbuffers*()
 
 fn handleinput*()
+
+fn drawrect*(x1, y1, x2, y2: int32)

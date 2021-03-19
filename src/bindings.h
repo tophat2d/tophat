@@ -51,4 +51,10 @@ void umCNFGHandleInput(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r);
+
 #endif

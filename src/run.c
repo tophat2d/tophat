@@ -48,8 +48,6 @@ void HandleKey(int keycode, int bDown) {
 		}
 	}
 
-	printf("%d\n", keycode);
-
 	if (!bDown) {
 		pressed[keycode] = 0;
 		justpressed[keycode] = 0;
