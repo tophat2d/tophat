@@ -6,7 +6,7 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"
-#include "audio.h"
+//#include "audio.h"
 
 float scaling;
 int *pressed;
@@ -45,7 +45,7 @@ void HandleMotion( int x, int y, int mask ) {
 	my = y;
 }
 void HandleDestroy() {
-	audeinit();
+	//audeinit();
 	umkaCall(umka, destroyfunc, 0, NULL, NULL);
 }
 

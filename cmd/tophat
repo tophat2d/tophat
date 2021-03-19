@@ -2,31 +2,49 @@
 
 Path=/usr/share/tophat
 
-if [ "$1" == "get" ]; then
+function get () {
 	echo "downloading"
-	sudo curl "https://marekmaskarinec.github.io/files/tophat.tar.xz" -o /tmp/tophat.tar.xz
+	curl "https://marekmaskarinec.github.io/files/tophat/tophat.tar.xz" -o tophat.tar.xz
+	if [ -f "tophat.tar.xz" ]; then
+		echo "download completed"
+	else
+		echo "download failed"
+		exit 1
+	fi
+}
+
+function clean () {
+	echo "test"
+	if [ -f $Path ]; then
+		echo "removing installed stuff"
+	fi
+	sudo rm -r $Path
+	if [ -f "tophat.tar.xz" ]; then rm -r tophat.tar.xz; fi
+}
+
+function setup () {
 	sudo rm -r $Path
 	sudo mkdir $Path
 	echo "extracting"
-	sudo tar -xf /tmp/tophat.tar.xz -C $Path
+	sudo tar -xf $1 -C $Path
 	echo "copying"
 	sudo mv $Path/tophat-release/* $Path
 	sudo rm -r $Path/tophat-release
-	sudo rm -r /tmp/tophat.tar.xz
+	echo "asking for version"
 	echo "done"
-fi
+}
 
-if [ "$1" == "run" ]; then
-	$Path/bin/tophat-linuxx11 debug
-fi
+function update() {
+	if [ $(curl "https://marekmaskarinec.github.io/files/tophat/version") = $(cat $Path/version) ]; then
+		echo "tophat is already up to date"
+		exit 0
+	fi
 
-if [ "$1" == "init" ]; then
-	mkdir tophat
-	cp -r $Path/umka/* ./tophat
-	cp $Path/template.um ./game.um
-fi
+	get
+	setup tophat.tar.xz
+}
 
-if [ "$1" == "package" ]; then
+function package() {
 	if [ "$2" == "" ]; then
 		echo "specify os"
 		exit 1
@@ -39,14 +57,59 @@ if [ "$1" == "package" ]; then
 	fi
 
 	if [ "$2" == "linux" ]; then
-		Bin=tophat-linuxx11
+		Bin=tophat-linux
+	elif [ "$2" == "windows" ]; then
+		Bin=tophat-win
 	fi
 
-	mkdir package-$2
-	mkdir package-$2/$Name.dat
-	cp -r ./* package-$2/$Name.dat
-	cp -r $Path/bin/$Bin ./package-$2/$Name
-	rm -r package-$2/$Name.dat/package
+	if [ "$Bin" == "" ]; then
+		echo "invalid os specified. only windows and linux currently supported"
+		exit 1
+	fi
+
+	mkdir $Name-$2
+	mkdir $Name-$2/$Name.dat
+	cp -r ./* $Name-$2/$Name.dat
+	cp -r $Path/bin/$Bin ./$Name-$2/$Name
+	rm -r $Name-$2/$Name.dat/$Name
+	if [ "$2" == "windows" ]; then
+		cp $Path/bin/libumka.dll $Name-$2
+	fi
+
+	zip $Name-$2
 
 	echo ""
+}
+
+if [ "$1" == "run" ]; then
+	$Path/bin/tophat-linux debug
 fi
+
+if [ "$1" == "package" ]; then
+	package
+fi
+
+if [ "$1" == "install" ]; then
+	setup $2
+fi
+
+if [ "$1" == "update" ]; then
+	update
+fi
+
+if [ "$1" == "uninstall" ]; then
+	clean
+fi
+
+if [ "$1" == "get" ]; then
+	get
+fi
+
+echo "invalid arguments. usage:"
+echo "run: runs the game in current directory"
+echo "package [ platform ] [ game name ]: makes a package from the game in current directory"
+echo "install [ package path ]: installs tophat from archive specified by path"
+echo "update: checks for update. if new version is available, downloads it and installs it"
+echo "uninstall: removes tophat data. this tool will stay"
+echo "get: gets tophat data"
+
