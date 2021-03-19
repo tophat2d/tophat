@@ -6,7 +6,7 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"
-//#include "audio.h"
+#include "audio.h"
 
 float scaling;
 int *pressed;
@@ -45,7 +45,7 @@ void HandleMotion( int x, int y, int mask ) {
 	my = y;
 }
 void HandleDestroy() {
-	//audeinit();
+	audeinit();
 	umkaCall(umka, destroyfunc, 0, NULL, NULL);
 }
 
@@ -62,14 +62,17 @@ int main(int argc, char *argv[]) {
 	memset(pressed, 0, 255 * sizeof(int));
 	memset(justpressed, 0, 255 * sizeof(int));
 
+	
 	if (argc > 1) {
 		respath = malloc(sizeof(char) * 2);
 		strcpy(respath, "./");
 		umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	} else {
+		char scriptpath[50];
 		respath = malloc(sizeof(char) * strlen(strcat(argv[0], ".dat/")));
-		strcpy(respath, strcat(argv[0], ".dat/"));
-		umkaOK = umkaInit(umka, strcat(argv[0], ".dat/game.um"), NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
+		respath = argv[0];
+		strcpy(scriptpath, respath);
+		umkaOK = umkaInit(umka, strcat(scriptpath, "game.um"), NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	}
 
 	if (!umkaOK) {

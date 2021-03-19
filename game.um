@@ -35,7 +35,7 @@ fn main() {
 
 	s = append(s, []^entity.ent{&player, &obj})
 
-	//tophat.debug()
+	tophat.debug2()
 
 	var w, h: int32
 

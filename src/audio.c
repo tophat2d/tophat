@@ -20,22 +20,27 @@ void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uin
 }
 
 void auinit() {
-	/*ma_decoder *decoder;
+	ma_decoder *decoder;
 	decoder = auload("test.wav");
 
+	auconf = ma_device_config_init(ma_device_type_playback);
 	auconf.playback.format = decoder->outputFormat;
 	auconf.playback.channels = decoder->outputChannels;
 	auconf.sampleRate = decoder->outputSampleRate;
 	auconf.dataCallback = data_callback;
-	auconf.pUserData = decoder;i*/
+	auconf.pUserData = decoder;
 
+	if (ma_device_init(NULL, &auconf, &audev) != MA_SUCCESS) {
+		printf("could not open sound device\n");
+		return;
+	}
 }
 
 void audeinit() {
 	ma_device_uninit(&audev);
 }
 
-	ma_decoder *auload(char *path) {
+ma_decoder *auload(char *path) {
 	ma_decoder *decoder;
 	decoder = malloc(sizeof(ma_decoder));
 
@@ -49,23 +54,23 @@ void audeinit() {
 }
 
 void auplay(ma_decoder *decoder) {
-	ma_device device;
-	ma_device_config config;
-	config = ma_device_config_init(ma_device_type_playback);
-	config.playback.format = decoder->outputFormat;
-	config.playback.channels = decoder->outputChannels;
-	config.sampleRate = decoder->outputSampleRate;
-	config.dataCallback = data_callback;
-	config.pUserData = decoder;
+
+	audeinit();
+
+	auconf = ma_device_config_init(ma_device_type_playback);
+	auconf.playback.format = decoder->outputFormat;
+	auconf.playback.channels = decoder->outputChannels;
+	auconf.sampleRate = decoder->outputSampleRate;
+	auconf.dataCallback = data_callback;
+	auconf.pUserData = decoder;
 
 	printf("playing sound\n");
 
-	if (ma_device_init(NULL, &config, &device) != MA_SUCCESS) {
+	if (ma_device_init(NULL, &auconf, &audev) != MA_SUCCESS) {
 		printf("could not open sound device\n");
 		return;
 	}
-
-	if (ma_device_start(&device) != MA_SUCCESS) {
+	if (ma_device_start(&audev) != MA_SUCCESS) {
 		printf("failed to start device\n");
 		return;
 	}

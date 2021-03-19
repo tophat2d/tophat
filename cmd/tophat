@@ -60,6 +60,12 @@ function package() {
 		Bin=tophat-linux
 	elif [ "$2" == "windows" ]; then
 		Bin=tophat-win
+	elif [ "$2" == "all" ]; then
+		echo "packaging for linux"
+		package $Name linux
+		echo "packaging for windows"
+		package $Name windows
+		exit 0
 	fi
 
 	if [ "$Bin" == "" ]; then
@@ -67,16 +73,17 @@ function package() {
 		exit 1
 	fi
 
-	mkdir $Name-$2
-	mkdir $Name-$2/$Name.dat
-	cp -r ./* $Name-$2/$Name.dat
-	cp -r $Path/bin/$Bin ./$Name-$2/$Name
-	rm -r $Name-$2/$Name.dat/$Name
+	mkdir ../$Name-$2
+	mkdir ../$Name-$2/$Name.dat
+	cp -r ./* ../$Name-$2/$Name.dat
+	cp -r $Path/bin/$Bin ../$Name-$2/$Name
 	if [ "$2" == "windows" ]; then
-		cp $Path/bin/libumka.dll $Name-$2
+		cp $Path/bin/libumka.dll ../$Name-$2
 	fi
 
-	zip $Name-$2
+	zip -r ../$Name-$2.zip ../$Name-$2
+	rm -r ../$Name-$2
+	mv ../$Name-$2.zip ./
 
 	echo ""
 }
@@ -87,7 +94,7 @@ if [ "$1" == "run" ]; then
 fi
 
 if [ "$1" == "package" ]; then
-	package
+	package "" $2 $3
 	exit 0
 fi
 
@@ -108,6 +115,13 @@ fi
 
 if [ "$1" == "get" ]; then
 	get
+	exit 0
+fi
+
+if [ "$1" == "init" ]; then
+ 	mkdir tophat
+ 	cp -r $Path/umka/* ./tophat
+ 	cp $Path/preset.um ./game.um
 	exit 0
 fi
 
