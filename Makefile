@@ -22,9 +22,11 @@ package: clean build windows
 	cp bin/windows/libumka.dll tophat-release/bin
 	cp -r umka tophat-release
 	echo $(version) > tophat-release/version
+	echo $(version) > bin/version
 	cp examples/preset.um tophat-release
 	tar cfJ tophat.tar.xz tophat-release
 	rm -r tophat-release
+	mv tophat.tar.xz bin
 
 clean:
 	if [ -f "./tophat-release" ]; then rm -r tophat-release tophat.tar.xz; fi
@@ -35,3 +37,6 @@ clean:
 cmdtool:
 	chmod +x cmd/tophat
 	sudo cp cmd/tophat /bin
+
+ru:
+	sl

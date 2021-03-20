@@ -13,6 +13,10 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r);
+
 //void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r);
 
 //void umimgrotate(UmkaStackSlot *p, UmkaStackSlot *r);

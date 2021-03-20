@@ -4,7 +4,7 @@ Path=/usr/share/tophat
 
 function get () {
 	echo "downloading"
-	curl "https://marekmaskarinec.github.io/files/tophat/tophat.tar.xz" -o tophat.tar.xz
+	curl "https://github.com/marekmaskarinec/tophat/raw/main/bin/tophat.tar.xz" -o tophat.tar.xz
 	if [ -f "tophat.tar.xz" ]; then
 		echo "download completed"
 	else
@@ -35,7 +35,7 @@ function setup () {
 }
 
 function update() {
-	if [ $(curl "https://marekmaskarinec.github.io/files/tophat/version") = $(cat $Path/version) ]; then
+	if [ $(curl "https://github.com/marekmaskarinec/tophat/raw/main/bin/version") = $(cat $Path/version) ]; then
 		echo "tophat is already up to date"
 		exit 0
 	fi

@@ -10,6 +10,10 @@ fn deleteimg(i: int)
 
 fn iconset(i: int)
 
+fn flipvimg(i: int)
+
+fn fliphimg(i: int)
+
 /*fn imgsetscale(x, y: real32, i: int)
 
 fn imgrotate(rot: int32, i: int)
@@ -28,6 +32,13 @@ fn (i: ^img) setasicon*() {
 	iconset(i.handle)
 }
 
+fn (i: ^img) flipv*() {
+	flipvimg(i.handle)
+}
+
+fn (i: ^img) fliph*() {
+	fliphimg(i.handle)
+}
 /*fn (i: ^img) scale*(x, y: real) {
 	imgsetscale(x, y, i.handle)
 }

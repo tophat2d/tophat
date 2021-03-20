@@ -16,6 +16,8 @@ void imgslowdraw(image *img);
 
 void flipv(image *img);
 
+void fliph(image *img);
+
 void rdimg(image *img, float scaling);
 
 #endif

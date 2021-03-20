@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
+#include <GL/gl.h>
 
 #include "tophat.h"
 #include "../lib/rawdraw/CNFG.h"
@@ -29,6 +30,8 @@ void umkabind(void *umka) {
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
 	umkaAddFunc(umka, "deleteimg", &umimgfree);
+	umkaAddFunc(umka, "flipvimg", &umimgflipv);
+	umkaAddFunc(umka, "fliphimg", &umimgfliph);
 	//umkaAddFunc(umka, "imgsetscale", &umimgsetscale);
 	//umkaAddFunc(umka, "imgrotate", &umimgrotate);
 
@@ -79,16 +82,29 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	image *img = loadimage(strcat(respath, path));
 	rdimg(img, scaling);
-	//flipv(img);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 
-	r[0].ptrVal = (long int)img;
+	r[0].ptrVal = (intptr_t)img;
 }
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
 
 	free(img->rdimg);
 	stbi_image_free(img);
+}
+void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[0].ptrVal;
+
+	flipv(img);
+	glDeleteTextures(1, &img->tex);
+	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
+}
+void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[0].ptrVal;
+
+	fliph(img);
+	glDeleteTextures(1, &img->tex);
+	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
 /*void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
@@ -300,7 +316,11 @@ void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r) {
+#ifndef _WIN32
 	image *img = (image *)p[0].ptrVal;
 
 	CNFGSetWindowIconData(img->w, img->h, img->rdimg);
+#else
+	printf("\033[31merror\033[0m: can't set window icon on windows\n");
+#endif
 }
