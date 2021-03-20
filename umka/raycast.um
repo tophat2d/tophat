@@ -1,0 +1,40 @@
+// vim: filetype=umka
+
+import (
+	"entity.um"
+	"polygon.um"
+)
+
+type ray = struct {
+	x: int32
+	y: int32
+	l: int32
+	r: int32
+}
+
+fn mk*(x, y, l, r: int32): ray {
+	return ray{x, y, l, r}
+}
+
+fn craygetcoll(count: int32, r: ^ray, s: ^^entity.cent): int32
+
+fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
+	cscn := []entity.cent{}
+	cps := []polygon.cpoly{}
+
+	for e in s {
+		cps = append(cps, []polygon.cpoly{polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}})
+		ce := entity.cent{null, e.image, e.sx, e.sy, e.rot, e.color, e.id}
+		cscn = append(cscn, []entity.cent{ce})
+	}
+
+	cscnp := []^entity.cent{}
+
+	for i:=0; i < len(cps); i++ {
+		cscn[i].p = &cps[i]
+		cscnp = append(cscnp, &cscn[i])
+	}
+
+	return craygetcoll(len(cscnp), r, &cscnp[0])
+}
+

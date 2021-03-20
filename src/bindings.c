@@ -44,6 +44,9 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "centdraw", &umentdraw);
 	umkaAddFunc(umka, "cgetcoll", &umgetcoll);
 
+	// rays
+	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
+
 	// misc
 	umkaAddFunc(umka, "sleep", &umsleep);
 	umkaAddFunc(umka, "visualizecam", &umvisualizecam);
@@ -62,6 +65,7 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "drawrect", &umCNFGTackRectangle);
 	umkaAddFunc(umka, "setwindowtitle", &umCNFGChangeWindowTitle);
 	umkaAddFunc(umka, "iconset", &umCNFGSetWindowIconData);
+	umkaAddFunc(umka, "cdrawpoly", &umCNFGTackPoly);
 }
 
 //ma_decoder *dc;
@@ -205,8 +209,47 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = 0;
 }
 
-// misc
+// rays
+void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
+	entity **scene = (entity **)p[0].ptrVal;
+	ray *ra = (ray *)p[1].ptrVal;
+	int count = p[2].intVal;
+	int coll;
 
+	int rx, ry;
+	rx = ra->x;
+	ry = ra->y - ra->l;
+
+	rotatepoint(&rx, &ry, ra->x, ra->y, ra->r);
+	
+	for (int i=0; i < count; i++) {
+		if (ra->x > scene[i]->p->x + scene[i]->p->w) {
+			continue;
+		}
+
+		if (ra->y > scene[i]->p->y + scene[i]->p->h) {
+			continue;
+		}
+
+		if (rx < scene[i]->p->x) {
+			continue;
+		}
+
+		if (ry < scene[i]->p->y) {
+			continue;
+		}
+
+		coll = polytoline(scene[i]->p, ra->x, ra->y, rx, ry);
+		if (coll) {
+			r->intVal = scene[i]->id;
+			return;
+		}
+	}
+	r->intVal = 0;
+}
+
+
+// misc
 void umsleep(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int t = p[0].intVal;
 
@@ -324,3 +367,15 @@ void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r) {
 	printf("\033[31merror\033[0m: can't set window icon on windows\n");
 #endif
 }
+
+void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r) {
+	poly *pl = (poly *)p[0].ptrVal;
+	uint32_t color = (uint32_t)p[1].uintVal;
+
+	RDPoint *pr;
+	pr = polytordpoint(pl, 0, 0);
+	CNFGColor(color);
+	CNFGTackPoly(pr, pl->vc);
+	free(pr);
+}
+

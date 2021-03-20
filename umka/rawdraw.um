@@ -1,4 +1,7 @@
-import "std/std.um"
+import (
+	"std/std.um"
+	"polygon.um"
+)
 
 fn drawtext*(text: str, x: int32, y: int32, color: uint32, size: real)
 
@@ -17,3 +20,12 @@ fn swapbuffers*()
 fn handleinput*()
 
 fn drawrect*(x1, y1, x2, y2: int32)
+
+fn drawline*(x1, y1, x2, y2, s: int32, color: uint32) {
+	// this isn't really good solution, but i just want to test rays.
+	p := polygon.mk(x1 - s, y1 - s, []int32{0, 0, x1 + s, y1 + s, x2 + s, y2 + s, x2 - s, y2 - s})
+
+	printf("%d, %d, %d, %d, %d, %d, %d, %d\n", p.x, p.y, p.v[2], p.v[3], p.v[4], p.v[5], p.v[6], p.v[7])
+
+	p.draw(color)
+}

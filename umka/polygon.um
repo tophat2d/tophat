@@ -1,7 +1,10 @@
 // vim: filetype=umka
 
-import "std/std.um"
-
+import (
+	"std/std.um"
+	"misc.um"
+	"rawdraw.um"
+)
 type poly* = struct {
     x: int32
     y: int32
@@ -48,19 +51,6 @@ fn mk*(x, y: int32, v: []int32): poly {
 	return p
 }
 
-fn rotatepoint(x, y, cx, cy, rot: int32): (int32, int32) {
-
-	angle := (rot * std.pi) / 180
-
-	x1 := x - cx;
-	y1 := y - cy;
-
-	x2 := round(x1 * cos(angle) - y1 * sin(angle));
-	y2 := round(x1 * sin(angle) + y1 * cos(angle));
-
-	return x2 + cx, y2 + cy
-}
-
 fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 	var x, y, cx, cy: int32
 
@@ -76,7 +66,7 @@ fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 		x = round(p.rv[i] * sx)
 		y = round(p.rv[i+1] * sy)
 
-		x, y = rotatepoint(x, y, cx, cy, rot)
+		x, y = misc.rotatepoint(x, y, cx, cy, rot)
 
 		if x - p.x > w {
 			w = x - p.x
@@ -91,4 +81,12 @@ fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 	p.v = v
 	p.w = w
 	p.h = h
+}
+
+fn cdrawpoly*(color: uint32, p: ^polygon.cpoly)
+
+fn (p: ^poly) draw*(color: uint32) {
+	cp := polygon.cpoly{p.x, p.y, &p.v[0], p.w, p.h, p.vc}
+
+	cdrawpoly(color, &cp)
 }

@@ -17,7 +17,7 @@ type ent* = struct {
 	id: int32
 }
 
-type cent = struct {
+type cent* = struct {
 	p: ^polygon.cpoly
 	image: image.img
 	sx: real

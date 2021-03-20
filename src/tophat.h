@@ -9,5 +9,6 @@
 #include "debug.h"
 #include "misc.h"
 #include "image.h"
+#include "ray.h"
 
 #endif

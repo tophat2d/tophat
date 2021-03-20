@@ -31,6 +31,8 @@ void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umsleep(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r);
@@ -60,5 +62,7 @@ void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r);
 
 #endif

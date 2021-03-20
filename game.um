@@ -8,6 +8,8 @@ import (
 	"umka/tophat.um"
 	"umka/input.um"
 	"umka/image.um"
+	"umka/raycast.um"
+	"umka/misc.um"
 	"umka/std/std.um"
 )
 
@@ -26,7 +28,6 @@ fn main() {
 	player.setscale(0.2, 0.2)
 	//player.setrot(10)
 
-
 	objp := polygon.mk(0, 0, []int32{0, 0, 0, 20, 20, 20, 20, 0})
 
 	obj := entity.mk(objp, 0x0000ebff, 10)
@@ -37,6 +38,8 @@ fn main() {
 
 	tophat.debug2()
 
+	ray := raycast.mk(10, 10, 20, 0)
+
 	var w, h: int32
 
 	var mx, my: int32
@@ -44,6 +47,10 @@ fn main() {
 	var coll: int32
 
 	var start: int
+
+	var color: uint32
+
+	rotspeed := 0.2
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
@@ -60,16 +67,26 @@ fn main() {
 			return
 		}
 
+		if input.ispressed(input.KEY_Q) {
+			ray.r -= round(rotspeed * tophat.delta)
+		}
 
-		player.p.x, player.p.y = input.getglobalmousepos(cam)
+		if input.ispressed(input.KEY_E) {
+			ray.r += round(rotspeed * tophat.delta)
+		}
 
-		player.draw(cam)
-		//obj.draw(cam)
-		coll = player.getcoll(s)
+		ray.x, ray.y = input.getglobalmousepos(cam)
+
+		rx, ry := misc.rotatepoint(ray.x, ray.y - ray.l, ray.x, ray.y, ray.r)
+		rawdraw.drawline(ray.x, ray.y, rx, ry, 1, color)
+
+		//player.draw(cam)
+		obj.draw(cam)
+		coll = ray.getcoll(s)
 		if coll > 0 {
-			player.color = 0xffff00ff
+			color = 0xffff00ff
 		} else {
-			player.color = 0xff00ffff
+			color = 0xff00ffff
 		}
 		//rawdraw.setcolor(0x262626eb)
 		//rawdraw.drawrect(20 - cam.x, 20 - cam.y, 40, 40)
