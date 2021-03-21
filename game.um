@@ -78,7 +78,7 @@ fn main() {
 		ray.x, ray.y = input.getglobalmousepos(cam)
 
 		rx, ry := misc.rotatepoint(ray.x, ray.y - ray.l, ray.x, ray.y, ray.r)
-		rawdraw.drawline(ray.x, ray.y, rx, ry, 1, color)
+		rawdraw.drawline(ray.x-cam.x, ray.y-cam.y, rx-cam.x, ry-cam.y, 1, color)
 
 		//player.draw(cam)
 		obj.draw(cam)
@@ -90,7 +90,7 @@ fn main() {
 		}
 		//rawdraw.setcolor(0x262626eb)
 		//rawdraw.drawrect(20 - cam.x, 20 - cam.y, 40, 40)
-		rawdraw.drawtext(std.itoa(player.p.x) + ", " + std.itoa(player.p.y), 10, 10, 0x000000ff, 1)
+		rawdraw.drawtext(std.itoa(ray.x) + ", " + std.itoa(ray.y), 10, 10, 0x000000ff, 1)
 	}
 	img.delete()
 }

@@ -100,17 +100,21 @@ fn frand*(): real {return real(rand()) / randMax}
 fn rtltime(): int
 fn time*(): int {return rtltime()}
 
-/*fn rtlclock(): real
+fn rtlclock(): real
 fn clock*(): real {return rtlclock()}
 
-// Command line
+// Command line and environment
 
-fn argc*(): int {return rtlargc}
+/*fn argc*(): int {return rtlargc}
 
 fn argv*(i: int): str {
     if i < 0 || i >= rtlargc {
         error("Command line parameter not found")
     }
-    s := ^[64]str(rtlargv)
-    return s[i]
+    return rtlargv[i]
 }*/
+
+fn rtlgetenv(name: str): str
+fn getenv*(name: str): str {
+    return "" + rtlgetenv(name)
+}

@@ -9,6 +9,8 @@ import (
 
 var start, end, delta*: int
 
+var platform*: str = "linux"
+
 fn sleep*(t: int)
 
 fn gettime*(): int
@@ -17,6 +19,11 @@ fn setup*(title: str, w, h: int32) {
 	rawdraw.setup(title, w, h)
 	rawdraw.setbgcolor(0x000000ff)
 	rawdraw.clearframe()
+
+	if std.getenv("HOME") == "" {
+		input.setwinmap()
+		platform = "windows"
+	}
 
 	start = gettime()
 }

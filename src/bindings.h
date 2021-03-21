@@ -65,4 +65,6 @@ void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r);
+
 #endif

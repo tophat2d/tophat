@@ -66,6 +66,7 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "setwindowtitle", &umCNFGChangeWindowTitle);
 	umkaAddFunc(umka, "iconset", &umCNFGSetWindowIconData);
 	umkaAddFunc(umka, "cdrawpoly", &umCNFGTackPoly);
+	umkaAddFunc(umka, "drawsegment", &umCNFGTackSegment);
 }
 
 //ma_decoder *dc;
@@ -379,3 +380,11 @@ void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r) {
 	free(pr);
 }
 
+void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int y2 = p[0].intVal;
+	int x2 = p[1].intVal;
+	int y1 = p[2].intVal;
+	int x1 = p[3].intVal;
+
+	CNFGTackSegment(x1 * scaling, y1 * scaling, x2 * scaling, y2 * scaling);
+}
