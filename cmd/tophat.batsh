@@ -1,0 +1,105 @@
+Path = "/usr/share/tophat";
+
+function get() {
+    println("downloading");
+	bash("curl \"https://github.com/marekmaskarinec/tophat/raw/main/bin/tophat.tar.xz\" -o tophat.tar.xz");
+    batch("curl \"https://github.com/marekmaskarinec/tophat/raw/main/bin/tophat.tar.xz\" -o tophat.tar.xz");
+	if (exists("tophat.zip")) {
+		println("download completed");
+	} else {
+		println("download failed");
+		return;
+	}
+}
+
+function clean () {
+    global Path;
+    
+	if (exists(Path)) {
+		println("removing tophat");
+	}
+	bash("sudo rm -r $Path");
+    batch("del %Path%");
+	if (exists("tophat.zip")) {
+        batch("del tophat.zip");
+        bash("rm -r tophat.tar.xz");
+    }
+}
+
+function setup () {
+    batch("del %Path%");
+    batch("mkdir %Path%");
+	bash("sudo rm -r $Path");
+	bash("sudo mkdir $Path");
+	println("extracting");
+    batch("TODO: unzip command");
+	bash("sudo tar -xf $1 -C $Path");
+	println("copying");
+    batch("MOVE %Path%/tophat-release/* %Path%");
+    batch("del %Path%/tophat-release");
+	bash("sudo mv $Path/tophat-release/* $Path");
+	bash("sudo rm -r $Path/tophat-release");
+	println("done");
+}
+
+function update() {
+    batch("echo updating not yet available on windows");
+    batch("EXIT /B 1");
+    bash("if [ $(curl \"https://github.com/marekmaskarinec/tophat/raw/main/bin/version\") = $(cat $Path/version) ]; then\necho \"tophat is already up to date\"\nexit 0\nfi");
+
+	get();
+	setup("tophat.zip");
+}
+
+function package(os, name) {
+	if (os == "") {
+		println("specify os");
+		return;
+	}
+
+	if (name == "") {
+		Name = "game";
+	} else {
+		Name = name;
+	}
+
+	if (os == "linux") {
+		Bin="tophat-linux";
+	}else if (os == "windows") {
+		Bin="tophat-win";
+	} else if (os == "all") {
+		println("packaging for linux");
+		package(Name, "linux");
+		println("packaging for windows");
+		package(Name, "windows");
+		return;
+	}
+
+	if (Bin == "") {
+		println("invalid os specified. only windows and linux currently supported");
+		return;
+	}
+
+    batch("mkdir ..\\%Name%-%1");
+    batch("mkdir ..\\%Name%-%1\\%Name%.dat");
+    batch("COPY .\\* ..\\%Name%-%1\\%Name%.dat");
+	batch("COPY %Path%\\bin\\%Bin% ..\\%Name%-%1\\%Name%");
+
+	bash("mkdir ../$Name-$1");
+	bash("mkdir ../$Name-$1/$Name.dat");
+	bash("cp -r ./* ../$Name-$1/$Name.dat");
+	bash("cp -r $Path/bin/$Bin ../$Name-$1/$Name");
+	if (os == "windows") {
+		bash("cp $Path/bin/libumka.dll ../$Name-$1");
+	}
+
+	bash("zip -r ../$Name-$1.zip ../$Name-$1");
+	bash("rm -r ../$Name-$1");
+	bash("mv ../$Name-$1.zip ./");
+    
+    bash("del ..\\%Name%-%1");
+	bash("MOVE ..\\%Name%-%1.zip .\\");
+
+	println("done");
+}
+
