@@ -6,7 +6,7 @@ build:
 	$(cc) $(cflags)
 
 windows:
-	x86_64-w64-mingw32-gcc src/*.c lib/windows/*.a -o tophat.exe -Wall -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread -Llib/windows -lumka
+	x86_64-w64-mingw32-gcc src/*.c lib/windows/libumka_static.a -o tophat.exe -Wall -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread -Llib/windows -DUMKA_STATIC -static -lumka_static
 run:
 	$(cc) $(cflags) -g
 	if [ -f "./tophat" ]; then ./tophat debug; fi
@@ -24,13 +24,13 @@ package: clean build windows
 	echo $(version) > tophat-release/version
 	echo $(version) > bin/version
 	cp examples/preset.um tophat-release
-	tar cfJ tophat.tar.xz tophat-release
+	zip tophat.zip tophat-release
 	rm -r tophat-release
-	mv tophat.tar.xz bin
+	mv tophat.zip bin
 
 clean:
 	if [ -f "./tophat-release" ]; then rm -r tophat-release tophat.tar.xz; fi
-	if [ -f "./tophat.tar.xz" ]; then rm -r tophat.tar.xz; fi
+	if [ -f "./tophat.zip" ]; then rm -r tophat.zip; fi
 	if [ -f "./tophat" ]; then rm tophat; fi
 	if [ -f "./tophat.exe" ]; then rm tophat.exe; fi
 
