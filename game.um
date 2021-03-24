@@ -10,6 +10,7 @@ import (
 	"umka/image.um"
 	"umka/raycast.um"
 	"umka/misc.um"
+	"umka/audio.um"
 	"umka/std/std.um"
 )
 
@@ -36,8 +37,6 @@ fn main() {
 
 	s = append(s, []^entity.ent{&player, &obj})
 
-	tophat.debug2()
-
 	ray := raycast.mk(10, 10, 20, 0)
 
 	var w, h: int32
@@ -52,10 +51,14 @@ fn main() {
 
 	rotspeed := 0.2
 
+	so := audio.load("test.wav")
+	audio.setsounds([]audio.sound{so})
+
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
 		if input.isjustpressed(input.KEY_W) {
+			so.play()
 			img.flipv()
 		}
 

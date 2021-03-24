@@ -21,3 +21,6 @@ int getscaling(int w, int h, int camw, int camh) {
 	return (int)(h/camh);
 }
 
+void errprint(char *text) {
+	printf("\033[31merror\033[0m: %s\n", text);
+}

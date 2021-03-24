@@ -21,6 +21,8 @@ extern int mx;
 extern int my;
 
 extern char *respath;
+extern sound **sounds;
+extern int soundcount;
 
 void umkabind(void *umka) {
 	// etc
@@ -46,6 +48,13 @@ void umkabind(void *umka) {
 
 	// rays
 	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
+	
+	// audio
+	umkaAddFunc(umka, "cauload", &umauload);
+	umkaAddFunc(umka, "cauarr", &umauarr);
+	umkaAddFunc(umka, "csoundloop", &umsoundloop);
+	umkaAddFunc(umka, "csoundplay", &umsoundplay);
+	umkaAddFunc(umka, "csoundvol", &umsoundvol);
 
 	// misc
 	umkaAddFunc(umka, "sleep", &umsleep);
@@ -208,6 +217,36 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 		}
 	}
 	r->intVal = 0;
+}
+
+// audio
+void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
+	sound *s = auload((char *)p->ptrVal);
+
+	r->ptrVal = (intptr_t)s;
+}
+
+void umauarr(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int count = p[0].intVal;
+	sound **auarr = (sound **)p[1].ptrVal;
+
+	soundcount = count;
+	sounds = auarr;
+}
+
+void umsoundloop(UmkaStackSlot *p, UmkaStackSlot *r) {
+	sound *s = (sound *)p[1].ptrVal;
+	s->looping = p[0].intVal;
+}
+
+void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
+	sound *s = (sound *)p[1].ptrVal;
+	s->playing = 1;
+}
+
+void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {
+	sound *s = (sound *)p[1].ptrVal;
+	s->volume = (float)p[0].realVal;
 }
 
 // rays

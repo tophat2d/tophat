@@ -5,4 +5,6 @@ void slp(int t);
 
 int getscaling(int w, int h, int camw, int camh);
 
+void errprint(char *text);
+
 #endif

@@ -10,5 +10,6 @@
 #include "misc.h"
 #include "image.h"
 #include "ray.h"
+#include "audio.h"
 
 #endif

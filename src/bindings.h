@@ -33,6 +33,16 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umauload(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umauarr(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umsoundloop(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r);
+
+void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umsleep(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r);
