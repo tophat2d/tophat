@@ -53,6 +53,7 @@ fn main() {
 
 	so := audio.load("test.wav")
 	audio.setsounds([]audio.sound{so})
+	so.looping(true)
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
@@ -63,6 +64,7 @@ fn main() {
 		}
 
 		if input.isjustpressed(input.KEY_S) {
+			so.stop()
 			img.fliph()
 		}
 
@@ -96,6 +98,7 @@ fn main() {
 		rawdraw.drawtext(std.itoa(ray.x) + ", " + std.itoa(ray.y), 10, 10, 0x000000ff, 1)
 	}
 	img.delete()
+	so.del()
 }
 
 fn windowdestroy() {

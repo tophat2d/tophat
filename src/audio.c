@@ -69,6 +69,12 @@ void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_ui
 			continue;
 		}
 
+		if (csound->deleted) {
+			ma_decoder_uninit(&csound->decoder);
+
+			free(csound);
+		}	
+
 		if (!csound->playing) {
 			continue;
 		}
@@ -82,14 +88,7 @@ void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_ui
 			}
 
 			csound->playing = 0;
-			csound->deleted = 1;
 		}
-
-		if (csound->deleted) {
-			ma_decoder_uninit(&csound->decoder);
-
-			free(csound);
-		}	
 	}
 }
 

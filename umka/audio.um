@@ -12,6 +12,10 @@ fn csoundloop(s: int, looping: int32)
 
 fn csoundplay(s: int)
 
+fn csoundstop(s: int)
+
+fn csounddelete(s: int)
+
 fn csoundvol(s: int, vol: real)
 
 fn load*(path: str): sound {
@@ -22,7 +26,7 @@ fn setsounds*(ss: []sound) {
 	cauarr(&ss[0], len(ss))
 }
 
-fn (s: ^sound) loop*(l: bool) {
+fn (s: ^sound) looping*(l: bool) {
 	if l {
 		csoundloop(s.handle, 1)
 		return
@@ -33,6 +37,14 @@ fn (s: ^sound) loop*(l: bool) {
 
 fn (s: ^sound) play*() {
 	csoundplay(s.handle)
+}
+
+fn (s: ^sound) stop*() {
+	csoundstop(s.handle)
+}
+
+fn (s: ^sound) del*() {
+	csounddelete(s.handle)
 }
 
 fn (s: ^sound) vol*(vol: real) {
