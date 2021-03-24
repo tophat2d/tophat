@@ -4,8 +4,8 @@ Path=/usr/share/tophat
 
 function get () {
 	echo "downloading"
-	curl "https://github.com/marekmaskarinec/tophat/raw/main/bin/tophat.tar.xz" -o tophat.tar.xz
-	if [ -f "tophat.tar.xz" ]; then
+	curl "https://github.com/marekmaskarinec/tophat/raw/main/bin/tophat.zip" -o tophat.zip
+	if [ -f "tophat.zip" ]; then
 		echo "download completed"
 	else
 		echo "download failed"
@@ -14,19 +14,18 @@ function get () {
 }
 
 function clean () {
-	echo "test"
 	if [ -f $Path ]; then
 		echo "removing installed stuff"
 	fi
 	sudo rm -r $Path
-	if [ -f "tophat.tar.xz" ]; then rm -r tophat.tar.xz; fi
+	if [ -f "tophat.zip" ]; then rm -r tophat.zip; fi
 }
 
 function setup () {
 	sudo rm -r $Path
 	sudo mkdir $Path
 	echo "extracting"
-	sudo tar -xf $1 -C $Path
+	sudo unzip $1 -d $Path
 	echo "copying"
 	sudo mv $Path/tophat-release/* $Path
 	sudo rm -r $Path/tophat-release
@@ -41,7 +40,7 @@ function update() {
 	fi
 
 	get
-	setup tophat.tar.xz
+	setup tophat.zip
 }
 
 function package() {
