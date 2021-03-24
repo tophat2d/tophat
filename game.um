@@ -55,6 +55,8 @@ fn main() {
 	audio.setsounds([]audio.sound{so})
 	so.looping(true)
 
+	so.vol(1)
+
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 

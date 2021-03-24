@@ -3,7 +3,7 @@ cflags=src/*.c src/img/*.c src/*.a -Wall -lm -lX11 -o tophat -Lsrc -lumka -L /li
 version=v0.0
 
 build:
-	$(cc) $(cflags)
+	$(cc) $(cflags) -Os
 
 windows:
 	x86_64-w64-mingw32-gcc src/*.c lib/windows/libumka_static.a -o tophat.exe -Wall -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread -Llib/windows -DUMKA_STATIC -static -lumka_static

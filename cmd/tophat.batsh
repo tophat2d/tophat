@@ -32,7 +32,7 @@ function setup () {
 	bash("sudo rm -r $Path");
 	bash("sudo mkdir $Path");
 	println("extracting");
-    batch("TODO: unzip command");
+    batch("powershell.exe -NoP -NonI -Command "Expand-Archive '%1' '%Path%'");
 	bash("sudo tar -xf $1 -C $Path");
 	println("copying");
     batch("MOVE %Path%/tophat-release/* %Path%");
