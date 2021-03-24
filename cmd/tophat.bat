@@ -135,6 +135,25 @@ if "%1" == "package" (
 	goto :package
 )
 
+if "%1" == "uninstall" (
+	del %Path%
+
+	goto :EOF
+)
+
+if "%1" == "init" (
+	COPY %Path%\umka tophat
+	COPY %Path%\preset.um game.um
+
+	goto :EOF
+)
+
+if "%1" == "run" (
+	%Path%\bin\tophat.exe debug
+
+	goto :EOF
+)
+
 echo invalid usage
 echo options:
 echo get: downloads archive with tophat
