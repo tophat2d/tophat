@@ -3,8 +3,7 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to
 
 ## issues
 
- - collisions seem to be a bit buggy, when you stretch your shape too much
- - images don't perform well. 55 of test.bmp are only possible at 60 fps full hd. on lower resolutions, images are ok. 
+ - collisions seem to be a bit buggy, when you stretch your shape too much. idk why
 
 ## features
 
@@ -23,10 +22,7 @@ Bindings are currently on par with the engine. I would even say, they have more 
 
 Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
-- gui tool
-- image flipping
 - docs
-- sounds
 - v0.1 release
 - physics engine (some simple one)
 - simple UI toolkit
