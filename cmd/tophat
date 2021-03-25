@@ -84,7 +84,7 @@ function package() {
 	rm -r ../$Name-$2
 	mv ../$Name-$2.zip ./
 
-	echo ""
+	echo "done"
 }
 
 if [ "$1" == "run" ]; then
