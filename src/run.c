@@ -62,7 +62,10 @@ void HandleKey(int keycode, int bDown) {
 
 	justpressed[keycode] = 0;
 }
-void HandleButton( int x, int y, int button, int bDown ) { }
+void HandleButton( int x, int y, int button, int bDown ) {
+	HandleKey(button+6, bDown);
+}
+
 void HandleMotion( int x, int y, int mask ) {
 	mx = x;
 	my = y;

@@ -60,12 +60,12 @@ fn main() {
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
-		if input.isjustpressed(input.KEY_W) {
+		if input.isjustpressed(input.LMB) {
 			so.play()
 			img.flipv()
 		}
 
-		if input.isjustpressed(input.KEY_S) {
+		if input.isjustpressed(input.RMB) {
 			so.stop()
 			img.fliph()
 		}

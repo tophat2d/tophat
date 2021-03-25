@@ -13,6 +13,9 @@ var (
 	ARROW_DOWN* : int32= 4
 	ARROW_LEFT*: int32 = 5
 	ARROW_RIGHT*: int32 = 6
+	LMB*: int32 = 7
+	MMB*: int32 = 8
+	RMB*: int32 = 9
 	KEY_0*: int32 = 48
 	KEY_1*: int32 = 49
 	KEY_2*: int32 = 50
