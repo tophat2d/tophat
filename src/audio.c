@@ -22,12 +22,7 @@ int soundcount;
 
 extern char *respath;
 
-ma_uint32 __read_and_mix_pcm_frames_f32(
-    ma_decoder* pDecoder,
-    float* pOutputF32,
-    ma_uint32 frameCount,
-    float volume
-){
+ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32, ma_uint32 frameCount, float volume) {
     float temp[4096];
     ma_uint32 tempCapInFrames = ma_countof(temp) / CHANNEL_COUNT;
     ma_uint32 totalFramesRead = 0;
@@ -65,15 +60,15 @@ void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_ui
 	for (int i=soundcount-1; i >= 0; i--) {
 		sound *csound = sounds[i];
 
-		if (csound == NULL || csound->deleted) {
-			continue;
-		}
-
 		if (csound->deleted) {
 			ma_decoder_uninit(&csound->decoder);
 
 			free(csound);
 		}	
+
+		if (csound == NULL || csound->deleted) {
+			continue;
+		}
 
 		if (!csound->playing) {
 			continue;
@@ -82,11 +77,10 @@ void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_ui
 		ma_uint32 framesread = __read_and_mix_pcm_frames_f32(&csound->decoder, (float *)pOutput, frameCount, csound->volume);
 										
 		if (framesread <= 0) {
+			ma_decoder_seek_to_pcm_frame(&csound->decoder, 0);
 			if (csound->looping) {
-				ma_decoder_seek_to_pcm_frame(&csound->decoder, 0);
 				continue;
 			}
-
 			csound->playing = 0;
 		}
 	}

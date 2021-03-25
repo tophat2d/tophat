@@ -1,0 +1,29 @@
+import (
+	"std/std.um"
+	"polygon.um"
+)
+
+fn drawtext*(text: str, x: int32, y: int32, color: uint32, size: real)
+
+fn setup*(title: str, w, h: int)
+
+fn setbgcolor*(color: int)
+
+fn setcolor*(color: int)
+
+fn clearframe*()
+
+fn getdimensions*(w, h: ^int32)
+
+fn swapbuffers*()
+
+fn handleinput*()
+
+fn drawsegment*(x1, y1, x2, y2: int32)
+
+fn drawrect*(x1, y1, x2, y2: int32)
+
+fn drawline*(x1, y1, x2, y2, s: int32, color: uint32) {
+	setcolor(color)
+	drawsegment(x1, y1, x2, y2)
+}

@@ -1,0 +1,16 @@
+// vim: filetype=umka
+
+import "std/std.um"
+
+fn rotatepoint*(x, y, cx, cy, rot: int32): (int32, int32) {
+
+	angle := (rot * std.pi) / 180
+
+	x1 := x - cx;
+	y1 := y - cy;
+
+	x2 := round(x1 * cos(angle) - y1 * sin(angle));
+	y2 := round(x1 * sin(angle) + y1 * cos(angle));
+
+	return x2 + cx, y2 + cy
+}
