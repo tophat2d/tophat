@@ -66,13 +66,14 @@ fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 		x = round(p.rv[i] * sx)
 		y = round(p.rv[i+1] * sy)
 
+		printf("%d, %d\n", x, y)
 		x, y = misc.rotatepoint(x, y, cx, cy, rot)
 
-		if x - p.x > w {
-			w = x - p.x
+		if x > w {
+			w = x
 		}
-		if y - p.y > h {
-			h = y - p.y
+		if y > h {
+			h = y
 		}
 
 		v = append(v, []int32{x, y})

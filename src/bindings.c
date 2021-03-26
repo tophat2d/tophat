@@ -80,8 +80,6 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "drawsegment", &umCNFGTackSegment);
 }
 
-//ma_decoder *dc;
-
 // etc
 void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
 	//auplay(dc);	
@@ -96,17 +94,22 @@ void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *path = (char *)p[0].ptrVal;
 
-	image *img = loadimage(strcat(respath, path));
+	image *img;
+	char pathcpy[512];
+	strcpy(pathcpy, respath);
+	img = loadimage(strcat(pathcpy, path));
 	rdimg(img, scaling);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 
 	r[0].ptrVal = (intptr_t)img;
+	stbi_image_free(img->raw);
 }
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
 
 	free(img->rdimg);
-	stbi_image_free(img);
+	stbi_image_free(img->raw);
+	free(img);
 }
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;

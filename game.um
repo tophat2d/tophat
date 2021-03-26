@@ -29,6 +29,7 @@ fn main() {
 	player.setscale(4, 4)
 	//player.setrot(10)
 
+	img = image.load("test.bmp")
 	objp := polygon.mk(0, 0, []int32{0, 0, 0, 20, 20, 20, 20, 0})
 
 	obj := entity.mk(objp, 0x0000ebff, 10)

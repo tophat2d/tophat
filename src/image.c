@@ -12,9 +12,11 @@
 image *loadimage(char *path) {
 	int w, h, c;
 
+	printf("%s\n", path);
+
 	unsigned char *data = stbi_load(path, &w, &h, &c, 0);
 
-	//printf("loaded image with h: %d, w: %d, c: %d\n", w, h, c);
+	printf("loaded image with h: %d, w: %d, c: %d\n", w, h, c);
 
 	image *img;
 	img = malloc(sizeof(image));
