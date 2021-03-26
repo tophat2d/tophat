@@ -17,4 +17,4 @@ in blank directory run `tophat init`. then replace the default game file with th
 ### 2. using data in this repo
 
 1. `cp -r ../../umka tophat`
-2. `../../tophat debug`
+2. `../../tophat debug` or `tophat run`
