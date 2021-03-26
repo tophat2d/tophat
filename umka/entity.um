@@ -69,6 +69,11 @@ fn (e: ^ent) setscale*(sx, sy: real) {
 }
 
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
+
+	if len(s) == 0 {
+		return 0
+	}
+
 	cscn := []cent{}
 	cps := []polygon.cpoly{}
 

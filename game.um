@@ -26,7 +26,7 @@ fn main() {
 	player := entity.mk(p, 0xff00ffff, 20)
 	img := image.load("test.bmp")
 	player.image = img
-	player.setscale(0.2, 0.2)
+	player.setscale(4, 4)
 	//player.setrot(10)
 
 	objp := polygon.mk(0, 0, []int32{0, 0, 0, 20, 20, 20, 20, 0})
@@ -87,8 +87,8 @@ fn main() {
 		rx, ry := misc.rotatepoint(ray.x, ray.y - ray.l, ray.x, ray.y, ray.r)
 		rawdraw.drawline(ray.x-cam.x, ray.y-cam.y, rx-cam.x, ry-cam.y, 1, color)
 
-		//player.draw(cam)
 		obj.draw(cam)
+		player.draw(cam)
 		coll = ray.getcoll(s)
 		if coll > 0 {
 			color = 0xffff00ff

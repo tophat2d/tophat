@@ -119,7 +119,12 @@ int main(int argc, char *argv[]) {
 
 	destroyfunc = umkaGetFunc(umka, NULL, "windowdestroy");
 
-	umkaRun(umka);
+	umkaOK = umkaRun(umka);
+	if (!umkaOK) {
+		UmkaError error;
+		umkaGetError(umka, &error);
+		printf("Umka runtime error %s (%d): %s\n", error.fileName, error.line, error.msg);
+	}
 
 	umkaFree(umka);
 

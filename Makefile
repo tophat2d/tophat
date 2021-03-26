@@ -14,7 +14,8 @@ run:
 	$(cc) $(cflags) -g
 	if [ -f "./tophat" ]; then ./tophat debug; fi
 
-install: build
+install: 
+	$(cc) $(cflags) -g
 	sudo cp tophat /usr/share/tophat/bin/tophat-linux
 
 package: clean build windows
