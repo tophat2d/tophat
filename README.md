@@ -15,7 +15,8 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to
 Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
 - add better return values from collisions
-- note on entities
+- notes on entities
+- minitutorials - how to structure, animations, raycasts, wasd movement etc.
 - v0.1 release
 - physics engine (some simple one)
 - simple UI toolkit
