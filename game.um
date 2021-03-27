@@ -83,7 +83,7 @@ fn main() {
 			ray.r += round(rotspeed * tophat.delta)
 		}
 
-		ray.x, ray.y = input.getglobalmousepos(cam)
+		player.p.x, player.p.y = input.getglobalmousepos(cam)
 
 		rx, ry := misc.rotatepoint(ray.x, ray.y - ray.l, ray.x, ray.y, ray.r)
 		rawdraw.drawline(ray.x-cam.x, ray.y-cam.y, rx-cam.x, ry-cam.y, 1, color)

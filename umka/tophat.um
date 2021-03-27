@@ -38,6 +38,9 @@ fn visualizecam(w, h: int32, color: uint32)
 fn updatescaling(w, h, camw, camh: int32)
 
 fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
+	rawdraw.setcolor(0x000000ff)
+	rawdraw.drawrect(0, cam.h, w^, h^)
+	rawdraw.drawrect(cam.w, 0, w^, h^)
 	rawdraw.swapbuffers()
 
 	end = gettime()
