@@ -18,9 +18,9 @@ Things I want to prioritize on. They are in the order, I want to complete them, 
 - add better return values from collisions
 - notes on entities
 - minitutorials - how to structure, animations, raycasts, wasd movement etc.
+- simple UI toolkit
 - v0.1 release
 - physics engine (some simple one)
-- simple UI toolkit
 - module support
 - particle system
 - tilemaps
