@@ -1,4 +1,4 @@
-# tophat
+# tophat engine
 A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to be both lightweight and easy to use.
 
 ## features
