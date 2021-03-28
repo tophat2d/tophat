@@ -5,7 +5,7 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to
 
 - scripting with [umka](https://github.com/vtereshkov/umka-lang)
 - you have your own game loop - you have the power over how the game works. not the engine
-- does things the simple way - no bloated system for animations. you can make them in one line.
+- does things the simple way - for example, tophat has no bloated system for animations. you can make them in just one line.
 - scaling - your game looks the same no matter the resolution
 - very lightweight - the engine is only about 750 kb in size
 - polygon to polygon collisions
@@ -14,12 +14,14 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to
 
 Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
+- more safety
 - convert coordinates and rotation to real
 - add better return values from collisions
 - notes on entities
 - minitutorials - how to structure, animations, raycasts, wasd movement etc.
 - simple UI toolkit
 - v0.1 release
+- web build
 - physics engine (some simple one)
 - module support
 - particle system
