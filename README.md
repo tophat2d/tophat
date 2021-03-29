@@ -18,8 +18,14 @@ Things I want to prioritize on. They are in the order, I want to complete them, 
 - convert coordinates and rotation to real
 - add better return values from collisions
 - notes on entities
+- `move_and_slide`-like function
 - minitutorials - how to structure, animations, raycasts, wasd movement etc.
 - simple UI toolkit
+- more templates
+- finnish space shooter example
+- fix image flipping
+- windows installer
+- fix windows package
 - v0.1 release
 - web build
 - physics engine (some simple one)
