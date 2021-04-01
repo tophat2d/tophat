@@ -1,6 +1,10 @@
 cc=cc
+
+# TODO: better path
+webcc=/home/marek/desk/emsdk/upstream/emscripten/emcc
 cflags=src/*.c src/img/*.c src/*.a -Wall -lm -lX11 -o tophat -Lsrc -lumka -L /lib64 -ldl -lGL -lpthread
 wincflags=src/*.c lib/windows/libumka_static.a -o tophat.exe -Wall -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread -Llib/windows -DUMKA_STATIC -static -lumka_static
+webcflags=src/*.c src/img/*.c lib/umka/src/*.c -Wall -s WASM=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -o main.wasm -ldl -lpthread
 
 version=v0.0
 
@@ -9,6 +13,9 @@ build:
 
 windows:
 	x86_64-w64-mingw32-gcc $(wincflags)
+
+web:
+	$(webcc) $(webcflags)
 
 run:
 	$(cc) $(cflags) -g

@@ -57,6 +57,8 @@ void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umCNFGSetVSync(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umCNFGSetBgColor(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGSetColor(UmkaStackSlot *p, UmkaStackSlot *r);

@@ -66,6 +66,7 @@ void umkabind(void *umka) {
 	// rawdraw
 	umkaAddFunc(umka, "drawtext", &umdrawtext);
 	umkaAddFunc(umka, "setup", &umCNFGSetup);
+	umkaAddFunc(umka, "setvsync", &umCNFGSetVSync);
 	umkaAddFunc(umka, "setbgcolor", &umCNFGSetBgColor);
 	umkaAddFunc(umka, "setcolor", &umCNFGSetColor);
 	umkaAddFunc(umka, "clearframe", &umCNFGClearFrame);
@@ -356,7 +357,11 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	if (res) {
 		printf("could not initialize rawdraw\n");
+		return;
 	}
+}
+
+void umCNFGSetVSync(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGSetBgColor(UmkaStackSlot *p, UmkaStackSlot *r) {

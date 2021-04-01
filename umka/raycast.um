@@ -23,8 +23,8 @@ fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 	cps := []polygon.cpoly{}
 
 	for e in s {
-		cps = append(cps, []polygon.cpoly{polygon.cpoly{e.p.x, e.p.y, &e.p.v[0], e.p.w, e.p.h, e.p.vc}})
-		ce := entity.cent{null, e.image, e.sx, e.sy, e.rot, e.color, e.id}
+		cps = append(cps, []polygon.cpoly{polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}})
+		ce := entity.cent{null, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
 		cscn = append(cscn, []entity.cent{ce})
 	}
 

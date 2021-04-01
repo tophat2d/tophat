@@ -59,3 +59,5 @@ fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 	visualizecam(cam.w, cam.h, bgcolor)
 }
 
+fn setvsync*(v: bool)
+
