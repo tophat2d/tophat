@@ -356,8 +356,6 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	//auinit();
 
-	CNFGSetVSync(0);
-
 	if (res) {
 		printf("could not initialize rawdraw\n");
 		return;
