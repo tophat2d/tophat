@@ -45,6 +45,9 @@ fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 
 	end = gettime()
 	delta = (end - start)/1000
+	if delta < 0 {
+		delta += 1000
+	}
 	start = gettime()
 
 	rawdraw.setbgcolor(0x000000ff)
