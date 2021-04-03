@@ -32,9 +32,8 @@ install:
 	sudo cp tophat /usr/share/tophat/bin/tophat-linux
 
 package: clean build windows
-	if [ ! -f "tophat-release" ]; then mkdir tophat-release; fi
-	if [ ! -f "tophat-release/bin" ]; then mkdir tophat-release/bin; fi
-	cp tophat tophat-release/bin/tophat-linux
+	mkdir -p tophat-release/bin
+	cp tophat     tophat-release/bin/tophat-linux
 	cp tophat.exe tophat-release/bin/tophat-win.exe
 	cp -r umka tophat-release
 	echo $(version) > tophat-release/version
@@ -45,11 +44,8 @@ package: clean build windows
 	mv tophat.zip bin
 
 clean:
-	if [ -f "./tophat-release" ]; then rm -r tophat-release tophat.tar.xz; fi
-	if [ -f "./tophat.zip" ];     then rm -r tophat.zip;                   fi
-	if [ -f "./bin/tophat.zip" ]; then rm -r bin/tophat.zip;               fi
-	if [ -f "./tophat" ];         then rm tophat;                          fi
-	if [ -f "./tophat.exe" ];     then rm tophat.exe;                      fi
+	rm -rf tophat-release
+	rm -f tophat tophat.exe tophat.zip bin/tophat.zip tophat.tar.xz
 
 cmdtool:
 	chmod +x cmd/tophat
