@@ -1,18 +1,24 @@
 cc=cc
+mingw=x86_64-w64-mingw32-gcc
+webcc=/home/marek/desk/emsdk/upstream/emscripten/emcc # TODO: better path
 
-# TODO: better path
-webcc=/home/marek/desk/emsdk/upstream/emscripten/emcc
-cflags=src/*.c src/img/*.c src/*.a -Wall -lm -lX11 -o tophat -Lsrc -lumka -L /lib64 -ldl -lGL -lpthread
-wincflags=src/*.c lib/windows/libumka_static.a -o tophat.exe -Wall -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread -Llib/windows -DUMKA_STATIC -static -lumka_static
-webcflags=src/*.c src/img/*.c lib/umka/src/*.c -Wall -s WASM=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -o main.wasm -ldl -lpthread
+sources=src/*.c src/img/*.c src/*.a
+wflags=-Wall
+libs=-lm -lX11 -Lsrc -lumka -L /lib64 -ldl -lGL -lpthread
+
+cflags=$(sources) $(wflags) -o tophat $(libs) -Os
+
+# TODO: sort out this mess
+wincflags=$(sources) lib/windows/libumka_static.a -o tophat.exe $(wflags) -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread -Llib/windows -DUMKA_STATIC -static -lumka_static
+webcflags=$(sources) lib/umka/src/*.c $(wflags) -s WASM=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -o main.wasm -ldl -lpthread
 
 version=v0.0
 
 build:
-	$(cc) $(cflags) -Os
+	$(cc) $(cflags)
 
 windows:
-	x86_64-w64-mingw32-gcc $(wincflags)
+	$(mingw) $(wincflags)
 
 web:
 	$(webcc) $(webcflags)
@@ -40,10 +46,10 @@ package: clean build windows
 
 clean:
 	if [ -f "./tophat-release" ]; then rm -r tophat-release tophat.tar.xz; fi
-	if [ -f "./tophat.zip" ]; then rm -r tophat.zip; fi
-	if [ -f "./bin/tophat.zip" ]; then rm -r bin/tophat.zip; fi
-	if [ -f "./tophat" ]; then rm tophat; fi
-	if [ -f "./tophat.exe" ]; then rm tophat.exe; fi
+	if [ -f "./tophat.zip" ];     then rm -r tophat.zip;                   fi
+	if [ -f "./bin/tophat.zip" ]; then rm -r bin/tophat.zip;               fi
+	if [ -f "./tophat" ];         then rm tophat;                          fi
+	if [ -f "./tophat.exe" ];     then rm tophat.exe;                      fi
 
 cmdtool:
 	chmod +x cmd/tophat
