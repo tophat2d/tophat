@@ -83,4 +83,6 @@ void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r);
+
 #endif

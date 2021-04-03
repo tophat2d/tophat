@@ -27,3 +27,5 @@ fn drawline*(x1, y1, x2, y2, s: int32, color: uint32) {
 	setcolor(color)
 	drawsegment(x1, y1, x2, y2)
 }
+
+fn cdrawimage*(img: int, rot: int32, scale: real, x, y: int32)

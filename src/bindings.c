@@ -79,6 +79,7 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "iconset", &umCNFGSetWindowIconData);
 	umkaAddFunc(umka, "cdrawpoly", &umCNFGTackPoly);
 	umkaAddFunc(umka, "drawsegment", &umCNFGTackSegment);
+	umkaAddFunc(umka, "cdrawimage", &umCNFGBlitTex);
 }
 
 // etc
@@ -355,6 +356,8 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	//auinit();
 
+	CNFGSetVSync(0);
+
 	if (res) {
 		printf("could not initialize rawdraw\n");
 		return;
@@ -449,4 +452,17 @@ void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int x1 = p[3].intVal;
 
 	CNFGTackSegment(x1 * scaling, y1 * scaling, x2 * scaling, y2 * scaling);
+}
+
+void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[4].ptrVal;
+
+	int x = p[1].intVal;
+	int y = p[0].intVal;
+
+	double s = p[2].realVal;
+	
+	int rot = p[3].intVal;
+	
+	CNFGBlitTex(img->tex, x * scaling, y * scaling, img->w * s * scaling, img->h * s * scaling, rot);
 }

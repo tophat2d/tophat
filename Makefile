@@ -9,7 +9,7 @@ webcflags=src/*.c src/img/*.c lib/umka/src/*.c -Wall -s WASM=1 -s ERROR_ON_UNDEF
 version=v0.0
 
 build:
-	$(cc) $(cflags)
+	$(cc) $(cflags) -Os
 
 windows:
 	x86_64-w64-mingw32-gcc $(wincflags)

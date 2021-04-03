@@ -1,4 +1,7 @@
-// vim: filetype=umka
+
+import (
+	"rawdraw.um"
+)
 
 type img* = struct {
 	handle: int
@@ -13,12 +16,6 @@ fn iconset(i: int)
 fn flipvimg(i: int)
 
 fn fliphimg(i: int)
-
-/*fn imgsetscale(x, y: real32, i: int)
-
-fn imgrotate(rot: int32, i: int)
-
-fn imgcopy(img: int): int*/
 
 fn load*(path: str): img {
 	return img{loadimg(&path[0])}
@@ -39,14 +36,7 @@ fn (i: ^img) flipv*() {
 fn (i: ^img) fliph*() {
 	fliphimg(i.handle)
 }
-/*fn (i: ^img) scale*(x, y: real) {
-	imgsetscale(x, y, i.handle)
-}
 
-fn (i: ^img) rotate*(rot: int32) {
-	imgrotate(rot, i.handle)
+fn (i: ^img) draw*(x, y, rot: int32, scale: real)  {
+	rawdraw.cdrawimage(i.handle, rot, scale, x, y)
 }
-
-fn (i: ^img) copy*(): img {
-	return img{imgcopy(i.handle)}
-}*/

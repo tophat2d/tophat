@@ -89,7 +89,8 @@ fn main() {
 		rawdraw.drawline(ray.x-cam.x, ray.y-cam.y, rx-cam.x, ry-cam.y, 1, color)
 
 		obj.draw(cam)
-		player.draw(cam)
+		//player.draw(cam)
+		img.draw(10, 0, 90, 2)
 		coll = ray.getcoll(s)
 		if coll > 0 {
 			color = 0xffff00ff
