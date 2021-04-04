@@ -4,7 +4,7 @@ Path=/usr/share/tophat
 
 function get () {
 	echo "downloading"
-	curl "https://github.com/marekmaskarinec/tophat/raw/main/bin/tophat.zip" -o tophat.zip
+	curl "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/tophat.zip" -o tophat.zip
 	if [ -f "tophat.zip" ]; then
 		echo "download completed"
 	else
