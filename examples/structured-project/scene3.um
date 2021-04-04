@@ -1,9 +1,15 @@
-// vim: filetype=umka
 
 import (
 	"tophat/rawdraw.um"
+	"tophat/input.um"
+
+	"global.um"
 )
 
 fn run*() {
  rawdraw.drawtext("scene 3", 2, 2, 0x000000ff, 2)
+
+	if input.isjustpressed(input.ARROW_RIGHT) {
+		global.scene = global.SCENE_1
+	}
 }
