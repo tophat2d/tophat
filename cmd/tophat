@@ -14,18 +14,19 @@ function get () {
 }
 
 function clean () {
-	if [ -f $Path ]; then
-		echo "removing installed stuff"
-	fi
-	sudo rm -r $Path
-	if [ -f "tophat.zip" ]; then rm -r tophat.zip; fi
+	sudo rm -rf $Path
+	rm -f tophat.zip
 }
 
 function setup () {
-	sudo rm -r $Path
+	sudo rm -rf $Path
 	sudo mkdir $Path
 	echo "extracting"
 	sudo unzip $1 -d $Path
+	if [ ! -f $Path/tophat-release ]; then
+		echo "extracting failed"
+		exit 1
+	fi
 	echo "copying"
 	sudo mv $Path/tophat-release/* $Path
 	sudo rm -r $Path/tophat-release
