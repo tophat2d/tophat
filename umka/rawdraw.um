@@ -5,6 +5,32 @@ import (
 
 fn drawtext*(text: str, x: int32, y: int32, color: uint32, size: real)
 
+fn textsize*(text: str, scale: real): (int, int) {
+	var w, maxw, h: int
+	w = 0
+	maxw = 0
+	h = 1
+
+	for s in text {
+		if s == "\n" {
+			h += 1
+			if w > maxw {
+				maxw = w
+			}
+
+			continue
+		}
+
+		w++
+	}
+
+	if w > maxw {
+		maxw = w
+	}
+
+	return round(maxw * scale * 3 - scale), round(h * 6 * scale)
+}
+
 fn setup*(title: str, w, h: int)
 
 fn setbgcolor*(color: int)

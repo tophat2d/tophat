@@ -95,9 +95,19 @@ int main(int argc, char *argv[]) {
 		strcpy(respath, "./");
 		umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	} else {
-		char scriptpath[50];
+		char scriptpath[128];
+#ifdef _WIN32
+		respath = malloc(sizeof(char) * strlen(argv[0]) - 4 + 5);
+
+		for (int i=0; i < strlen(argv[0]) - 4; i++)
+			respath[i] = argv[0][i];
+
+		strcat(respath, ".dat\\");
+
+#else
 		respath = malloc(sizeof(char) * strlen(strcat(argv[0], ".dat/")));
 		respath = argv[0];
+#endif
 		strcpy(scriptpath, respath);
 		umkaOK = umkaInit(umka, strcat(scriptpath, "game.um"), NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	}

@@ -23,10 +23,6 @@ function setup () {
 	sudo mkdir $Path
 	echo "extracting"
 	sudo unzip $1 -d $Path
-	if [ ! -f $Path/tophat-release ]; then
-		echo "extracting failed"
-		exit 1
-	fi
 	echo "copying"
 	sudo mv $Path/tophat-release/* $Path
 	sudo rm -r $Path/tophat-release
@@ -59,13 +55,17 @@ function package() {
 	if [ "$2" == "linux" ]; then
 		Bin=tophat-linux
 	elif [ "$2" == "windows" ]; then
-		Bin=tophat-win
+		Bin=tophat-win.exe
+		Sufix=exe
 	elif [ "$2" == "all" ]; then
 		echo "packaging for linux"
 		package $Name linux
 		echo "packaging for windows"
 		package $Name windows
 		exit 0
+	else
+		echo "invalid platform. choose: linux, windows or all"
+		exit 1
 	fi
 
 	if [ "$Bin" == "" ]; then
@@ -76,10 +76,7 @@ function package() {
 	mkdir ../$Name-$2
 	mkdir ../$Name-$2/$Name.dat
 	cp -r ./* ../$Name-$2/$Name.dat
-	cp -r $Path/bin/$Bin ../$Name-$2/$Name
-	if [ "$2" == "windows" ]; then
-		cp $Path/bin/libumka.dll ../$Name-$2
-	fi
+	cp -r $Path/bin/$Bin ../$Name-$2/$Name.$Sufix
 
 	zip -r ../$Name-$2.zip ../$Name-$2
 	rm -r ../$Name-$2
