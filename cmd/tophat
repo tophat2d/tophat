@@ -31,7 +31,7 @@ function setup () {
 }
 
 function update() {
-	if [ $(curl "https://github.com/marekmaskarinec/tophat/raw/main/bin/version") = $(cat $Path/version) ]; then
+	if [ $(curl "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/version") = $(cat $Path/version) ]; then
 		echo "tophat is already up to date"
 		exit 0
 	fi
