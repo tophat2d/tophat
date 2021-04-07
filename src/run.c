@@ -87,10 +87,12 @@ int main(int argc, char *argv[]) {
 		respath = malloc(sizeof(char) * 4);
 		strcpy(respath, "./");
 		strcpy(scriptpath, "game.um");
+		fclose(f);
 	} else if ((f = fopen("tophat.dat/game.um", "r"))) {
 		respath = malloc(sizeof(char) * 11);
 		strcpy(respath, "tophat.dat/");
 		strcpy(scriptpath, "tophat.dat/game.um");
+		fclose(f);
 	} else {
 		errprint("Could not find game.um. Make sure you are in a proper directory.");
 
