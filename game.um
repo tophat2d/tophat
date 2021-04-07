@@ -18,8 +18,9 @@ fn main() {
 
 	cam := rectangle.mk(10, 10, 80, 80)
 	tophat.setup("test game", cam.x * 100, cam.y * 100)
+	var w, h: int32
 
-	s := []^entity.ent{}
+	/*s := []^entity.ent{}
 
 	p := polygon.mk(10, 10, []int32{0, 0, 0, 10, 10, 10, 10, 0})
 
@@ -40,7 +41,6 @@ fn main() {
 
 	ray := raycast.mk(10, 10, 20, 0)
 
-	var w, h: int32
 
 	var mx, my: int32
 
@@ -50,13 +50,13 @@ fn main() {
 
 	var color: uint32
 
-	rotspeed := 0.2
+	rotspeed := 0.2*/
 
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
-		if input.isjustpressed(input.LMB) {
+		/*if input.isjustpressed(input.LMB) {
 			img.flipv()
 		}
 
@@ -92,9 +92,8 @@ fn main() {
 		}
 		//rawdraw.setcolor(0x262626eb)
 		//rawdraw.drawrect(20 - cam.x, 20 - cam.y, 40, 40)
-		rawdraw.drawtext(std.itoa(ray.x) + ", " + std.itoa(ray.y), 10, 10, 0x000000ff, 1)
+		rawdraw.drawtext(std.itoa(ray.x) + ", " + std.itoa(ray.y), 10, 10, 0x000000ff, 1)*/
 	}
-	img.delete()
 }
 
 fn windowdestroy() {

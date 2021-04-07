@@ -2,7 +2,6 @@
 #include <string.h>
 
 #define CNFG_IMPLEMENTATION
-#define CNFGOGL
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"
@@ -91,23 +90,13 @@ int main(int argc, char *argv[]) {
 	auinit();
 
 	if (argc > 1) {
-		respath = malloc(sizeof(char) * 2);
+		respath = malloc(sizeof(char) * 4);
 		strcpy(respath, "./");
 		umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	} else {
 		char scriptpath[128];
-#ifdef _WIN32
-		respath = malloc(sizeof(char) * strlen(argv[0]) - 4 + 5);
-
-		for (int i=0; i < strlen(argv[0]) - 4; i++)
-			respath[i] = argv[0][i];
-
-		strcat(respath, ".dat\\");
-
-#else
-		respath = malloc(sizeof(char) * strlen(strcat(argv[0], ".dat/")));
-		respath = argv[0];
-#endif
+		respath = malloc(sizeof(char) * 11);
+		respath = "tophat.dat/";
 		strcpy(scriptpath, respath);
 		umkaOK = umkaInit(umka, strcat(scriptpath, "game.um"), NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 	}
@@ -137,6 +126,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	umkaFree(umka);
+
+	free(respath);
 
 	return 0;
 }

@@ -64,6 +64,10 @@ void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_ui
 	for (int i=soundcount-1; i >= 0; i--) {
 		sound *csound = sounds[i];
 
+		if (csound == NULL) {
+			continue;
+		}
+
 		if (csound->deleted) {
 			ma_decoder_uninit(&csound->decoder);
 
@@ -132,7 +136,7 @@ sound *auload(char *path) {
 	char cpath[512];
 	strcpy(cpath, respath);
 	strcat(cpath, path);
-	res = ma_decoder_init_file(path, &decodercfg, &s->decoder);
+	res = ma_decoder_init_file(cpath, &decodercfg, &s->decoder);
 	if (res != MA_SUCCESS) {
 		errprint("failed to load sound.");
 		return NULL;

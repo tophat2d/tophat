@@ -280,7 +280,7 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	rx = ra->x;
 	ry = ra->y - ra->l;
 
-	rotatepoint(&rx, &ry, ra->x, ra->y, ra->r);
+	RotatePoint(&rx, &ry, ra->x, ra->y, ra->r);
 	
 	for (int i=0; i < count; i++) {
 		if (ra->x > scene[i]->p->x + scene[i]->p->w) {
@@ -355,6 +355,8 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int res = CNFGSetup(title, w, h);
 
 	//auinit();
+
+	//CNFGSetVSync(0);
 
 	if (res) {
 		printf("could not initialize rawdraw\n");

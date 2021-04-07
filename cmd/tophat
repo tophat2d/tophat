@@ -56,12 +56,12 @@ function package() {
 		Bin=tophat-linux
 	elif [ "$2" == "windows" ]; then
 		Bin=tophat-win.exe
-		Sufix=exe
+		Sufix=.exe
 	elif [ "$2" == "all" ]; then
 		echo "packaging for linux"
-		package $Name linux
+		package $Name linux $Name
 		echo "packaging for windows"
-		package $Name windows
+		package $Name windows $Name
 		exit 0
 	else
 		echo "invalid platform. choose: linux, windows or all"
@@ -74,9 +74,9 @@ function package() {
 	fi
 
 	mkdir ../$Name-$2
-	mkdir ../$Name-$2/$Name.dat
-	cp -r ./* ../$Name-$2/$Name.dat
-	cp -r $Path/bin/$Bin ../$Name-$2/$Name.$Sufix
+	mkdir ../$Name-$2/tophat.dat
+	cp -r ./* ../$Name-$2/tophat.dat
+	cp -r $Path/bin/$Bin ../$Name-$2/$Name$Sufix
 
 	zip -r ../$Name-$2.zip ../$Name-$2
 	rm -r ../$Name-$2
