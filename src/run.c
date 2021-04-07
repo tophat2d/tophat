@@ -71,6 +71,9 @@ void HandleMotion( int x, int y, int mask ) {
 }
 void HandleDestroy() {
 	audeinit();
+	umkaFree(umka);
+
+	free(respath);
 	umkaCall(umka, destroyfunc, 0, NULL, NULL);
 }
 
@@ -125,9 +128,6 @@ int main(int argc, char *argv[]) {
 		printf("Umka runtime error %s (%d): %s\n", error.fileName, error.line, error.msg);
 	}
 
-	umkaFree(umka);
-
-	free(respath);
 
 	return 0;
 }

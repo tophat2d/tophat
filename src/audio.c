@@ -122,7 +122,7 @@ void audeinit() {
 		free(sounds[i]);
 	}
 
-	free(sounds);
+	//free(sounds);
 }
 
 sound *auload(char *path) {
