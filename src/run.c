@@ -6,6 +6,7 @@
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"
 #include "audio.h"
+#include "misc.h"
 
 float scaling;
 int *pressed;
@@ -71,7 +72,6 @@ void HandleMotion( int x, int y, int mask ) {
 }
 void HandleDestroy() {
 	audeinit();
-	umkaFree(umka);
 
 	free(respath);
 	umkaCall(umka, destroyfunc, 0, NULL, NULL);
@@ -80,29 +80,25 @@ void HandleDestroy() {
 int main(int argc, char *argv[]) {
 	umka = umkaAlloc();
 	int umkaOK;	
-	scaling = 1;
-
-	int pa[255];
-	int jpa[255];
-	pressed = &pa[0];
-	justpressed = &jpa[0];
-
-	memset(pressed, 0, 255 * sizeof(int));
-	memset(justpressed, 0, 255 * sizeof(int));
-
-	auinit();
-
-	if (argc > 1) {
+	
+	FILE *f;
+	char scriptpath[20];
+	if ((f = fopen("game.um", "r"))) {
 		respath = malloc(sizeof(char) * 4);
 		strcpy(respath, "./");
-		umkaOK = umkaInit(umka, "game.um", NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
-	} else {
-		char scriptpath[128];
+		strcpy(scriptpath, "game.um");
+	} else if ((f = fopen("tophat.dat/game.um", "r"))) {
 		respath = malloc(sizeof(char) * 11);
-		respath = "tophat.dat/";
-		strcpy(scriptpath, respath);
-		umkaOK = umkaInit(umka, strcat(scriptpath, "game.um"), NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
+		strcpy(respath, "tophat.dat/");
+		strcpy(scriptpath, "tophat.dat/game.um");
+	} else {
+		errprint("Could not find game.um. Make sure you are in a proper directory.");
+
+		return 1;
 	}
+	umkaOK = umkaInit(umka, scriptpath, NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
+
+	auinit();
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");
@@ -121,6 +117,16 @@ int main(int argc, char *argv[]) {
 
 	destroyfunc = umkaGetFunc(umka, NULL, "windowdestroy");
 
+	scaling = 1;
+
+	int pa[255];
+	int jpa[255];
+	pressed = &pa[0];
+	justpressed = &jpa[0];
+
+	memset(pressed, 0, 255 * sizeof(int));
+	memset(justpressed, 0, 255 * sizeof(int));
+
 	umkaOK = umkaRun(umka);
 	if (!umkaOK) {
 		UmkaError error;
@@ -128,6 +134,6 @@ int main(int argc, char *argv[]) {
 		printf("Umka runtime error %s (%d): %s\n", error.fileName, error.line, error.msg);
 	}
 
-
+	umkaFree(umka);
 	return 0;
 }

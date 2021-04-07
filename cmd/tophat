@@ -86,7 +86,7 @@ function package() {
 }
 
 if [ "$1" == "run" ]; then
-	$Path/bin/tophat-linux debug
+	$Path/bin/tophat-linux
 	exit 0
 fi
 
