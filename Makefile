@@ -39,13 +39,14 @@ package: clean build windows
 	echo $(version) > tophat-release/version
 	echo $(version) > bin/version
 	cp examples/preset.um tophat-release
+	rm -rf bin/tophat.zip
 	zip -r tophat.zip tophat-release
 	rm -r tophat-release
 	mv tophat.zip bin
 
 clean:
 	rm -rf tophat-release
-	rm -f tophat tophat.exe tophat.zip bin/tophat.zip tophat.tar.xz
+	rm -f tophat tophat.exe
 
 cmdtool:
 	chmod +x cmd/tophat

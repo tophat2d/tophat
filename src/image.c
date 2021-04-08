@@ -5,8 +5,6 @@
 
 #include "../lib/rawdraw/CNFG.h"
 
-#include <GL/gl.h>
-
 #include "image.h"
 
 image *loadimage(char *path) {
@@ -19,7 +17,17 @@ image *loadimage(char *path) {
 	img->w = w;
 	img->h = h;
 	img->c = c;
-	img->raw = data;
+
+	// Faster way, but it doesn't seem to work and jam ends soon. TODO FIXME
+	/*if (c == 4) {
+		img->rdimg = (uint32_t *)data;
+
+		stbi_image_free(data);
+		return img;
+	}*/
+
+	rdimg(img, data);
+	stbi_image_free(data);
 
 	return img;
 }
@@ -63,7 +71,7 @@ void fliph(image *img) {
 	img->rdimg = f;
 }
 
-void rdimg(image *img, float scaling) {
+void rdimg(image *img, unsigned char *data) {
 
 	uint32_t *rd;
 	rd = malloc(sizeof(int) * img->w * img->h);
@@ -77,7 +85,7 @@ void rdimg(image *img, float scaling) {
 				if (i > 3) {
 					current += 255;
 				} else {
-					current += (uint32_t)img->raw[(y * img->w + x) * img->c + i];
+					current += (uint32_t)data[(y * img->w + x) * img->c + i];
 				}
 			}
 
@@ -89,56 +97,9 @@ void rdimg(image *img, float scaling) {
 
 				current = 0xff | current<<8;
 			}
-			if (current < 0) {
-				printf("%x\n", current);
-			}
 			rd[(y * img->w + x)] = current;
 		}
 	}
 
-	/*
-	uint32_t *rd;
-	rd = malloc(sizeof(int) * img->w * img->h);
-	uint32_t current = 0;
-	float errorx, errory;
-
-
-	for (int y=0; y < img->h; y += img->c) {
-		for (int j=0; j < (int)scaling; j++) {
-			errory += scaling - (int)scaling;
-
-			for (int x=0; x < img->w; x += img->c) {
-				errorx += scaling - (int)scaling;
-      
-				for (int i=0; i < img->c; i++) {
-					current *= 255;
-					if (i > 3) {
-						current += 255;
-					} else {
-						current += (uint32_t)img->raw[(y*img->h + x)+i];
-					}
-				}
-     
-				printf("current: %X\n", current);
-
-				for (int i=0; i < (int)scaling; i++) {
-					rd[(y*img->h + x)/img->c + i] = current;
-				}
-      
-				if (errorx >= 1) {
-					rd[(y*img->h + x)/img->c + (int)scaling] = current;
-					errorx -= 1;
-				}
-			}
-
-			if (errory >= 1) {
-				j--;
-				errory -= 1;
-			}
-
-		}
-	}*/
-
 	img->rdimg = rd;
-
 }

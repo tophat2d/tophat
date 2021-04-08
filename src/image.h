@@ -2,7 +2,6 @@
 #define IMAGE_H
 
 typedef struct {
-	unsigned char *raw;
 	int w;
 	int h;
 	int c;
@@ -18,6 +17,6 @@ void flipv(image *img);
 
 void fliph(image *img);
 
-void rdimg(image *img, float scaling);
+void rdimg(image *img, unsigned char *data);
 
 #endif
