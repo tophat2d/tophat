@@ -340,7 +340,7 @@ void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	CNFGPenX = x * scaling;
 	CNFGPenY = y * scaling;
 	CNFGColor(color);
-	CNFGSetLineWidth(0.6 * scaling);
+	CNFGSetLineWidth(0.6 * scaling * size);
 	CNFGDrawText(text, size * scaling);
 }
 
