@@ -17,6 +17,8 @@ fn flipvimg(i: int)
 
 fn fliphimg(i: int)
 
+fn imgvalid(i: int): int32
+
 fn load*(path: str): img {
 	return img{loadimg(&path[0])}
 }
@@ -39,4 +41,8 @@ fn (i: ^img) fliph*() {
 
 fn (i: ^img) draw*(x, y, rot: int32, scale: real)  {
 	rawdraw.cdrawimage(i.handle, rot, scale, x, y)
+}
+
+fn (i: ^img) validate*(): bool {
+	return bool(imgvalid(i.handle))
 }

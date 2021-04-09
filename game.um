@@ -20,79 +20,15 @@ fn main() {
 	tophat.setup("test game", cam.x * 100, cam.y * 100)
 	var w, h: int32
 
-	/*s := []^entity.ent{}
+	img := image.load("thisisnonsense.png")
 
-	p := polygon.mk(10, 10, []int32{0, 0, 0, 10, 10, 10, 10, 0})
-
-	player := entity.mk(p, 0xff00ffff, 20)
-	img := image.load("test.bmp")
-	player.image = img
-	player.setscale(4, 4)
-	//player.setrot(10)
-
-	img = image.load("test.bmp")
-	objp := polygon.mk(0, 0, []int32{0, 0, 0, 20, 20, 20, 20, 0})
-
-	obj := entity.mk(objp, 0x0000ebff, 10)
-	obj.setrot(90)
-	obj.setscale(1, 1)
-
-	s = append(s, []^entity.ent{&player, &obj})
-
-	ray := raycast.mk(10, 10, 20, 0)
-
-
-	var mx, my: int32
-
-	var coll: int32
-
-	var start: int
-
-	var color: uint32
-
-	rotspeed := 0.2*/
-
+	if !img.validate() {
+		printf("not valid\n")
+		return
+	}
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
-
-		/*if input.isjustpressed(input.LMB) {
-			img.flipv()
-		}
-
-		if input.isjustpressed(input.RMB) {
-			img.fliph()
-		}
-
-		if input.isjustpressed(input.KEY_ESCAPE) {
-			return
-		}
-
-		if input.ispressed(input.KEY_Q) {
-			ray.r -= round(rotspeed * tophat.delta)
-		}
-
-		if input.ispressed(input.KEY_E) {
-			ray.r += round(rotspeed * tophat.delta)
-		}
-
-		player.p.x, player.p.y = input.getglobalmousepos(cam)
-
-		rx, ry := misc.rotatepoint(ray.x, ray.y - ray.l, ray.x, ray.y, ray.r)
-		rawdraw.drawline(ray.x-cam.x, ray.y-cam.y, rx-cam.x, ry-cam.y, 1, color)
-
-		obj.draw(cam)
-		//player.draw(cam)
-		img.draw(10, 0, 90, 2)
-		coll = ray.getcoll(s)
-		if coll > 0 {
-			color = 0xffff00ff
-		} else {
-			color = 0xff00ffff
-		}
-		//rawdraw.setcolor(0x262626eb)
-		//rawdraw.drawrect(20 - cam.x, 20 - cam.y, 40, 40)
-		rawdraw.drawtext(std.itoa(ray.x) + ", " + std.itoa(ray.y), 10, 10, 0x000000ff, 1)*/
 	}
 }
 

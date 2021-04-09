@@ -7,6 +7,8 @@
 
 #include "image.h"
 
+#include "misc.h"
+
 image *loadimage(char *path) {
 	int w, h, c;
 
@@ -17,6 +19,14 @@ image *loadimage(char *path) {
 	img->w = w;
 	img->h = h;
 	img->c = c;
+
+	if (data == NULL) {
+		char buff[256];
+		sprintf(buff, "could not find image at path %s\n", path);
+		errprint(buff);
+		img->rdimg = NULL;
+		return img;
+	}
 
 	// Faster way, but it doesn't seem to work and jam ends soon. TODO FIXME
 	/*if (c == 4) {

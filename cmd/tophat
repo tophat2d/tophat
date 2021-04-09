@@ -73,13 +73,28 @@ function package() {
 		exit 1
 	fi
 
+	rm -rf $Name-$2.zip
+
 	mkdir ../$Name-$2
 	mkdir ../$Name-$2/tophat.dat
 	cp -r ./* ../$Name-$2/tophat.dat
 	cp -r $Path/bin/$Bin ../$Name-$2/$Name$Sufix
 
-	zip -r ../$Name-$2.zip ../$Name-$2
-	rm -r ../$Name-$2
+	Ignore="-x RAIDER -x tophat.dat/*.zip -x tophat.dat/*.git* -x tophat.dat/"
+
+	if [ -f ".thignore" ]; then
+		Ignore="$Ignore $(sed ':a;N;$!ba;s/\n/ -x tophat.dat\//g' .thignore)"
+	fi
+
+	if [ "$2" == "windows" ]; then
+		mv ../$Name-$2 ./
+		zip -Z store -y -q -r ../$Name-$2.zip $Name-$2
+	else
+		zip -q -r ../$Name-$2.zip ../$Name-$2
+	fi
+
+	rm -rf ../$Name-$2
+	rm -rf ./$Name-$2
 	mv ../$Name-$2.zip ./
 
 	echo "done"

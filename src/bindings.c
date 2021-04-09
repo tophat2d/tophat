@@ -34,8 +34,7 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "deleteimg", &umimgfree);
 	umkaAddFunc(umka, "flipvimg", &umimgflipv);
 	umkaAddFunc(umka, "fliphimg", &umimgfliph);
-	//umkaAddFunc(umka, "imgsetscale", &umimgsetscale);
-	//umkaAddFunc(umka, "imgrotate", &umimgrotate);
+	umkaAddFunc(umka, "imgvalid", &umimgvalid);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
@@ -104,12 +103,25 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	r[0].ptrVal = (intptr_t)img;
 }
+
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
 
 	free(img->rdimg);
 	free(img);
 }
+
+void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[0].ptrVal;
+
+	if (img->rdimg != NULL) {
+		r->intVal = 1;
+		return;
+	}
+
+	r->intVal = 0;
+}
+
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
 
@@ -117,6 +129,7 @@ void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
 	glDeleteTextures(1, &img->tex);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
+
 void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
 
@@ -124,20 +137,6 @@ void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
 	glDeleteTextures(1, &img->tex);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
-/*void umimgsetscale(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[0].ptrVal;
-	double x = p[1].realVal;
-	double y = p[2].realVal;
-
-	img->scalex = x;
-	img->scaley = y;
-}
-void umimgrotate(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[0].ptrVal;
-	int rot = p[1].intVal;
-
-	img->rot = rot;
-}*/
 
 // input
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
