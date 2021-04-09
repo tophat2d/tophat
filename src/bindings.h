@@ -41,8 +41,6 @@ void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r);
 
-void umsounddelete(UmkaStackSlot *p, UmkaStackSlot *r);
-
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umsleep(UmkaStackSlot *p, UmkaStackSlot *r);

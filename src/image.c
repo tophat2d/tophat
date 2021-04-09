@@ -22,7 +22,7 @@ image *loadimage(char *path) {
 
 	if (data == NULL) {
 		char buff[256];
-		sprintf(buff, "could not find image at path %s\n", path);
+		sprintf(buff, "could not find image at path %s", path);
 		errprint(buff);
 		img->rdimg = NULL;
 		return img;
@@ -30,9 +30,8 @@ image *loadimage(char *path) {
 
 	// Faster way, but it doesn't seem to work and jam ends soon. TODO FIXME
 	/*if (c == 4) {
-		img->rdimg = (uint32_t *)data;
+		img->rdimg = (unsigned int *)data;
 
-		stbi_image_free(data);
 		return img;
 	}*/
 

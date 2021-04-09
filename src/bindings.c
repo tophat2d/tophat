@@ -54,7 +54,6 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "csoundloop", &umsoundloop);
 	umkaAddFunc(umka, "csoundplay", &umsoundplay);
 	umkaAddFunc(umka, "csoundstop", &umsoundstop);
-	umkaAddFunc(umka, "csounddelete", &umsounddelete);
 	umkaAddFunc(umka, "csoundvol", &umsoundvol);
 
 	// misc
@@ -250,14 +249,6 @@ void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
 	sound *s = (sound *)p[0].ptrVal;
 	s->playing = 0;
-}
-
-void umsounddelete(UmkaStackSlot *p, UmkaStackSlot *r) {
-	sound *s = (sound *)p[0].ptrVal;
-
-	ma_decoder_uninit(&s->decoder);
-
-	free(s);
 }
 
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {

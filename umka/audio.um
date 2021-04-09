@@ -4,6 +4,10 @@ type sound* = struct {
 	handle: int
 }
 
+var sarr*: []sound
+
+fn setsounds*(ss: []sound)
+
 fn cauload(path: str): int
 
 fn cauarr(s: ^sound, count: int32)
@@ -14,12 +18,15 @@ fn csoundplay(s: int)
 
 fn csoundstop(s: int)
 
-fn csounddelete(s: int)
-
 fn csoundvol(s: int, vol: real)
 
 fn load*(path: str): sound {
-	return sound{cauload(path)}
+	s := sound{cauload(path)}
+
+	sarr = append(sarr, s)
+	setsounds(sarr)
+
+	return s
 }
 
 fn setsounds*(ss: []sound) {
@@ -41,10 +48,6 @@ fn (s: ^sound) play*() {
 
 fn (s: ^sound) stop*() {
 	csoundstop(s.handle)
-}
-
-fn (s: ^sound) del*() {
-	csounddelete(s.handle)
 }
 
 fn (s: ^sound) vol*(vol: real) {

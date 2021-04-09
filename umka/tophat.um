@@ -4,6 +4,7 @@ import (
 	"rawdraw.um"
 	"rectangle.um"
 	"input.um"
+	"audio.um"
 	"std/std.um"
 )
 
@@ -24,6 +25,8 @@ fn setup*(title: str, w, h: int32) {
 		input.setwinmap()
 		platform = "windows"
 	}
+
+	audio.sarr = []audio.sound{}
 
 	start = gettime()
 }
