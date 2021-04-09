@@ -58,7 +58,7 @@ void flipv(image *img) {
 
 	for (int i=0; i < img->w; i++) {
 		for (int j=0; j < img->h; j++) {
-			f[(j + 1) * img->w - i] = img->rdimg[j * img->w + i];
+			f[(j + 1) * img->w - i - 1] = img->rdimg[j * img->w + i];
 		}
 	}
 

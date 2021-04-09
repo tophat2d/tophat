@@ -20,15 +20,19 @@ fn main() {
 	tophat.setup("test game", cam.x * 100, cam.y * 100)
 	var w, h: int32
 
-	img := image.load("thisisnonsense.png")
+	img := image.load("etc/test.png")
 
 	if !img.validate() {
 		printf("not valid\n")
 		return
 	}
 
+	img.flipv()
+
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
+
+		img.draw(30, 30, 0, 1)
 	}
 }
 

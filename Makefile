@@ -44,6 +44,17 @@ package: clean build windows
 	rm -r tophat-release
 	mv tophat.zip bin
 
+win-package: clean build windows
+	mkdir -p tophat-win/tophat/bin
+	cp tophat     tophat-win/tophat/bin/tophat-linux
+	cp tophat.exe tophat-win/tophat/bin/tophat-win.exe
+	cp -r umka tophat-win/tophat/
+	cp examples/preset.um tophat-win/tophat
+	cp cmd/install.bat tophat
+	rm -rf bin/tophat-win.zip
+	zip -Z store -y -q -r bin/tophat-win.zip tophat-win 
+	rm -r tophat
+
 clean:
 	rm -rf tophat-release
 	rm -f tophat tophat.exe
