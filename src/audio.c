@@ -103,12 +103,12 @@ void auinit(){
 	auconf.pUserData         = NULL;
 
 	if (ma_device_init(NULL, &auconf, &audev) != MA_SUCCESS) {
-		printf("Failed to open playback device.\n");
+		errprint("Failed to open playback device.");
 		return;
 	}
 
 	if (ma_device_start(&audev) != MA_SUCCESS) {
-		printf("Failed to start playback device.\n");
+		errprint("Failed to start playback device.");
 		return;
 	}
 }
@@ -138,7 +138,9 @@ sound *auload(char *path) {
 	strcat(cpath, path);
 	res = ma_decoder_init_file(cpath, &decodercfg, &s->decoder);
 	if (res != MA_SUCCESS) {
-		errprint("failed to load sound.");
+		char buff[256];
+		sprintf("failed to load sound at %s", path);
+		errprint(buff);
 		return NULL;
 	}
 
