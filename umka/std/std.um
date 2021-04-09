@@ -11,7 +11,8 @@ const (
 )    
 
 fn rtlfopen  (name: str, mode: str): File;  
-fn fopen*    (name: str, mode: str): File {return rtlfopen(name, mode)}
+fn cfopen    (name: str, mode: str): File;
+fn fopen*    (name: str, mode: str): File {return cfopen(name, mode)}
 
 fn rtlfclose (f: File): int
 fn fclose*   (f: File): int {return rtlfclose(f)}

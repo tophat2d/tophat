@@ -9,6 +9,8 @@ void umdebug(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umfopen(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r);

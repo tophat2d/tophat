@@ -8,9 +8,7 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "../lib/stb/stb_image.h"
-//#include "../lib/miniaudio/miniaudio.h"
 
-//#include "audio.h"
 #include "bindings.h"
 #include "poly.h"
 
@@ -28,6 +26,7 @@ void umkabind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "debug", &umdebug);
 	umkaAddFunc(umka, "debug2", &umdebug2);
+	umkaAddFunc(umka, "cfopen", &umfopen);
 
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
@@ -88,6 +87,17 @@ void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r) {
 	//dc = auload("test.wav");
 	//auinit();
+}
+
+void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
+	const char *name = (const char *)p[1].ptrVal;
+	const char *mode = (const char *)p[0].ptrVal;
+
+	char path[512];
+	strcpy(respath, path);
+
+	FILE *f = fopen(strcat(path, name), mode);
+	r->ptrVal = (intptr_t)f;
 }
 
 // images
