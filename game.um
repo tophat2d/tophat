@@ -2,15 +2,14 @@
 
 import (
 	"umka/rawdraw.um"
-	"umka/polygon.um"
-	"umka/entity.um"
-	"umka/rectangle.um"
+	"umka/vec.um"
 	"umka/tophat.um"
 	"umka/input.um"
-	"umka/image.um"
+	"umka/rectangle.um"
+	"umka/entity.um"
 	"umka/raycast.um"
-	"umka/misc.um"
-	"umka/audio.um"
+	"umka/polygon.um"
+
 	"umka/std/std.um"
 )
 
@@ -20,19 +19,32 @@ fn main() {
 	tophat.setup("test game", cam.x * 100, cam.y * 100)
 	var w, h: int32
 
-	img := image.load("etc/test.png")
+	box := entity.mk(polygon.mk(0, 0, []int32{0, 0, 0, 10, 10, 10, 10, 0}), 0x000000ff, 1)
 
-	if !img.validate() {
-		printf("not valid\n")
-		return
-	}
-
-	img.flipv()
+	ray := raycast.mk(0, 0, 5, 0)
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
-		img.draw(30, 30, 0, 1)
+		if input.ispressed(input.KEY_Q) {
+			ray.r -= round(0.2 * tophat.delta)
+		}
+
+		if input.ispressed(input.KEY_E) {
+			ray.r += round(0.2 * tophat.delta)
+		}
+
+		box.draw(cam)
+
+		ray.x, ray.y = input.getglobalmousepos(cam)
+
+		scn := []^entity.ent{&box}
+		color := 0xff | 0xff0000 * ray.getcoll(scn)
+
+		cx := cam.x - cam.w / 2
+		cy := cam.y - cam.h / 2
+		rx, ry := vec.rotatepoint(ray.x, ray.y - ray.l, ray.x, ray.y, ray.r)
+		rawdraw.drawline(round(ray.x-cx), round(ray.y-cy), round(rx-cx), round(ry-cy), 3, color)
 	}
 }
 

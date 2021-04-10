@@ -5,7 +5,14 @@ import (
 	"polygon.um"
 )
 
-type ray = struct {
+type ray* = struct {
+	x: real
+	y: real
+	l: int32
+	r: real
+}
+
+type cray = struct {
 	x: int32
 	y: int32
 	l: int32
@@ -16,7 +23,7 @@ fn mk*(x, y, l, r: int32): ray {
 	return ray{x, y, l, r}
 }
 
-fn craygetcoll(count: int32, r: ^ray, s: ^^entity.cent): int32
+fn craygetcoll(count: int32, r: ^cray, s: ^^entity.cent): int32
 
 fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 	cscn := []entity.cent{}
@@ -35,6 +42,8 @@ fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 		cscnp = append(cscnp, &cscn[i])
 	}
 
-	return craygetcoll(len(cscnp), r, &cscnp[0])
+	cr := cray{round(r.x), round(r.y), r.l, round(r.r)}
+
+	return craygetcoll(len(cscnp), &cr, &cscnp[0])
 }
 

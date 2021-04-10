@@ -269,7 +269,9 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	RotatePoint(&rx, &ry, ra->x, ra->y, ra->r);
 	
 	for (int i=0; i < count; i++) {
-		if (ra->x > scene[i]->p->x + scene[i]->p->w)
+
+		// This breaks it. FIXME
+		/*if (ra->x > scene[i]->p->x + scene[i]->p->w)
 			continue;
 
 		if (ra->y > scene[i]->p->y + scene[i]->p->h)
@@ -279,9 +281,15 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 			continue;
 
 		if (ry < scene[i]->p->y)
-			continue;
+			continue;*/
 
 		coll = polytoline(scene[i]->p, ra->x, ra->y, rx, ry);
+		if (coll) {
+			r->intVal = scene[i]->id;
+			return;
+		}
+
+		coll = polytopoint(scene[i]->p, rx, ry);
 		if (coll) {
 			r->intVal = scene[i]->id;
 			return;
