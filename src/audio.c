@@ -18,7 +18,6 @@
 #define SAMPLE_RATE 48000
 
 
-uint16_t auidcounter = 0;
 ma_device_config auconf;
 ma_device audev;
 sound **sounds;
@@ -65,16 +64,6 @@ void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_ui
 		sound *csound = sounds[i];
 
 		if (csound == NULL) {
-			continue;
-		}
-
-		if (csound->deleted) {
-			ma_decoder_uninit(&csound->decoder);
-
-			free(csound);
-		}	
-
-		if (csound == NULL || csound->deleted) {
 			continue;
 		}
 
@@ -144,13 +133,9 @@ sound *auload(char *path) {
 		return NULL;
 	}
 
-	s->id = auidcounter;
 	s->playing = 0;
-	s->deleted = 0;
 	s->volume = 100;
 	s->looping = 0;
-
-	auidcounter++;
 
 	return s;
 }
