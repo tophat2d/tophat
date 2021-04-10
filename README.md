@@ -21,7 +21,6 @@ Things I want to prioritize on. They are in the order, I want to complete them, 
 - simple UI toolkit
 - more templates
 - finnish space shooter example
-- fix image flipping
 - windows installer
 - v0.1 release
 - web build
