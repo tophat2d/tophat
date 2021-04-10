@@ -41,40 +41,35 @@ image *loadimage(char *path) {
 	return img;
 }
 
-void imgslowdraw(image *img) {
-	for (int y=0; y < img->h / img->c; y++) {
-		for (int x=0; x < img->w / img->c; x++) {
-			if (img->rdimg[(y * img->w) + x] != 1) {
-				CNFGColor(img->rdimg[(y * img->w) + x] * 256 + 255);
-				CNFGTackPixel(x, y);
-			}	
-		}
-	}
-}
-
 void flipv(image *img) {
+
+	if (img->rdimg == NULL) {
+		errprint("flipv: image is not valid");
+		return;
+	}
+
 	uint32_t *f;
 	f = malloc(sizeof(uint32_t) * img->w * img->h);
 
-	for (int i=0; i < img->w; i++) {
-		for (int j=0; j < img->h; j++) {
+	for (int i=0; i < img->w; i++) for (int j=0; j < img->h; j++)
 			f[(j + 1) * img->w - i - 1] = img->rdimg[j * img->w + i];
-		}
-	}
 
 	free(img->rdimg);
 	img->rdimg = f;
 }
 
 void fliph(image *img) {
+
+	if (img->rdimg == NULL) {
+		errprint("fliph: image is not valid");
+		return;
+	}
+
 	uint32_t *f;
 	f = malloc(sizeof(uint32_t) * img->w * img->h);
 
-	for (int i=0; i < img->w; i++) {
-		for (int j=0; j < img->h; j++) {
+	for (int i=0; i < img->w; i++) for (int j=0; j < img->h; j++)
 			f[(img->h - j - 1) * img->w + i] = img->rdimg[j * img->w + i];
-		}
-	}
 
 	free(img->rdimg);
 	img->rdimg = f;

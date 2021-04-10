@@ -11,8 +11,6 @@ typedef struct {
 
 image *loadimage(char *path);
 
-void imgslowdraw(image *img);
-
 void flipv(image *img);
 
 void fliph(image *img);
