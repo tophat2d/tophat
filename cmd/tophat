@@ -132,8 +132,8 @@ fi
 
 if [ "$1" == "init" ]; then
  	mkdir tophat
- 	cp -r $Path/umka/* ./tophat
- 	cp $Path/preset.um ./game.um
+ 	cp -rf $Path/umka/* ./tophat
+ 	cp $Path/*.um ./
 	exit 0
 fi
 

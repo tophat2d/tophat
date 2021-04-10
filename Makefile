@@ -38,7 +38,7 @@ package: clean build windows
 	cp -r umka tophat-release
 	echo $(version) > tophat-release/version
 	echo $(version) > bin/version
-	cp examples/preset.um tophat-release
+	cp examples/preset/*.um tophat-release
 	rm -rf bin/tophat.zip
 	zip -r tophat.zip tophat-release
 	rm -r tophat-release
@@ -49,11 +49,11 @@ win-package: clean build windows
 	cp tophat     tophat-win/tophat/bin/tophat-linux
 	cp tophat.exe tophat-win/tophat/bin/tophat-win.exe
 	cp -r umka tophat-win/tophat/
-	cp examples/preset.um tophat-win/tophat
-	cp cmd/install.bat tophat
+	cp examples/preset/*.um tophat-win/tophat
+	cp cmd/install.bat tophat-win/
 	rm -rf bin/tophat-win.zip
 	zip -Z store -y -q -r bin/tophat-win.zip tophat-win 
-	rm -r tophat
+	rm -r tophat-win
 
 clean:
 	rm -rf tophat-release

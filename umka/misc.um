@@ -1,4 +1,29 @@
-// vim: filetype=umka
-
 import "std/std.um"
 
+fn stepify*(val, step: real): real {
+	if step != 0 {
+		val = trunc(val / step + 0.5) * step
+	}
+	return val
+}
+
+// TODO: better sort
+fn ysort*(ents: []entity.ent): []entity.ent {
+	swapped := true
+
+	for swapped {
+		swapped = false
+
+		for i:=1; i < len(ents); i++ {
+			if ents[i-1].p.y > ents[i].p.y {
+				tmp := ents[i]
+				ents[i] = ents[i-1]
+				ents[i-1] = tmp
+
+				swapped = true
+			}
+		}
+	}
+
+	return ents
+}
