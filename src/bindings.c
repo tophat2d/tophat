@@ -189,32 +189,21 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int count = p[2].intVal;
 	int coll;
 
-	//printf("%d, %X, %d\n", e->p->x, e->color, sizeof(poly *));
-
 	for (int i=0; i < count; i++) {
-		if (e->id == scene[i]->id) {
+		if (e->id == scene[i]->id)
 			continue;
-		}
 
-		if (e->p->x > scene[i]->p->x + scene[i]->p->w) {
-			//printf("exit due to bounding box %d\n", rand());
+		if (e->p->x > scene[i]->p->x + scene[i]->p->w)
 			continue;
-		}
 
-		if (e->p->y > scene[i]->p->y + scene[i]->p->h) {
-			//printf("exit due to bounding box %d\n", rand());
+		if (e->p->y > scene[i]->p->y + scene[i]->p->h)
 			continue;
-		}
 
-		if (e->p->w + e->p->x < scene[i]->p->x) {
-			//printf("exit due to bounding box %d\n", rand());
+		if (e->p->w + e->p->x < scene[i]->p->x)
 			continue;
-		}
 
-		if (e->p->h + e->p->y < scene[i]->p->y) {
-			//printf("exit due to bounding box %d\n", rand());
+		if (e->p->h + e->p->y < scene[i]->p->y)
 			continue;
-		}
 
 		coll = polytopoly(scene[i]->p, e->p);
 		if (coll) {
@@ -280,21 +269,17 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	RotatePoint(&rx, &ry, ra->x, ra->y, ra->r);
 	
 	for (int i=0; i < count; i++) {
-		if (ra->x > scene[i]->p->x + scene[i]->p->w) {
+		if (ra->x > scene[i]->p->x + scene[i]->p->w)
 			continue;
-		}
 
-		if (ra->y > scene[i]->p->y + scene[i]->p->h) {
+		if (ra->y > scene[i]->p->y + scene[i]->p->h)
 			continue;
-		}
 
-		if (rx < scene[i]->p->x) {
+		if (rx < scene[i]->p->x)
 			continue;
-		}
 
-		if (ry < scene[i]->p->y) {
+		if (ry < scene[i]->p->y)
 			continue;
-		}
 
 		coll = polytoline(scene[i]->p, ra->x, ra->y, rx, ry);
 		if (coll) {
@@ -350,10 +335,6 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int h = p[0].intVal;
 
 	int res = CNFGSetup(title, w, h);
-
-	//auinit();
-
-	//CNFGSetVSync(0);
 
 	if (res) {
 		printf("could not initialize rawdraw\n");
@@ -427,7 +408,7 @@ void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	CNFGSetWindowIconData(img->w, img->h, img->rdimg);
 #else
-	printf("\033[31merror\033[0m: can't set window icon on windows\n");
+	errprint("can't set window icon on this platform");
 #endif
 }
 
