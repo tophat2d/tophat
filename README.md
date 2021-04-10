@@ -19,7 +19,6 @@ Things I want to prioritize on. They are in the order, I want to complete them, 
 - `move_and_slide`-like function
 - minitutorials - how to structure, animations, raycasts, wasd movement etc.
 - simple UI toolkit
-- more templates
 - finnish space shooter example
 - windows installer
 - v0.1 release
