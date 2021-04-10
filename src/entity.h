@@ -21,8 +21,6 @@ typedef struct entnode {
 	struct entnode *next;
 } entnode_t;
 
-entity entityfrompoly(poly *p, uint32_t color);
-entity entityfromimage(char path[]);
 void draw(entity *o, rect *cam);
 
 #endif
