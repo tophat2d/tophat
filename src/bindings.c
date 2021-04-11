@@ -268,20 +268,34 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	RotatePoint(&rx, &ry, ra->x, ra->y, ra->r);
 	
+	rect rr = newrect(ra->x, ra->y, rx, ry);
+
+	if (rx < ra->x) {
+		rr.x = rx;
+		rr.w = ra->x;
+	}
+
+	if (ry < ra->y) {
+		rr.y = ry;
+		rr.h = ra->y;
+	}
+
+	//CNFGColor(0x8800ffff);
+	//CNFGTackRectangle((rr.x+40) * scaling, (rr.y+40) * scaling, (rr.w + 40) * scaling, (rr.h + 40) * scaling);
+
 	for (int i=0; i < count; i++) {
 
-		// This breaks it. FIXME
-		/*if (ra->x > scene[i]->p->x + scene[i]->p->w)
+		if (rr.x > scene[i]->p->x + scene[i]->p->w)
 			continue;
 
-		if (ra->y > scene[i]->p->y + scene[i]->p->h)
+		if (rr.y > scene[i]->p->y + scene[i]->p->h)
 			continue;
 
-		if (rx < scene[i]->p->x)
+		if (rr.w < scene[i]->p->x)
 			continue;
 
-		if (ry < scene[i]->p->y)
-			continue;*/
+		if (rr.h < scene[i]->p->y)
+			continue;
 
 		coll = polytoline(scene[i]->p, ra->x, ra->y, rx, ry);
 		if (coll) {
