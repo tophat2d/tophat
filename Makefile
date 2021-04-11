@@ -48,6 +48,7 @@ win-package: clean build windows
 	mkdir -p tophat-win/tophat/bin
 	cp tophat     tophat-win/tophat/bin/tophat-linux
 	cp tophat.exe tophat-win/tophat/bin/tophat-win.exe
+	echo $(version) > tophat-win/version
 	cp -r umka tophat-win/tophat/
 	cp examples/preset/*.um tophat-win/tophat
 	cp cmd/install.bat tophat-win/

@@ -1,18 +1,16 @@
 # tophat engine
-A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw). It aims to be both lightweight and easy to use.
+A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows scripting with [umka](https://github.com/vtereshkov/umka-lang). It aims to give as much power as possible to the user, while still being comfortable to use.
 
 ## features
 
 - scripting with [umka](https://github.com/vtereshkov/umka-lang)
 - you have your own game loop - you have the power over how the game works. not the engine
-- does things the simple way - for example, tophat has no bloated system for animations. you can make them in just one line.
+- does things the simple way
 - scaling - your game looks the same no matter the resolution
 - very lightweight - the engine is only about 750 kb in size
-- polygon to polygon collisions
+- great cli tool for linux
 
 ## TODO
-
-Things I want to prioritize on. They are in the order, I want to complete them, but the further into the list you are, the less accurate it is.
 
 - add better return values from collisions
 - notes on entities
@@ -20,7 +18,6 @@ Things I want to prioritize on. They are in the order, I want to complete them, 
 - minitutorials - how to structure, animations, raycasts, wasd movement etc.
 - simple UI toolkit
 - finnish space shooter example
-- windows installer
 - v0.1 release
 - web build
 - physics engine (some simple one)
