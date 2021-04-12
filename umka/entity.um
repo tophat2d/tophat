@@ -94,3 +94,7 @@ fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	ce := cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
 	return cgetcoll(len(cscnp), &ce, &cscnp[0])
 }
+
+fn (e: ^ent) animate*(t, fps: int, anim: ^[]image.img) {
+	e.image = anim^[(round(real(t)/(1000/fps)) % len(anim^))]
+}
