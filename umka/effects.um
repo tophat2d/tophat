@@ -1,0 +1,49 @@
+
+type anim* = struct {
+	anim: []image.img
+	rot: real
+	scale: real
+	fps: int
+
+	px: real
+	py: real 
+
+	zerotime: int
+
+	frame: int
+}
+
+fn mkanim*(px, py: int32, anm: []image.img, fps: int): anim {
+	a := anim{}
+
+	a.anim = append(anm, anm[len(anm)-1])
+
+	a.fps = fps
+	a.scale = 1
+	a.rot = 0
+
+	a.px = px
+	a.py = py
+
+	return a
+}
+
+fn (a: ^anim) start*() {
+	a.zerotime = global.t
+}
+
+fn (a: ^anim) handle*(t: int): bool {
+	a.frame = (round(real(t-a.ztime)/round((1000.0/a.fps))) % len(a.anim))
+
+	a.anim[a.frame].draw(round(a.px) - global.cam.x + global.cam.w/2, round(a.py) - global.cam.y + global.cam.h/2, round(a.rot), a.s)
+
+	if e.frame == len(e.anim) - 1 {
+		if a.looping {
+			a.zerotime = t
+		} else {
+			return true
+		}
+	}
+
+	return false
+}

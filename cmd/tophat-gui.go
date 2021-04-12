@@ -14,13 +14,13 @@ import (
 
 var ws string = "none"
 var version string = "check your tophat install"
-var defOptions []string = []string{"run", "package", "init", "open workspace"}
+var defOptions []string = []string{"run", "package", "init", "open workspace", "update libraries", "check version"}
 var istophat bool = false
 var tophatPath string = "/usr/share/tophat/"
 var cpops flop.Options
 
 func wsinit() {
-	err := flop.Copy(tophatPath + "umka", ws + string(os.PathSeparator) + "tophat", cpops)
+	err := libs()
 	if err != nil {
 		dlgs.Error("Error", fmt.Sprintf("Could not copy files. %s", err.Error()))
 		fmt.Println(err.Error())
@@ -61,16 +61,23 @@ func run() {
 	dlgs.Info("output", sout)
 }
 
+func libs(): error {
+	err := flop.Copy(tophatPath + "umka", ws + string(os.PathSeparator) + "tophat", cpops)
+	if err != nil {
+		return err
+	}
+}
+
 func pkg(name string, platform string) {
 	out := ".." + string(os.PathSeparator) + name + platform
 
-	_, err := exec.Command("mkdir", out).Output()
+	err := os.MkdirAll(out, 0777)
 	if err != nil {
 		dlgs.Error("Error", err.Error())
 		return
 	}
 
-	_, err = exec.Command("mkdir", out + string(os.PathSeparator) + "tophat.dat").Output()
+	err = os.MkdirAll(out + string(os.PathSeparator) + "tophat.dat", 0777)
 	if err != nil {
 		dlgs.Error("Error", err.Error())
 		return
@@ -94,6 +101,18 @@ func pkg(name string, platform string) {
 		fmt.Println(err.Error())
 		return
 	}
+}
+
+func versionCheck(): bool {
+	resp, err := http.Get("https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/version")
+	if err != nil {
+		dlgs.Error("Error", "Could not check version: " + err.Error())
+	}
+	defer resp.Body.Close()
+
+	upVersion := io.ReadAll(res.Body)
+
+	return (upVersion == version)
 }
 
 func main() {
@@ -160,9 +179,19 @@ func main() {
 		case "run":
 			run()
 		case "package":
-			dlgs.Info("info", "Packaging not yet available on windows")
-			//pkg(wssplit[len(wssplit)-1], "windows")
-			//pkg(wssplit[len(wssplit)-1], "linux")
+			pkg(wssplit[len(wssplit)-1], "windows")
+			pkg(wssplit[len(wssplit)-1], "linux")
+		case "update libs":
+			err := libs()
+			if err != nil {
+				dlgs.Error("Error", err.Error())
+			}
+		case "check version":
+			if versionCheck() {
+				dlgs.Info("Info", "tophat is up to date")
+			} else {
+				dlgs.Info("Info", "tophat is not up to date")
+			}
 		}
 	}
 }
