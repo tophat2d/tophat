@@ -9,6 +9,7 @@ import (
 	"umka/entity.um"
 	"umka/raycast.um"
 	"umka/polygon.um"
+	"umka/ui.um"
 
 	"umka/std/std.um"
 )
@@ -19,32 +20,16 @@ fn main() {
 	tophat.setup("test game", cam.x * 100, cam.y * 100)
 	var w, h: int32
 
-	box := entity.mk(polygon.mk(0, 0, []int32{0, 0, 0, 10, 10, 10, 10, 0}), 0x000000ff, 1)
-
-	ray := raycast.mk(0, 0, 5, 0)
+	ui.main = ui.mkhbox([]ui.element{ui.mklabel("hello world", 1, 0xff), ui.mklabel("hello World", 1, 0xff), ui.mklabel("hello World", 1, 0xff)})	
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
 		if input.ispressed(input.KEY_Q) {
-			ray.r -= round(0.2 * tophat.delta)
+			//ui.main.children = append(ui.main.children, ui.mklabel("Hello world", 1, 0x000000ff))
 		}
 
-		if input.ispressed(input.KEY_E) {
-			ray.r += round(0.2 * tophat.delta)
-		}
-
-		box.draw(cam)
-
-		ray.x, ray.y = input.getglobalmousepos(cam)
-
-		scn := []^entity.ent{&box}
-		color := 0xff | 0xff0000 * ray.getcoll(scn)
-
-		cx := cam.x - cam.w / 2
-		cy := cam.y - cam.h / 2
-		rx, ry := vec.rotatepoint(ray.x, ray.y - ray.l, ray.x, ray.y, ray.r)
-		rawdraw.drawline(round(ray.x-cx), round(ray.y-cy), round(rx-cx), round(ry-cy), 3, color)
+		ui.handle(cam.w, cam.h)
 	}
 }
 

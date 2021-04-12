@@ -1,0 +1,129 @@
+
+import (
+	"rectangle.um"
+	"rawdraw.um"
+)
+
+type element* = interface {
+	draw()
+	calculate()
+	gspan(): ^int
+	gpadding(): ^rectangle.rect
+	gdimensions(): ^rectangle.rect
+}
+
+type hbox* = struct {
+	children: []element
+	padding, dimensions: rectangle.rect
+	span: int
+}
+
+type label* = struct {
+	text: str
+	textsize: real
+	textcolor: uint32
+	bgcolor: uint32
+	padding, dimensions: rectangle.rect
+	span: int
+}
+
+fn mkhbox*(c: []element): hbox {
+	h := hbox {}
+
+	h.padding = rectangle.mk(0, 0, 0, 0)
+	h.children = c
+	h.dimensions = rectangle.mk(0, 0, 0, 0)
+	h.span = 1
+
+	return h
+}
+
+fn (hb: ^hbox) calculate*() {
+
+	totalspan := 0
+	cy := 0
+
+	for i:=0; i < len(hb.children); i++ {
+		totalspan += hb.children[i].gspan()^
+	}
+
+	for i:=0; i < len(hb.children); i++ {
+
+		dims := hb.children[i].gdimensions()
+		padd := hb.children[i].gpadding()
+
+		dims.x = padd.x
+		dims.w = dims.w - padd.w
+
+		dims.y = cy + padd.y
+		dims.h = cy + dims.h/totalspan - padd.y
+
+		printf("%d\n", hb.dimensions.h)
+		cy += hb.dimensions.h/totalspan * hb.children[i].gspan()^
+	}
+}
+
+fn (hb: ^hbox) draw*() {
+	for i:=0; i < len(hb.children); i++ {
+		hb.children[i].draw()
+	}
+}
+
+fn (hb: ^hbox) gspan*(): ^int {
+	return &hb.span
+}
+
+fn (hb: ^hbox) gpadding*(): ^rectangle.rect {
+	return &hb.padding
+}
+
+fn (hb: ^hbox) gdimensions*(): ^rectangle.rect {
+	return &hb.dimensions
+}
+
+fn mklabel*(text: str, textsize: real, textcolor: uint32): label {
+	h := label {}
+
+	h.text = text
+	h.textsize = textsize
+	h.textcolor = textcolor
+	h.bgcolor = 0x0
+	h.padding = rectangle.mk(0, 0, 0, 0)
+	h.dimensions = rectangle.mk(0, 0, 0, 0)
+	h.span = 1
+
+	return h
+}
+
+fn (l: ^label) calculate*() {}
+
+fn (l: ^label) draw*() {
+	printf("drawing label at %d, %d\n", l.dimensions.x, l.dimensions.y)
+
+	rawdraw.setcolor(l.bgcolor)
+	rawdraw.drawrect(l.dimensions.x, l.dimensions.y, l.dimensions.w, l.dimensions.h)
+
+	rawdraw.drawtext(l.text, l.dimensions.x, l.dimensions.y, l.textcolor, l.textsize)
+}
+
+fn (l: ^label) gspan*(): ^int {
+	return &l.span
+}
+
+fn (l: ^label) gpadding*(): ^rectangle.rect {
+	return &l.padding
+}
+
+fn (l: ^label) gdimensions*(): ^rectangle.rect {
+	return &l.dimensions
+}
+
+var main*: element
+
+fn handle*(w, h: int32) {
+	dims := main.gdimensions()
+	dims.w = w
+	dims.h = h
+	main.calculate()
+	main.draw()
+}
