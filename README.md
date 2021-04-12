@@ -13,12 +13,10 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 ## TODO
 
 - add better return values from collisions
-- notes on entities
-- `move_and_slide`-like function
-- minitutorials - how to structure, animations, raycasts, wasd movement etc.
 - simple UI toolkit
 - finnish space shooter example
 - v0.1 release
+- `move_and_slide`-like function
 - web build
 - physics engine (some simple one)
 - module support
