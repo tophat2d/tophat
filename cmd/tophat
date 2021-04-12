@@ -3,7 +3,7 @@
 Path=/usr/share/tophat
 
 function get () {
-	echo "downloading"
+	echo "downloading tophat"
 	curl "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/tophat.zip" -o tophat.zip
 	if [ -f "tophat.zip" ]; then
 		echo "download completed"
@@ -23,6 +23,7 @@ function clean () {
 }
 
 function setup () {
+	echo "installing tophat"
 	sudo rm -rf $Path
 	sudo mkdir $Path
 	echo "extracting"
@@ -30,18 +31,17 @@ function setup () {
 	echo "copying"
 	sudo mv $Path/tophat-release/* $Path
 	sudo rm -r $Path/tophat-release
-	echo "asking for version"
 	echo "done"
 }
 
 function update() {
-	if [ $(curl "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/version") = $(cat $Path/version) ]; then
+	echo "checking for new versions"
+	if [ $(curl -s "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/version") = $(cat $Path/version) ]; then
 		echo "tophat is already up to date"
 		exit 0
 	fi
 
-	get
-	setup tophat.zip
+	get; setup tophat.zip
 }
 
 function package() {
@@ -84,7 +84,7 @@ function package() {
 	cp -r ./* ../$Name-$2/tophat.dat
 	cp -r $Path/bin/$Bin ../$Name-$2/$Name$Sufix
 
-	Ignore="-x RAIDER -x tophat.dat/*.zip -x tophat.dat/*.git* -x tophat.dat/"
+	Ignore="-x tophat.dat/*.zip -x tophat.dat/*.git* -x tophat.dat/"
 
 	if [ -f ".thignore" ]; then
 		Ignore="$Ignore $(sed ':a;N;$!ba;s/\n/ -x tophat.dat\//g' .thignore)"
