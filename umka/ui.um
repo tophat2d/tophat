@@ -12,7 +12,6 @@ const (
 	BOT* = 2	
 )
 
-
 type element* = interface {
 	draw()
 	calculate()
@@ -22,17 +21,11 @@ type element* = interface {
 	gdimensions(): ^rectangle.rect
 }
 
-type hbox* = struct {
+type box* = struct {
 	children: []element
 	padding, dimensions: rectangle.rect
 	span: int
-}
-
-type vbox* = struct {
-	children: []element
-	padding, dimensions: rectangle.rect
-	span: int
-	_: char
+	vertical: bool 
 }
 
 type label* = struct {
@@ -58,130 +51,83 @@ type button* = struct {
 }
 
 ////////////////////////////////
-// hbox
+// box
 
-fn mkhbox*(c: []element): hbox {
-	h := hbox {}
+fn mkbox*(c: []element, vertical: bool): box {
+	h := box {}
 
 	h.padding = rectangle.mk(0, 0, 0, 0)
 	h.children = c
 	h.dimensions = rectangle.mk(0, 0, 0, 0)
 	h.span = 1
+	h.vertical = vertical
 
 	return h
 }
 
-fn (hb: ^hbox) calculate*() {
+fn (b: ^box) calculate*() {
 
 	totalspan := 0
-	cy := 0
+	off := 0
 
-	for i:=0; i < len(hb.children); i++ {
-		totalspan += hb.children[i].gspan()^
+	for i:=0; i < len(b.children); i++ {
+		totalspan += b.children[i].gspan()^
 	}
 
-	for i:=0; i < len(hb.children); i++ {
+	for i:=0; i < len(b.children); i++ {
 
-		dims := hb.children[i].gdimensions()
-		padd := hb.children[i].gpadding()
-
-		dims.x = hb.dimensions.x + padd.x
-		dims.w = hb.dimensions.w - padd.w  * hb.children[i].gspan()^
-
-		dims.y = hb.dimensions.y + cy + padd.y
-		dims.h = hb.dimensions.h/totalspan - padd.h - hb.padding.h
-
-		hb.children[i].calculate()
-
-		cy += hb.dimensions.h/totalspan * hb.children[i].gspan()^
+		if b.vertical {
+			dims := b.children[i].gdimensions()
+			padd := b.children[i].gpadding()
+      
+			dims.x = b.dimensions.x + off + padd.x
+			dims.w = b.dimensions.w/totalspan - padd.w - b.padding.w
+      
+			dims.y = b.dimensions.y + padd.y
+			dims.h = b.dimensions.h - padd.h * b.children[i].gspan()^
+      
+			b.children[i].calculate()
+      
+			off += b.dimensions.w/totalspan * b.children[i].gspan()^
+		
+		} else {
+			dims := b.children[i].gdimensions()
+			padd := b.children[i].gpadding()
+      
+			dims.x = b.dimensions.x + padd.x
+			dims.w = b.dimensions.w - padd.w  * b.children[i].gspan()^
+      
+			dims.y = b.dimensions.y + off + padd.y
+			dims.h = b.dimensions.h/totalspan - padd.h - b.padding.h
+      
+			b.children[i].calculate()
+      
+			off += b.dimensions.h/totalspan * b.children[i].gspan()^
+		}
 	}
 }
 
-fn (hb: ^hbox) draw*() {
+fn (hb: ^box) draw*() {
 	for i:=0; i < len(hb.children); i++ {
 		hb.children[i].draw()
 	}
 }
 
-fn (hb: ^hbox) gspan*(): ^int {
+fn (hb: ^box) gspan*(): ^int {
 	return &hb.span
 }
 
-fn (hb: ^hbox) gpadding*(): ^rectangle.rect {
+fn (hb: ^box) gpadding*(): ^rectangle.rect {
 	return &hb.padding
 }
 
-fn (hb: ^hbox) gdimensions*(): ^rectangle.rect {
+fn (hb: ^box) gdimensions*(): ^rectangle.rect {
 	return &hb.dimensions
 }
 
-fn (hb: ^hbox) handle*() {
+fn (hb: ^box) handle*() {
 	for i:=0; i < len(hb.children); i++ {
 		hb.children[i].handle()
-	}
-}
-
-////////////////////////////////
-// vbox
-
-fn mkvbox*(c: []element): vbox {
-	h := vbox {}
-
-	h.padding = rectangle.mk(0, 0, 0, 0)
-	h.children = c
-	h.dimensions = rectangle.mk(0, 0, 0, 0)
-	h.span = 1
-
-	return h
-}
-
-fn (vb: ^vbox) calculate*() {
-
-	totalspan := 0
-	cx := 0
-
-	for i:=0; i < len(vb.children); i++ {
-		totalspan += vb.children[i].gspan()^
-	}
-
-	for i:=0; i < len(vb.children); i++ {
-
-		dims := vb.children[i].gdimensions()
-		padd := vb.children[i].gpadding()
-
-		dims.x = vb.dimensions.x + cx + padd.x
-		dims.w = vb.dimensions.w/totalspan - padd.w - vb.padding.w
-
-		dims.y = vb.dimensions.y + padd.y
-		dims.h = vb.dimensions.h - padd.h * vb.children[i].gspan()^
-
-		vb.children[i].calculate()
-
-		cx += vb.dimensions.w/totalspan * vb.children[i].gspan()^
-	}
-}
-
-fn (hb: ^vbox) draw*() {
-	for i:=0; i < len(hb.children); i++ {
-		hb.children[i].draw()
-	}
-}
-
-fn (hb: ^vbox) gspan*(): ^int {
-	return &hb.span
-}
-
-fn (hb: ^vbox) gpadding*(): ^rectangle.rect {
-	return &hb.padding
-}
-
-fn (hb: ^vbox) gdimensions*(): ^rectangle.rect {
-	return &hb.dimensions
-}
-
-fn (vb: ^vbox) handle*() {
-	for i:=0; i < len(vb.children); i++ {
-		vb.children[i].handle()
 	}
 }
 
