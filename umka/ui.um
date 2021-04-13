@@ -2,6 +2,7 @@
 import (
 	"rectangle.um"
 	"rawdraw.um"
+	"input.um"
 )
 
 type element* = interface {
@@ -26,6 +27,20 @@ type label* = struct {
 	padding, dimensions: rectangle.rect
 	span: int
 }
+
+type button* = struct {
+	label: label
+	toggled: bool
+	pressed: bool
+	justpressed: bool
+	clickfunc: bool
+
+	padding, dimensions: rectangle.rect
+	span: int
+}
+
+////////////////////////////////
+// hbox
 
 fn mkhbox*(c: []element): hbox {
 	h := hbox {}
@@ -52,13 +67,14 @@ fn (hb: ^hbox) calculate*() {
 		dims := hb.children[i].gdimensions()
 		padd := hb.children[i].gpadding()
 
-		dims.x = padd.x
-		dims.w = dims.w - padd.w
+		dims.x = hb.dimensions.x + padd.x
+		dims.w = hb.dimensions.w - padd.w - hb.padding.w
 
-		dims.y = cy + padd.y
-		dims.h = cy + dims.h/totalspan - padd.y
+		dims.y = hb.dimensions.y + cy + padd.y
+		dims.h = hb.dimensions.h/totalspan - padd.h - hb.padding.h
 
-		printf("%d\n", hb.dimensions.h)
+		hb.children[i].calculate()
+
 		cy += hb.dimensions.h/totalspan * hb.children[i].gspan()^
 	}
 }
@@ -81,6 +97,9 @@ fn (hb: ^hbox) gdimensions*(): ^rectangle.rect {
 	return &hb.dimensions
 }
 
+////////////////////////////////
+// label
+
 fn mklabel*(text: str, textsize: real, textcolor: uint32): label {
 	h := label {}
 
@@ -98,8 +117,6 @@ fn mklabel*(text: str, textsize: real, textcolor: uint32): label {
 fn (l: ^label) calculate*() {}
 
 fn (l: ^label) draw*() {
-	printf("drawing label at %d, %d\n", l.dimensions.x, l.dimensions.y)
-
 	rawdraw.setcolor(l.bgcolor)
 	rawdraw.drawrect(l.dimensions.x, l.dimensions.y, l.dimensions.w, l.dimensions.h)
 
@@ -118,12 +135,75 @@ fn (l: ^label) gdimensions*(): ^rectangle.rect {
 	return &l.dimensions
 }
 
+////////////////////////////////
+// button
+
+fn mkbutton*(l: label): button {
+	b := button{}
+
+	b.padding = l.padding
+	b.label = l
+	b.pressed = false
+	b.justpressed = false
+	b.toggled = false
+	b.span = 1
+
+	return b
+}
+
+fn (b: ^button) calculate*() {
+	b.label.dimensions = b.dimensions
+
+	mx, my := input.getmousepos()
+	mp := input.ispressed(input.LMB)
+
+	ms := (b.dimensions.x <= mx && b.dimensions.y <= my && mx <= b.dimensions.x + b.dimensions.w && my <= b.dimensions.y + b.dimensions.h)
+	//printf("%d, %d, %d, %d\n", b.dimensions.x, b.dimensions.y, b.dimensions.x + b.dimensions.w, b.dimensions.y + b.dimensions.h)
+
+	b.justpressed = false
+
+	if ms && mp {
+		if !b.pressed {
+			b.justpressed = true
+		}
+		b.pressed = true
+	} else {
+		b.pressed = false
+	}
+
+	if b.justpressed {
+		b.toggled = !b.toggled
+	}
+}
+
+fn (b: ^button) draw*() {
+	b.label.draw()
+}
+
+fn (b: ^button) gspan*(): ^int {
+	return &b.span
+}
+
+fn (b: ^button) gpadding*(): ^rectangle.rect {
+	return &b.padding
+}
+
+fn (b: ^button) gdimensions*(): ^rectangle.rect {
+	return &b.dimensions
+}
+
+////////////////////////////////
+// main handler
+
 var main*: element
 
 fn handle*(w, h: int32) {
 	dims := main.gdimensions()
-	dims.w = w
-	dims.h = h
+	padd := main.gpadding()
+	dims.x = padd.x
+	dims.y = padd.y
+	dims.w = w - padd.w
+	dims.h = h - padd.h
 	main.calculate()
 	main.draw()
 }
