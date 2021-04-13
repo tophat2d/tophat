@@ -15,7 +15,7 @@ webcflags=$(sources) lib/umka/src/*.c $(wflags) -s WASM=1 -s ERROR_ON_UNDEFINED_
 version=v0.0
 
 build:
-	$(cc) $(cflags) -g
+	$(cc) $(cflags) -Os
 
 windows:
 	$(mingw) $(wincflags)

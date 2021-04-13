@@ -19,6 +19,13 @@ type hbox* = struct {
 	span: int
 }
 
+type vbox* = struct {
+	children: []element
+	padding, dimensions: rectangle.rect
+	span: int
+	_: char
+}
+
 type label* = struct {
 	text: str
 	textsize: real
@@ -94,6 +101,64 @@ fn (hb: ^hbox) gpadding*(): ^rectangle.rect {
 }
 
 fn (hb: ^hbox) gdimensions*(): ^rectangle.rect {
+	return &hb.dimensions
+}
+
+////////////////////////////////
+// vbox
+
+fn mkvbox*(c: []element): vbox {
+	h := vbox {}
+
+	h.padding = rectangle.mk(0, 0, 0, 0)
+	h.children = c
+	h.dimensions = rectangle.mk(0, 0, 0, 0)
+	h.span = 1
+
+	return h
+}
+
+fn (vb: ^vbox) calculate*() {
+
+	totalspan := 0
+	cx := 0
+
+	for i:=0; i < len(vb.children); i++ {
+		totalspan += vb.children[i].gspan()^
+	}
+
+	for i:=0; i < len(vb.children); i++ {
+
+		dims := vb.children[i].gdimensions()
+		padd := vb.children[i].gpadding()
+
+		dims.x = vb.dimensions.x + cx + padd.x
+		dims.w = vb.dimensions.w/totalspan - padd.w - vb.padding.w
+
+		dims.y = vb.dimensions.y + padd.y
+		dims.h = vb.dimensions.h - padd.h - vb.padding.h
+
+		vb.children[i].calculate()
+
+		cx += vb.dimensions.w/totalspan * vb.children[i].gspan()^
+	}
+}
+
+fn (hb: ^vbox) draw*() {
+	for i:=0; i < len(hb.children); i++ {
+		hb.children[i].draw()
+	}
+}
+
+fn (hb: ^vbox) gspan*(): ^int {
+	return &hb.span
+}
+
+fn (hb: ^vbox) gpadding*(): ^rectangle.rect {
+	return &hb.padding
+}
+
+fn (hb: ^vbox) gdimensions*(): ^rectangle.rect {
 	return &hb.dimensions
 }
 

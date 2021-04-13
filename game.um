@@ -20,11 +20,13 @@ fn main() {
 	tophat.setup("test game", cam.x * 100, cam.y * 100)
 	var w, h: int32
 
-	ui.main = ui.mkhbox([]ui.element{/*ui.mklabel("hello world", 1, 0xaa), ui.mklabel("hello World", 1, 0xff), */ui.mkbutton(ui.mklabel("click me!", 1, 0xff))})	
+	ui.main = ui.mkhbox([]ui.element{ui.mkvbox([]ui.element{}), ui.mkbutton(ui.mklabel("click me!", 1, 0xff))})	
 
 	mainbox := ^ui.hbox(ui.main)
+	vbox := ^ui.vbox(mainbox.children[0])
+	vbox.span = 2
 
-	button := ^ui.button(mainbox.children[0])
+	button := ^ui.button(mainbox.children[1])
 	button.label.bgcolor = 0x224422ff
 
 	mainbox.padding.x = 2
@@ -38,7 +40,7 @@ fn main() {
 		}
 
 		if button.justpressed {
-			mainbox.children = append(mainbox.children, ui.mklabel(repr(std.rand()%30), 0.8, std.rand()%16777215 << 8 | 0xff))
+			vbox.children = append(vbox.children, ui.mklabel(repr(std.rand()%30), 0.8, std.rand()%16777215 << 8 | 0xff))
 		}
 
 		ui.handle(cam.w, cam.h)
