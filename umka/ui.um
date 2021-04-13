@@ -3,11 +3,20 @@ import (
 	"rectangle.um"
 	"rawdraw.um"
 	"input.um"
+	"tophat.um"
 )
+
+const (
+	TOP* = 0
+	MID* = 1
+	BOT* = 2	
+)
+
 
 type element* = interface {
 	draw()
 	calculate()
+	handle()
 	gspan(): ^int
 	gpadding(): ^rectangle.rect
 	gdimensions(): ^rectangle.rect
@@ -30,6 +39,8 @@ type label* = struct {
 	text: str
 	textsize: real
 	textcolor: uint32
+	valign: int
+	halign: int
 	bgcolor: uint32
 	padding, dimensions: rectangle.rect
 	span: int
@@ -75,7 +86,7 @@ fn (hb: ^hbox) calculate*() {
 		padd := hb.children[i].gpadding()
 
 		dims.x = hb.dimensions.x + padd.x
-		dims.w = hb.dimensions.w - padd.w - hb.padding.w
+		dims.w = hb.dimensions.w - padd.w  * hb.children[i].gspan()^
 
 		dims.y = hb.dimensions.y + cy + padd.y
 		dims.h = hb.dimensions.h/totalspan - padd.h - hb.padding.h
@@ -102,6 +113,12 @@ fn (hb: ^hbox) gpadding*(): ^rectangle.rect {
 
 fn (hb: ^hbox) gdimensions*(): ^rectangle.rect {
 	return &hb.dimensions
+}
+
+fn (hb: ^hbox) handle*() {
+	for i:=0; i < len(hb.children); i++ {
+		hb.children[i].handle()
+	}
 }
 
 ////////////////////////////////
@@ -136,7 +153,7 @@ fn (vb: ^vbox) calculate*() {
 		dims.w = vb.dimensions.w/totalspan - padd.w - vb.padding.w
 
 		dims.y = vb.dimensions.y + padd.y
-		dims.h = vb.dimensions.h - padd.h - vb.padding.h
+		dims.h = vb.dimensions.h - padd.h * vb.children[i].gspan()^
 
 		vb.children[i].calculate()
 
@@ -162,6 +179,12 @@ fn (hb: ^vbox) gdimensions*(): ^rectangle.rect {
 	return &hb.dimensions
 }
 
+fn (vb: ^vbox) handle*() {
+	for i:=0; i < len(vb.children); i++ {
+		vb.children[i].handle()
+	}
+}
+
 ////////////////////////////////
 // label
 
@@ -175,11 +198,29 @@ fn mklabel*(text: str, textsize: real, textcolor: uint32): label {
 	h.padding = rectangle.mk(0, 0, 0, 0)
 	h.dimensions = rectangle.mk(0, 0, 0, 0)
 	h.span = 1
+	h.valign = MID
+	h.halign = MID
 
 	return h
 }
 
-fn (l: ^label) calculate*() {}
+fn (l: ^label) calculate*() {
+	sx, sy := rawdraw.textsize(l.text, l.textsize)
+
+	switch l.valign {
+	case MID:
+		l.padding.y = (l.dimensions.h-sy)/2
+	case BOT:
+		l.padding.y = l.dimensions.h - sy
+	}
+
+	switch l.halign {
+	case MID:
+		l.padding.x = (l.dimensions.w-sx)/2
+	case BOT:
+		l.padding.x = l.dimensions.w - sx
+	}
+}
 
 fn (l: ^label) draw*() {
 	rawdraw.setcolor(l.bgcolor)
@@ -200,6 +241,8 @@ fn (l: ^label) gdimensions*(): ^rectangle.rect {
 	return &l.dimensions
 }
 
+fn (l: ^label) handle*() {}
+
 ////////////////////////////////
 // button
 
@@ -218,7 +261,26 @@ fn mkbutton*(l: label): button {
 
 fn (b: ^button) calculate*() {
 	b.label.dimensions = b.dimensions
+	b.label.calculate()
+}
 
+fn (b: ^button) draw*() {
+	b.label.draw()
+}
+
+fn (b: ^button) gspan*(): ^int {
+	return &b.span
+}
+
+fn (b: ^button) gpadding*(): ^rectangle.rect {
+	return &b.padding
+}
+
+fn (b: ^button) gdimensions*(): ^rectangle.rect {
+	return &b.dimensions
+}
+
+fn (b: ^button) handle*() {
 	mx, my := input.getmousepos()
 	mp := input.ispressed(input.LMB)
 
@@ -239,22 +301,7 @@ fn (b: ^button) calculate*() {
 	if b.justpressed {
 		b.toggled = !b.toggled
 	}
-}
 
-fn (b: ^button) draw*() {
-	b.label.draw()
-}
-
-fn (b: ^button) gspan*(): ^int {
-	return &b.span
-}
-
-fn (b: ^button) gpadding*(): ^rectangle.rect {
-	return &b.padding
-}
-
-fn (b: ^button) gdimensions*(): ^rectangle.rect {
-	return &b.dimensions
 }
 
 ////////////////////////////////
@@ -262,7 +309,7 @@ fn (b: ^button) gdimensions*(): ^rectangle.rect {
 
 var main*: element
 
-fn handle*(w, h: int32) {
+fn update*(w, h: int32) {
 	dims := main.gdimensions()
 	padd := main.gpadding()
 	dims.x = padd.x
@@ -270,5 +317,13 @@ fn handle*(w, h: int32) {
 	dims.w = w - padd.w
 	dims.h = h - padd.h
 	main.calculate()
+}
+
+fn handle*(w, h: int32) {
+	if tophat.t % 100 < 32 {
+		update(w, h)
+	}
+
+	main.handle()
 	main.draw()
 }

@@ -8,7 +8,7 @@ import (
 	"std/std.um"
 )
 
-var start, end, delta*: int
+var t*, end, delta*: int
 
 var platform*: str = "linux"
 
@@ -28,7 +28,7 @@ fn setup*(title: str, w, h: int32) {
 
 	audio.sarr = []audio.sound{}
 
-	start = gettime()
+	t = gettime()
 }
 
 fn setwindowtitle*(title: str)
@@ -47,11 +47,11 @@ fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 	rawdraw.swapbuffers()
 
 	end = gettime()
-	delta = (end - start)/1000
+	delta = (end - t)/1000
 	if delta < 0 {
 		delta += 1000
 	}
-	start = gettime()
+	t = gettime()
 
 	rawdraw.setbgcolor(0x000000ff)
 	rawdraw.clearframe()

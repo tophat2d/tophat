@@ -24,7 +24,7 @@ fn main() {
 
 	mainbox := ^ui.hbox(ui.main)
 	vbox := ^ui.vbox(mainbox.children[0])
-	vbox.span = 2
+	vbox.span = 1
 
 	button := ^ui.button(mainbox.children[1])
 	button.label.bgcolor = 0x224422ff
@@ -41,6 +41,7 @@ fn main() {
 
 		if button.justpressed {
 			vbox.children = append(vbox.children, ui.mklabel(repr(std.rand()%30), 0.8, std.rand()%16777215 << 8 | 0xff))
+			ui.update(cam.w, cam.h)
 		}
 
 		ui.handle(cam.w, cam.h)
