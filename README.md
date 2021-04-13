@@ -1,5 +1,5 @@
 # tophat engine
-A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows scripting with [umka](https://github.com/vtereshkov/umka-lang). It aims to give as much power as possible to the user, while still being comfortable to use.
+A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows scripting with [umka](https://github.com/vtereshkov/umka-lang). It aims to give as much power as possible to the user, while still being comfortable to use. See docs [here](https://github.com/marekmaskarinec/tophat/wiki/Umka-libraries). Examples can be found in the examples folder.
 
 ## features
 
