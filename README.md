@@ -16,7 +16,6 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
   - button callback
   - more functions
   - image box
-  - fix text align  
 - finnish space shooter example
 - v0.1 release
 - add better return values from collisions

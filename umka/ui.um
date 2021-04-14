@@ -170,7 +170,7 @@ fn (l: ^label) calculate*() {
 
 fn (l: ^label) draw*() {
 	rawdraw.setcolor(l.bgcolor)
-	rawdraw.drawrect(l.dimensions.x, l.dimensions.y, l.dimensions.w, l.dimensions.h)
+	rawdraw.drawrect(l.dimensions.x - l.padding.x, l.dimensions.y - l.padding.y, l.dimensions.w + l.padding.w, l.dimensions.h + l.padding.h)
 
 	rawdraw.drawtext(l.text, l.dimensions.x, l.dimensions.y, l.textcolor, l.textsize)
 }
@@ -208,6 +208,11 @@ fn mkbutton*(l: label): button {
 fn (b: ^button) calculate*() {
 	b.label.dimensions = b.dimensions
 	b.label.calculate()
+	b.label.dimensions.x += b.label.padding.x
+	b.label.dimensions.w -= b.label.padding.w
+
+	b.label.dimensions.y += b.label.padding.y
+	b.label.dimensions.h -= b.label.padding.h
 }
 
 fn (b: ^button) draw*() {
