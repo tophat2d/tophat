@@ -81,10 +81,10 @@ fn (b: ^box) calculate*() {
 			padd := b.children[i].gpadding()
       
 			dims.x = b.dimensions.x + off + padd.x
-			dims.w = b.dimensions.w/totalspan - padd.w - b.padding.w
+			dims.w = b.dimensions.w/totalspan * b.children[i].gspan()^ - padd.w
       
 			dims.y = b.dimensions.y + padd.y
-			dims.h = b.dimensions.h - padd.h * b.children[i].gspan()^
+			dims.h = b.dimensions.h - padd.h
       
 			b.children[i].calculate()
       
@@ -95,10 +95,10 @@ fn (b: ^box) calculate*() {
 			padd := b.children[i].gpadding()
       
 			dims.x = b.dimensions.x + padd.x
-			dims.w = b.dimensions.w - padd.w  * b.children[i].gspan()^
+			dims.w = b.dimensions.w - padd.w - padd.x
       
 			dims.y = b.dimensions.y + off + padd.y
-			dims.h = b.dimensions.h/totalspan - padd.h - b.padding.h
+			dims.h = b.dimensions.h/totalspan * b.children[i].gspan()^ - padd.h - padd.y
       
 			b.children[i].calculate()
       
@@ -260,8 +260,8 @@ fn update*(w, h: int32) {
 	padd := main.gpadding()
 	dims.x = padd.x
 	dims.y = padd.y
-	dims.w = w - padd.w
-	dims.h = h - padd.h
+	dims.w = w - padd.w - padd.x
+	dims.h = h - padd.h - padd.y
 	main.calculate()
 }
 

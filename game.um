@@ -24,7 +24,7 @@ fn main() {
 
 	mainbox := ^ui.box(ui.main)
 	vbox := ^ui.box(mainbox.children[0])
-	vbox.span = 1
+	vbox.span = 2
 
 	button := ^ui.button(mainbox.children[1])
 	button.label.bgcolor = 0x224422ff

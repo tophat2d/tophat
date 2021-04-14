@@ -46,12 +46,12 @@ fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 	rawdraw.drawrect(cam.w, 0, w^, h^)
 	rawdraw.swapbuffers()
 
-	end = gettime()
-	delta = (end - t)/1000
+	end = gettime()/1000
+	delta = (end - t)
 	if delta < 0 {
 		delta += 1000
 	}
-	t = gettime()
+	t = gettime()/1000
 
 	rawdraw.setbgcolor(0x000000ff)
 	rawdraw.clearframe()

@@ -2,6 +2,7 @@
 
 import (
 	"polygon.um"
+	"tophat.um"
 	"rectangle.um"
 	"std/std.um"
 	"image.um"
@@ -95,6 +96,6 @@ fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	return cgetcoll(len(cscnp), &ce, &cscnp[0])
 }
 
-fn (e: ^ent) animate*(t, fps: int, anim: ^[]image.img) {
-	e.image = anim^[(round(real(t)/(1000/fps)) % len(anim^))]
+fn (e: ^ent) animate*(fps: int, anim: ^[]image.img) {
+	e.image = anim^[(round(real(tophat.t)/(1000/fps)) % len(anim^))]
 }
