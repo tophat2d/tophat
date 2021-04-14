@@ -13,7 +13,7 @@ type anim* = struct {
 	frame: int
 }
 
-fn mkanim*(px, py: int32, anm: []image.img, fps: int): anim {
+fn mk*(px, py: int32, anm: []image.img, fps: int): anim {
 	a := anim{}
 
 	a.anim = append(anm, anm[len(anm)-1])
