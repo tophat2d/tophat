@@ -21,6 +21,8 @@ void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r);

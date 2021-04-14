@@ -19,6 +19,8 @@ fn fliphimg(i: int)
 
 fn imgvalid(i: int): int32
 
+fn imggetdims(w, h: ^int32, i: int)
+
 fn load*(path: str): img {
 	return img{loadimg(&path[0])}
 }
@@ -45,4 +47,11 @@ fn (i: ^img) draw*(x, y, rot: int32, scale: real)  {
 
 fn (i: ^img) validate*(): bool {
 	return bool(imgvalid(i.handle))
+}
+
+fn (i: ^img) getdims*(): (int32, int32) {
+	var w, h: int32
+	imggetdims(&w, &h, i.handle)
+
+	return w, h
 }

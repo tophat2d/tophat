@@ -34,6 +34,7 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "flipvimg", &umimgflipv);
 	umkaAddFunc(umka, "fliphimg", &umimgfliph);
 	umkaAddFunc(umka, "imgvalid", &umimgvalid);
+	umkaAddFunc(umka, "imggetdims", &umimggetdims);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
@@ -145,6 +146,15 @@ void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fliph(img);
 	glDeleteTextures(1, &img->tex);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
+}
+
+void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[0].ptrVal;
+	int *h = (int *)p[1].ptrVal;
+	int *w = (int *)p[2].ptrVal;
+
+	*w = img->w;
+	*h = img->h;
 }
 
 // input
