@@ -15,6 +15,10 @@ import (
 	"umka/std/std.um"
 )
 
+fn ontoggle(toggled: bool) {
+	printf("%d\n", int(toggled))
+}
+
 fn main() { 
 
 	cam := rectangle.mk(10, 10, 80, 80)
@@ -29,6 +33,7 @@ fn main() {
 
 	button := ^ui.button(mainbox.children[1])
 	button.label.bgcolor = 0x224422ff
+	button.ontoggle = ontoggle
 
 	mainbox.padding.x = 2
 	mainbox.padding.w = 2

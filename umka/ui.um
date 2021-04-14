@@ -60,6 +60,9 @@ type button* = struct {
 
 	padding, dimensions: rectangle.rect
 	span: int
+
+	onpress, onjustpress: fn()
+	ontoggle: fn(toggled: bool)
 }
 
 ////////////////////////////////
@@ -248,6 +251,10 @@ fn mkbutton*(l: label): button {
 	b.toggled = false
 	b.span = 1
 
+	b.onpress = fn() {}
+	b.onjustpress = fn() {}
+	b.ontoggle = fn(toggled: bool) {}
+
 	return b
 }
 
@@ -289,14 +296,17 @@ fn (b: ^button) handle*() {
 	if ms && mp {
 		if !b.pressed {
 			b.justpressed = true
+			b.onjustpress()
 		}
 		b.pressed = true
+		b.onpress()
 	} else {
 		b.pressed = false
 	}
 
 	if b.justpressed {
 		b.toggled = !b.toggled
+		b.ontoggle(b.toggled)
 	}
 
 }
