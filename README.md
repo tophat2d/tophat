@@ -4,7 +4,8 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 ## features
 
 - scripting with [umka](https://github.com/vtereshkov/umka-lang)
-- you have your own game loop - you have the power over how the game works. not the engine
+- you have the power. there are little to no background processes ran by the engine. the engine doesn't affect your stuff. this allows for solutions, that wouldn't be possible in engines like godot or unity
+- no editor. although one might see this as an disadvantage (and it might be), some engines take editor to the point, where you can't do stuff manually. it might be harder to make levels, but atleast you can do it your own way.
 - does things the simple way
 - scaling - your game looks the same no matter the resolution
 - very lightweight - the engine is only about 750 kb in size
