@@ -47,6 +47,8 @@ void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umsleep(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r);

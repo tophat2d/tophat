@@ -8,7 +8,7 @@ import (
 	"std/std.um"
 )
 
-var t*, end, delta*: int
+var t*, start, end, delta*: int
 
 var platform*: str = "linux"
 
@@ -47,11 +47,12 @@ fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 	rawdraw.swapbuffers()
 
 	end = gettime()/1000
-	delta = (end - t)
+	delta = (end - start)
 	if delta < 0 {
 		delta += 1000
 	}
-	t = gettime()/1000
+	start = gettime()/1000
+	t += delta
 
 	rawdraw.setbgcolor(0x000000ff)
 	rawdraw.clearframe()

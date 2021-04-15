@@ -20,8 +20,14 @@ fn csoundstop(s: int)
 
 fn csoundvol(s: int, vol: real)
 
+fn csoundvalidate(s: int): int
+
 fn load*(path: str): sound {
 	s := sound{cauload(path)}
+
+	if len(sarr) == 0 {
+		sarr = []sound{}
+	}
 
 	sarr = append(sarr, s)
 	setsounds(sarr)
@@ -52,4 +58,8 @@ fn (s: ^sound) stop*() {
 
 fn (s: ^sound) vol*(vol: real) {
 	csoundvol(s.handle, vol)
+}
+
+fn (s: ^sound) validate*(): bool {
+	return bool(csoundvalidate(s.handle))
 }

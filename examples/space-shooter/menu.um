@@ -1,0 +1,44 @@
+
+import (
+	"tophat/ui.um"
+	"tophat/rectangle.um"
+
+	"gamescn.um"
+	"global.um"
+)
+
+var (
+	mainbox: ui.box
+	playbutton: ui.button
+	settingsbutton: ui.button
+)
+
+// creating ui
+fn init*() {
+	playbutton = ui.mkbutton(ui.mklabel("PLAY", 1, 0x22ff))
+	playbutton.label.bgcolor = 0xeeeeeeff
+	playbutton.padding = rectangle.mk(10, 10, 10, 10)
+
+	settingsbutton = ui.mkbutton(ui.mklabel("QUIT", 1, 0x22ff))
+	settingsbutton.label.bgcolor = 0xeeeeeeff
+	settingsbutton.padding = rectangle.mk(10, 10, 10, 10)
+
+	mainbox = ui.mkbox([]ui.element{ui.mklabel("SPACE GAME", 2, 0xeeeeeeff), &playbutton, &settingsbutton}, false)
+	mainbox.padding = rectangle.mk(10, 20, 10, 20)
+
+	ui.main = mainbox
+}
+
+fn run*() {
+	ui.main = mainbox // setting main element
+	ui.handle(global.cam.w, global.cam.h)
+
+	if playbutton.pressed {
+		gamescn.retry()
+		global.scene = global.GAME
+	}
+
+	if settingsbutton.pressed {
+		global.scene = global.QUIT
+	}
+}

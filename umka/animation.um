@@ -1,9 +1,15 @@
 
+import (
+	"image.um"
+	"rectangle.um"
+)
+
 type anim* = struct {
 	anim: []image.img
 	rot: real
 	scale: real
 	fps: int
+	looping: bool
 
 	px: real
 	py: real 
@@ -25,19 +31,21 @@ fn mk*(px, py: int32, anm: []image.img, fps: int): anim {
 	a.px = px
 	a.py = py
 
+	a.looping = false
+
 	return a
 }
 
-fn (a: ^anim) start*() {
-	a.zerotime = global.t
+fn (a: ^anim) start*(t: int) {
+	a.zerotime = t
 }
 
-fn (a: ^anim) handle*(t: int): bool {
-	a.frame = (round(real(t-a.ztime)/round((1000.0/a.fps))) % len(a.anim))
+fn (a: ^anim) handle*(t: int, cam: rectangle.rect): bool {
+	a.frame = (round(real(t-a.zerotime)/round((1000.0/a.fps))) % len(a.anim))
 
-	a.anim[a.frame].draw(round(a.px) - global.cam.x + global.cam.w/2, round(a.py) - global.cam.y + global.cam.h/2, round(a.rot), a.s)
+	a.anim[a.frame].draw(round(a.px) - cam.x + cam.w/2, round(a.py) - cam.y + cam.h/2, round(a.rot), a.scale)
 
-	if e.frame == len(e.anim) - 1 {
+	if a.frame == len(a.anim) - 1 {
 		if a.looping {
 			a.zerotime = t
 		} else {

@@ -290,6 +290,7 @@ fn (b: ^button) handle*() {
 
 	ms := (b.dimensions.x <= mx && b.dimensions.y <= my && mx <= b.dimensions.x + b.dimensions.w && my <= b.dimensions.y + b.dimensions.h)
 	//printf("%d, %d, %d, %d\n", b.dimensions.x, b.dimensions.y, b.dimensions.x + b.dimensions.w, b.dimensions.y + b.dimensions.h)
+	//printf("%d, %d, %d, %d\n", mx, my, int(mp), int(ms))
 
 	b.justpressed = false
 
@@ -309,6 +310,7 @@ fn (b: ^button) handle*() {
 		b.ontoggle(b.toggled)
 	}
 
+	//printf("%d\n", int(b.pressed))
 }
 
 ////////////////////////////////

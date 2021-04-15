@@ -1,0 +1,66 @@
+///////////////////////////////////////////////////////////////////////////
+// space shooter example                                                 //
+// file structure:                                                       //
+//   game.um      - main file with entry point                           //
+//   gamescn.um   - game loop                                            //
+//     player.um  - player handling                                      //
+//     enemy.um   - enemy handling                                       //
+//     bullet.um  - bullet handling                                      //
+//     effects.um - animations, hit effect and stars                     //
+//     sounds.um  - file with all sound variables                        //
+//   deathscn.um  - game over menu                                       //
+//   menu.um      - main menu                                            //
+//   global.um    - global variables                                     //
+//   settings.um  - game settings. you can disable/enable some features  //
+///////////////////////////////////////////////////////////////////////////
+
+
+import (
+	"tophat/rectangle.um"
+	"tophat/tophat.um"
+	"tophat/rawdraw.um"
+	"tophat/input.um"
+
+	"gamescn.um"
+	"deathscn.um"
+	"global.um"
+	"menu.um"
+	"sounds.um"
+)
+
+// main entry point of our game
+fn main() {
+	// sets up the engine
+	tophat.setup("space shooter", 480, 720)
+
+	var w, h: int32
+
+	// creating camera
+	global.cam = rectangle.mk(0, 0, 96, 144)
+
+	// calling init functions in our scenes. these load assets
+	gamescn.init()
+	menu.init()
+	deathscn.init()
+	sounds.init()
+
+	// setting scene variable to menu
+	global.scene = global.MENU
+
+	// main cycle
+	for true {
+		tophat.cycle(&w, &h, 0x000022ff, global.cam)
+
+		// choosing, which function to call
+		switch global.scene {
+		case global.MENU:
+			menu.run()
+		case global.GAME:
+			gamescn.run()
+		case global.DEAD:
+			deathscn.run()
+		case global.QUIT:
+			break
+		}
+	}
+}

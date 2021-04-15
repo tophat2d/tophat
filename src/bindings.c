@@ -55,6 +55,7 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "csoundplay", &umsoundplay);
 	umkaAddFunc(umka, "csoundstop", &umsoundstop);
 	umkaAddFunc(umka, "csoundvol", &umsoundvol);
+	umkaAddFunc(umka, "csoundvalidate", &umsoundvalidate);
 
 	// misc
 	umkaAddFunc(umka, "sleep", &umsleep);
@@ -263,6 +264,17 @@ void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {
 	sound *s = (sound *)p[1].ptrVal;
 	s->volume = (float)p[0].realVal;
+}
+
+void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r) {
+	sound *s = (sound *)p[0].ptrVal;
+
+	if (s == NULL) {
+		r[0].intVal = 0;
+		return;
+	}
+
+	r[0].intVal = 1;
 }
 
 // rays
