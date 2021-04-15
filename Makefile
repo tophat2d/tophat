@@ -14,7 +14,7 @@ releaseflags=-Os -DRELEASE_BUILD
 wincflags=$(sources) -DCNFGOGL lib/windows/libumka_static.a -o tophat.exe $(wflags) -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread -Llib/windows -DUMKA_STATIC -static -lumka_static 
 webcflags=$(sources) lib/umka/src/*.c $(wflags) -s WASM=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -o main.wasm -ldl -lpthread
 
-version=v0.0
+version=v0.1
 
 build: libembed
 	$(cc) $(cflags) $(releaseflags)
