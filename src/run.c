@@ -7,6 +7,9 @@
 #include "bindings.h"
 #include "audio.h"
 #include "misc.h"
+#ifdef RELEASE_BUILD
+#include "umkalibs.h"
+#endif
 
 float scaling;
 int *pressed;
@@ -81,16 +84,17 @@ void HandleDestroy() {
 int main(int argc, char *argv[]) {
 	umka = umkaAlloc();
 	int umkaOK;	
+
+	char rp[255];
+	respath = &rp[0];
 	
 	FILE *f;
 	char scriptpath[20];
 	if ((f = fopen("game.um", "r"))) {
-		respath = malloc(sizeof(char) * 4);
 		strcpy(respath, "./");
 		strcpy(scriptpath, "game.um");
 		fclose(f);
 	} else if ((f = fopen("tophat.dat/game.um", "r"))) {
-		respath = malloc(sizeof(char) * 11);
 		strcpy(respath, "tophat.dat/");
 		strcpy(scriptpath, "tophat.dat/game.um");
 		fclose(f);
@@ -107,6 +111,24 @@ int main(int argc, char *argv[]) {
 		printf("Could not initialize umka.\n");
 		return 1;
 	}
+
+#ifdef RELEASE_BUILD
+	umkaAddModule(umka, "animation.um", libs[0]);
+	umkaAddModule(umka, "audio.um", libs[1]);
+	umkaAddModule(umka, "entity.um", libs[2]);
+	umkaAddModule(umka, "image.um", libs[3]);
+	umkaAddModule(umka, "input.um", libs[4]);
+	umkaAddModule(umka, "map.um", libs[5]);
+	umkaAddModule(umka, "misc.um", libs[6]);
+	umkaAddModule(umka, "polygon.um", libs[7]);
+	umkaAddModule(umka, "rawdraw.um", libs[8]);
+	umkaAddModule(umka, "raycast.um", libs[9]);
+	umkaAddModule(umka, "rectangle.um", libs[10]);
+	umkaAddModule(umka, "tophat.um", libs[11]);
+	umkaAddModule(umka, "ui.um", libs[12]);
+	umkaAddModule(umka, "vec.um", libs[13]);
+	umkaAddModule(umka, "std.um", libs[14]);
+#endif
 
 	umkabind(umka);
 	umkaOK = umkaCompile(umka);
@@ -129,6 +151,7 @@ int main(int argc, char *argv[]) {
 
 	memset(pressed, 0, 255 * sizeof(int));
 	memset(justpressed, 0, 255 * sizeof(int));
+
 
 	umkaOK = umkaRun(umka);
 	if (!umkaOK) {

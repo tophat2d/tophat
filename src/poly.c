@@ -11,6 +11,8 @@ extern float scaling;
 
 poly *newpoly(int px, int py, int vertnum, ...) {
 	int mx, my;
+	mx = 0;
+	my = 0;
 	va_list valist;
 	int *v = malloc(vertnum * sizeof(int) * 2);
 	if (v == NULL) {

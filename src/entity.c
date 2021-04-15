@@ -3,11 +3,10 @@
 
 #include "../lib/rawdraw/CNFG.h"
 
-#include "img/bmp.h"
-
 #include "entity.h"
 #include "rect.h"
 #include "poly.h"
+#include "misc.h"
 
 extern float scaling;
 

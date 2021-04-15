@@ -2,11 +2,13 @@ cc=gcc
 mingw=x86_64-w64-mingw32-gcc
 webcc=/home/marek/desk/emsdk/upstream/emscripten/emcc # TODO: better path
 
-sources=src/*.c src/img/*.c src/*.a
+sources=src/*.c src/*.a
 wflags=-Wall
 libs=-lm -lX11 -Lsrc -lumka -L /lib64 -ldl -lGL -lpthread
 
 cflags=$(sources) $(wflags) -o tophat $(libs) -DCNFGOGL
+
+releaseflags=-Os -DRELEASE_BUILD
 
 # TODO: sort out this mess
 wincflags=$(sources) -DCNFGOGL lib/windows/libumka_static.a -o tophat.exe $(wflags) -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread -Llib/windows -DUMKA_STATIC -static -lumka_static 
@@ -14,11 +16,11 @@ webcflags=$(sources) lib/umka/src/*.c $(wflags) -s WASM=1 -s ERROR_ON_UNDEFINED_
 
 version=v0.0
 
-build:
-	$(cc) $(cflags) -Os
+build: libembed
+	$(cc) $(cflags) $(releaseflags)
 
-windows:
-	$(mingw) $(wincflags)
+windows: libembed
+	$(mingw) $(wincflags) $(releaseflags)
 
 web:
 	$(webcc) $(webcflags)
@@ -43,6 +45,7 @@ package: clean build windows
 	zip -r tophat.zip tophat-release
 	rm -r tophat-release
 	mv tophat.zip bin
+	make clean
 
 win-package: clean build windows
 	mkdir -p tophat-win/tophat/bin
@@ -58,11 +61,16 @@ win-package: clean build windows
 
 clean:
 	rm -rf tophat-release
-	rm -f tophat tophat.exe
+	rm -f tophat tophat.exe src/umkalibs.h
 
 cmdtool:
 	chmod +x cmd/tophat
 	sudo cp cmd/tophat /bin
+
+libembed:
+	echo "#ifndef UMKALIBS_H\n#define UMKALIBS_H\nconst char *libs[] = {" > src/umkalibs.h
+	embedder text umka/*.um umka/std/std.um >> src/umkalibs.h
+	echo "};\n#endif" >> src/umkalibs.h
 
 ru:
 	sl
