@@ -1,5 +1,5 @@
 # tophat engine
-A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows scripting with [umka](https://github.com/vtereshkov/umka-lang). It aims to give as much power as possible to the user, while still being comfortable to use. See docs [here](https://github.com/marekmaskarinec/tophat/wiki/Umka-libraries). Examples can be found in the examples folder.
+A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows scripting with [umka](https://github.com/vtereshkov/umka-lang). It aims to give as much power as possible to the user, while still being comfortable to use. To get started, read [this](https://github.com/marekmaskarinec/tophat/wiki/getting-started) article. See docs [here](https://github.com/marekmaskarinec/tophat/wiki/Umka-libraries). Examples can be found in the examples folder.
 
 ## features
 
@@ -12,15 +12,15 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 
 ## TODO
 
-- file embedding
 - v0.1 release
-- add better return values from collisions
-- `move_and_slide`-like function
-- web build
+- file embedding
+- tilemaps
+- csv parser
 - particle system
 - physics engine (some simple one)
-- module support
-- tilemaps
+- `move_and_slide`-like function
+- add better return values from collisions
+- web build
 
 ## MIGHTDO
 
