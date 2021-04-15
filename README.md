@@ -12,7 +12,7 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 
 ## TODO
 
-- finnish space shooter example
+- file embedding
 - v0.1 release
 - add better return values from collisions
 - `move_and_slide`-like function
