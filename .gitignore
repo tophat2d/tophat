@@ -3,4 +3,4 @@
 tophat
 tophat.exe
 src/umkalibs.h
-cmd/embedder
+cmd/embedder/embedder

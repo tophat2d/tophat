@@ -68,8 +68,9 @@ cmdtool:
 	sudo cp cmd/tophat /bin
 
 libembed:
+	@if [ ! -f cmd/embedder/embedder ]; then echo "please build embedder by running go build in cmd/embedder"; exit 1; fi
 	echo "#ifndef UMKALIBS_H\n#define UMKALIBS_H\nconst char *libs[] = {" > src/umkalibs.h
-	embedder text umka/*.um umka/std/std.um >> src/umkalibs.h
+	./cmd/embedder/embedder text umka/*.um umka/std/std.um >> src/umkalibs.h
 	echo "};\n#endif" >> src/umkalibs.h
 
 ru:
