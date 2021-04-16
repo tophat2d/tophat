@@ -25,10 +25,6 @@ fn csoundvalidate(s: int): int
 fn load*(path: str): sound {
 	s := sound{cauload(path)}
 
-	if len(sarr) == 0 {
-		sarr = []sound{}
-	}
-
 	sarr = append(sarr, s)
 	setsounds(sarr)
 

@@ -61,6 +61,11 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
 
 void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
 	for (int i=soundcount-1; i >= 0; i--) {
+
+		if (sounds[0] == NULL) {
+			continue;
+		}
+
 		sound *csound = sounds[i];
 
 		if (csound == NULL) {

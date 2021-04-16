@@ -1,1 +1,1 @@
-copy tophat %CSIDL_DEFAULT_MYDOCUMENTS%
+copy tophat %HOMEPATH%\Documents\

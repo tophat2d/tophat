@@ -17,7 +17,7 @@ webcflags=$(sources) lib/umka/src/*.c $(wflags) -s WASM=1 -s ERROR_ON_UNDEFINED_
 version=v0.1
 
 build: libembed
-	$(cc) $(cflags) $(releaseflags)
+	$(cc) $(cflags) $(releaseflags) -g
 
 windows: libembed
 	$(mingw) $(wincflags) $(releaseflags)
