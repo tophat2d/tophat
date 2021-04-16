@@ -76,8 +76,9 @@ void HandleMotion( int x, int y, int mask ) {
 void HandleDestroy() {
 	audeinit();
 
-	free(respath);
-	umkaCall(umka, destroyfunc, 0, NULL, NULL);
+	if (destroyfunc) {
+		umkaCall(umka, destroyfunc, 0, NULL, NULL);
+	}
 	umkaFree(umka);
 }
 

@@ -2,3 +2,5 @@
 **/*.swp
 tophat
 tophat.exe
+src/umkalibs.h
+cmd/embedder
