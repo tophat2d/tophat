@@ -116,19 +116,20 @@ int main(int argc, char *argv[]) {
 #ifdef RELEASE_BUILD
 	umkaAddModule(umka, "animation.um", libs[0]);
 	umkaAddModule(umka, "audio.um", libs[1]);
-	umkaAddModule(umka, "entity.um", libs[2]);
-	umkaAddModule(umka, "image.um", libs[3]);
-	umkaAddModule(umka, "input.um", libs[4]);
-	umkaAddModule(umka, "map.um", libs[5]);
-	umkaAddModule(umka, "misc.um", libs[6]);
-	umkaAddModule(umka, "polygon.um", libs[7]);
-	umkaAddModule(umka, "rawdraw.um", libs[8]);
-	umkaAddModule(umka, "raycast.um", libs[9]);
-	umkaAddModule(umka, "rectangle.um", libs[10]);
-	umkaAddModule(umka, "tophat.um", libs[11]);
-	umkaAddModule(umka, "ui.um", libs[12]);
-	umkaAddModule(umka, "vec.um", libs[13]);
-	umkaAddModule(umka, "std.um", libs[14]);
+	umkaAddModule(umka, "csv.um", libs[2]);
+	umkaAddModule(umka, "entity.um", libs[3]);
+	umkaAddModule(umka, "image.um", libs[4]);
+	umkaAddModule(umka, "input.um", libs[5]);
+	umkaAddModule(umka, "map.um", libs[6]);
+	umkaAddModule(umka, "misc.um", libs[7]);
+	umkaAddModule(umka, "polygon.um", libs[8]);
+	umkaAddModule(umka, "rawdraw.um", libs[9]);
+	umkaAddModule(umka, "raycast.um", libs[10]);
+	umkaAddModule(umka, "rectangle.um", libs[11]);
+	umkaAddModule(umka, "tophat.um", libs[12]);
+	umkaAddModule(umka, "ui.um", libs[13]);
+	umkaAddModule(umka, "vec.um", libs[14]);
+	umkaAddModule(umka, "std.um", libs[15]);
 #endif
 
 	umkabind(umka);

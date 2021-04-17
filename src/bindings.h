@@ -11,14 +11,6 @@ void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umfopen(UmkaStackSlot *p, UmkaStackSlot *r);
 
-void umparsecsv(UmkaStackSlot *p, UmkaStackSlot *r);
-
-void umtocsv(UmkaStackSlot *p, UmkaStackSlot *r);
-
-void umfreestr(UmkaStackSlot *p, UmkaStackSlot *r);
-
-void umfreecsv(UmkaStackSlot *p, UmkaStackSlot *r);
-
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r);

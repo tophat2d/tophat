@@ -70,7 +70,7 @@ cmdtool:
 libembed:
 	#@if [ ! -f cmd/embedder/embedder ]; then echo "please build embedder by running go build in cmd/embedder"; exit 1; fi
 	echo "#ifndef UMKALIBS_H\n#define UMKALIBS_H\nconst char *libs[] = {" > src/umkalibs.h
-	./cmd/embedder/embedder text umka/animation.um umka/audio.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um >> src/umkalibs.h
+	./cmd/embedder/embedder text umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um >> src/umkalibs.h
 	echo "};\n#endif" >> src/umkalibs.h
 
 ru:

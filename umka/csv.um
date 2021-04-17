@@ -1,31 +1,46 @@
+//////////////////////////////////////////////////////////////////
+//                                                              //
+// taken from: https://github.com/marekmaskarinec/libs          //
+//                                                              //
+//////////////////////////////////////////////////////////////////
 
-fn ccsvparse(inp: str): str//[][]str
-
-fn ctocsv(inp: [][]str): str
-
-fn freestr(inp: str)
-
-fn freecsv(inp: [][]str)
-
-fn parse*(inp: str): [][]str {
-	printf(inp)
-	cval := ccsvparse(inp)
-
-	// there must be a better way
-	//out := append(cval, [][]str{})
-	//out = delete(out, len(out)-1)
-
-	//freecsv(cval)
-
-	return [][]str{}///cval//out
-}
-
-fn to*(inp: [][]str): str {
-	cval := ctocsv(inp)
-
-	out := cval
-
-	//freestr(cval)
-
+fn gettocomma(s: int, inp: str, le: ^int): str {
+	out := ""
+	i := s
+	for j:=0; i < len(inp) && inp[i] != ',' && inp[i] != '\n'; i++ {
+		out += inp[i]
+	}
+	le^ = i - 1
 	return out
 }
+
+fn parse*(inp: str): [][]str {
+	out := [][]str{}
+	var r, c: int
+	out = append(out, []str{gettocomma(0, inp, &c)})
+	c = 1
+	for i:=0; i < len(inp); i++ {
+		if inp[i] == '\n' {
+			r++
+			c = 1
+			out = append(out, []str{gettocomma(i+1, inp, &i)})
+		} else if inp[i] == ',' {
+			out[r] = append(out[r], gettocomma(i+1, inp, &i))
+			c++
+		}
+	}
+	return out
+}
+
+fn encode*(inp: [][]str): str {
+	out := ""
+	for i:=0; i < len(inp); i++ {
+		for j:=0; j < len(inp[i]); j++ {
+			out += inp[i][j]
+			if j < len(inp[i])-1 { out += "," }
+		}
+		out += "\n"
+	}
+	return out
+}
+
