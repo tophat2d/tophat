@@ -1,0 +1,31 @@
+
+fn ccsvparse(inp: str): str//[][]str
+
+fn ctocsv(inp: [][]str): str
+
+fn freestr(inp: str)
+
+fn freecsv(inp: [][]str)
+
+fn parse*(inp: str): [][]str {
+	printf(inp)
+	cval := ccsvparse(inp)
+
+	// there must be a better way
+	//out := append(cval, [][]str{})
+	//out = delete(out, len(out)-1)
+
+	//freecsv(cval)
+
+	return [][]str{}///cval//out
+}
+
+fn to*(inp: [][]str): str {
+	cval := ctocsv(inp)
+
+	out := cval
+
+	//freestr(cval)
+
+	return out
+}

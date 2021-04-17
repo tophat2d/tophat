@@ -11,6 +11,7 @@ import (
 	"umka/polygon.um"
 	"umka/ui.um"
 	"umka/image.um"
+	"umka/csv.um"
 
 	"umka/std/std.um"
 )
@@ -40,6 +41,10 @@ fn main() {
 
 	vbox.image = image.load("etc/test.png")
 	vbox.imagemode = ui.SCALE
+
+	data := "val1,val2\nrow2,val4\n"
+
+	printf("%s\n", repr(csv.parse(data)))
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)

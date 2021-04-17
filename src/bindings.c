@@ -11,6 +11,7 @@
 
 #include "bindings.h"
 #include "poly.h"
+#include "csv.h"
 
 extern float scaling;
 extern int *pressed;
@@ -27,6 +28,12 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "debug", &umdebug);
 	umkaAddFunc(umka, "debug2", &umdebug2);
 	umkaAddFunc(umka, "cfopen", &umfopen);
+
+	// csv
+	umkaAddFunc(umka, "ccsvparse", &umparsecsv);
+	umkaAddFunc(umka, "ctocsv", &umtocsv);
+	umkaAddFunc(umka, "freestr", &umfreestr);
+	umkaAddFunc(umka, "freecsv", &umfreecsv);
 
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
@@ -100,6 +107,36 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	FILE *f = fopen(strcat(path, name), mode);
 	r->ptrVal = (intptr_t)f;
+}
+
+// csv
+void umparsecsv(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char *inp = (char *)p[0].ptrVal;
+	csv_t res;
+
+	printf("%s\n", inp);
+
+	csvparse(&res, inp);
+
+	printf("%d, %d\n", res.rows, res.collumns[0]);
+
+	free(res.collumns);
+
+	r[0].ptrVal = (intptr_t)res.data;
+}
+
+void umtocsv(UmkaStackSlot *p, UmkaStackSlot *r) {
+	csv_t inp = (csv_t){ .data = (char ***)p[2].ptrVal, .rows = p[1].intVal, .collumns = (int *)p[2].ptrVal };
+
+	r[0].ptrVal = (intptr_t)tocsv(&inp);
+}
+
+void umfreestr(UmkaStackSlot *p, UmkaStackSlot *r) {
+	free((char *)p[0].ptrVal);
+}
+
+void umfreecsv(UmkaStackSlot *p, UmkaStackSlot *r) {
+	free((char ***)p[0].ptrVal);
 }
 
 // images
