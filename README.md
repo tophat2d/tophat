@@ -15,8 +15,8 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 
 - csv parser
 - tilemaps
+- rewrite go parts in c or umka
 - better windows workflow
-- rewrite embedder in c/umka
 - user file embedding
 - particle system
 - physics engine (some simple one)
