@@ -1,7 +1,14 @@
 set /p Name=Target: 
-mkdir %Target%-windows
-COPY %Target% %Target%-windows\tophat.dat
-COPY bin\tophat-win.exe %Target%-windows
-mkdir %Target%-linux
-COPY %Target% %Target%-linux\tophat.dat
-COPY bin\tophat-linux %Target%-linux
+
+mkdir %Name%-windows
+mkdir %Name%-windows\tophat.dat
+copy /Y %Name%\*.* %Name%-windows\tophat.dat
+copy /Y bin\tophat-win.exe %Name%-windows
+rename %Name%-windows\tophat-win.exe %Name%.exe
+
+mkdir %Name%-linux
+mkdir %Name%-linux\tophat.dat
+copy /Y %Name%\*.* %Name%-linux\tophat.dat
+copy /Y bin\tophat-linux %Name%-linux
+rename %Name%-linux\tophat-linux %Name%
+
