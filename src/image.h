@@ -15,6 +15,8 @@ void flipv(image *img);
 
 void fliph(image *img);
 
+void imgcrop(image *img, int x1, int y1, int x2, int y2);
+
 void rdimg(image *img, unsigned char *data);
 
 #endif

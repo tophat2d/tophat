@@ -35,6 +35,7 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "fliphimg", &umimgfliph);
 	umkaAddFunc(umka, "imgvalid", &umimgvalid);
 	umkaAddFunc(umka, "imggetdims", &umimggetdims);
+	umkaAddFunc(umka, "imgcrop", &umimgcrop);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
@@ -124,7 +125,6 @@ void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
 	image *img = (image *)p[0].ptrVal;
-
 	if (img->rdimg != NULL) {
 		r->intVal = 1;
 		return;
@@ -156,6 +156,18 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	*w = img->w;
 	*h = img->h;
+}
+
+void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
+	image *img = (image *)p[4].ptrVal;
+	int y2 = p[0].intVal;
+	int y1 = p[1].intVal;
+	int x2 = p[2].intVal;
+	int x1 = p[3].intVal;
+
+	imgcrop(img, x1, y1, x2, y2);
+	glDeleteTextures(1, &img->tex);
+	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
 
 // input
