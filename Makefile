@@ -3,7 +3,7 @@ mingw=x86_64-w64-mingw32-gcc
 webcc=/home/marek/desk/emsdk/upstream/emscripten/emcc # TODO: better path
 
 sources=src/*.c src/*.a
-wflags=-Wall
+wflags=-Wall -Wno-maybe-uninitialized
 libs=-lm -lX11 -Lsrc -lumka -L /lib64 -ldl -lGL -lpthread
 
 cflags=$(sources) $(wflags) -o tophat $(libs) -DCNFGOGL
@@ -48,13 +48,15 @@ package: clean build windows
 	make clean
 
 win-package: clean build windows
-	mkdir -p tophat-win/tophat/bin
-	cp tophat     tophat-win/tophat/bin/tophat-linux
-	cp tophat.exe tophat-win/tophat/bin/tophat-win.exe
+	mkdir -p tophat-win/bin
+	mkdir -p tophat-win/preset
+	cp tophat     tophat-win/bin/tophat-linux
+	cp tophat.exe tophat-win/bin/tophat-win.exe
 	echo $(version) > tophat-win/version
-	cp -r umka tophat-win/tophat/
-	cp examples/preset/*.um tophat-win/tophat
-	cp cmd/install.bat tophat-win/
+	cp examples/preset/*.um tophat-win/preset
+	cp cmd/run.bat tophat-win/preset
+	cp cmd/init.bat tophat-win/
+	cp cmd/package.bat tophat-win/
 	rm -rf bin/tophat-win.zip
 	zip -Z store -y -q -r bin/tophat-win.zip tophat-win 
 	rm -r tophat-win

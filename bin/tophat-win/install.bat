@@ -1,1 +1,0 @@
-copy tophat %HOMEPATH%\Documents\

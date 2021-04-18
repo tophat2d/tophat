@@ -28,7 +28,7 @@ char *gettocomma(int s, char *inp, int *le) {
 	int len = strlen(inp);
 	char *tr;
 	for (l=0; l < len && inp[s+l] != ',' && inp[s+l] != '\n'; l++)
-	tr = malloc(sizeof(char) * l);
+	tr = malloc(sizeof(char) * (l + 1));
 	for (int i=0; i < l; i++)
 		tr[i] = inp[i+s];
 	*le += l - 1;
@@ -68,7 +68,7 @@ void csvparse(csv_t *res, char *inp) {
 // encoding
 
 char *tocsv(csv_t *inp) {
-	int size;
+	int size = 0;
 	for (int i=0; i < inp->rows; i++) {
 		for (int j=0; j < inp->collumns[i]; j++) {
 			size += strlen(inp->data[i][j]);
