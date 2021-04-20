@@ -9,6 +9,11 @@
 
 extern float scaling;
 
+enum {
+	STRETCH,
+	TOPLEFT,
+} scaleops;
+
 void tmapdraw(tmap *t, rect *cam) {
 	int camx = cam->x - (cam->w / 2);
 	int camy = cam->y - (cam->h / 2);
@@ -36,7 +41,19 @@ void tmapdraw(tmap *t, rect *cam) {
 		if (t->cells[j*t->w+i] == 0) {
 			continue;
 		}
-		CNFGBlitTex(t->tiles[t->cells[j*t->w+i]-1]->tex, (t->x+i*t->cellsize-camx)*scaling, (t->y+j*t->cellsize-camy)*scaling, (t->cellsize)*scaling+scaling/4, (t->cellsize)*scaling+scaling/4, 0);
+		int scalex, scaley;
+		switch (t->scaletype) {
+		case STRETCH:
+			scalex = t->cellsize;
+			scaley = t->cellsize;
+			break;
+		case TOPLEFT:
+			scalex = t->tiles[t->cells[j*t->w+i]-1]->w;
+			scaley = t->tiles[t->cells[j*t->w+i]-1]->h;
+			break;
+		}
+
+		CNFGBlitTex(t->tiles[t->cells[j*t->w+i]-1]->tex, (t->x+i*t->cellsize-camx)*scaling, (t->y+j*t->cellsize-camy)*scaling, scalex*scaling+scaling/4, scaley*scaling+scaling/4, 0);
 		
 		// possible way of preventing spaces without big overlap
 		//rx = (t->x+i*t->cellsize-camx)*scaling - floor((t->x+i*t->cellsize-camx)*scaling);

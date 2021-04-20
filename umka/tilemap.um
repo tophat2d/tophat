@@ -28,10 +28,8 @@ type ctmap* = struct {
 }
 
 const (
-	SCALE* = 0
+	STRETCH* = 0
 	TOPLEFT* = 1
-	CENTER* = 2
-	STRECTCH* = 3
 )
 
 fn mk*(inp: str, images: []image.img): tmap {

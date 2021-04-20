@@ -31,16 +31,14 @@ fn main() {
 	img2 := image.load("etc/test.png")
 	img2.fliph()
 
-	tmdata := "tophat tilemap,10,0,8,0\n0,2,2,0\n1,1,1,1\n2,2,2,2\n0,1,1,0\n"
+	tmdata := "tophat tilemap,10,0,6,0\n0,2,2,0\n1,1,1,1\n2,2,2,2\n0,1,1,0\n"
 
 	t := tilemap.mk(tmdata, []image.img{img, img2})
-	printf("%s\n", repr(t.cells))
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
 		t.draw(cam)
-		rawdraw.drawtext(repr(w) + ", " + repr(h), 1, 1, 0xff, 1)
 	}
 }
 
