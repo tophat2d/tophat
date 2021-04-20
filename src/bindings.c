@@ -17,8 +17,8 @@
 #endif
 
 extern float scaling;
-extern int *pressed;
-extern int *justpressed;
+extern int pressed[255];
+extern int justpressed[255];
 extern int mx;
 extern int my;
 
