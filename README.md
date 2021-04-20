@@ -15,6 +15,7 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 
 - tilemaps
   - auto tile
+  - collisions
   - better prevention of transparent lines
 - rewrite go parts in c or umka
 - user file embedding
