@@ -69,10 +69,6 @@ int main(int argc, char *argv[]) {
 
 	scaling = 1;
 
-	/*int pa[255];
-	int jpa[255];
-	pressed = &pa[0];
-	justpressed = &jpa[0];*/
 	inputinit();
 
 	umkaOK = umkaRun(umka);
