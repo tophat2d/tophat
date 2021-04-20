@@ -1,0 +1,62 @@
+
+import (
+	"csv.um"
+	"image.um"
+	"std/std.um"
+	"rectangle.um"
+)
+
+type tmap* = struct {
+	tiles: []image.img
+	x: int
+	y: int
+	w: int
+	cells: []int32
+	cellsize: int
+	scaletype: int
+}
+
+type ctmap* = struct {
+	tiles: ^int
+	x: int32
+	y: int32
+	w: int32
+	h: int32
+	cells: ^int32
+	cellsize: int32
+	scaletype: int32
+}
+
+const (
+	SCALE* = 0
+	TOPLEFT* = 1
+	CENTER* = 2
+	STRECTCH* = 3
+)
+
+fn mk*(inp: str, images: []image.img): tmap {
+	res := csv.parse(inp)
+
+	if len(res) < 2 { return tmap{} }
+	if len(res[0]) < 2 { return tmap{} }
+	if res[0][0] != "tophat tilemap" { return tmap{} }
+
+	cells := []int32{}
+
+	for i:=1; i < len(res); i++ {
+		for j:=0; j < len(res[i]); j++ {
+			cells = append(cells, std.atoi(res[i][j]))
+		}
+	}
+
+	return tmap{images, std.atoi(res[0][1]), std.atoi(res[0][2]), len(res[1]), cells, std.atoi(res[0][3]), std.atoi(res[0][4])}
+}
+
+fn (t: ^tmap) edit*(x, y, tile: int) { t.cells[y*t.w + x] = tile }
+
+fn cdrawtmap(ct: ^ctmap, cam: ^rectangle.rect)
+
+fn (t: ^tmap) draw*(cam: rectangle.rect) {
+	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], t.cellsize, t.scaletype}
+	cdrawtmap(&cm, &cam)
+}

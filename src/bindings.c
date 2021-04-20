@@ -11,6 +11,10 @@
 
 #include "bindings.h"
 #include "poly.h"
+#include "tilemap.h"
+#ifdef RELEASE_BUILD
+#include "umkalibs.h"
+#endif
 
 extern float scaling;
 extern int *pressed;
@@ -27,6 +31,9 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "debug", &umdebug);
 	umkaAddFunc(umka, "debug2", &umdebug2);
 	umkaAddFunc(umka, "cfopen", &umfopen);
+
+	// tilemaps
+	umkaAddFunc(umka, "cdrawtmap", &umdrawtmap);
 
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
@@ -80,6 +87,26 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "cdrawpoly", &umCNFGTackPoly);
 	umkaAddFunc(umka, "drawsegment", &umCNFGTackSegment);
 	umkaAddFunc(umka, "cdrawimage", &umCNFGBlitTex);
+
+#ifdef RELEASE_BUILD
+	umkaAddModule(umka, "animation.um", libs[0]);
+	umkaAddModule(umka, "audio.um", libs[1]);
+	umkaAddModule(umka, "csv.um", libs[2]);
+	umkaAddModule(umka, "entity.um", libs[3]);
+	umkaAddModule(umka, "image.um", libs[4]);
+	umkaAddModule(umka, "input.um", libs[5]);
+	umkaAddModule(umka, "map.um", libs[6]);
+	umkaAddModule(umka, "misc.um", libs[7]);
+	umkaAddModule(umka, "polygon.um", libs[8]);
+	umkaAddModule(umka, "rawdraw.um", libs[9]);
+	umkaAddModule(umka, "raycast.um", libs[10]);
+	umkaAddModule(umka, "rectangle.um", libs[11]);
+	umkaAddModule(umka, "tilemap.um", libs[12]);
+	umkaAddModule(umka, "tophat.um", libs[13]);
+	umkaAddModule(umka, "ui.um", libs[14]);
+	umkaAddModule(umka, "vec.um", libs[15]);
+	umkaAddModule(umka, "std.um", libs[16]);
+#endif
 }
 
 // etc
@@ -101,6 +128,13 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	FILE *f = fopen(strcat(path, name), mode);
 	r->ptrVal = (intptr_t)f;
+}
+
+// tilemaps
+void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r) {
+	rect *cam = (rect *)p[0].ptrVal;
+	tmap *t = (tmap *)p[1].ptrVal;
+	tmapdraw(t, cam);
 }
 
 // images
