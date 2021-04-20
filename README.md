@@ -13,10 +13,11 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 
 ## TODO
 
-- csv parser
 - tilemaps
+  - scaling options
+  - auto tile
+  - better prevention of transparent lines
 - rewrite go parts in c or umka
-- better windows workflow
 - user file embedding
 - particle system
 - physics engine (some simple one)
