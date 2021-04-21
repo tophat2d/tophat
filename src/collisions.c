@@ -3,10 +3,14 @@
 //
 #include "entity.h"
 #include <stdio.h>
+#include <math.h>
 
 #include "collisions.h"
 #include "main.h"
 #include "poly.h"
+#include "tilemap.h"
+
+int stepify(int inp, int step);
 
 extern int entitycount;
 
@@ -135,7 +139,6 @@ int polytopoint(poly *a, int px, int py) {
 		vcy = a->v[current+1] + a->x;
 		vny = a->v[next+1] + a->y;
 
-		// this is some kind of black magic I found on the internet.
 		if (((vcy >= py && vny < py) || (vcy < py && vny >= py)) && (px < (vnx-vcx)*(py-vcy) / (vny-vcy)+vcx)) {
 			result = !result;
 		}
@@ -143,60 +146,24 @@ int polytopoint(poly *a, int px, int py) {
 	return result;
 }
 
-/*
-   int collbyentity(entnode_t *a, entity *e) {
-   int id, aid, x, y, w, h, ax, ay, aw, ah;
-   entnode_t *current, *next;
+int stepify(int inp, int step) {
+	if (step != 0)
+		inp = trunc(inp / step + 0.5) * step;
+	return inp;
+}
 
-   id = e->id;
-   x = e->r.x;
-   y = e->r.y;
-   w = e->r.w;
-   h = e->r.h;
-
-   next = a;
-   current = a;
-
-   while (next != NULL) {
-
-   if (current->val == NULL) {
-   next = current->next;
-   current = next;
-   continue;
-   }
-
-   aid = current->val->id;
-   ax = current->val->r.x;
-   ay = current->val->r.y;
-   ah = current->val->r.h;
-   aw = current->val->r.w;
-
-   next = current->next;
-   current = next;
-
-   if (id == aid) {
-   continue;
-   }
-
-   if (x + w <= ax) {
-   continue;
-   }
-
-   if (y + h <= ay) {
-   continue;
-   }
-
-   if (x >= ax+aw) {
-   continue;
-   }
-
-   if (y >= ay+ah) {
-   continue;
-   }
-
-   return aid;
-   }
-
-   return 0;
-   }*/
-
+int collontilemap(poly *p, tmap *t, int *rx, int *ry) {
+	for (int i=0; i < p->vc; i++) {
+		int x = (stepify(p->x + p->v[i], t->cellsize)-t->x)/t->cellsize;
+		int y = (stepify(p->y + p->v[i+1], t->cellsize)-t->y)/t->cellsize;
+		if (x < 0) continue;
+		if (y < 0) continue;
+		if (t->cells[y*t->w+x] <= 0) continue;
+		if (t->collmask[t->cells[y*t->w + x]-1]) {
+			*rx = x;
+			*ry = y;
+			return 1;
+		}
+	}
+	return 0;
+}

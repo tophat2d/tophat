@@ -11,6 +11,7 @@ typedef struct {
 	int w;
 	int h;
 	int *cells;
+	int *collmask;
 	int cellsize;
 	int scaletype;
 } tmap;

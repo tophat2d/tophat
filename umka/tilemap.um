@@ -4,6 +4,8 @@ import (
 	"image.um"
 	"std/std.um"
 	"rectangle.um"
+	"entity.um"
+	"polygon.um"
 )
 
 type tmap* = struct {
@@ -12,6 +14,7 @@ type tmap* = struct {
 	y: int
 	w: int
 	cells: []int32
+	collmask: []bool
 	cellsize: int
 	scaletype: int
 }
@@ -23,6 +26,7 @@ type ctmap* = struct {
 	w: int32
 	h: int32
 	cells: ^int32
+	collmask: ^int32
 	cellsize: int32
 	scaletype: int32
 }
@@ -47,7 +51,7 @@ fn mk*(inp: str, images: []image.img): tmap {
 		}
 	}
 
-	return tmap{images, std.atoi(res[0][1]), std.atoi(res[0][2]), len(res[1]), cells, std.atoi(res[0][3]), std.atoi(res[0][4])}
+	return tmap{images, std.atoi(res[0][1]), std.atoi(res[0][2]), len(res[1]), cells, make([]bool, len(images)), std.atoi(res[0][3]), std.atoi(res[0][4])}
 }
 
 fn (t: ^tmap) edit*(x, y, tile: int) { t.cells[y*t.w + x] = tile }
@@ -55,6 +59,34 @@ fn (t: ^tmap) edit*(x, y, tile: int) { t.cells[y*t.w + x] = tile }
 fn cdrawtmap(ct: ^ctmap, cam: ^rectangle.rect)
 
 fn (t: ^tmap) draw*(cam: rectangle.rect) {
-	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], t.cellsize, t.scaletype}
+	if len(t.cells) == 0 { return }
+
+	ccm := make([]int32, len(t.collmask))
+	for i:=0; i < len(t.collmask); i++ {
+		ccm[i] = int32(t.collmask[i])
+	}
+
+	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
 	cdrawtmap(&cm, &cam)
+}
+
+fn ctmapgetcoll(x, y: ^int32, t: ^ctmap, e: ^entity.cent): int32
+
+fn (t: ^tmap) getcoll*(e: entity.ent): (int, int, bool) {
+	if len(t.cells) == 0 { return 0, 0, false }
+
+	ccm := make([]int32, len(t.collmask))
+	for i:=0; i < len(t.collmask); i++ {
+		ccm[i] = int32(t.collmask[i])
+	}
+
+	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
+	
+	cp := polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}
+	ce := entity.cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
+
+	var rx, ry: int32
+	c := ctmapgetcoll(&rx, &ry, &cm, &ce)
+
+	return rx, rx, bool(c)
 }

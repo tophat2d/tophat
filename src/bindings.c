@@ -34,6 +34,7 @@ void umkabind(void *umka) {
 
 	// tilemaps
 	umkaAddFunc(umka, "cdrawtmap", &umdrawtmap);
+	umkaAddFunc(umka, "ctmapgetcoll", &umtmapgetcoll);
 
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
@@ -135,6 +136,15 @@ void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r) {
 	rect *cam = (rect *)p[0].ptrVal;
 	tmap *t = (tmap *)p[1].ptrVal;
 	tmapdraw(t, cam);
+}
+
+void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
+	entity *ent = (entity *)p[0].ptrVal;
+	tmap *t = (tmap *)p[1].ptrVal;
+	int *y = (int *)p[2].ptrVal;
+	int *x = (int *)p[3].ptrVal;
+
+	r->intVal = collontilemap(ent->p, t, x, y);
 }
 
 // images

@@ -29,13 +29,8 @@ void tmapdraw(tmap *t, rect *cam) {
 	if (t->x>=camx) sx = 0;
 	if (t->y>=camy) sy = 0;
 
-	if (sw > t->w)
-		sw = t->w;
-	if (sh > t->h)
-		sh = t->h;
-
-	//float rx = 0;
-	//float ry = 0;
+	if (sw > t->w) sw = t->w;
+	if (sh > t->h) sh = t->h;
 
 	for (int i=sx; i < sx+sw; i++) for (int j=sy; j < sy+sh; j++) {
 		if (t->cells[j*t->w+i] == 0) {
@@ -53,10 +48,6 @@ void tmapdraw(tmap *t, rect *cam) {
 			break;
 		}
 
-		CNFGBlitTex(t->tiles[t->cells[j*t->w+i]-1]->tex, (t->x+i*t->cellsize-camx)*scaling, (t->y+j*t->cellsize-camy)*scaling, scalex*scaling+scaling/4, scaley*scaling+scaling/4, 0);
-		
-		// possible way of preventing spaces without big overlap
-		//rx = (t->x+i*t->cellsize-camx)*scaling - floor((t->x+i*t->cellsize-camx)*scaling);
-		//ry = (t->y+i*t->cellsize-camy)*scaling - floor((t->y+i*t->cellsize-camy)*scaling);
+		CNFGBlitTex(t->tiles[t->cells[j*t->w+i]-1]->tex, (t->x+i*t->cellsize-camx)*scaling, (t->y+j*t->cellsize-camy)*scaling, scalex*scaling+scaling/6, scaley*scaling+scaling/6, 0);
 	}
 }

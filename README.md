@@ -14,9 +14,7 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 ## TODO
 
 - tilemaps
-  - scaling options
-  - auto tile
-  - better prevention of transparent lines
+	- fix some bugs with collisions
 - rewrite go parts in c or umka
 - user file embedding
 - particle system
@@ -29,6 +27,7 @@ A 2d game engine using [rawdraw](https://github.com/cntools/rawdraw) and allows 
 
 This is an experimental territory. These features aren't important to the engine, but I want to implement them one day. They are unsorted.
 
+- auto tile
 - doom-like 3d game
 - ldtk parsing
 - game jam or something
