@@ -153,11 +153,15 @@ int stepify(int inp, int step) {
 }
 
 int collontilemap(poly *p, tmap *t, int *rx, int *ry) {
+	if (p->x + p->w < t->x) return 0;
+	if (p->y + p->h < t->y) return 0;
 	for (int i=0; i < p->vc; i++) {
 		int x = (stepify(p->x + p->v[i], t->cellsize)-t->x)/t->cellsize;
 		int y = (stepify(p->y + p->v[i+1], t->cellsize)-t->y)/t->cellsize;
 		if (x < 0) continue;
 		if (y < 0) continue;
+		if (x > t->w) continue;
+		if (y > t->h) continue;
 		if (t->cells[y*t->w+x] <= 0) continue;
 		if (t->collmask[t->cells[y*t->w + x]-1]) {
 			*rx = x;

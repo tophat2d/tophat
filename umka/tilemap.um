@@ -43,15 +43,20 @@ fn mk*(inp: str, images: []image.img): tmap {
 	if len(res[0]) < 2 { return tmap{} }
 	if res[0][0] != "tophat tilemap" { return tmap{} }
 
-	cells := []int32{}
+	collmask := make([]bool, len(res[1]))
+	for i:=0; i < len(res[1]); i++ {
+		if res[1][i] == "true" { collmask[i] = true; continue }
+		collmask[i] = false
+	}
 
-	for i:=1; i < len(res); i++ {
+	cells := []int32{}
+	for i:=2; i < len(res); i++ {
 		for j:=0; j < len(res[i]); j++ {
 			cells = append(cells, std.atoi(res[i][j]))
 		}
 	}
 
-	return tmap{images, std.atoi(res[0][1]), std.atoi(res[0][2]), len(res[1]), cells, make([]bool, len(images)), std.atoi(res[0][3]), std.atoi(res[0][4])}
+	return tmap{images, std.atoi(res[0][1]), std.atoi(res[0][2]), len(res[2]), cells, collmask, std.atoi(res[0][3]), std.atoi(res[0][4])}
 }
 
 fn (t: ^tmap) edit*(x, y, tile: int) { t.cells[y*t.w + x] = tile }

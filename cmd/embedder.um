@@ -1,0 +1,42 @@
+fn _replace(inp, pattern, repl: str): []str {
+	lsplit := -1
+	tr := []str{}
+
+	for i:=0; i < len(inp); i++ {
+		s := inp[i]
+		if s == pattern[0] {
+			for j:=0; pattern[j] == inp[i]; j++ {
+				if j == len(pattern) - 1 {
+					tr = append(tr, sslice(inp, lsplit + 1 , i - len(pattern)))
+					if repl != "" {
+						tr = append(tr, repl)
+					}
+					lsplit = i
+					break		
+				}
+				i++
+			}
+		}
+	}
+	tr = append(tr, sslice(inp, lsplit + 1, len(inp)-1))
+
+	return tr
+}
+
+fn replace*(inp, pattern, replacer: str): str { return join(_replace(inp, pattern, replacer), "") }
+
+fn split*(inp: str, splitter: str): []str { return _replace(inp, splitter, "") }
+
+fn strtoc(inp: str): str {
+	out := ""
+	splt := split(inp, "\n")
+
+	for i:=0; i < len(splt); i++ {
+		tmp := replace(splt[i], "\\", "\\\\")
+		out += "\"" + replace(tmp, "\"", "\\\"") + "\\n\"\n"
+	}
+
+	return out
+}
+
+

@@ -31,20 +31,21 @@ fn main() {
 	img2 := image.load("etc/test.png")
 	img2.fliph()
 
-	tmdata := "tophat tilemap,6,0,6,0\n0,2,2,0\n1,1,1,1\n2,2,2,2\n0,1,1,0\n"
+	tmdata := "tophat tilemap,6,0,6,0\ntrue,true\n0,2,2,0\n1,1,1,1\n2,2,2,2\n0,1,1,0\n"
 
 	e := entity.mk(polygon.mk(0, 0, []int32{0, 0, 4, 0, 4, 4, 0, 4}), 0xff, 1)
 
 	t := tilemap.mk(tmdata, []image.img{img, img2})
-	t.collmask = []bool{true, true}
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 
 		e.p.x, e.p.y = input.getglobalmousepos(cam)
 
+		e.color = 0xff
 		x, y, c := t.getcoll(e)
-		printf("%d\n", int(c))
+
+		e.color += 0xffff00 * int(c)
 
 		t.draw(cam)
 		e.draw(cam)
