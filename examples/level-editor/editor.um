@@ -11,16 +11,26 @@ import (
 )
 
 var (
-	brushvis: ui.box
-	buttons: []ui.button								
-	target: tilemap.tmap
-	mainbox: ui.box
-	brush: int32
-	images: []image.img
+	brushvis: ui.box // box, that shows, which tile is active
+	buttons: []ui.button // all image buttons
+	target: tilemap.tmap // the tilemap, that is editer
+	mainbox: ui.box // box containing all ui
+	brush: int32 // current tile
+	images: []image.img // array of all tiles
 )
 
+// custom stepify function, that works better in this case
+fn stepify(val, step: real): real {
+	if step != 0 {
+		val = round(val / step + 0.5) * step
+	}
+	return val
+}
+
 fn init*() {
-	images = []image.img{image.load("1.png"), image.load("2.png"), image.load("3.png"), image.load("4.png")}
+	images = []image.img{image.load("1.png"), image.load("2.png"), image.load("3.png"), image.load("4.png")} // loading images
+
+	// here we are making a tilemap by hand
 	target = tilemap.tmap{
 		images,
 		72,
@@ -31,9 +41,12 @@ fn init*() {
 		6,
 		tilemap.TOPLEFT}
 	
-	brushvis = ui.mkbox([]ui.element{}, false)
-	brushvis.imagemode = ui.SCALE
-	mainbox = ui.mkbox([]ui.element{&brushvis}, false)
+	brushvis = ui.mkbox([]ui.element{}, false) // making brush visualizer
+	brushvis.imagemode = ui.SCALE // setting it's image scaling mode to SCALE
+
+	mainbox = ui.mkbox([]ui.element{&brushvis}, false) // creating mainbox
+
+	// buttons
 	buttons = make([]ui.button, len(images))
 	for i:=0; i < len(images); i++ {
 		buttons[i] = ui.mkbutton(ui.mklabel("", 1, 0xff))
@@ -41,16 +54,18 @@ fn init*() {
 		mainbox.children = append(mainbox.children, ui.mkbox([]ui.element{&buttons[i]}, false))
 		^ui.box(mainbox.children[i+1]).image = images[i]
 	}
+
 	mainbox.padding.w = 120
 	ui.main = mainbox
 
 	brush := 1
 }
 
+// this function paints a tile to target
 fn paint*(tile: int) {
 	x, y := input.getmousepos()
-	x = round(misc.stepify(x-target.x, target.cellsize)/target.cellsize)
-	y = round(misc.stepify(y-target.y, target.cellsize)/target.cellsize)
+	x = round(stepify(x-target.x, target.cellsize)/target.cellsize)-1
+	y = round(stepify(y-target.y, target.cellsize)/target.cellsize)-1
 
 	if x < 0 || y < 0 {
 		return
@@ -60,30 +75,35 @@ fn paint*(tile: int) {
 }
 
 fn run*() {
-	canpaint := true
+	// going through all the buttons. if it is pressed, we will set it's number as brush
 	for i:=0; i < len(buttons); i++ {
 		if buttons[i].pressed {
 			brush = i + 1
-			canpaint = false
 		}
 	}
+
+	// setting visualizer's image
 	if brush != 0 {
 		brushvis.image = images[brush-1]
 	}
 
-	if input.ispressed(input.LMB) && canpaint {
+	// click handling
+	if input.ispressed(input.LMB) {
 		paint(brush)
 	}
 
-	if input.ispressed(input.RMB) && canpaint {
-		paint(0)
+	if input.ispressed(input.RMB) {
+		paint(0) // zero means no tile
 	}
 
-	target.draw(global.cam)
+	target.draw(global.cam) // drawing the tilemap
+
+	// drawing the cursor
 	x, y := input.getmousepos()
-	x = round(misc.stepify(x, target.cellsize))
-	y = round(misc.stepify(y, target.cellsize))
+	x = round(misc.stepify(x, target.cellsize)-target.cellsize)
+	y = round(misc.stepify(y, target.cellsize)-target.cellsize)
 	rawdraw.setcolor(0x00ffffaa)
 	rawdraw.drawrect(x, y, 6, 6)
-	ui.handle(global.cam.w, global.cam.h)
+
+	ui.handle(global.cam.w, global.cam.h) // handling ui
 }
