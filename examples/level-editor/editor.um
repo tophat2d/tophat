@@ -1,0 +1,89 @@
+
+import (
+	"ui.um"
+	"tilemap.um"
+	"image.um"
+	"input.um"
+	"misc.um"
+	"rawdraw.um"
+
+	"global.um"
+)
+
+var (
+	brushvis: ui.box
+	buttons: []ui.button								
+	target: tilemap.tmap
+	mainbox: ui.box
+	brush: int32
+	images: []image.img
+)
+
+fn init*() {
+	images = []image.img{image.load("1.png"), image.load("2.png"), image.load("3.png"), image.load("4.png")}
+	target = tilemap.tmap{
+		images,
+		72,
+		0,
+		20,
+		make([]int32, 20*20),
+		[]bool{false, false, false, false},
+		6,
+		tilemap.TOPLEFT}
+	
+	brushvis = ui.mkbox([]ui.element{}, false)
+	brushvis.imagemode = ui.SCALE
+	mainbox = ui.mkbox([]ui.element{&brushvis}, false)
+	buttons = make([]ui.button, len(images))
+	for i:=0; i < len(images); i++ {
+		buttons[i] = ui.mkbutton(ui.mklabel("", 1, 0xff))
+		buttons[i].label.bgcolor = 0x33
+		mainbox.children = append(mainbox.children, ui.mkbox([]ui.element{&buttons[i]}, false))
+		^ui.box(mainbox.children[i+1]).image = images[i]
+	}
+	mainbox.padding.w = 120
+	ui.main = mainbox
+
+	brush := 1
+}
+
+fn paint*(tile: int) {
+	x, y := input.getmousepos()
+	x = round(misc.stepify(x-target.x, target.cellsize)/target.cellsize)
+	y = round(misc.stepify(y-target.y, target.cellsize)/target.cellsize)
+
+	if x < 0 || y < 0 {
+		return
+	}
+
+	target.cells[y*target.w + x] = tile
+}
+
+fn run*() {
+	canpaint := true
+	for i:=0; i < len(buttons); i++ {
+		if buttons[i].pressed {
+			brush = i + 1
+			canpaint = false
+		}
+	}
+	if brush != 0 {
+		brushvis.image = images[brush-1]
+	}
+
+	if input.ispressed(input.LMB) && canpaint {
+		paint(brush)
+	}
+
+	if input.ispressed(input.RMB) && canpaint {
+		paint(0)
+	}
+
+	target.draw(global.cam)
+	x, y := input.getmousepos()
+	x = round(misc.stepify(x, target.cellsize))
+	y = round(misc.stepify(y, target.cellsize))
+	rawdraw.setcolor(0x00ffffaa)
+	rawdraw.drawrect(x, y, 6, 6)
+	ui.handle(global.cam.w, global.cam.h)
+}

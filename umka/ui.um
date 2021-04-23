@@ -76,6 +76,7 @@ fn mkbox*(c: []element, vertical: bool): box {
 	h.dimensions = rectangle.mk(0, 0, 0, 0)
 	h.span = 1
 	h.vertical = vertical
+	h.imagemode = CENTER
 
 	return h
 }

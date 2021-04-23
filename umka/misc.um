@@ -1,4 +1,7 @@
-import "std/std.um"
+
+import (
+	"entity.um"								
+)
 
 fn stepify*(val, step: real): real {
 	if step != 0 {
