@@ -56,12 +56,13 @@ type button* = struct {
 	toggled: bool
 	pressed: bool
 	justpressed: bool
+	justreleased: bool
 	clickfunc: bool
 
 	padding, dimensions: rectangle.rect
 	span: int
 
-	onpress, onjustpress: fn()
+	onpress, onjustpress, onrelease: fn()
 	ontoggle: fn(toggled: bool)
 }
 
@@ -254,6 +255,7 @@ fn mkbutton*(l: label): button {
 
 	b.onpress = fn() {}
 	b.onjustpress = fn() {}
+	b.onrelease = fn() {}
 	b.ontoggle = fn(toggled: bool) {}
 
 	return b
@@ -294,6 +296,7 @@ fn (b: ^button) handle*() {
 	//printf("%d, %d, %d, %d\n", mx, my, int(mp), int(ms))
 
 	b.justpressed = false
+	b.justreleased = false 
 
 	if ms && mp {
 		if !b.pressed {
@@ -303,6 +306,10 @@ fn (b: ^button) handle*() {
 		b.pressed = true
 		b.onpress()
 	} else {
+		if b.pressed {
+			b.justreleased = true
+			b.onrelease()
+		}
 		b.pressed = false
 	}
 

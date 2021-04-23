@@ -33,12 +33,12 @@ fn run*() {
 	ui.main = mainbox // setting main element
 	ui.handle(global.cam.w, global.cam.h)
 
-	if playbutton.pressed {
+	if playbutton.justreleased {
 		gamescn.retry()
 		global.scene = global.GAME
 	}
 
-	if settingsbutton.pressed {
+	if settingsbutton.justreleased {
 		global.scene = global.QUIT
 	}
 }

@@ -36,7 +36,6 @@ package: clean build windows
 	mkdir -p tophat-release/bin
 	cp tophat     tophat-release/bin/tophat-linux
 	cp tophat.exe tophat-release/bin/tophat-win.exe
-	cp -r umka tophat-release
 	echo $(version) > tophat-release/version
 	echo $(version) > bin/version
 	cp examples/preset/*.um tophat-release
@@ -69,7 +68,6 @@ cmdtool:
 	sudo cp cmd/tophat /bin
 
 libembed:
-	#@if [ ! -f cmd/embedder/embedder ]; then echo "please build embedder by running go build in cmd/embedder"; exit 1; fi
 	echo "#ifndef UMKALIBS_H\n#define UMKALIBS_H\nconst char *libs[] = {" > src/umkalibs.h
 	./cmd/embedder/embedder text umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um >> src/umkalibs.h
 	echo "};\n#endif" >> src/umkalibs.h
