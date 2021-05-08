@@ -33,20 +33,24 @@ int main(int argc, char *argv[]) {
 	
 	FILE *f;
 	char scriptpath[20];
-	if ((f = fopen("game.um", "r"))) {
+	if ((f = fopen("main.um", "r"))) {
+		strcpy(respath, "./");
+		strcpy(scriptpath, "main.um");
+		fclose(f);
+	} else if ((f = fopen("game.um", "r"))) {
 		strcpy(respath, "./");
 		strcpy(scriptpath, "game.um");
 		fclose(f);
-	} else if ((f = fopen("main.um", "r"))) {
-		strcpy(respath, "./");
-		strcpy(scriptpath, "main.um");
+	} else if ((f = fopen("tophat.dat/main.um", "r"))) {
+		strcpy(respath, "tophat.dat/");
+		strcpy(scriptpath, "tophat.dat/main.um");
 		fclose(f);
 	} else if ((f = fopen("tophat.dat/game.um", "r"))) {
 		strcpy(respath, "tophat.dat/");
 		strcpy(scriptpath, "tophat.dat/game.um");
 		fclose(f);
 	} else {
-		errprint("Could not find game.um. Make sure you are in a proper directory.");
+		errprint("Could not find game.um or main.um. Make sure you are in a proper directory.");
 
 		return 1;
 	}

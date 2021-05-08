@@ -1,0 +1,100 @@
+
+import (
+	"tilemap.um"
+	"image.um"
+	"std.um"
+)
+
+// 0: north
+// 1: west
+// 2: south
+// 3: east
+
+var (
+	maze: [][]int32		
+)
+
+fn getneighbors(px, py: int): []int32 {
+	out := []int32{}
+
+	if py > 0 && maze[py-1][px] == 1 {
+		out = append(out, 0)
+	}
+	if px > 0 && maze[py][px-1] == 1 {
+		out = append(out, 1)
+	}
+	if py < len(maze)-1 && maze[py+1][px] == 1 {
+		out = append(out, 2)
+	}
+	if px < len(maze[py])-1 && maze[py][px+1] == 1 {
+		out = append(out, 3)
+	}
+
+	return out
+}
+
+fn _gen(px, py: int) {
+	if maze[px][py] == 0 {
+		return
+	}
+	maze[px][py] = 0
+
+	nbs := getneighbors(px, py)
+	done := []int32{}
+	for len(nbs) > 1 && len(done) < len(nbs) {
+		rng := std.rand()%len(nbs)
+		printf("%s\n", repr(nbs))
+
+		npx := px
+		npy := py
+		switch nbs[rng] {
+		case 0:
+			maze[py-1][px] = 0
+			npy--
+		case 1:
+			maze[py+1][px] = 0
+			npx--
+		case 2:
+			maze[py][px-1] = 0
+			npy++
+		case 3:
+			maze[py][px+1] = 0
+			npx++
+		}
+
+		printf("%d, %d, %d\n", px, py, len(nbs))
+
+		_gen(npx, npy)
+		done = append(done, rng)
+		nbs = getneighbors(px, py)
+	}
+}
+
+fn generate*(size: int): tilemap.tmap {
+	size *= 2
+	maze = make([][]int32, size)
+
+	for i:=0; i < size; i++ {
+		maze[i] = make([]int32, size)
+		for j:=0; j < size; j++ {
+			maze[i][j] = 1
+		}
+	}
+
+	std.srand(std.time())
+	_gen(std.rand()%size/2, std.rand()%size/2)
+
+	cells := make([]int32, size*size)
+	for i:=0; i < size; i++ {
+		cells = append(cells, maze[i])
+	}
+
+	return tilemap.tmap {
+		[]image.img{},
+		0, 0,
+		size,
+		cells,
+		[]bool{true},
+		0, 0}
+}
+

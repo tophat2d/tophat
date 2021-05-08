@@ -2,6 +2,7 @@
 #define LIGHT_H
 
 #include "rect.h"
+#include <stdint.h>
 
 typedef struct {
 	int px;
