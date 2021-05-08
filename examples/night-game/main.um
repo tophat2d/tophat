@@ -1,0 +1,28 @@
+
+import (
+	"tophat/tophat.um"
+	"tophat/rawdraw.um"
+	"tophat/rectangle.um"
+
+	"global.um"
+	"game.um"
+)
+
+fn main() {
+	tophat.setup("title", 1280, 720)
+
+	global.cam = rectangle.mk(0, 0, 384, 216)
+
+	game.init()
+
+	for true {
+		tophat.cycle(&global.w, &global.h, 0xff, global.cam)
+
+		switch global.scene {
+		case global.NONE:
+			return
+		case global.GAME:
+			game.run()
+		}
+	}
+}

@@ -1,7 +1,7 @@
 CC=gcc
 MINGW=x86_64-w64-mingw32-gcc
 
-SOURCES=src/*.c# lib/rawdraw/chew.c
+SOURCES=src/*.c
 WARNINGS=-Wall -Wno-maybe-uninitialized
 LFLAGS=-lm -lX11 -Lsrc -lumka -L /lib64 -ldl -lGL -lpthread
 WINLFLAGS=-lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread
@@ -10,7 +10,7 @@ WIN_UMKA_LIB=-Llib/windows -lumka_static
 DEFINES=-DCNFGOGL -DUMKA_STATIC
 
 CFLAGS=-o tophat $(SOURCES) lib/umka/build/libumka.a $(WARNINGS) $(LFLAGS) $(UMKA_LIB) $(DEFINES)
-WINCFLAGS=-o tophat $(SOURCES) lib/windows/libumka_static.a $(WARNINGS) $(WINLFLAGS) $(WIN_UMKA_LIB) $(DEFINES)
+WINCFLAGS=-o tophat $(SOURCES) lib/rawdraw/chew.c lib/windows/libumka_static.a $(WARNINGS) $(WINLFLAGS) $(WIN_UMKA_LIB) $(DEFINES) -DNO_OPENGL_HEADERS
 
 RELEASE_FLAGS=-Os -DRELEASE_BUILD
 
