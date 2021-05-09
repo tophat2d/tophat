@@ -65,12 +65,12 @@ cmdtool:
 
 libembed:
 	echo "#ifndef UMKALIBS_H\n#define UMKALIBS_H\nconst char *libs[] = {" > src/umkalibs.h
-	umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um >> src/umkalibs.h
+	./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um >> src/umkalibs.h
 	echo "};\n#endif" >> src/umkalibs.h
 
 deps:
 	@echo "updating submodules"
-	git submodule update --init --recursive
+	git submodule update --remote --merge
 	@echo "downloading miniaudio"
 	curl https://raw.githubusercontent.com/mackron/miniaudio/master/miniaudio.h > lib/miniaudio.h
 	@echo "downloading stb_image"
