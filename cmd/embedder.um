@@ -1,5 +1,5 @@
 import (
-	"std.um"								
+	"../lib/umka/import/std.um"								
 )
 
 fn sslice*(inp: str, start, end: int): str {
