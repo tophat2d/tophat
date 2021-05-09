@@ -8,6 +8,7 @@
 
 #include "tophat.h"
 #include "../lib/rawdraw/CNFG.h"
+#include "../lib/rawdraw/chew.h"
 #include "../lib/umka/src/umka_api.h"
 #include "../lib/stb_image.h"
 
@@ -502,6 +503,10 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int h = p[0].intVal;
 
 	int res = CNFGSetup(title, w, h);
+
+#ifdef _WIN32
+	chewInit();
+#endif
 
 	if (res) {
 		printf("could not initialize rawdraw\n");
