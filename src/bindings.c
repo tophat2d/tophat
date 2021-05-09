@@ -50,6 +50,7 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "imgvalid", &umimgvalid);
 	umkaAddFunc(umka, "imggetdims", &umimggetdims);
 	umkaAddFunc(umka, "imgcrop", &umimgcrop);
+	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
@@ -238,6 +239,19 @@ void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
 	imgcrop(img, x1, y1, x2, y2);
 	glDeleteTextures(1, &img->tex);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
+}
+
+// returns a pointer to an image from data
+void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int h = p[0].intVal;
+	int w = p[1].intVal;
+	uint32_t *data = (uint32_t *)p[2].ptrVal;
+
+	image *img = malloc(sizeof(image));
+	imagefromdata(img, data, w, h);
+	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
+
+	r->ptrVal = (intptr_t)img;
 }
 
 // input

@@ -53,6 +53,14 @@ image *loadimage(char *path) {
 	return img;
 }
 
+inline void imagefromdata(image *img, uint32_t *data, int w, int h) {
+	img->rdimg = malloc(sizeof(uint32_t) * w * h);
+	memcpy(img->rdimg, data, sizeof(uint32_t) * w * h);
+	img->w = w;
+	img->h = h;
+	img->c = 4;
+}
+
 void blittex(unsigned int tex, int x, int y, int w, int h, float rot) {
 	if( w == 0 || h == 0 ) return;
 

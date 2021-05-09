@@ -13,6 +13,8 @@ typedef struct {
 
 void blittex(unsigned int tex, int x, int y, int w, int h, float rot);
 
+void imagefromdata(image *img, uint32_t *data, int w, int h);
+
 image *loadimage(char *path);
 
 void flipv(image *img);
