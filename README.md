@@ -21,7 +21,6 @@ If you want to look at some examples, they can be find in the `examples` folder.
 
 ### deps:
   - compiler - gcc and clang are tested to work. I had some problems with tcc.
-  - umka - for embedder. Only needed for release builds. Not for testing
   - libGL headers
   - libX11 headers for linux build
  
@@ -42,11 +41,9 @@ I'm open to contributions, although the c code is kind of a mess right now. I pl
 
 ## todo
 
-- fix windows support
 - navigation on tilemaps
 - better return values from raycasts
 - `move_and_slide`-like function
-- light cones and circles (gotta learn opengl for that)
 - particle system
 - convert backend to reals and allow for pixel imperfect movement
 - physics engine
