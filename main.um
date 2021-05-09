@@ -39,7 +39,7 @@ fn main() {
 
 	visualizer := entity.mk(polygon.mk(0, 0, []int32{0, 0, 2, 0, 2, 2, 0, 2}), 0xff0000aa, 0)
 
-	lc := light.cone{0, 0, 0, 40, 20, 0xffff00ff}
+	lc := light.cone{0, 0, 0, 40, 20, tophat.yellow}
 
 	img := image.load("etc/test.png")
 
