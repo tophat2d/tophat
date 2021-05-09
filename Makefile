@@ -20,7 +20,7 @@ build: libembed
 	$(CC) $(CFLAGS) $(RELEASE_FLAGS)
 
 windows: libembed
-	$(MINGW) $(WINCFLAGS) $(RELEASE_FLAGS)
+	$(MINGW) $(WINCFLAGS) $(RELEASE_FLAGS) -g
 
 run:
 	$(CC) $(CFLAGS) -g && ./tophat
@@ -78,3 +78,4 @@ deps:
 	@echo "building umka"
 	cd lib/umka && $(MAKE)
 	@echo "done"
+

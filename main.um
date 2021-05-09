@@ -43,6 +43,9 @@ fn main() {
 
 	img := image.load("etc/test.png")
 
+	img2 := image.fromdata([]uint32{0xff}, 1)
+	printf("%s\n", repr(img2.validate()))
+
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 		time += tophat.delta
@@ -76,6 +79,7 @@ fn main() {
 
 		lc.draw(cam)
 		img.draw(1, 1, 45, 1)
+		img2.draw(8, 8, 1, 8)
 	}
 }
 

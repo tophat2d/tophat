@@ -31,6 +31,8 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r);
 
+void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r);
+
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r);
 
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r);

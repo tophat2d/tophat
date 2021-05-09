@@ -35,7 +35,6 @@ void drawlightcone(lightcone *l, rect *cam) {
 	verts[4] = 200;
 	verts[6] = 300;
 	verts[7] = 50/0;*/
-	printf("%d\n", l->rotation);
 	rotatepoint(&verts[3], &verts[4], verts[0], verts[1], l->rotation);
 	rotatepoint(&verts[6], &verts[7], verts[0], verts[1], l->rotation);
 	uint32_t *colors = &CNFGVertDataC[CNFGVertPlace];
