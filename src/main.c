@@ -21,7 +21,6 @@ void HandleDestroy() {
 	if (destroyfunc) {
 		umkaCall(umka, destroyfunc, 0, NULL, NULL);
 	}
-	umkaFree(umka);
 }
 
 int main(int argc, char *argv[]) {
@@ -84,5 +83,6 @@ int main(int argc, char *argv[]) {
 		printf("Umka runtime error %s (%d): %s\n", error.fileName, error.line, error.msg);
 	}
 
+	umkaFree(umka);
 	return 0;
 }
