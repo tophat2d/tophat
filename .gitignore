@@ -1,0 +1,8 @@
+**/.vscode
+**/*.swp
+tophat
+tophat.exe
+src/umkalibs.h
+cmd/embedder/embedder
+lib/stb_image.h
+lib/miniaudio.h

@@ -1,0 +1,175 @@
+#include <stdint.h>
+
+#include <GL/gl.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include "../lib/stb_image.h"
+
+#include "../lib/rawdraw/CNFG.h"
+#include "../lib/rawdraw/chew.h"
+
+#include "image.h"
+
+#include "misc.h"
+
+extern GLuint gRDShaderProg;
+extern GLuint gRDBlitProg;
+extern GLuint gRDShaderProgUX;
+extern GLuint gRDBlitProgUX;
+extern GLuint gRDBlitProgUT;
+extern GLuint gRDBlitProgTex;
+extern GLuint gRDLastResizeW;
+extern GLuint gRDLastResizeH;
+
+image *loadimage(char *path) {
+	int w, h, c;
+
+	unsigned char *data = stbi_load(path, &w, &h, &c, 0);
+
+	image *img;
+	img = malloc(sizeof(image));
+	img->w = w;
+	img->h = h;
+	img->c = c;
+
+	if (data == NULL) {
+		char buff[256];
+		sprintf(buff, "could not find image at path %s", path);
+		errprint(buff);
+		img->rdimg = NULL;
+		return img;
+	}
+
+	// Faster way, but it doesn't seem to work. TODO FIXME
+	/*if (c == 4) {
+		img->rdimg = (unsigned int *)data;
+
+		return img;
+	}*/
+
+	rdimg(img, data);
+	stbi_image_free(data);
+
+	return img;
+}
+
+void blittex(unsigned int tex, int x, int y, int w, int h, float rot) {
+	if( w == 0 || h == 0 ) return;
+
+	CNFGFlushRender();
+
+	glUseProgram(gRDBlitProg);
+	glUniform4f(gRDBlitProgUX,
+		1.f/gRDLastResizeW, -1.f/gRDLastResizeH,
+		-0.5f+x/(float)gRDLastResizeW, 0.5f-y/(float)gRDLastResizeH);
+	glUniform1i(gRDBlitProgUT, 0);
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	float cx = w/2;
+	float cy = h/2;
+
+	float zrotx = 0;
+	float zroty = 0;
+	float brotx = w;
+	float broty = h;
+	float wrotx = w;
+	float wroty = 0;
+	float hrotx = 0;
+	float hroty = h;
+
+	if ( rot != 0 ) {
+		rotatepoint(&zrotx, &zroty, cx, cy, rot);
+		rotatepoint(&brotx, &broty, cx, cy, rot);
+		rotatepoint(&wrotx, &wroty, cx, cy, rot);
+		rotatepoint(&hrotx, &hroty, cx, cy, rot);
+	}
+
+	const float verts[] = {
+		zrotx, zroty, wrotx, wroty, brotx, broty,
+		zrotx, zroty, brotx, broty, hrotx, hroty };
+	static const uint8_t colors[] = {
+		0,0,   255,0,  255,255,
+		0,0,  255,255, 0,255 };
+
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
+	glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, colors);
+
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+}
+
+void flipv(image *img) {
+	if (img->rdimg == NULL) {
+		errprint("flipv: image is not valid");
+		return;
+	}
+
+	uint32_t *f;
+	f = malloc(sizeof(uint32_t) * img->w * img->h);
+
+	for (int i=0; i < img->w; i++) for (int j=0; j < img->h; j++)
+			f[(j + 1) * img->w - i - 1] = img->rdimg[j * img->w + i];
+
+	free(img->rdimg);
+	img->rdimg = f;
+}
+
+void fliph(image *img) {
+	if (img->rdimg == NULL) {
+		errprint("fliph: image is not valid");
+		return;
+	}
+
+	uint32_t *f;
+	f = malloc(sizeof(uint32_t) * img->w * img->h);
+	for (int i=0; i < img->w; i++) for (int j=0; j < img->h; j++)
+			f[(img->h - j - 1) * img->w + i] = img->rdimg[j * img->w + i];
+
+	free(img->rdimg);
+	img->rdimg = f;
+}
+
+void imgcrop(image *img, int x1, int y1, int x2, int y2) {
+	if (img->rdimg == NULL) {
+		errprint("crop: image is not valid");
+		return;
+	}
+
+	uint32_t *n;
+	n = malloc(sizeof(uint32_t) * x2-x1 * y2-y1);
+
+	for (int x=0; x < x2-x1; x++) {
+		for (int y=0; y < y2-y1; y++) {
+			n[y*(x2-x1)+x] = img->rdimg[(y+y1)*img->w+x+x1];
+		}
+	}
+	free(img->rdimg);
+	img->w = x2-x1;
+	img->h = y2-y1;
+	img->rdimg = n;
+}
+
+void rdimg(image *img, unsigned char *data) {
+	uint32_t *rd;
+	rd = malloc(sizeof(int) * img->w * img->h);
+	uint32_t current = 0;
+
+	for (int y=0; y < img->h; y += 1) {
+		for (int x=0; x < img->w; x += 1) {
+			current = 0;
+			for (int i=0; i < img->c; i++) {
+				current = current << 8;
+				current += (uint32_t)data[(y * img->w + x) * img->c + i];
+			}
+			for (int i=0; i < 4 - img->c; i++) {
+				if (current == 1) {
+					current = 0x00 | current<<8;
+					continue;
+				}
+				current = 0xff | current<<8;
+			}
+			rd[(y * img->w + x)] = current;
+		}
+	}
+	img->rdimg = rd;
+}

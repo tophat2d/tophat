@@ -1,0 +1,346 @@
+
+import (
+	"rectangle.um"
+	"rawdraw.um"
+	"input.um"
+	"tophat.um"
+	"image.um"
+)
+
+const (
+	// text aligns
+	TOP* = 0
+	MID* = 1
+	BOT* = 2
+
+	// image modes
+	CENTER* = 3
+	STRETCH* = 4
+	SCALE* = 5
+)
+
+type element* = interface {
+	draw()
+	calculate()
+	handle()
+	gspan(): ^int
+	gpadding(): ^rectangle.rect
+	gdimensions(): ^rectangle.rect
+}
+
+type box* = struct {
+	children: []element
+	padding, dimensions: rectangle.rect
+	span: int
+	vertical: bool 
+
+	image: image.img
+	imagemode: int
+	imgs: int
+	imgx, imgy: int
+}
+
+type label* = struct {
+	text: str
+	textsize: real
+	textcolor: uint32
+	valign: int
+	halign: int
+	bgcolor: uint32
+	padding, dimensions: rectangle.rect
+	span: int
+}
+
+type button* = struct {
+	label: label
+	toggled: bool
+	pressed: bool
+	justpressed: bool
+	justreleased: bool
+	clickfunc: bool
+
+	padding, dimensions: rectangle.rect
+	span: int
+
+	onpress, onjustpress, onrelease: fn()
+	ontoggle: fn(toggled: bool)
+}
+
+////////////////////////////////
+// box
+
+fn mkbox*(c: []element, vertical: bool): box {
+	h := box {}
+
+	h.padding = rectangle.mk(0, 0, 0, 0)
+	h.children = c
+	h.dimensions = rectangle.mk(0, 0, 0, 0)
+	h.span = 1
+	h.vertical = vertical
+	h.imagemode = CENTER
+
+	return h
+}
+
+fn (b: ^box) calculate*() {
+
+	totalspan := 0.0
+	off := 0
+
+	for i:=0; i < len(b.children); i++ {
+		totalspan += b.children[i].gspan()^
+	}
+
+	for i:=0; i < len(b.children); i++ {
+
+		if b.vertical {
+			dims := b.children[i].gdimensions()
+			padd := b.children[i].gpadding()
+      
+			dims.x = b.dimensions.x + off + padd.x
+			dims.w = round(real(b.dimensions.w)/totalspan) * b.children[i].gspan()^ - padd.w
+      
+			dims.y = b.dimensions.y + padd.y
+			dims.h = b.dimensions.h - padd.h
+      
+			b.children[i].calculate()
+      
+			off += round(real(b.dimensions.w)/totalspan) * b.children[i].gspan()^
+		
+		} else {
+			dims := b.children[i].gdimensions()
+			padd := b.children[i].gpadding()
+      
+			dims.x = b.dimensions.x + padd.x
+			dims.w = b.dimensions.w - padd.w - padd.x
+      
+			dims.y = b.dimensions.y + off + padd.y
+			dims.h = round(real(b.dimensions.h)/totalspan * b.children[i].gspan()^) - padd.h - padd.y
+      
+			b.children[i].calculate()
+      
+			off += round(real(b.dimensions.h)/totalspan) * b.children[i].gspan()^
+		}
+	}
+
+	if b.image.handle == 0 {
+		return
+	}
+
+	switch b.imagemode {
+	case CENTER:
+		b.imgs = 1
+
+		w, h := b.image.getdims()
+
+		b.imgx = b.dimensions.x + (b.dimensions.w-w)/2
+		b.imgy = b.dimensions.y + (b.dimensions.h-h)/2
+	case SCALE:
+
+		w, h = b.image.getdims()
+
+		sx := b.dimensions.w / w
+		sy := b.dimensions.h / h
+
+		b.imgs = sy
+
+		if sx < sy {
+			b.imgs = sx
+		}
+
+		b.imgx = b.dimensions.x + (b.dimensions.w - w*b.imgs)/2
+		b.imgy = b.dimensions.y + (b.dimensions.h - h*b.imgs)/2
+	}
+}
+
+fn (hb: ^box) draw*() {
+
+	if hb.image.handle != 0 {
+		hb.image.draw(hb.imgx, hb.imgy, 0, hb.imgs)
+	}
+
+	for i:=0; i < len(hb.children); i++ {
+		hb.children[i].draw()
+	}
+}
+
+fn (hb: ^box) gspan*(): ^int {
+	return &hb.span
+}
+
+fn (hb: ^box) gpadding*(): ^rectangle.rect {
+	return &hb.padding
+}
+
+fn (hb: ^box) gdimensions*(): ^rectangle.rect {
+	return &hb.dimensions
+}
+
+fn (hb: ^box) handle*() {
+	for i:=0; i < len(hb.children); i++ {
+		hb.children[i].handle()
+	}
+}
+
+////////////////////////////////
+// label
+
+fn mklabel*(text: str, textsize: real, textcolor: uint32): label {
+	h := label {}
+
+	h.text = text
+	h.textsize = textsize
+	h.textcolor = textcolor
+	h.bgcolor = 0x0
+	h.padding = rectangle.mk(0, 0, 0, 0)
+	h.dimensions = rectangle.mk(0, 0, 0, 0)
+	h.span = 1
+	h.valign = MID
+	h.halign = MID
+
+	return h
+}
+
+fn (l: ^label) calculate*() {
+	sx, sy := rawdraw.textsize(l.text, l.textsize)
+
+	switch l.valign {
+	case MID:
+		l.padding.y = (l.dimensions.h-sy)/2
+	case BOT:
+		l.padding.y = l.dimensions.h - sy
+	}
+
+	switch l.halign {
+	case MID:
+		l.padding.x = (l.dimensions.w-sx)/2
+	case BOT:
+		l.padding.x = l.dimensions.w - sx
+	}
+}
+
+fn (l: ^label) draw*() {
+	rawdraw.setcolor(l.bgcolor)
+	rawdraw.drawrect(l.dimensions.x - l.padding.x, l.dimensions.y - l.padding.y, l.dimensions.w + l.padding.w, l.dimensions.h + l.padding.h)
+
+	rawdraw.drawtext(l.text, l.dimensions.x, l.dimensions.y, l.textcolor, l.textsize)
+}
+
+fn (l: ^label) gspan*(): ^int {
+	return &l.span
+}
+
+fn (l: ^label) gpadding*(): ^rectangle.rect {
+	return &l.padding
+}
+
+fn (l: ^label) gdimensions*(): ^rectangle.rect {
+	return &l.dimensions
+}
+
+fn (l: ^label) handle*() {}
+
+////////////////////////////////
+// button
+
+fn mkbutton*(l: label): button {
+	b := button{}
+
+	b.padding = l.padding
+	b.label = l
+	b.pressed = false
+	b.justpressed = false
+	b.toggled = false
+	b.span = 1
+
+	b.onpress = fn() {}
+	b.onjustpress = fn() {}
+	b.onrelease = fn() {}
+	b.ontoggle = fn(toggled: bool) {}
+
+	return b
+}
+
+fn (b: ^button) calculate*() {
+	b.label.dimensions = b.dimensions
+	b.label.calculate()
+	b.label.dimensions.x += b.label.padding.x
+	b.label.dimensions.w -= b.label.padding.w
+
+	b.label.dimensions.y += b.label.padding.y
+	b.label.dimensions.h -= b.label.padding.h
+}
+
+fn (b: ^button) draw*() {
+	b.label.draw()
+}
+
+fn (b: ^button) gspan*(): ^int {
+	return &b.span
+}
+
+fn (b: ^button) gpadding*(): ^rectangle.rect {
+	return &b.padding
+}
+
+fn (b: ^button) gdimensions*(): ^rectangle.rect {
+	return &b.dimensions
+}
+
+fn (b: ^button) handle*() {
+	mx, my := input.getmousepos()
+	mp := input.ispressed(input.LMB)
+
+	ms := (b.dimensions.x <= mx && b.dimensions.y <= my && mx <= b.dimensions.x + b.dimensions.w && my <= b.dimensions.y + b.dimensions.h)
+	//printf("%d, %d, %d, %d\n", b.dimensions.x, b.dimensions.y, b.dimensions.x + b.dimensions.w, b.dimensions.y + b.dimensions.h)
+	//printf("%d, %d, %d, %d\n", mx, my, int(mp), int(ms))
+
+	b.justpressed = false
+	b.justreleased = false 
+
+	if ms && mp {
+		if !b.pressed {
+			b.justpressed = true
+			b.onjustpress()
+		}
+		b.pressed = true
+		b.onpress()
+	} else {
+		if b.pressed {
+			b.justreleased = true
+			b.onrelease()
+		}
+		b.pressed = false
+	}
+
+	if b.justpressed {
+		b.toggled = !b.toggled
+		b.ontoggle(b.toggled)
+	}
+
+	//printf("%d\n", int(b.pressed))
+}
+
+////////////////////////////////
+// main handler
+
+var mainelement*: element
+
+fn update*(w, h: int32) {
+	dims := mainelement.gdimensions()
+	padd := mainelement.gpadding()
+	dims.x = padd.x
+	dims.y = padd.y
+	dims.w = w - padd.w - padd.x
+	dims.h = h - padd.h - padd.y
+	mainelement.calculate()
+}
+
+fn handle*(w, h: int32) {
+	if tophat.t % 100 < 32 {
+		update(w, h)
+	}
+
+	mainelement.handle()
+	mainelement.draw()
+}

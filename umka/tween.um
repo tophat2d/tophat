@@ -1,0 +1,43 @@
+
+type twn* = struct {
+	val: ^real
+	lenght: int
+	endval: real
+	starttime: int
+	startval: real
+}
+
+fn mk*(val: ^real, endval: real, lenght: int): twn {
+	t := twn{}
+
+	t.val = val
+	t.endval = endval
+	t.lenght = lenght
+	if val != null { t.startval = val^ }
+
+	return t
+}
+
+fn (t: ^twn) start*(time: int) {
+	if t.val != null { t.val^ = t.startval }
+	t.starttime = time
+}
+
+fn (t: ^twn) get*(time: int): (bool, real) {
+	if time > t.starttime + t.lenght { 
+		if t.val != null { return true, t.val^ }
+			return true, -1
+	}
+
+	x := time
+	x0 := t.starttime
+	y0 := t.startval
+	x1 := t.starttime + t.lenght
+	y1 := t.endval
+
+	y := y0 + (x - x0) * ((y1 - y0)/(x1-x0))
+
+	if t.val != null { t.val^ = y }
+
+	return false, y
+}

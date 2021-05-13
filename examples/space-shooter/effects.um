@@ -1,0 +1,77 @@
+
+import (
+	"tophat/tophat.um"
+	"tophat/rawdraw.um"
+	"tophat/rectangle.um"
+	"tophat/animation.um"
+
+	"tophat/std/std.um"
+)
+
+// type used for star
+type star* = struct {
+	x, y, w, h: real
+	speed: real
+}
+
+var (
+	hitend*: int // this is, when the hit effect will end
+
+	stars: []star // list of all stars
+
+	anims*: []animation.anim // list of all animations
+
+	cam: rectangle.rect // we need to store our own version of camera to avoid circular imports TODO
+)
+
+fn init*(cami: rectangle.rect) {
+	stars = []star{}
+	anims = []animation.anim{}
+	cam = cami
+}
+
+// function, that handles the star effect. it needs to be separate, since stars need to be drawn first
+fn handlestars*() {
+
+	// this is a block, that adds stars. it will add them every 200 ms
+	if tophat.t % 200 < tophat.delta + 1 {
+		for i:=0; i < 5; i++ {
+			stars = append(stars, star{std.rand()%96, std.rand()%20, 1, 2, real(std.rand()%2+2)/100}) // speed needs to be random for the "3d" effect
+		}
+	}
+
+	todel := []int{} // list of indexes to delete, so we don't do it while iterating over the array
+	for i:=0; i < len(stars); i++ {
+		if stars[i].y >= 144 { // checking, if star is bellow screen. note, that here we use coords in relation to screen, since we use the rawdraw module
+			todel = append(todel, i)
+			continue
+		}
+
+		stars[i].y += stars[i].speed * tophat.delta // moving star
+		rawdraw.setcolor(0xeeeeeeff) // setting color
+		rawdraw.drawrect(round(stars[i].x), round(stars[i].y), round(stars[i].w), round(stars[i].h)) // drawing
+	}
+
+	for i:=0; i < len(todel); i++ {
+		stars = delete(stars, todel[i] - i) // deleting stars
+	}
+}
+
+// main handle function. hit effect and animations
+fn handle*() {
+	if tophat.t < hitend { // checking, if hit effect should be drawn
+		rawdraw.setcolor(0xb91919aa)
+		rawdraw.drawrect(0, 0, 96, 144) // drawing hit effect
+	}
+
+	todel := []int{}
+	for i:=0; i < len(anims); i++ {
+		if anims[i].handle(tophat.t, cam) { // handling animations
+			todel = append(todel, i)
+		}
+	}
+
+	for i:=0; i < len(todel); i++ {
+		anims = delete(anims, todel[i] - i)
+	}
+}

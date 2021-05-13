@@ -1,0 +1,32 @@
+
+import "std/std.um"
+
+fn rotatepoint*(x, y, cx, cy, rot: real): (real, real) {
+	angle := (rot * std.pi) / 180
+
+	x1 := x - cx
+	y1 := y - cy
+
+	x2 := x1 * cos(angle) - y1 * sin(angle)
+	y2 := x1 * sin(angle) + y1 * cos(angle)
+
+	return x2 + cx, y2 + cy
+}
+
+fn distanceto*(x1, y1, x2, y2: real): real { return std.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) }
+
+fn angleto*(x1, y1, x2, y2: real): real { return atan2(y2 - y1, x2 - x1) * 180 / std.pi + 180 }
+
+fn abs*(x, y: real): (real, real) { return fabs(x), fabs(y) }
+
+fn rnd*(x, y: real): (int32, int32) { return round(x), round(y) }
+
+fn flr*(x, y: real): (int32, int32) { return trunc(x), trunc(y) }
+
+fn sub*(x1, y1, x2, y2: real): (real, real) { return x1 - x2, y1 - y2 }
+
+fn add*(x1, y1, x2, y2: real): (real, real) { return x1 + x2, y1 + y2 }
+
+fn div*(x1, y1, x2, y2: real): (real, real) { return x1 / x2, y1 / y2 }
+
+fn mul*(x1, y1, x2, y2: real): (real, real) { return x1 * x2, y1 * y2 }

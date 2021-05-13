@@ -1,0 +1,61 @@
+// vim: filetype=umka
+
+type sound* = struct {
+	handle: int
+}
+
+var sarr*: []sound
+
+fn setsounds*(ss: []sound)
+
+fn cauload(path: str): int
+
+fn cauarr(s: ^sound, count: int32)
+
+fn csoundloop(s: int, looping: int32)
+
+fn csoundplay(s: int)
+
+fn csoundstop(s: int)
+
+fn csoundvol(s: int, vol: real)
+
+fn csoundvalidate(s: int): int
+
+fn load*(path: str): sound {
+	s := sound{cauload(path)}
+
+	sarr = append(sarr, s)
+	setsounds(sarr)
+
+	return s
+}
+
+fn setsounds*(ss: []sound) {
+	cauarr(&ss[0], len(ss))
+}
+
+fn (s: ^sound) looping*(l: bool) {
+	if l {
+		csoundloop(s.handle, 1)
+		return
+	}
+
+	csoundloop(s.handle, 0)
+}
+
+fn (s: ^sound) play*() {
+	csoundplay(s.handle)
+}
+
+fn (s: ^sound) stop*() {
+	csoundstop(s.handle)
+}
+
+fn (s: ^sound) vol*(vol: real) {
+	csoundvol(s.handle, vol)
+}
+
+fn (s: ^sound) validate*(): bool {
+	return bool(csoundvalidate(s.handle))
+}

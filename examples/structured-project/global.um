@@ -1,0 +1,12 @@
+
+// scene variable
+var (
+	scene*: int								
+)
+
+// scenes
+const (
+	SCENE_1* = 0
+	SCENE_2* = 1
+	SCENE_3* = 2
+)

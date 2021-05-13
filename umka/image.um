@@ -1,0 +1,63 @@
+
+import (
+	"rawdraw.um"
+)
+
+type img* = struct {
+	handle: int
+}
+
+fn loadimg(path: ^char): int
+
+fn deleteimg(i: int)
+
+fn iconset(i: int)
+
+fn flipvimg(i: int)
+
+fn fliphimg(i: int)
+
+fn imgvalid(i: int): int32
+
+fn imggetdims(w, h: ^int32, i: int)
+
+fn imgcrop(img: int, x1, x2, y1, y2: int32)
+
+fn load*(path: str): img {
+	return img{loadimg(&path[0])}
+}
+
+fn (i: ^img) delete*() {
+	deleteimg(i.handle)
+}
+
+fn (i: ^img) setasicon*() {
+	iconset(i.handle)
+}
+
+fn (i: ^img) flipv*() {
+	flipvimg(i.handle)
+}
+
+fn (i: ^img) fliph*() {
+	fliphimg(i.handle)
+}
+
+fn (i: ^img) draw*(x, y, rot: int32, scale: real)  {
+	rawdraw.cdrawimage(i.handle, rot, scale, x, y)
+}
+
+fn (i: ^img) validate*(): bool {
+	return bool(imgvalid(i.handle))
+}
+
+fn (i: ^img) getdims*(): (int32, int32) {
+	var w, h: int32
+	imggetdims(&w, &h, i.handle)
+
+	return w, h
+}
+
+fn (i: ^img) crop*(x1, y1, x2, y2: int32) {
+	imgcrop(i.handle, x1, x2, y1, y2)
+}

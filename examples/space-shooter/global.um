@@ -1,0 +1,34 @@
+
+import (
+	"tophat/rectangle.um"
+	"tophat/tophat.um"
+
+	"effects.um" // global shouldn't import anything else, than tophat package. TODO
+)
+
+// list of scenes
+const (
+	QUIT* = -1
+	MENU* = 0
+	GAME* = 1
+	DEAD* = 2
+)
+
+var (
+	score*: int
+	cam*: rectangle.rect
+
+	scene*: int
+	hp*: int
+)
+
+// function, that takes damage
+fn takedmg*() {
+	hp -= 1
+
+	if hp <= 0 {
+		scene = DEAD
+	}
+
+	effects.hitend = tophat.t + 80
+}

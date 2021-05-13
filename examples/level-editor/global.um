@@ -1,0 +1,15 @@
+
+import (
+	"tophat/rectangle.um"
+)
+
+const (
+	NONE* = -1
+	EDITOR* = 0
+)
+
+var (
+	scene*: int
+	w*, h*: int32
+	cam*: rectangle.rect
+)

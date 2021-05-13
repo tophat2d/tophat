@@ -1,0 +1,92 @@
+// vim: filetype=umka
+
+import (
+	"std/std.um"
+	"vec.um"
+	"rawdraw.um"
+)
+type poly* = struct {
+    x: real
+    y: real
+    v: []int32
+		rv: []int32
+		rw: int32
+		rh: int32
+    w: int32
+    h: int32
+    vc: int32
+}
+
+type cpoly* = struct {
+	x: int32
+	y: int32
+	v: ^int32
+	w: int32
+	h: int32
+	vc: int32
+}
+
+fn mk*(x, y: real, v: []int32): poly {
+	var p: poly
+
+	p.vc = int32(len(v)/2)
+	p.v = v
+	p.x = x
+	p.y = y
+
+	var maxx, maxy: int32;
+
+	for i:=0; i < len(v); i += 2 {
+		if v[i] > maxx { maxx = v[i] }
+		
+		if v[i + 1] > maxy { maxy = v[i + 1] }
+	}
+
+	p.w = maxx
+	p.h = maxy
+	p.rw = p.w
+	p.rh = p.h
+	p.rv = v
+
+	return p
+}
+
+fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
+	var x, y, cx, cy: real
+
+	cx = round(p.rw/2 * sx)
+	cy = round(p.rh/2 * sy)
+	
+	var w, h: int32
+
+	v := []int32{}
+
+	for i:=0; i<len(p.v); i+=2 {
+
+		x = p.rv[i] * sx
+		y = p.rv[i+1] * sy
+
+		tx, ty := vec.rotatepoint(x, y, cx, cy, rot)
+
+		if tx > w {
+			w = round(tx)
+		}
+		if ty > h {
+			h = round(ty)
+		}
+
+		v = append(v, []int32{round(tx), round(ty)})
+	}
+
+	p.v = v
+	p.w = w
+	p.h = h
+}
+
+fn cdrawpoly*(color: uint32, p: ^polygon.cpoly)
+
+fn (p: ^poly) draw*(color: uint32) {
+	cp := polygon.cpoly{round(p.x), round(p.y), &p.v[0], p.w, p.h, p.vc}
+
+	cdrawpoly(color, &cp)
+}
