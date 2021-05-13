@@ -1,0 +1,21 @@
+
+import (
+	"tophat/audio.um"
+)
+
+var (
+	// all our sounds
+	explosion*: audio.sound
+	damage*: audio.sound
+	shoot*: audio.sound
+)
+
+// init function, which loads sounds and sets their volume:w
+fn init*() {
+	explosion = audio.load("sounds/explosion.wav")
+	explosion.vol(0.6)
+	damage = audio.load("sounds/dmgsound.wav")
+	damage.vol(0.4)
+	shoot = audio.load("sounds/shoot.wav")
+	shoot.vol(0.4)
+}

@@ -1,0 +1,103 @@
+import (
+	"polygon.um"
+	"tophat.um"
+	"rectangle.um"
+	"std/std.um"
+	"image.um"
+)
+
+type ent* = struct {
+	p: polygon.poly
+	image: image.img
+	sx: real
+	sy: real
+	rot: real 
+	color: uint32
+	id: int32
+}
+
+type cent* = struct {
+	p: ^polygon.cpoly
+	image: image.img
+	sx: real
+	sy: real
+	rot: int32	
+	color: uint32
+	id: int32
+}
+
+var colldatax, colldatay: int32
+
+fn centdraw(e: cent, c: rectangle.rect)
+
+fn (e: ^ent) draw*(c: rectangle.rect) {
+	cp := polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}
+	ce := cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
+
+	centdraw(ce, c)
+}
+
+fn cgetcoll(ix, iy: ^int32, count: int32, e: ^cent, s: ^^cent): int32
+
+fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
+	if id == 0 {
+		id = std.rand() + 1
+	}
+
+	var e: ent
+	e.p = p
+	e.image = image.img{0}
+	e.sx = 1
+	e.sy = 1
+	e.rot = 0
+	e.color = color
+	e.id = id
+
+	return e
+}
+
+fn (e: ^ent) setrot*(rot: real) {
+	e.rot = rot
+	e.p.transform(e.sx, e.sy, round(rot))
+}
+
+fn (e: ^ent) setscale*(sx, sy: real) {
+	e.sx = sx
+	e.sy = sy
+	e.p.transform(sx, sy, round(e.rot))
+}
+
+fn (e: ^ent) getcoll*(s: []^ent): int32 {
+
+	if len(s) == 0 {
+		return 0
+	}
+
+	cscn := []cent{}
+	cps := []polygon.cpoly{}
+
+	for e in s {
+		cps = append(cps, []polygon.cpoly{polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}})
+		ce := cent{null, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
+		cscn = append(cscn, []cent{ce})
+	}
+
+	cscnp := []^cent{}
+
+	for i:=0; i < len(cps); i++ {
+		cscn[i].p = &cps[i]
+		cscnp = append(cscnp, &cscn[i])
+	}
+
+	cp := polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}
+	ce := cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
+	return cgetcoll(&colldatax, &colldatay, len(cscnp), &ce, &cscnp[0])
+}
+
+fn retrievecolldata*(): (int32, int32) {
+	return colldatax, colldatay	
+}
+
+fn (e: ^ent) animate*(fps: int, anim: ^[]image.img) {
+	e.image = anim^[(round(real(tophat.t)/(1000/fps)) % len(anim^))]
+}

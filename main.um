@@ -1,0 +1,84 @@
+import (
+	"umka/rawdraw.um"
+	"umka/vec.um"
+	"umka/tophat.um"
+	"umka/input.um"
+	"umka/rectangle.um"
+	"umka/entity.um"
+	"umka/raycast.um"
+	"umka/polygon.um"
+	"umka/ui.um"
+	"umka/image.um"
+	"umka/csv.um"
+	"umka/tilemap.um"
+	"umka/tween.um"
+	"umka/light.um"
+
+	"umka/std/std.um"
+)
+
+fn main() { 
+
+	cam := rectangle.mk(0, 0, 200, 200)
+	tophat.setup("test game", 100, 100)
+	var w, h: int32
+
+	e := entity.mk(polygon.mk(0,0, []int32{0,0, 10, 0, 10, 10, 0, 10}), 0xff, 1)
+	var time: int = 000
+	t1 := tween.mk(&e.p.x, 40, 2000)
+	t1.start(time)
+	t2 := tween.mk(&e.p.y, -80, 1000)
+	t2.start(time)
+
+	e2 := entity.mk(polygon.mk(0,0, []int32{0,0, 40, 0, 40, 40, 0, 40}), 0xff, 1)
+	rot := 0.0
+	t3 := tween.mk(&rot, 360, 10000)
+	//t3.start(time)
+
+	e3 := entity.mk(polygon.mk(0, 0, []int32{0, 0, 8, 0, 8, 8, 0, 8}), 0xff, 0)
+
+	visualizer := entity.mk(polygon.mk(0, 0, []int32{0, 0, 2, 0, 2, 2, 0, 2}), 0xff0000aa, 0)
+
+	lc := light.cone{0, 0, 0, 40, 20, 0xffff00ff}
+
+	img := image.load("etc/test.png")
+
+	for true {
+		tophat.cycle(&w, &h, 0xffffffff, cam)
+		time += tophat.delta
+
+		e3.p.x, e3.p.y = input.getglobalmousepos(cam)
+
+		lc.rot = round(vec.angleto(lc.px, lc.py, e3.p.x, e3.p.y))
+
+		r, _ := t1.get(time)
+		if r {
+			t1.start(time)
+			t2.start(time)
+		}
+		r, _ = t2.get(time)
+		//r, _ = t3.get(time)
+		if r {
+			//t3.start(time)
+		}
+		e2.setrot(round(rot))
+		//e.draw(cam)
+		e2.draw(cam)
+
+		scn := []^entity.ent{&e2}
+		e3.color = 0xff | 0x00ffff00 * int(e3.getcoll(scn))
+		visualizer.p.x, visualizer.p.y = entity.retrievecolldata()
+		rawdraw.drawtext(repr(visualizer.p.x) + ", " + repr(visualizer.p.y), 1, 1, 0xff, 1)
+		e3.draw(cam)
+		if e3.color != 0xff {
+			visualizer.draw(cam)
+		}
+
+		lc.draw(cam)
+		img.draw(1, 1, 45, 1)
+	}
+}
+
+fn windowdestroy() {
+	printf("destroying window\n")
+}

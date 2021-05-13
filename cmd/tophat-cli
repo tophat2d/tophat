@@ -1,0 +1,156 @@
+#!/usr/bin/env bash
+
+Path=/usr/share/tophat
+
+function get () {
+	echo "downloading tophat"
+	curl "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/tophat.zip" -o tophat.zip
+	if [ -f "tophat.zip" ]; then
+		echo "download completed"
+	else
+		echo "download failed"
+		exit 1
+	fi
+}
+
+function libcpy () {
+	cp -r $Path/umka ./
+}
+
+function clean () {
+	sudo rm -rf $Path
+	sudo rm -rf $(which tophat)
+}
+
+function setup () {
+	sudo rm -rf $Path
+	sudo mkdir $Path
+	sudo unzip -q $1 -d $Path
+	sudo mv $Path/tophat-release/* $Path
+	sudo rm -r $Path/tophat-release
+}
+
+function update() {
+	echo "checking for new versions"
+	upversion=$(curl -s "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/version")
+	if [ $upversion = $(cat $Path/version) ]; then
+		echo "tophat is already up to date"
+		exit 0
+	fi
+
+	echo "updating to $upversion"
+
+	get; setup tophat.zip
+
+	echo "done"
+}
+
+function package() {
+	if [ "$2" == "" ]; then
+		echo "specify os"
+		exit 1
+	fi
+
+	if [ "$3" == "" ]; then
+		Name=game
+	else
+		Name=$3
+	fi
+
+	if [ "$2" == "linux" ]; then
+		Bin=tophat-linux
+	elif [ "$2" == "windows" ]; then
+		Bin=tophat-win.exe
+		Sufix=.exe
+	elif [ "$2" == "all" ]; then
+		echo "packaging for linux"
+		package $Name linux $Name
+		echo "packaging for windows"
+		package $Name windows $Name
+		exit 0
+	else
+		echo "invalid platform. choose: linux, windows or all"
+		exit 1
+	fi
+
+	if [ "$Bin" == "" ]; then
+		echo "invalid os specified. only windows and linux currently supported"
+		exit 1
+	fi
+
+	rm -rf $Name-$2.zip
+
+	mkdir ../$Name-$2
+	mkdir ../$Name-$2/tophat.dat
+	cp -r ./* ../$Name-$2/tophat.dat
+	cp -r $Path/bin/$Bin ../$Name-$2/$Name$Sufix
+
+	Ignore="-x tophat.dat/*.zip -x tophat.dat/*.git* -x tophat.dat/"
+
+	if [ -f ".thignore" ]; then
+		Ignore="$Ignore $(sed ':a;N;$!ba;s/\n/ -x tophat.dat\//g' .thignore)"
+	fi
+
+	if [ "$2" == "windows" ]; then
+		mv ../$Name-$2 ./
+		zip -Z store -y -q -r ../$Name-$2.zip $Name-$2
+	else
+		zip -q -r ../$Name-$2.zip ../$Name-$2
+	fi
+
+	rm -rf ../$Name-$2
+	rm -rf ./$Name-$2
+	mv ../$Name-$2.zip ./
+
+	echo "done"
+}
+
+if [ "$1" == "run" ]; then
+	$Path/bin/tophat-linux
+	exit 0
+fi
+
+if [ "$1" == "package" ]; then
+	package "" $2 $3
+	exit 0
+fi
+
+if [ "$1" == "install" ]; then
+	setup $2
+	exit 0
+fi
+
+if [ "$1" == "update" ]; then
+	update
+	exit 0
+fi
+
+if [ "$1" == "uninstall" ]; then
+	clean
+	exit 0
+fi
+
+if [ "$1" == "get" ]; then
+	get
+	exit 0
+fi
+
+if [ "$1" == "init" ]; then
+ 	mkdir tophat
+ 	cp -rf $Path/umka/* ./tophat
+ 	cp $Path/*.um ./
+	exit 0
+fi
+
+echo "tophat v0.2 cli tool"
+echo "made by Marek Maskarinec"
+echo "invalid arguments. usage:"
+echo "    run: runs the game in current directory"
+echo "    init: initializes current directory with hello world game"
+echo "    libs: copies libraries to current directory. this is done automatically, if updating in tophat directory"
+echo "    package [ platform ] [ game name ]: makes a package of the game in current directory"
+echo "    install [ package path ]: installs tophat from archive specified by path"
+echo "    update: checks for update. if new version is available, downloads it and installs it"
+echo "    uninstall: removes tophat data."
+echo "    get: gets tophat data"
+

@@ -1,0 +1,82 @@
+
+import (
+	"tophat/entity.um"
+	"tophat/image.um"
+	"tophat/polygon.um"
+	"tophat/input.um"
+	"tophat/tophat.um"
+	"tophat/audio.um"
+
+	"bullet.um"
+	"global.um"
+	"settings.um"
+	"sounds.um"
+)
+
+var (
+	ship: entity.ent
+	shipanim: []image.img
+	pspeed: real 
+	hp*: int
+)
+
+fn init*() {
+	ship = entity.mk(polygon.mk(40, 25, []int32{0, 0, 0, 8, 8, 8, 8, 0}), 0x000000ff, 1) // player entity
+	ship.setscale(0.1, 0.1)
+	shipanim = []image.img{image.load("graphics/ship1.png"), image.load("graphics/ship2.png")} // animation
+	pspeed = 0.1 // ship speed
+}
+
+fn handle*() {
+	ship.animate(8, &shipanim) // animating player entity
+
+	// wasd movement
+	if input.ispressed(input.KEY_W) {
+		ship.p.y -= pspeed * tophat.delta
+	}
+
+	if input.ispressed(input.KEY_S) {
+		if ship.p.y < 70 {
+			ship.p.y += pspeed * tophat.delta
+		}
+	}
+
+	if input.ispressed(input.KEY_A) {
+		if !(ship.p.x < -48 && !settings.screenwrap) {
+			ship.p.x -= pspeed * tophat.delta
+		}
+	}
+
+	if input.ispressed(input.KEY_D) {
+		if !(ship.p.x > 44 && !settings.screenwrap) {
+			ship.p.x += pspeed * tophat.delta
+		}
+	}
+
+	// shooting
+	if input.isjustpressed(input.KEY_ENTER) {
+		cb := len(bullet.all)
+		bullet.all = append(bullet.all, []entity.ent{bullet.prefab})
+		bullet.all = append(bullet.all, []entity.ent{bullet.prefab})
+
+		bullet.all[cb].p.x = ship.p.x + 2
+		bullet.all[cb].p.y = ship.p.y
+		bullet.all[cb+1].p.x = ship.p.x + 5
+		bullet.all[cb+1].p.y = ship.p.y
+
+		sounds.shoot.play()
+	}
+
+	// screenwrapping. can be enabled in settings
+	if settings.screenwrap {
+		if ship.p.x < -48 {
+			ship.p.x = 48
+		}
+
+		if ship.p.x > 48 {
+			ship.p.x = -48
+		}
+	}
+
+	ship.draw(global.cam) // drawing ship
+}

@@ -1,0 +1,72 @@
+
+import (
+	"tophat/ui.um"
+	"tophat/rectangle.um"
+
+	"tophat/std/std.um"
+
+	"global.um"
+	"gamescn.um"
+)
+
+var (
+	mainbox: ui.box // main box of ui
+	retrybutton: ui.button
+	menubutton: ui.button
+
+	running: bool = false // this is false, if scene is not active, or is in it's first loop
+
+	maxscore: int32 // top score
+)
+
+// called, when retry button is pressed
+fn retrypress() {
+	gamescn.retry() // method, that resets score and hp
+	global.scene = global.GAME // switches scene
+	running = false
+}
+
+// called, when menu button is pressed
+fn menupress() {
+	global.scene = global.MENU
+	running = false
+}
+
+// setting up ui
+fn init*() {
+	retrybutton = ui.mkbutton(ui.mklabel("RETRY", 1, 0x22ff))
+	retrybutton.label.bgcolor = 0xeeeeeeff
+	retrybutton.padding = rectangle.mk(10, 10, 10, 10)
+	retrybutton.onrelease = retrypress
+
+	menubutton = ui.mkbutton(ui.mklabel("TO MENU", 1, 0x22ff))
+	menubutton.label.bgcolor = 0xeeeeeeff
+	menubutton.padding = rectangle.mk(10, 10, 10, 10)
+	menubutton.onrelease = menupress
+
+	mainbox = ui.mkbox([]ui.element{ui.mkbox([]ui.element{ui.mklabel("GAME OVER", 2, 0xeeeeeeff), ui.mklabel("SCORE " + repr(global.score), 1, 0xeeeeeeff)}, false),
+	 &retrybutton, &menubutton}, false)
+	mainbox.padding = rectangle.mk(10, 10, 10, 10)
+
+	ui.mainelement = mainbox
+}
+
+// start function
+fn start*() {
+	if global.score > maxscore {
+		maxscore = global.score
+	}
+}
+
+// main function called from game.um
+fn run*() {
+	// checking, if we should call start function
+	if !running {
+		start()
+
+		^ui.label(^ui.box(mainbox.children[0]).children[1]).text = "SCORE " + repr(global.score) + "| " + "TOP " + repr(maxscore)
+		running = true // need to set to true
+	}
+	ui.mainelement = mainbox // set ui.main, in case menu ran before this
+	ui.handle(global.cam.w, global.cam.h) // ui handling
+}
