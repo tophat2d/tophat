@@ -143,8 +143,25 @@ void imgcrop(image *img, int x1, int y1, int x2, int y2) {
 		return;
 	}
 
+	if (x1 < 0 || y1 < 0 || x2 >= img->w || y2 >= img->h) {
+		errprint("crop: invalid dimensions");
+		return;
+	}
+
+	if (x1 > x2) {
+		int tmp = x1;
+		x1 = x2;
+		x2 = tmp;
+	}
+
+	if (y1 > y2) {
+		int tmp = y1;
+		y1 = y2;
+		y2 = tmp;
+	}
+
 	uint32_t *n;
-	n = malloc(sizeof(uint32_t) * x2-x1 * y2-y1);
+ 	n = calloc(sizeof(uint32_t), (x2-x1) * (y2-y1));
 
 	for (int x=0; x < x2-x1; x++) {
 		for (int y=0; y < y2-y1; y++) {
