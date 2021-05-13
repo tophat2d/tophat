@@ -17,6 +17,10 @@ Tophat is a 2d game engine focused on minimalism and not taking power away from 
 
 If you want to look at some examples, they can be find in the `examples` folder. If you decide to start working with the engine, I recommend reading the [getting started](https://github.com/marekmaskarinec/tophat/wiki/Getting-started) article, that covers installing the engine and making a new project. Then you can continue by reading the [docs](https://github.com/marekmaskarinec/tophat/wiki/Umka-libraries).
 
+## games made with tophat
+
+Aside from examples, I have made a jam game called [RAIDER](https://maskarinec.itch.io/RAIDER). If you know/have made a game in tophat, don't hesitate and make a pr to add it here.
+
 ## build instructions
 
 ### deps:
@@ -31,7 +35,7 @@ If you want to look at some examples, they can be find in the `examples` folder.
 - `make install` - build and install, so you can test on existing projects
 - `make build` - release build
 - `make windows` - build for windows
-- `make package` - build windows and linux and package
+- `make package` - creates a package, that can be installed using linux shell tool
 - `make win-package` - same as above, but is makes a windows package
 
 
@@ -41,6 +45,7 @@ I'm open to contributions, although the c code is kind of a mess right now. I pl
 
 ## todo
 
+- tranparency on images
 - navigation on tilemaps
 - better return values from raycasts
 - `move_and_slide`-like function
