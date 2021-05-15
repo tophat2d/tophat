@@ -398,6 +398,8 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	entity **scene = (entity **)p[0].ptrVal;
 	ray *ra = (ray *)p[1].ptrVal;
 	int count = p[2].intVal;
+	int *iy = (int *)p[3].ptrVal;
+	int *ix = (int *)p[4].ptrVal;
 	int coll;
 
 	float rx, ry;
@@ -421,8 +423,6 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	//CNFGColor(0x8800ffff);
 	//CNFGTackRectangle((rr.x+40) * scaling, (rr.y+40) * scaling, (rr.w + 40) * scaling, (rr.h + 40) * scaling);
 	
-	int ix, iy;
-
 	for (int i=0; i < count; i++) {
 
 		if (rr.x > scene[i]->p->x + scene[i]->p->w)
@@ -437,13 +437,13 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 		if (rr.h < scene[i]->p->y)
 			continue;
 
-		coll = polytoline(scene[i]->p, ra->x, ra->y, rx, ry, &ix, &iy);
+		coll = polytoline(scene[i]->p, ra->x, ra->y, rx, ry, ix, iy);
 		if (coll) {
 			r->intVal = scene[i]->id;
 			return;
 		}
 
-		coll = polytopoint(scene[i]->p, rx, ry, &ix, &iy);
+		coll = polytopoint(scene[i]->p, rx, ry, ix, iy);
 		if (coll) {
 			r->intVal = scene[i]->id;
 			return;
