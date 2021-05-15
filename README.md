@@ -12,6 +12,7 @@ Tophat is a 2d game engine focused on minimalism and not taking power away from 
 - linear interpolation similar to godot's tweens
 - raycasts (also similar to godot)
 - automatic scaling - your games look the same no matter the resolution
+- great cli tool for linux
 
 ## getting started
 
@@ -47,7 +48,6 @@ I'm open to contributions, although the c code is kind of a mess right now. I pl
 
 - tranparency on images
 - navigation on tilemaps
-- better return values from raycasts
 - `move_and_slide`-like function
 - particle system
 - convert backend to reals and allow for pixel imperfect movement
