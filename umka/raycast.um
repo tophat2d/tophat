@@ -19,11 +19,13 @@ type cray = struct {
 	r: int32
 }
 
+var colldatax, colldatay: int32
+
 fn mk*(x, y, l, r: int32): ray {
 	return ray{x, y, l, r}
 }
 
-fn craygetcoll(count: int32, r: ^cray, s: ^^entity.cent): int32
+fn craygetcoll(ix, iy: ^int32, count: int32, r: ^cray, s: ^^entity.cent): int32
 
 fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 	cscn := []entity.cent{}
@@ -44,6 +46,9 @@ fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 
 	cr := cray{round(r.x), round(r.y), r.l, round(r.r)}
 
-	return craygetcoll(len(cscnp), &cr, &cscnp[0])
+	return craygetcoll(&colldatax, &colldatay, len(cscnp), &cr, &cscnp[0])
 }
 
+fn retrievecolldata*(): (int32, int32) {
+	return colldatax, colldatay
+}

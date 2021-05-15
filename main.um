@@ -23,14 +23,41 @@ fn main() {
 	tophat.setup("test game", 100, 100)
 	var w, h: int32
 
-	img := image.load("etc/test.png")
-	img2 := image.load("etc/test.png")
-	img2.crop(18, 12, 8, 8)
+	e := entity.mk(polygon.mk(0, 0, []int32{0, 0, 10, 0, 10, 10, 0, 10}), tophat.black, 0)
+	r := raycast.mk(0, 0, 20, 0)
+	vis := entity.mk(polygon.mk(0, 0, []int32{-1, -1, 1, -1, 1, 1, -1, 1}), tophat.cyan, 0)
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
-		img.draw(1, 1, 0, 1)
-		img2.draw(12, 1, 0, 1)
+
+		if input.ispressed(input.KEY_Q) {
+			r.r -= round(0.3 * tophat.delta)
+		}
+		if input.ispressed(input.KEY_E) {
+			r.r += round(0.3 * tophat.delta)
+		}
+		if input.ispressed(input.KEY_W) {
+			r.l -= round(0.1 * tophat.delta)
+		}
+		if input.ispressed(input.KEY_S) {
+			r.l += round(0.1 * tophat.delta)
+		}
+
+		e.draw(cam)
+
+		ex, ey := vec.rotatepoint(r.x, r.y-r.l, r.x, r.y, r.r)
+		camx := cam.x-cam.w/2
+		camy := cam.y-cam.h/2
+		rawdraw.drawline(round(r.x-camx), round(r.y-camy), round(ex-camx), round(ey-camy), 4, tophat.red)
+
+		r.x, r.y = input.getglobalmousepos(cam)
+		scn := []^entity.ent{&e}
+		if r.getcoll(scn) != 0 {
+			vis.p.x, vis.p.y = raycast.retrievecolldata()
+			vis.draw(cam)
+		}
+		
+		
 	}
 }
 
