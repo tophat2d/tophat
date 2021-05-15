@@ -18,16 +18,17 @@ function libcpy () {
 }
 
 function clean () {
-	sudo rm -rf $Path
-	sudo rm -rf $(which tophat)
+	rm -rf $Path
+	rm -rf tophat.zip
+	rm -rf $(which tophat)
 }
 
 function setup () {
-	sudo rm -rf $Path
-	sudo mkdir $Path
-	sudo unzip -q $1 -d $Path
-	sudo mv $Path/tophat-release/* $Path
-	sudo rm -r $Path/tophat-release
+	rm -rf $Path
+	mkdir $Path
+	unzip -q $1 -d $Path
+	mv $Path/tophat-release/* $Path
+	rm -r $Path/tophat-release
 }
 
 function update() {
@@ -122,6 +123,7 @@ fi
 
 if [ "$1" == "update" ]; then
 	update
+	rm tophat.zip
 	exit 0
 fi
 
@@ -136,8 +138,6 @@ if [ "$1" == "get" ]; then
 fi
 
 if [ "$1" == "init" ]; then
- 	mkdir tophat
- 	cp -rf $Path/umka/* ./tophat
  	cp $Path/*.um ./
 	exit 0
 fi
