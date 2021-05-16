@@ -37,9 +37,9 @@ fn mk*(x, y: real, v: []int32): poly {
 	var maxx, maxy: int32;
 
 	for i:=0; i < len(v); i += 2 {
-		if v[i] > maxx { maxx = v[i] }
+		if fabs(real(v[i])) > maxx { maxx = round(fabs(real(v[i]))) }
 		
-		if v[i + 1] > maxy { maxy = v[i + 1] }
+		if fabs(real(v[i + 1])) > maxy { maxy = round(fabs(real(v[i + 1]))) }
 	}
 
 	p.w = maxx

@@ -12,7 +12,7 @@ DEFINES=-DCNFGOGL -DUMKA_STATIC
 CFLAGS=-o tophat $(SOURCES) lib/umka/build/libumka.a $(WARNINGS) $(LFLAGS) $(UMKA_LIB) $(DEFINES)
 WINCFLAGS=-o tophat $(SOURCES) lib/rawdraw/chew.c lib/windows/libumka_static.a $(WARNINGS) $(WINLFLAGS) $(WIN_UMKA_LIB) $(DEFINES) -DNO_OPENGL_HEADERS
 
-RELEASE_FLAGS=-Os -DRELEASE_BUILD
+RELEASE_FLAGS=-DRELEASE_BUILD
 
 VERSION=v0.2-$(shell git rev-parse --short HEAD)
 
@@ -25,8 +25,8 @@ windows: libembed
 run:
 	$(CC) $(CFLAGS) -g && ./tophat
 
-install: 
-	$(CC) $(CFLAGS) -g && sudo cp tophat /usr/share/tophat/bin/tophat-linux
+install: build
+	cp tophat /usr/share/tophat/bin/tophat-linux
 
 package: clean build windows
 	mkdir -p tophat-release/bin
@@ -61,7 +61,7 @@ clean:
 
 cmdtool:
 	chmod +x cmd/tophat-cli
-	sudo cp cmd/tophat-cli /bin
+	sudo cp cmd/tophat-cli /bin/tophat
 
 libembed:
 	echo "#ifndef UMKALIBS_H\n#define UMKALIBS_H\nconst char *libs[] = {" > src/umkalibs.h
