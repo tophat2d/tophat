@@ -15,10 +15,10 @@ void draw(entity *o, rect *camera) {
 	camx = camera->x - (camera->w / 2);
 	camy = camera->y - (camera->h / 2);
 
-	if (o->p->x + o->p->w < camx || o->p->x > camx + camera->w)
+	if (o->p->x + o->p->w < camx || o->p->x - o->p->w > camx + camera->w)
 		return;
 
-	if (o->p->y + o->p->h < camy || o->p->y > camy + camera->h)
+	if (o->p->y + o->p->h < camy || o->p->y - o->p->h > camy + camera->h)
 		return;
 
 	if (o->img == NULL) {
