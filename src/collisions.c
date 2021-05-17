@@ -76,12 +76,10 @@ int polytopoly(poly *p1, poly *p2, int *ix, int *iy) {
 		vny = p1->v[next + 1] + p1->y;
 
 		coll = polytoline(p2, vcx, vcy, vnx, vny, ix, iy);
-		if (coll)
-			return 1;
+		if (coll) return 1;
 
-		coll = polytopoint(p1, p2->v[0], p2->v[1], ix, iy);
-		if (coll)
-			return 1;
+		coll = polytopoint(p1, p2->x + p2->v[0], p2->y + p2->v[1], ix, iy);
+		if (coll) return 1;
 	}
 
 	return 0;
