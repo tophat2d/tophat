@@ -8,6 +8,5 @@ jobs:
     - name: make
       run: |
         sudo apt-get install gcc zip make libx11-dev
-        git submodule update --recursive --remote
         make deps
         make package
