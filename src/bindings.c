@@ -315,14 +315,10 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	}
 
 	if (ew < 0) {
-		int tmp = ew;
-		ew = ex;
-		ex = tmp;
+		ew = abs(ew);
 	}
 	if (eh < 0) {
-		int tmp = eh;
-		eh = ey;
-		ey = tmp;
+		eh = abs(eh);
 	}
 
 	for (int i=0; i < count; i++) {
@@ -335,14 +331,10 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 		int sh = e->p->h;
 		
 		if (sw < 0) {
-			int tmp = sw;
-			sw = sx;
-			sx = tmp;
+			sw = abs(sw);
 		}
 		if (sh < 0) {
-			int tmp = sh;
-			sh = sy;
-			sy = tmp;
+			sh = abs(sh);
 		}
 
 		if (ex > sx + sw)
@@ -364,12 +356,6 @@ void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 		}
 
 		coll = polytopoly(e->p, scene[i]->p, ix, iy);
-		if (coll) {
-			r->intVal = scene[i]->id;
-			return;
-		}
-
-		coll = polytopoly(scene[i]->p, e->p, ix, iy);
 		if (coll) {
 			r->intVal = scene[i]->id;
 			return;
