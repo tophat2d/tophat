@@ -1,12 +1,13 @@
 name: Tophat auto package workflow
 on: [push]
 jobs:
-  Linux-Package:
+  Auto-Package:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: make
       run: |
-        sudo apt-get install gcc zip make libx11-dev libgl-dev
+        sudo apt-get install gcc zip make libx11-dev libgl-dev gcc-mingw-w64-x86-64
         make deps
         make package
+        make win-package
