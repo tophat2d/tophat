@@ -69,6 +69,7 @@ libembed:
 	echo "};\n#endif" >> src/umkalibs.h
 
 deps:
+	if [ ! -f libs/umka/Makefile ]; then git submodule update --recursive --remote; fi
 	@echo "updating submodules"
 	git submodule update --remote --merge
 	@echo "downloading miniaudio"
