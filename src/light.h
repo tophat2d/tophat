@@ -11,8 +11,8 @@ typedef struct {
 	int lenght;
 	int width;
 	uint32_t color;
-} lightcone;
+} th_lightcone;
 
-void drawlightcone(lightcone *l, rect *cam);
+void th_draw_lightcone(th_lightcone *l, th_rect *cam);
 
 #endif

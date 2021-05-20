@@ -3,24 +3,20 @@
 
 #include <stdint.h>
 #include "rect.h"
-#include "poly.h"
+#include "polygon.h"
 #include "image.h"
 
 typedef struct {
-	poly *p;
-	image *img;
+	th_poly *p;
+	th_image *img;
 	double sx;
 	double sy;
 	int rot;
 	uint32_t color;
 	int id;
-} entity;
+} th_ent;
 
-typedef struct entnode {
-	entity *val;
-	struct entnode *next;
-} entnode_t;
-
-void draw(entity *o, rect *cam);
+void th_ent_draw(th_ent *o, th_rect *camera);
+int th_ent_getcoll(th_ent *e, th_ent **scene, int count, int *ix, int *iy);
 
 #endif

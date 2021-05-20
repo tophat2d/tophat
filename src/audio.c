@@ -19,8 +19,8 @@
 
 ma_device_config auconf;
 ma_device audev;
-sound **sounds;
-int soundcount;
+th_sound **sounds;
+int sound_count;
 
 extern char *respath;
 
@@ -59,11 +59,11 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
 }
 
 void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
-	for (int i=soundcount-1; i >= 0; i--) {
+	for (int i=sound_count-1; i >= 0; i--) {
 		if (sounds[0] == NULL)
 			continue;
 
-		sound *csound = sounds[i];
+		th_sound *csound = sounds[i];
 
 		if (csound == NULL)
 			continue;
@@ -91,12 +91,12 @@ void auinit(){
 	auconf.pUserData = NULL;
 
 	if (ma_device_init(NULL, &auconf, &audev) != MA_SUCCESS) {
-		errprint("Failed to open playback device.");
+		th_error("Failed to open playback device.");
 		return;
 	}
 
 	if (ma_device_start(&audev) != MA_SUCCESS) {
-		errprint("Failed to start playback device.");
+		th_error("Failed to start playback device.");
 		return;
 	}
 }
@@ -104,16 +104,16 @@ void auinit(){
 void audeinit() {
 	ma_device_uninit(&audev);
 
-	for (int i=soundcount - 1; i >= 0; i--) {
+	for (int i=sound_count - 1; i >= 0; i--) {
 		ma_decoder_uninit(&sounds[i]->decoder);
 
 		free(sounds[i]);
 	}
 }
 
-sound *auload(char *path) {
-	sound *s;
-	s = malloc(sizeof(sound));
+th_sound *auload(char *path) {
+	th_sound *s;
+	s = malloc(sizeof(th_sound));
 
 	ma_decoder_config decodercfg;
 	decodercfg = ma_decoder_config_init(SAMPLE_FORMAT, CHANNEL_COUNT, SAMPLE_RATE);
@@ -124,9 +124,7 @@ sound *auload(char *path) {
 	strcat(cpath, path);
 	res = ma_decoder_init_file(cpath, &decodercfg, &s->decoder);
 	if (res != MA_SUCCESS) {
-		char buff[256];
-		sprintf("failed to load sound at %s", path);
-		errprint(buff);
+		th_error("couldn't load sound at path %s", path);
 		return NULL;
 	}
 

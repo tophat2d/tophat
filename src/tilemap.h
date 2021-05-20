@@ -5,7 +5,7 @@
 #include "rect.h"
 
 typedef struct {
-	image **tiles;
+	th_image **tiles;
 	int x;
 	int y;
 	int w;
@@ -14,8 +14,8 @@ typedef struct {
 	int *collmask;
 	int cellsize;
 	int scaletype;
-} tmap;
+} th_tmap;
 
-void tmapdraw(tmap *t, rect *cam);
+void th_tmap_draw(th_tmap *t, th_rect *cam);
 
 #endif

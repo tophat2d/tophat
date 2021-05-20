@@ -6,60 +6,13 @@
 #include <math.h>
 
 #include "collisions.h"
-#include "main.h"
-#include "poly.h"
+#include "polygon.h"
 #include "tilemap.h"
 
 int stepify(int inp, int step);
 
-extern int entitycount;
-
-// relic from the times tophat was c only. I'm keeping this, since I want to make tophat work with c.
-int collbyentity(entnode_t *a, entity *e) {
-	entnode_t *current, *next;
-	int i = 0;
-	int coll;
-
-	current = a;
-	next = a;
-
-	if (e == NULL) {
-		return 1;
-	}
-
-	i = 0;
-
-	while (next != NULL) {
-
-		current = next;
-		next = current->next;
-
-		i++;
-
-		if (current->val == NULL) {
-			current = current->next;
-			continue;
-		}
-
-		if (e->id == current->val->id) {
-			continue;
-		}
-
-		int ix, iy;
-		coll = polytopoly(current->val->p, e->p, &ix, &iy);
-		if (coll) {
-			return current->val->id;
-		}
-
-		if (current->next == NULL) {
-			return 0;
-		}
-	}
-	return 0;
-}
-
 // checks collision between two polygons
-int polytopoly(poly *p1, poly *p2, int *ix, int *iy) {
+int _th_poly_to_poly(th_poly *p1, th_poly *p2, int *ix, int *iy) {
 	int next = 0;
 	int vcx, vcy, vnx, vny;
 	int coll = 0;
@@ -75,17 +28,19 @@ int polytopoly(poly *p1, poly *p2, int *ix, int *iy) {
 		vnx = p1->v[next] + p1->x;
 		vny = p1->v[next + 1] + p1->y;
 
-		coll = polytoline(p2, vcx, vcy, vnx, vny, ix, iy);
-		if (coll) return 1;
+		coll = _th_poly_to_line(p2, vcx, vcy, vnx, vny, ix, iy);
+		if (coll)
+			return 1;
 
-		coll = polytopoint(p1, p2->x + p2->v[0], p2->y + p2->v[1], ix, iy);
-		if (coll) return 1;
+		coll = _th_poly_to_point(p1, p2->x + p2->v[0], p2->y + p2->v[1], ix, iy);
+		if (coll)
+			return 1;
 	}
 
 	return 0;
 }
 
-int polytoline(poly *a, int sx, int sy, int ex, int ey, int *ix, int *iy) {
+int _th_poly_to_line(th_poly *a, int sx, int sy, int ex, int ey, int *ix, int *iy) {
 	int next = 0;
 	int csx, csy, cex, cey;
 	int coll = 0;
@@ -98,7 +53,7 @@ int polytoline(poly *a, int sx, int sy, int ex, int ey, int *ix, int *iy) {
 		cex = a->v[next] + a->x;
 		cey = a->v[next + 1] + a->y;
 
-		coll = linetoline(sx, sy, ex, ey, csx, csy, cex, cey, ix, iy);
+		coll = _th_line_to_line(sx, sy, ex, ey, csx, csy, cex, cey, ix, iy);
 		if (coll)
 			return 1;
 	}
@@ -106,7 +61,7 @@ int polytoline(poly *a, int sx, int sy, int ex, int ey, int *ix, int *iy) {
 	return 0;
 }
 
-int linetoline(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int *ix, int *iy) {
+int _th_line_to_line(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int *ix, int *iy) {
 	float uA = (float)((x4-x3)*(y1-y3) - (y4-y3)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
 	float uB = (float)((x2-x1)*(y1-y3) - (y2-y1)*(x1-x3)) / ((y4-y3)*(x2-x1) - (x4-x3)*(y2-y1));
 
@@ -119,7 +74,7 @@ int linetoline(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, i
 	return 0;
 }
 
-int polytopoint(poly *a, int px, int py, int *ix, int *iy) {
+int _th_poly_to_point(th_poly *a, int px, int py, int *ix, int *iy) {
 	int result = 0;
 	int current, next;
 	int vcx, vnx, vcy, vny;
@@ -133,8 +88,8 @@ int polytopoint(poly *a, int px, int py, int *ix, int *iy) {
 			next = 0;
 
 		vcx = a->v[current] + a->x;
-		vnx = a->v[next] + a->y;
-		vcy = a->v[current+1] + a->x;
+		vnx = a->v[next] + a->x;
+		vcy = a->v[current+1] + a->y;
 		vny = a->v[next+1] + a->y;
 
 		if (((vcy >= py && vny < py) || (vcy < py && vny >= py)) && (px < (vnx-vcx)*(py-vcy) / (vny-vcy)+vcx)) {
@@ -152,7 +107,7 @@ int stepify(int inp, int step) {
 	return inp;
 }
 
-int collontilemap(poly *p, tmap *t, int *rx, int *ry) {
+int _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry) {
 	if (p->x + p->w < t->x) return 0;
 	if (p->y + p->h < t->y) return 0;
 	for (int i=0; i < p->vc; i++) {

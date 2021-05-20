@@ -1,30 +1,26 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <math.h>
 #include "misc.h"
-#ifdef _WIN32
-	#include <windows.h>
-#else
-	#include <unistd.h>
-#endif
 
-void slp(int t) {
-	printf("%d, %f\n", t, (float)t/1000);
-	usleep(t*1000);
+float th_get_scaling(int w, int h, int camw, int camh) {
+	if ((float)w/camw < (float)h/camh)
+		return (float)w/camw;
+
+	return (float)h/camh;
 }
 
-int getscaling(int w, int h, int camw, int camh) {
-	if (w/camw < h/camh) {
-		return (int)(w/camw);
-	}
+// TODO: allow for formatted text
+void th_error(char *text, ...) {
+	fprintf(stderr, "\x1b[1m\x1b[31merror: \x1b[0m");
 
-	return (int)(h/camh);
+	va_list args;
+	va_start(args, text);
+	vfprintf(stderr, text, args);
+	va_end(args);
 }
 
-void errprint(char *text) {
-	printf("\033[31merror\033[0m: %s\n", text);
-}
-
-void rotatepoint(float *x, float *y, float cx, float cy, float rot) {
+void th_rotate_point(float *x, float *y, float cx, float cy, float rot) {
 	float angle = (rot * M_PI)/180;
 
 	float x1 = *x - cx;

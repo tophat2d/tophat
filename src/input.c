@@ -1,10 +1,10 @@
 #include <string.h>
 
-int mx;
-int my;
+int mousex;
+int mousey;
 
 int pressed[255];
-int justpressed[255];
+int just_pressed[255];
 
 void HandleKey(int keycode, int bDown) {
 	if (keycode > 255) {
@@ -37,28 +37,28 @@ void HandleKey(int keycode, int bDown) {
 
 	if (!bDown) {
 		pressed[keycode] = 0;
-		justpressed[keycode] = 0;
+		just_pressed[keycode] = 0;
 		return;
 	}
 
 	if (!pressed[keycode]) {
 		pressed[keycode] = 1;
-		justpressed[keycode] = 1;
+		just_pressed[keycode] = 1;
 		return;
 	}
 
-	justpressed[keycode] = 0;
+	just_pressed[keycode] = 0;
 }
 void HandleButton( int x, int y, int button, int bDown ) {
 	HandleKey(button+6, bDown);
 }
 
 void HandleMotion( int x, int y, int mask ) {
-	mx = x;
-	my = y;
+	mousex = x;
+	mousey = y;
 }
 
-void inputinit() {
+void _th_input_init() {
 	memset(&pressed[0], 0, 255 * sizeof(int));
-	memset(&justpressed[0], 0, 255 * sizeof(int));
+	memset(&just_pressed[0], 0, 255 * sizeof(int));
 }

@@ -1,7 +1,11 @@
+
 #include <stdint.h>
 
 #include <GL/gl.h>
 
+#ifdef __TINYC__
+#define STBI_NO_SIMD
+#endif
 #define STB_IMAGE_IMPLEMENTATION
 #include "../lib/stb_image.h"
 
@@ -21,21 +25,19 @@ extern GLuint gRDBlitProgTex;
 extern GLuint gRDLastResizeW;
 extern GLuint gRDLastResizeH;
 
-image *loadimage(char *path) {
+th_image *th_load_image(char *path) {
 	int w, h, c;
 
 	unsigned char *data = stbi_load(path, &w, &h, &c, 0);
 
-	image *img;
-	img = malloc(sizeof(image));
+	th_image *img;
+	img = calloc(sizeof(th_image), 1);
 	img->w = w;
 	img->h = h;
 	img->c = c;
 
 	if (data == NULL) {
-		char buff[256];
-		sprintf(buff, "could not find image at path %s", path);
-		errprint(buff);
+		th_error("could not find image at path %s", path);
 		img->rdimg = NULL;
 		return img;
 	}
@@ -47,13 +49,20 @@ image *loadimage(char *path) {
 		return img;
 	}*/
 
-	rdimg(img, data);
+	_th_rdimg(img, data);
 	stbi_image_free(data);
 
 	return img;
 }
 
-inline void imagefromdata(image *img, uint32_t *data, int w, int h) {
+void th_free_image(th_image *img) {
+	CNFGDeleteTex(img->tex);
+
+	free(img->rdimg);
+	free(img);
+}
+
+inline void th_image_from_data(th_image *img, uint32_t *data, int w, int h) {
 	img->rdimg = malloc(sizeof(uint32_t) * w * h);
 	memcpy(img->rdimg, data, sizeof(uint32_t) * w * h);
 	img->w = w;
@@ -61,7 +70,7 @@ inline void imagefromdata(image *img, uint32_t *data, int w, int h) {
 	img->c = 4;
 }
 
-void blittex(unsigned int tex, int x, int y, int w, int h, float rot) {
+void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot) {
 	if( w == 0 || h == 0 ) return;
 
 	CNFGFlushRender();
@@ -87,10 +96,10 @@ void blittex(unsigned int tex, int x, int y, int w, int h, float rot) {
 	float hroty = h;
 
 	if ( rot != 0 ) {
-		rotatepoint(&zrotx, &zroty, cx, cy, rot);
-		rotatepoint(&brotx, &broty, cx, cy, rot);
-		rotatepoint(&wrotx, &wroty, cx, cy, rot);
-		rotatepoint(&hrotx, &hroty, cx, cy, rot);
+		th_rotate_point(&zrotx, &zroty, cx, cy, rot);
+		th_rotate_point(&brotx, &broty, cx, cy, rot);
+		th_rotate_point(&wrotx, &wroty, cx, cy, rot);
+		th_rotate_point(&hrotx, &hroty, cx, cy, rot);
 	}
 
 	const float verts[] = {
@@ -106,9 +115,9 @@ void blittex(unsigned int tex, int x, int y, int w, int h, float rot) {
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void flipv(image *img) {
+void th_image_flipv(th_image *img) {
 	if (img->rdimg == NULL) {
-		errprint("flipv: image is not valid");
+		th_error("flipv: image is not valid");
 		return;
 	}
 
@@ -122,9 +131,9 @@ void flipv(image *img) {
 	img->rdimg = f;
 }
 
-void fliph(image *img) {
+void th_image_fliph(th_image *img) {
 	if (img->rdimg == NULL) {
-		errprint("fliph: image is not valid");
+		th_error("fliph: image is not valid");
 		return;
 	}
 
@@ -137,14 +146,14 @@ void fliph(image *img) {
 	img->rdimg = f;
 }
 
-void imgcrop(image *img, int x1, int y1, int x2, int y2) {
+void th_image_crop(th_image *img, int x1, int y1, int x2, int y2) {
 	if (img->rdimg == NULL) {
-		errprint("crop: image is not valid");
+		th_error("crop: image is not valid");
 		return;
 	}
 
 	if (x1 < 0 || y1 < 0 || x2 >= img->w || y2 >= img->h) {
-		errprint("crop: invalid dimensions");
+		th_error("crop: invalid dimensions");
 		return;
 	}
 
@@ -174,7 +183,7 @@ void imgcrop(image *img, int x1, int y1, int x2, int y2) {
 	img->rdimg = n;
 }
 
-void rdimg(image *img, unsigned char *data) {
+void _th_rdimg(th_image *img, unsigned char *data) {
 	uint32_t *rd;
 	rd = malloc(sizeof(int) * img->w * img->h);
 	uint32_t current = 0;

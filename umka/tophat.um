@@ -23,8 +23,6 @@ var t*, start, end, delta*: int
 
 var platform*: str = "linux"
 
-fn sleep*(t: int)
-
 fn gettime*(): int
 
 fn setup*(title: str, w, h: int32) {
@@ -43,12 +41,7 @@ fn setup*(title: str, w, h: int32) {
 }
 
 fn setwindowtitle*(title: str)
-
-fn debug*()
-fn debug2*()
-
 fn visualizecam(w, h: int32, color: uint32)
-
 fn updatescaling(w, h, camw, camh: int32)
 
 fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
@@ -76,6 +69,4 @@ fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 
 	visualizecam(cam.w, cam.h, bgcolor)
 }
-
-fn setvsync*(v: bool)
 

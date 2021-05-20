@@ -9,20 +9,15 @@ typedef struct {
 	int c;
 	uint32_t *rdimg;
 	unsigned int tex;
-} image;
+} th_image;
 
-void blittex(unsigned int tex, int x, int y, int w, int h, float rot);
-
-void imagefromdata(image *img, uint32_t *data, int w, int h);
-
-image *loadimage(char *path);
-
-void flipv(image *img);
-
-void fliph(image *img);
-
-void imgcrop(image *img, int x1, int y1, int x2, int y2);
-
-void rdimg(image *img, unsigned char *data);
+th_image *th_load_image(char *path);
+void th_free_image(th_image *img);
+void th_image_from_data(th_image *img, uint32_t *data, int w, int h);
+void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot);
+void th_image_flipv(th_image *img);
+void th_image_fliph(th_image *img);
+void th_image_crop(th_image *img, int x1, int y1, int x2, int y2);
+void _th_rdimg(th_image *img, unsigned char *data);
 
 #endif

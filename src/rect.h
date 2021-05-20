@@ -6,8 +6,6 @@ typedef struct {
 	int y;
 	int w;
 	int h;
-} rect;
-
-rect newrect(int px, int py, int w, int h);
+} th_rect;
 
 #endif
