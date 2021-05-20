@@ -49,7 +49,7 @@ int main(int argc, char *argv[]) {
 		strcpy(scriptpath, "tophat.dat/game.um");
 		fclose(f);
 	} else {
-		errprint("Could not find game.um or main.um. Make sure you are in a proper directory.");
+		th_error("Could not find game.um or main.um. Make sure you are in a proper directory.");
 
 		return 1;
 	}
@@ -62,7 +62,7 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	umkabind(umka);
+	_th_umka_bind(umka);
 	umkaOK = umkaCompile(umka);
 
 	if (!umkaOK) {
@@ -74,7 +74,7 @@ int main(int argc, char *argv[]) {
 
 	destroyfunc = umkaGetFunc(umka, NULL, "windowdestroy");
 	scaling = 1;
-	inputinit();
+	_th_input_init();
 
 	umkaOK = umkaRun(umka);
 	if (!umkaOK) {

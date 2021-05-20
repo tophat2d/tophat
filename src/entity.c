@@ -1,16 +1,15 @@
 #include <stdio.h>
 #include <stdlib.h>
-
 #include "../lib/rawdraw/CNFG.h"
-
 #include "entity.h"
 #include "rect.h"
-#include "poly.h"
+#include "polygon.h"
 #include "misc.h"
+#include "collisions.h"
 
 extern float scaling;
 
-void draw(entity *o, rect *camera) {
+void th_ent_draw(th_ent *o, th_rect *camera) {
 	int camx, camy;
 	camx = camera->x - (camera->w / 2);
 	camy = camera->y - (camera->h / 2);
@@ -22,15 +21,12 @@ void draw(entity *o, rect *camera) {
 		return;
 
 	if (o->img == NULL) {
-		if (o->p == NULL) {
-			char buff[128];
-			sprintf(buff, "invalid entity with id of %d", o->id);
-			errprint(buff);
-		}
+		if (o->p == NULL)
+			th_error("invalid entity with id %d", o->id);
 
 		RDPoint *points;
 
-		points = polytordpoint(o->p, camx, camy);
+		points = _th_poly_to_rdpoint(o->p, camx, camy);
 		CNFGColor(o->color);
 		CNFGTackPoly(points, o->p->vc);
 		free(points);
@@ -38,6 +34,52 @@ void draw(entity *o, rect *camera) {
 		return;
 	}
 
-	blittex(o->img->tex, (o->p->x-camx) * scaling, (o->p->y-camy) * scaling, o->img->w * o->sx * scaling, o->img->h * o->sy * scaling, o->rot);
-	//CNFGBlitTex(o->img->tex, (o->p->x-camx) * scaling, (o->p->y-camy) * scaling, o->img->w * o->sx * scaling, o->img->h * o->sy * scaling, o->rot);
+	th_blit_tex(o->img->tex, (o->p->x-camx) * scaling, (o->p->y-camy) * scaling, o->img->w * o->sx * scaling, o->img->h * o->sy * scaling, o->rot);
+}
+
+int th_ent_getcoll(th_ent *e, th_ent **scene, int count, int *ix, int *iy) {
+	int coll;
+
+	int ex = e->p->x;
+	int ey = e->p->y;
+	int ew = e->p->w;
+	int eh = e->p->h;
+	
+	if (!ex || !ey)
+		return 0;
+
+	if (ew < 0)
+		ew = abs(ew);
+	if (eh < 0)
+		eh = abs(eh);
+
+	for (int i=0; i < count; i++) {
+		if (e->id == scene[i]->id) continue;
+
+		int sx = e->p->x;
+		int sy = e->p->y;
+		int sw = e->p->w;
+		int sh = e->p->h;
+		
+		if (sw < 0)
+			sw = abs(sw);
+		if (sh < 0)
+			sh = abs(sh);
+
+		if (ex > sx + sw) continue;
+		if (ey > sy + sh) continue;
+		if (ew + ex < sx) continue;
+		if (eh + ey < sy) continue;
+
+		coll = _th_poly_to_poly(scene[i]->p, e->p, ix, iy);
+		if (coll) {
+			return scene[i]->id;
+		}
+
+		coll = _th_poly_to_poly(e->p, scene[i]->p, ix, iy);
+		if (coll) {
+			return scene[i]->id;
+		}
+	}
+	return 0;
 }

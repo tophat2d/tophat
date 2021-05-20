@@ -1,40 +1,41 @@
-// all umka bindings and more
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <GL/gl.h>
 
-#include "tophat.h"
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/rawdraw/chew.h"
 #include "../lib/umka/src/umka_api.h"
 #include "../lib/stb_image.h"
 
 #include "bindings.h"
-#include "poly.h"
+#include "polygon.h"
 #include "tilemap.h"
 #include "light.h"
+#include "audio.h"
+#include "entity.h"
+#include "raycast.h"
+#include "image.h"
+#include "collisions.h"
+#include "misc.h"
+
 #ifdef RELEASE_BUILD
 #include "umkalibs.h"
 #endif
 
 extern float scaling;
 extern int pressed[255];
-extern int justpressed[255];
-extern int mx;
-extern int my;
+extern int just_pressed[255];
+extern int mousex;
+extern int mousey;
 
 extern char *respath;
-extern sound **sounds;
-extern int soundcount;
+extern th_sound **sounds;
+extern int sound_count;
 
-// this function binds all the function here and embedded libraries
-void umkabind(void *umka) {
+void _th_umka_bind(void *umka) {
 	// etc
-	umkaAddFunc(umka, "debug", &umdebug);
-	umkaAddFunc(umka, "debug2", &umdebug2);
 	umkaAddFunc(umka, "cfopen", &umfopen);
 
 	umkaAddFunc(umka, "cdrawcone", &umdrawcone);
@@ -60,7 +61,7 @@ void umkabind(void *umka) {
 
 	// entities
 	umkaAddFunc(umka, "centdraw", &umentdraw);
-	umkaAddFunc(umka, "cgetcoll", &umgetcoll);
+	umkaAddFunc(umka, "cgetcoll", &umentgetcoll);
 
 	// rays
 	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
@@ -75,14 +76,12 @@ void umkabind(void *umka) {
 	umkaAddFunc(umka, "csoundvalidate", &umsoundvalidate);
 
 	// misc
-	umkaAddFunc(umka, "sleep", &umsleep);
 	umkaAddFunc(umka, "visualizecam", &umvisualizecam);
 	umkaAddFunc(umka, "gettime", &umgettime);
 
 	// rawdraw
 	umkaAddFunc(umka, "drawtext", &umdrawtext);
 	umkaAddFunc(umka, "setup", &umCNFGSetup);
-	umkaAddFunc(umka, "setvsync", &umCNFGSetVSync);
 	umkaAddFunc(umka, "setbgcolor", &umCNFGSetBgColor);
 	umkaAddFunc(umka, "setcolor", &umCNFGSetColor);
 	umkaAddFunc(umka, "clearframe", &umCNFGClearFrame);
@@ -118,16 +117,6 @@ void umkabind(void *umka) {
 #endif
 }
 
-// etc
-// mainly debug functions used by me and fopen, that takes respath into consideration
-void umdebug(UmkaStackSlot *p, UmkaStackSlot *r) {
-}
-
-void umdebug2(UmkaStackSlot *p, UmkaStackSlot *r) {
-	//dc = auload("test.wav");
-	//auinit();
-}
-
 void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	const char *name = (const char *)p[1].ptrVal;
 	const char *mode = (const char *)p[0].ptrVal;
@@ -139,44 +128,44 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->ptrVal = (intptr_t)f;
 }
 
+///////////////////////
 // lightcone
-
 void umdrawcone(UmkaStackSlot *p, UmkaStackSlot *r) {
-	lightcone *lc = (lightcone *)p[1].ptrVal;
-	rect *cam = (rect *)p[0].ptrVal;
-	drawlightcone(lc, cam);
+	th_lightcone *lc = (th_lightcone *)p[1].ptrVal;
+	th_rect *cam = (th_rect *)p[0].ptrVal;
+	th_draw_lightcone(lc, cam);
 }
 
+///////////////////////
 // tilemaps
-
 // draws a tilemap takes a rectangle as a camera and the tilemap itself
 void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r) {
-	rect *cam = (rect *)p[0].ptrVal;
-	tmap *t = (tmap *)p[1].ptrVal;
-	tmapdraw(t, cam);
+	th_rect *cam = (th_rect *)p[0].ptrVal;
+	th_tmap *t = (th_tmap *)p[1].ptrVal;
+	th_tmap_draw(t, cam);
 }
 
 // checks, if tilemap collides with entity.
 // ent - entity to collide with, t - tilemap, x and y - pointers to ints used to return, where the collision occured
 void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	entity *ent = (entity *)p[0].ptrVal;
-	tmap *t = (tmap *)p[1].ptrVal;
+	th_ent *ent = (th_ent *)p[0].ptrVal;
+	th_tmap *t = (th_tmap *)p[1].ptrVal;
 	int *y = (int *)p[2].ptrVal;
 	int *x = (int *)p[3].ptrVal;
 
-	r->intVal = collontilemap(ent->p, t, x, y);
+	r->intVal = _th_coll_on_tilemap(ent->p, t, x, y);
 }
 
+///////////////////////
 // images
-
 // loads an image at respath + path
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *path = (char *)p[0].ptrVal;
 
-	image *img;
+	th_image *img;
 	char pathcpy[512];
 	strcpy(pathcpy, respath);
-	img = loadimage(strcat(pathcpy, path));
+	img = th_load_image(strcat(pathcpy, path));
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 
 	r[0].ptrVal = (intptr_t)img;
@@ -184,15 +173,14 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // frees an image
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[0].ptrVal;
+	th_image *img = (th_image *)p[0].ptrVal;
 
-	free(img->rdimg);
-	free(img);
+	th_free_image(img);
 }
 
 // checks, if image is correctly loaded
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[0].ptrVal;
+	th_image *img = (th_image *)p[0].ptrVal;
 	if (img->rdimg != NULL) {
 		r->intVal = 1;
 		return;
@@ -203,25 +191,24 @@ void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // flips image
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[0].ptrVal;
+	th_image *img = (th_image *)p[0].ptrVal;
 
-	flipv(img);
+	th_image_flipv(img);
 	glDeleteTextures(1, &img->tex);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
 
 // flips image
 void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[0].ptrVal;
+	th_image *img = (th_image *)p[0].ptrVal;
 
-	fliph(img);
+	th_image_fliph(img);
 	glDeleteTextures(1, &img->tex);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
 
-// gets dimensions of an image
 void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[0].ptrVal;
+	th_image *img = (th_image *)p[0].ptrVal;
 	int *h = (int *)p[1].ptrVal;
 	int *w = (int *)p[2].ptrVal;
 
@@ -229,15 +216,14 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
 	*h = img->h;
 }
 
-// crops an image. currently broken
 void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[4].ptrVal;
+	th_image *img = (th_image *)p[4].ptrVal;
 	int y2 = p[0].intVal;
 	int y1 = p[1].intVal;
 	int x2 = p[2].intVal;
 	int x1 = p[3].intVal;
 
-	imgcrop(img, x1, y1, x2, y2);
+	th_image_crop(img, x1, y1, x2, y2);
 	glDeleteTextures(1, &img->tex);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
@@ -248,28 +234,26 @@ void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int w = p[1].intVal;
 	uint32_t *data = (uint32_t *)p[2].ptrVal;
 
-	image *img = malloc(sizeof(image));
-	imagefromdata(img, data, w, h);
+	th_image *img = malloc(sizeof(th_image));
+	th_image_from_data(img, data, w, h);
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 
 	r->ptrVal = (intptr_t)img;
 }
 
+///////////////////////
 // input
-
 // gets position of mouse cursor
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int *x = (int *)p[1].ptrVal;
 	int *y = (int *)p[0].ptrVal;
 
-	*x = mx / scaling;
-	*y = my / scaling;
+	*x = mousex / scaling;
+	*y = mousey / scaling;
 }
 
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
-
-	//printf("%d\n", pressed[keycode]);
 
 	r[0].intVal = pressed[keycode];
 }
@@ -277,98 +261,37 @@ void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
-	r[0].intVal = justpressed[keycode];
-	justpressed[keycode] = 0;
+	r[0].intVal = just_pressed[keycode];
+	just_pressed[keycode] = 0;
 }
 
+///////////////////////
 // entities
-
 // draws an entity
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	rect *rc = (rect *)&p[0];
-	entity *e = (entity *)&p[2]; // this is weird solution, but it seems to work for now. TODO
+	th_rect *rc = (th_rect *)&p[0];
+	th_ent *e = (th_ent *)&p[2];
 
-	if (e->img == 0) {
+	if (e->img == 0)
 		e->img = NULL;
-	}
 
-	draw(e, rc);
+	th_ent_draw(e, rc);
 }
 
-// checks, if entity collides with any of those in scene
-void umgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	entity **scene = (entity **)p[0].ptrVal;
-	entity *e = (entity *)p[1].ptrVal;
+void umentgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_ent **scene = (th_ent **)p[0].ptrVal;
+	th_ent *e = (th_ent *)p[1].ptrVal;
 	int count = p[2].intVal;
 	int *iy = (int *)p[3].ptrVal;
 	int *ix = (int *)p[4].ptrVal;
-	int coll;
 
-	int ex = e->p->x;
-	int ey = e->p->y;
-	int ew = e->p->w;
-	int eh = e->p->h;
-	
-	if (!ex || !ey) {
-		r->intVal = 0;
-		return;
-	}
-
-	if (ew < 0) {
-		ew = abs(ew);
-	}
-	if (eh < 0) {
-		eh = abs(eh);
-	}
-
-	for (int i=0; i < count; i++) {
-		if (e->id == scene[i]->id)
-			continue;
-
-		int sx = e->p->x;
-		int sy = e->p->y;
-		int sw = e->p->w;
-		int sh = e->p->h;
-		
-		if (sw < 0) {
-			sw = abs(sw);
-		}
-		if (sh < 0) {
-			sh = abs(sh);
-		}
-
-		if (ex > sx + sw)
-			continue;
-
-		if (ey > sy + sh)
-			continue;
-
-		if (ew + ex < sx)
-			continue;
-
-		if (eh + ey < sy)
-			continue;
-
-		coll = polytopoly(scene[i]->p, e->p, ix, iy);
-		if (coll) {
-			r->intVal = scene[i]->id;
-			return;
-		}
-
-		coll = polytopoly(e->p, scene[i]->p, ix, iy);
-		if (coll) {
-			r->intVal = scene[i]->id;
-			return;
-		}
-	}
-	r->intVal = 0;
+	r->intVal = th_ent_getcoll(e, scene, count, ix, iy);
 }
 
-// audio
-
-// load audio file at respath + path
+///////////////////////
+// entities
 void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
-	sound *s = auload((char *)p->ptrVal);
+	th_sound *s = auload((char *)p->ptrVal);
 
 	r->ptrVal = (intptr_t)s;
 }
@@ -376,35 +299,35 @@ void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
 // sets array of sounds to be played
 void umauarr(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int count = p[0].intVal;
-	sound **auarr = (sound **)p[1].ptrVal;
+	th_sound **auarr = (th_sound **)p[1].ptrVal;
 
-	soundcount = count;
+	sound_count = count;
 	sounds = auarr;
 }
 
 void umsoundloop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	sound *s = (sound *)p[1].ptrVal;
+	th_sound *s = (th_sound *)p[1].ptrVal;
 	s->looping = p[0].intVal;
 }
 
 void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
-	sound *s = (sound *)p[0].ptrVal;
+	th_sound *s = (th_sound *)p[0].ptrVal;
 	s->playing = 1;
 }
 
 void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	sound *s = (sound *)p[0].ptrVal;
+	th_sound *s = (th_sound *)p[0].ptrVal;
 	s->playing = 0;
 }
 
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {
-	sound *s = (sound *)p[1].ptrVal;
+	th_sound *s = (th_sound *)p[1].ptrVal;
 	s->volume = (float)p[0].realVal;
 }
 
 // checks, if sound is valid
 void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r) {
-	sound *s = (sound *)p[0].ptrVal;
+	th_sound *s = (th_sound *)p[0].ptrVal;
 
 	if (s == NULL) {
 		r[0].intVal = 0;
@@ -414,77 +337,20 @@ void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r[0].intVal = 1;
 }
 
-// rays
-
-// checks, if ra collides with any entities in scene
+///////////////////////
+// raycast
 void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	entity **scene = (entity **)p[0].ptrVal;
-	ray *ra = (ray *)p[1].ptrVal;
+	th_ent **scene = (th_ent **)p[0].ptrVal;
+	th_ray *ra = (th_ray *)p[1].ptrVal;
 	int count = p[2].intVal;
 	int *iy = (int *)p[3].ptrVal;
 	int *ix = (int *)p[4].ptrVal;
-	int coll;
 
-	float rx, ry;
-	rx = ra->x;
-	ry = ra->y - ra->l;
-
-	rotatepoint(&rx, &ry, ra->x, ra->y, ra->r);
-	
-	rect rr = newrect(ra->x, ra->y, rx, ry);
-
-	if (rx < ra->x) {
-		rr.x = rx;
-		rr.w = ra->x;
-	}
-
-	if (ry < ra->y) {
-		rr.y = ry;
-		rr.h = ra->y;
-	}
-
-	//CNFGColor(0x8800ffff);
-	//CNFGTackRectangle((rr.x+40) * scaling, (rr.y+40) * scaling, (rr.w + 40) * scaling, (rr.h + 40) * scaling);
-	
-	for (int i=0; i < count; i++) {
-
-		if (rr.x > scene[i]->p->x + scene[i]->p->w)
-			continue;
-
-		if (rr.y > scene[i]->p->y + scene[i]->p->h)
-			continue;
-
-		if (rr.w < scene[i]->p->x)
-			continue;
-
-		if (rr.h < scene[i]->p->y)
-			continue;
-
-		coll = polytoline(scene[i]->p, ra->x, ra->y, rx, ry, ix, iy);
-		if (coll) {
-			r->intVal = scene[i]->id;
-			return;
-		}
-
-		coll = polytopoint(scene[i]->p, rx, ry, ix, iy);
-		if (coll) {
-			r->intVal = scene[i]->id;
-			return;
-		}
-	}
-	r->intVal = 0;
+	r->intVal = th_ray_getcoll(ra, scene, count, ix, iy);
 }
 
-
+///////////////////////
 // misc
-
-// sleeps for t number of ms. currently broken on windows
-void umsleep(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int t = p[0].intVal;
-
-	slp(t);
-}
-
 // draws a rectangle showing, where the camera is
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int w = p[2].intVal;
@@ -503,8 +369,8 @@ void umgettime(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = (long int)(t.tv_usec);
 }
 
-// rawdraw
-
+///////////////////////
+// rawdraw TODO: hide rawdraw from c lib
 // draws text
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	double size = p[0].realVal;
@@ -535,9 +401,6 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 		printf("could not initialize rawdraw\n");
 		return;
 	}
-}
-
-void umCNFGSetVSync(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGSetBgColor(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -600,20 +463,20 @@ void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r) {
 #ifndef _WIN32
-	image *img = (image *)p[0].ptrVal;
+	th_image *img = (th_image *)p[0].ptrVal;
 
 	CNFGSetWindowIconData(img->w, img->h, img->rdimg);
 #else
-	errprint("can't set window icon on this platform");
+	th_error("can't set window icon on this platform");
 #endif
 }
 
 void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r) {
-	poly *pl = (poly *)p[0].ptrVal;
+	th_poly *pl = (th_poly *)p[0].ptrVal;
 	uint32_t color = (uint32_t)p[1].uintVal;
 
 	RDPoint *pr;
-	pr = polytordpoint(pl, 0, 0);
+	pr = _th_poly_to_rdpoint(pl, 0, 0);
 	CNFGColor(color);
 	CNFGTackPoly(pr, pl->vc);
 	free(pr);
@@ -629,7 +492,7 @@ void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
-	image *img = (image *)p[4].ptrVal;
+	th_image *img = (th_image *)p[4].ptrVal;
 
 	int x = p[1].intVal;
 	int y = p[0].intVal;
@@ -637,6 +500,5 @@ void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
 	double s = p[2].realVal;
 	int rot = p[3].intVal;
 	
-	//CNFGBlitTex(img->tex, x * scaling, y * scaling, img->w * s * scaling, img->h * s * scaling, rot);
-	blittex(img->tex, x * scaling, y * scaling, img->w * s * scaling, img->h * s * scaling, rot);
+	th_blit_tex(img->tex, x * scaling, y * scaling, img->w * s * scaling, img->h * s * scaling, rot);
 }

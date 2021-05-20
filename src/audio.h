@@ -8,7 +8,7 @@ typedef struct {
     int playing;
     float volume;
     int looping;
-} sound;
+} th_sound;
 
 void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
@@ -16,6 +16,6 @@ void auinit();
 
 void audeinit();
 
-sound *auload(char *path);
+th_sound *auload(char *path);
 
 #endif

@@ -1,3 +1,4 @@
+
 #include <stdlib.h>
 #include <math.h>
 #include <stdio.h>
@@ -14,29 +15,34 @@ enum {
 	TOPLEFT,
 } scaleops;
 
-void tmapdraw(tmap *t, rect *cam) {
+void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	int camx = cam->x - (cam->w / 2);
 	int camy = cam->y - (cam->h / 2);
 
-	if (camx > t->w*t->cellsize) return;
-	if (camy > t->h*t->cellsize) return;
+	if (camx > t->w*t->cellsize) 
+		return;
+	if (camy > t->h*t->cellsize)
+		return;
 
 	int sx = abs((abs(t->x)-abs(camx))/t->cellsize - 1);
 	int sy = abs((abs(t->y)-abs(camy))/t->cellsize - 1);
 	int sw = cam->w/t->cellsize + 1;
 	int sh = cam->h/t->cellsize + 1;
 
-	if (t->x>=camx) sx = 0;
-	if (t->y>=camy) sy = 0;
+	if (t->x>=camx)
+		sx = 0;
+	if (t->y>=camy)
+		sy = 0;
 
-	if (sw > t->w) sw = t->w;
-	if (sh > t->h) sh = t->h;
+	if (sw > t->w)
+		sw = t->w;
+	if (sh > t->h)
+		sh = t->h;
 
 	for (int i=sx; i < sx+sw; i++) for (int j=sy; j < sy+sh; j++) {
-		if (t->cells[j*t->w+i] == 0) {
-			continue;
-		}
-		int scalex, scaley;
+		if (t->cells[j*t->w+i] == 0) continue;
+
+		int scalex, scaley = 0;
 		switch (t->scaletype) {
 		case STRETCH:
 			scalex = t->cellsize;
@@ -48,7 +54,6 @@ void tmapdraw(tmap *t, rect *cam) {
 			break;
 		}
 
-		//CNFGBlitTex(t->tiles[t->cells[j*t->w+i]-1]->tex, (t->x+i*t->cellsize-camx)*scaling, (t->y+j*t->cellsize-camy)*scaling, scalex*scaling+scaling/6, scaley*scaling+scaling/6, 0);
-		blittex(t->tiles[t->cells[j*t->w+i]-1]->tex, (t->x+i*t->cellsize-camx)*scaling, (t->y+j*t->cellsize-camy)*scaling, scalex*scaling+scaling/6, scaley*scaling+scaling/6, 0);
+		th_blit_tex(t->tiles[t->cells[j*t->w+i]-1]->tex, (t->x+i*t->cellsize-camx)*scaling, (t->y+j*t->cellsize-camy)*scaling, scalex*scaling+scaling/6, scaley*scaling+scaling/6, 0);
 	}
 }
