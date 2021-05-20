@@ -25,7 +25,7 @@ Aside from examples, I have made a jam game called [RAIDER](https://maskarinec.i
 ## build instructions
 
 ### deps:
-  - compiler - gcc and clang are tested to work. I had some problems with tcc.
+  - compiler - gcc, tcc and clang work. I didn't test any others.
   - libGL headers
   - libX11 headers for linux build
  
@@ -35,7 +35,7 @@ Aside from examples, I have made a jam game called [RAIDER](https://maskarinec.i
 - `make run` - to build without optimizations and embedding + run
 - `make install` - build and install, so you can test on existing projects
 - `make build` - release build
-- `make windows` - build for windows
+- `make wbuild` - build for windows
 - `make package` - creates a package, that can be installed using linux shell tool
 - `make win-package` - same as above, but is makes a windows package
 

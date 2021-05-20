@@ -9,5 +9,7 @@ jobs:
       run: |
         sudo apt-get install gcc zip make libx11-dev libgl-dev gcc-mingw-w64-x86-64
         make deps
+        make build
+        make wbuild
         make package
         make win-package
