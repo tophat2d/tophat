@@ -58,7 +58,7 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
     return totalFramesRead;
 }
 
-void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
+void _th_audio_data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
 	for (int i=sound_count-1; i >= 0; i--) {
 		if (sounds[0] == NULL)
 			continue;
@@ -82,12 +82,12 @@ void data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_ui
 	}
 }
 
-void auinit(){
+void th_audio_init(){
 	auconf = ma_device_config_init(ma_device_type_playback);
 	auconf.playback.format = SAMPLE_FORMAT;
 	auconf.playback.channels = CHANNEL_COUNT;
 	auconf.sampleRate = SAMPLE_RATE;
-	auconf.dataCallback = data_callback;
+	auconf.dataCallback = _th_audio_data_callback;
 	auconf.pUserData = NULL;
 
 	if (ma_device_init(NULL, &auconf, &audev) != MA_SUCCESS) {
@@ -101,7 +101,7 @@ void auinit(){
 	}
 }
 
-void audeinit() {
+void th_audio_deinit() {
 	ma_device_uninit(&audev);
 
 	for (int i=sound_count - 1; i >= 0; i--) {
@@ -111,10 +111,7 @@ void audeinit() {
 	}
 }
 
-th_sound *auload(char *path) {
-	th_sound *s;
-	s = malloc(sizeof(th_sound));
-
+void th_sound_load(th_sound *s, char *path) {
 	ma_decoder_config decodercfg;
 	decodercfg = ma_decoder_config_init(SAMPLE_FORMAT, CHANNEL_COUNT, SAMPLE_RATE);
 
@@ -123,14 +120,10 @@ th_sound *auload(char *path) {
 	strcpy(cpath, respath);
 	strcat(cpath, path);
 	res = ma_decoder_init_file(cpath, &decodercfg, &s->decoder);
-	if (res != MA_SUCCESS) {
+	if (res != MA_SUCCESS)
 		th_error("couldn't load sound at path %s", path);
-		return NULL;
-	}
 
 	s->playing = 0;
 	s->volume = 100;
 	s->looping = 0;
-
-	return s;
 }

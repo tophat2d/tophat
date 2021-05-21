@@ -291,7 +291,8 @@ void umentgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // entities
 void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_sound *s = auload((char *)p->ptrVal);
+	th_sound *s = malloc(sizeof(th_sound));
+	th_sound_load(s, (char *)p->ptrVal);
 
 	r->ptrVal = (intptr_t)s;
 }

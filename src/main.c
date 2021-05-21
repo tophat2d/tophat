@@ -16,7 +16,7 @@ int destroyfunc;
 void *umka;
 
 void HandleDestroy() {
-	audeinit();
+	th_audio_deinit();
 
 	if (destroyfunc) {
 		umkaCall(umka, destroyfunc, 0, NULL, NULL);
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
 	}
 	umkaOK = umkaInit(umka, scriptpath, NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
 
-	auinit();
+	th_audio_init();
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");
