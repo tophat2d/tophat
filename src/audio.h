@@ -10,12 +10,12 @@ typedef struct {
     int looping;
 } th_sound;
 
-void data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
+void _th_audio_data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
-void auinit();
+void th_audio_init();
 
-void audeinit();
+void th_audio_deinit();
 
-th_sound *auload(char *path);
+void th_sound_load(th_sound *s, char *path);
 
 #endif
