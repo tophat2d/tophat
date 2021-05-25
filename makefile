@@ -22,6 +22,9 @@ WIN_FULL=$(SOURCES) lib/rawdraw/chew.c lib/windows/libumka_static.a $(WARNINGS) 
 build: libs
 	$(CC) -o tophat $(SRC) $(LINUX_FULL) $(RELEASE_FLAGS) -Os
 
+install: build
+	sudo cp tophat /usr/share/tophat/bin/tophat-linux
+
 wbuild: libs
 	$(MINGW) -o tophat.exe $(SRC) $(WIN_FULL) $(RELEASE_FLAGS)
 

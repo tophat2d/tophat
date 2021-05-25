@@ -77,8 +77,8 @@ fn (t: ^tmap) draw*(cam: rectangle.rect) {
 
 fn ctmapgetcoll(x, y: ^int32, t: ^ctmap, e: ^entity.cent): int32
 
-fn (t: ^tmap) getcoll*(e: entity.ent): (int, int, bool) {
-	if len(t.cells) == 0 { return 0, 0, false }
+fn (t: ^tmap) getcoll*(e: entity.ent, rx, ry: ^int32): bool {
+	if len(t.cells) == 0 { return false }
 
 	ccm := make([]int32, len(t.collmask))
 	for i:=0; i < len(t.collmask); i++ {
@@ -90,8 +90,7 @@ fn (t: ^tmap) getcoll*(e: entity.ent): (int, int, bool) {
 	cp := polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}
 	ce := entity.cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
 
-	var rx, ry: int32
-	c := ctmapgetcoll(&rx, &ry, &cm, &ce)
+	c := ctmapgetcoll(rx, ry, &cm, &ce)
 
-	return rx, rx, bool(c)
+	return bool(c)
 }

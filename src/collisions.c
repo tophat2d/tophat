@@ -3,6 +3,7 @@
 //
 #include "entity.h"
 #include <stdio.h>
+#include <stdbool.h>
 #include <math.h>
 
 #include "collisions.h"
@@ -107,22 +108,24 @@ int stepify(int inp, int step) {
 	return inp;
 }
 
-int _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry) {
-	if (p->x + p->w < t->x) return 0;
-	if (p->y + p->h < t->y) return 0;
-	for (int i=0; i < p->vc; i++) {
-		int x = (stepify(p->x + p->v[i], t->cellsize)-t->x)/t->cellsize;
-		int y = (stepify(p->y + p->v[i+1], t->cellsize)-t->y)/t->cellsize;
-		if (x < 0) continue;
-		if (y < 0) continue;
-		if (x > t->w) continue;
-		if (y > t->h) continue;
-		if (t->cells[y*t->w+x] <= 0) continue;
-		if (t->collmask[t->cells[y*t->w + x]-1]) {
-			*rx = x;
-			*ry = y;
-			return 1;
+bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry) {
+	if (p->x < t->x || p->y < t->y)
+		return false;
+
+	for (int i=0; i < p->vc * 2; i += 2) {
+		int absx = p->x + p->v[i];
+		int absy = p->y + p->v[i+1];
+		int tx = (absx - t->x) / t->cellsize;
+		int ty = (absy - t->y) / t->cellsize;
+
+		int tile = t->cells[(t->w * ty) + tx];
+		//printf("abs: %d %d\nt: %d %d\ntilen: %d\ncoll: %d\n---------\n", absx, absy, tx, ty, tile, t->collmask[tile]);
+		if (t->collmask[tile - 1]) {
+			*rx = absx;
+			*ry = absy;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
+
