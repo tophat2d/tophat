@@ -122,7 +122,7 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	const char *mode = (const char *)p[0].ptrVal;
 
 	char path[512];
-	strcpy(respath, path);
+	strcpy(path, respath);
 
 	FILE *f = fopen(strcat(path, name), mode);
 	r->ptrVal = (intptr_t)f;
@@ -152,8 +152,10 @@ void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_tmap *t = (th_tmap *)p[1].ptrVal;
 	int *y = (int *)p[2].ptrVal;
 	int *x = (int *)p[3].ptrVal;
+	int *ty = (int *)p[4].ptrVal;
+	int *tx = (int *)p[5].ptrVal;
 
-	r->intVal = _th_coll_on_tilemap(ent->p, t, x, y);
+	r->intVal = _th_coll_on_tilemap(ent->p, t, x, y, tx, ty);
 }
 
 ///////////////////////

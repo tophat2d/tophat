@@ -108,7 +108,7 @@ int stepify(int inp, int step) {
 	return inp;
 }
 
-bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry) {
+bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {
 	if (p->x < t->x || p->y < t->y)
 		return false;
 
@@ -123,6 +123,8 @@ bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry) {
 		if (t->collmask[tile - 1]) {
 			*rx = absx;
 			*ry = absy;
+			*rtx = tx;
+			*rty = ty;
 			return true;
 		}
 	}
