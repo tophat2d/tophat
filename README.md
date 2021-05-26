@@ -2,7 +2,7 @@
 
 Tophat is a 2d game engine focused on minimalism and not taking power away from the user. Although it is made in c, you can make games using [umka](https://github.com/vtereshkov/umka-lang) a language inspired by go, that makes your gamedev easier. It currently supports linux and windows with web, android and raspberry pi support on the way.
 
-[Tophat Server](https://img.shields.io/discord/846663478873030666.svg?label=Discord&logo=Discord&colorB=7289da)](https://discord.gg/PcT7cn59h9)
+![Tophat Server](https://img.shields.io/discord/846663478873030666.svg?label=Discord&logo=Discord&colorB=7289da)](https://discord.gg/PcT7cn59h9)
 
 ## features
 
