@@ -58,7 +58,7 @@ package:
 	zip -r tophat.zip tophat-release
 	rm -r tophat-release
 	mv tophat.zip bin
-	make clean
+	rm -r tophat-release
 
 win-package:
 	mkdir -p tophat-win/bin
