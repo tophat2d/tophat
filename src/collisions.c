@@ -109,10 +109,10 @@ int stepify(int inp, int step) {
 }
 
 bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {
-	if (p->x < t->x || p->y < t->y)
-		return false;
 
 	for (int i=0; i < p->vc * 2; i += 2) {
+		if (p->x + p->v[i] < t->x || p->y + p->v[i+1] < t->y)
+			continue;
 		int absx = p->x + p->v[i];
 		int absy = p->y + p->v[i+1];
 		int tx = (absx - t->x) / t->cellsize;

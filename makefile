@@ -1,4 +1,4 @@
-CC=gcc
+CC=tcc
 MINGW=x86_64-w64-mingw32-gcc
 
 WARNINGS=-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-old-style-declaration -Wno-implicit-fallthrough
