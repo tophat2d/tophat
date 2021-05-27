@@ -12,7 +12,7 @@ float th_get_scaling(int w, int h, int camw, int camh) {
 
 // TODO: allow for formatted text
 void th_error(char *text, ...) {
-	fprintf(stderr, "\x1b[1m\x1b[31merror: \x1b[0m");
+	fprintf(stderr, "\x1b[1m\x1b[31merror: \x1b[0m\n");
 
 	va_list args;
 	va_start(args, text);

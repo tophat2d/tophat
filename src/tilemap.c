@@ -19,15 +19,15 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	int camx = cam->x - (cam->w / 2);
 	int camy = cam->y - (cam->h / 2);
 
-	if (camx > t->w*t->cellsize) 
+	if (camx > t->x + t->w*t->cellsize) 
 		return;
-	if (camy > t->h*t->cellsize)
+	if (camy > t->y + t->h*t->cellsize)
 		return;
 
-	int sx = abs((abs(t->x)-abs(camx))/t->cellsize - 1);
-	int sy = abs((abs(t->y)-abs(camy))/t->cellsize - 1);
-	int sw = cam->w/t->cellsize + 1;
-	int sh = cam->h/t->cellsize + 1;
+	int sx = abs((abs(t->x)-abs(camx))/t->cellsize);
+	int sy = abs((abs(t->y)-abs(camy))/t->cellsize);
+	int sw = cam->w/t->cellsize + 2;
+	int sh = cam->h/t->cellsize + 2;
 
 	if (t->x>=camx)
 		sx = 0;
@@ -35,9 +35,9 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 		sy = 0;
 
 	if (sw > t->w)
-		sw = t->w;
+		sw = t->w - sx;
 	if (sh > t->h)
-		sh = t->h;
+		sh = t->h - sy;
 
 	for (int i=sx; i < sx+sw; i++) for (int j=sy; j < sy+sh; j++) {
 		if (t->cells[j*t->w+i] == 0) continue;
