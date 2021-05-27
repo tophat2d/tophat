@@ -25,6 +25,8 @@ fn imgcrop(img: int, x1, x2, y1, y2: int32)
 
 fn imgfromdata(data: ^uint32, w: int32, h: int32): int
 
+fn imgcopy(data: int): int
+
 fn load*(path: str): img {
 	return img{loadimg(&path[0])}
 }
@@ -66,5 +68,9 @@ fn (i: ^img) crop*(x1, y1, x2, y2: int32) {
 
 fn fromdata*(data: []uint32, w: int): img {
 	return img{imgfromdata(&data[0], w, len(data)/w)}
+}
+
+fn (i: ^img) copy*(): img {
+	return img{imgcopy(i.handle)}
 }
 

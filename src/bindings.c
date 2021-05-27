@@ -53,6 +53,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "imggetdims", &umimggetdims);
 	umkaAddFunc(umka, "imgcrop", &umimgcrop);
 	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
+	umkaAddFunc(umka, "imgcopy", &umimgcopy);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
@@ -241,6 +242,18 @@ void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 
 	r->ptrVal = (intptr_t)img;
+}
+
+void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *inp = (th_image *)p[0].ptrVal;
+
+	th_image *out = calloc(sizeof(th_image), 1);
+	out->w = inp->w;
+	out->h = inp->h;
+	out->rdimg = calloc(sizeof(uint32_t), out->w * out->h);
+	memcpy(out->rdimg, inp->rdimg, sizeof(uint32_t) * out->w * out->h);
+
+	r->ptrVal = (intptr_t)out;
 }
 
 ///////////////////////

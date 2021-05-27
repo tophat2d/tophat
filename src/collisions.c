@@ -10,8 +10,6 @@
 #include "polygon.h"
 #include "tilemap.h"
 
-int stepify(int inp, int step);
-
 // checks collision between two polygons
 int _th_poly_to_poly(th_poly *p1, th_poly *p2, int *ix, int *iy) {
 	int next = 0;
@@ -102,24 +100,20 @@ int _th_poly_to_point(th_poly *a, int px, int py, int *ix, int *iy) {
 	return result;
 }
 
-int stepify(int inp, int step) {
-	if (step != 0)
-		inp = trunc(inp / step + 0.5) * step;
-	return inp;
-}
-
 bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {
 
 	for (int i=0; i < p->vc * 2; i += 2) {
 		if (p->x + p->v[i] < t->x || p->y + p->v[i+1] < t->y)
 			continue;
+		if (p->x + p->v[i] > t->x + t->w * t->cellsize || p->y + p->v[i+1] > t->y + t->h * t->cellsize)
+			continue;
+
 		int absx = p->x + p->v[i];
 		int absy = p->y + p->v[i+1];
 		int tx = (absx - t->x) / t->cellsize;
 		int ty = (absy - t->y) / t->cellsize;
 
 		int tile = t->cells[(t->w * ty) + tx];
-		//printf("abs: %d %d\nt: %d %d\ntilen: %d\ncoll: %d\n---------\n", absx, absy, tx, ty, tile, t->collmask[tile]);
 		if (t->collmask[tile - 1]) {
 			*rx = absx;
 			*ry = absy;

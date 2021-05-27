@@ -1,4 +1,4 @@
-CC=tcc
+CC=gcc
 MINGW=x86_64-w64-mingw32-gcc
 
 WARNINGS=-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-old-style-declaration -Wno-implicit-fallthrough
@@ -23,7 +23,7 @@ build: libs
 	$(CC) -o tophat $(SRC) $(LINUX_FULL) $(RELEASE_FLAGS) -Os
 
 install: build
-	sudo cp tophat /usr/share/tophat/bin/tophat-linux
+	tcc -o tophat $(SRC) $(LINUX_FULL) $(RELEASE_FLAGS) -g && sudo cp tophat /usr/share/tophat/bin/tophat-linux
 
 wbuild: libs
 	$(MINGW) -o tophat.exe $(SRC) $(WIN_FULL) $(RELEASE_FLAGS)

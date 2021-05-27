@@ -152,7 +152,7 @@ void th_image_crop(th_image *img, int x1, int y1, int x2, int y2) {
 		return;
 	}
 
-	if (x1 < 0 || y1 < 0 || x2 >= img->w || y2 >= img->h) {
+	if (x1 < 0 || y1 < 0 || x2 > img->w || y2 > img->h) {
 		th_error("crop: invalid dimensions");
 		return;
 	}
