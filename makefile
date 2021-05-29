@@ -19,6 +19,8 @@ WIN_FULL=$(SOURCES) lib/rawdraw/chew.c lib/windows/libumka_static.a $(WARNINGS) 
 #build: $(OBJ)
 #	$(CC) $(OBJ) $(LINUX_FULL) -o tophat
 
+VERSION=v0.3
+
 build: libs
 	$(CC) -o tophat $(SRC) $(LINUX_FULL) $(RELEASE_FLAGS) -s -Os
 
@@ -61,14 +63,15 @@ package:
 
 win-package:
 	mkdir -p tophat-win/bin
-	mkdir -p tophat-win/preset
 	cp tophat tophat-win/bin/tophat-linux
 	cp tophat.exe tophat-win/bin/tophat-win.exe
 	echo $(VERSION) > tophat-win/version
-	cp examples/preset/*.um tophat-win/preset
+	cp -r examples/* tophat-win/
+	mv tophat-win/README.md tophat-win/examples.txt
 	cp cmd/run.bat tophat-win/preset
 	cp cmd/init.bat tophat-win/
 	cp cmd/package.bat tophat-win/
+	cp etc/win-readme tophat-win/readme.txt
 	rm -rf bin/tophat-win.zip
 	zip -Z store -y -q -r bin/tophat-win.zip tophat-win 
 	rm -r tophat-win
