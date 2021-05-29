@@ -2,7 +2,7 @@
 import (
 	"csv.um"
 	"image.um"
-	"std/std.um"
+	"std.um"
 	"rectangle.um"
 	"entity.um"
 	"polygon.um"
@@ -36,6 +36,22 @@ const (
 	TOPLEFT* = 1
 )
 
+fn parse_num(inp: char): (int, bool) {
+	if inp >= '0' && inp <= '9' {
+		return int(inp) - int('0'), true
+	}
+
+	if inp >= 'A' && inp <= 'Z' {
+		return int(inp) - int('A'), true
+	}
+
+	if inp >= 'a' && inp <= 'z' {
+		return int(inp) - int('a'), true
+	}
+
+	return 0, false
+}
+
 fn mk*(inp: str, images: []image.img): tmap {
 	res := csv.parse(inp)
 
@@ -43,6 +59,9 @@ fn mk*(inp: str, images: []image.img): tmap {
 	if len(res[0]) < 2 { return tmap{} }
 	if res[0][0] != "tophat tilemap" { return tmap{} }
 
+	if len(res[1]) != len(images) {
+		error("incorrect collision mask in tilemap")
+	}
 	collmask := make([]bool, len(res[1]))
 	for i:=0; i < len(res[1]); i++ {
 		if res[1][i] == "true" { collmask[i] = true; continue }
@@ -52,7 +71,20 @@ fn mk*(inp: str, images: []image.img): tmap {
 	cells := []int32{}
 	for i:=2; i < len(res); i++ {
 		for j:=0; j < len(res[i]); j++ {
-			cells = append(cells, std.atoi(res[i][j]))
+			if res[i][j] == "" {
+				continue
+			}
+
+			val, check := parse_num(res[i][j][0])
+			if !check {
+				error("number in tilemap isn't valid")
+			}
+
+			if val > len(images) {
+				error("number on " + repr(i) + ", " + repr(j) + "exceeds number of images")
+			}
+
+			cells = append(cells, val)
 		}
 	}
 
