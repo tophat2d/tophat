@@ -106,51 +106,50 @@ function package() {
 	echo "done"
 }
 
-if [ "$1" == "run" ]; then
-	$Path/bin/tophat-linux
-	exit 0
-fi
+case $1 in
+	("run")
+		$Path/bin/tophat-linux
+	;;
+	("package")
+		package "" $2 $3
+	;;
+	("install")
+		setup $2
+	;;
+	("update")
+		update
+		rm tophat.zip
+	;;
+	("uninstall")
+		clean
+	;;
+	("get")
+		get
+	;;
+	("init")
+		cp $Path/*.um ./
+	;;
+	("version")
+		if [ -f "/usr/share/tophat/version" ]; then
+			cat $Path/version
+		else
+			echo "tophat is not installed"
+		fi
+	;;
+	*)
+		echo "tophat v0.3 cli tool"
+		echo "made by Marek Maskarinec"
+		echo "invalid arguments. usage:"
+		echo "    run: runs the game in current directory"
+		echo "    init: initializes current directory with hello world game"
+		echo "    libs: copies libraries to current directory. this is done automatically, if updating in tophat directory"
+		echo "    package [ platform ] [ game name ]: makes a package of the game in current directory"
+		echo "    install [ package path ]: installs tophat from archive specified by path"
+		echo "    update: checks for update. if new version is available, downloads it and installs it"
+		echo "    uninstall: removes tophat data."
+		echo "    get: gets tophat data"
+		echo "more info on discord server: https://discord.gg/PcT7cn59h9"
+	;;
+esac
 
-if [ "$1" == "package" ]; then
-	package "" $2 $3
-	exit 0
-fi
-
-if [ "$1" == "install" ]; then
-	setup $2
-	exit 0
-fi
-
-if [ "$1" == "update" ]; then
-	update
-	rm tophat.zip
-	exit 0
-fi
-
-if [ "$1" == "uninstall" ]; then
-	clean
-	exit 0
-fi
-
-if [ "$1" == "get" ]; then
-	get
-	exit 0
-fi
-
-if [ "$1" == "init" ]; then
- 	cp $Path/*.um ./
-	exit 0
-fi
-
-echo "tophat v0.2 cli tool"
-echo "made by Marek Maskarinec"
-echo "invalid arguments. usage:"
-echo "    run: runs the game in current directory"
-echo "    init: initializes current directory with hello world game"
-echo "    libs: copies libraries to current directory. this is done automatically, if updating in tophat directory"
-echo "    package [ platform ] [ game name ]: makes a package of the game in current directory"
-echo "    install [ package path ]: installs tophat from archive specified by path"
-echo "    update: checks for update. if new version is available, downloads it and installs it"
-echo "    uninstall: removes tophat data."
-echo "    get: gets tophat data"
 
