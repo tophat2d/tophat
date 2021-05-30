@@ -101,7 +101,6 @@ int _th_poly_to_point(th_poly *a, int px, int py, int *ix, int *iy) {
 }
 
 bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {
-
 	for (int i=0; i < p->vc * 2; i += 2) {
 		if (p->x + p->v[i] < t->x || p->y + p->v[i+1] < t->y)
 			continue;
@@ -114,6 +113,9 @@ bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int
 		int ty = (absy - t->y) / t->cellsize;
 
 		int tile = t->cells[(t->w * ty) + tx];
+		if (!tile)
+			continue;
+
 		if (t->collmask[tile - 1]) {
 			*rx = absx;
 			*ry = absy;
