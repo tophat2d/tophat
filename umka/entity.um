@@ -31,6 +31,10 @@ var colldatax, colldatay: int32
 fn centdraw(e: cent, c: rectangle.rect)
 
 fn (e: ^ent) draw*(c: rectangle.rect) {
+	if len(e.p.v) == 0 {
+		return
+	}
+	
 	cp := polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}
 	ce := cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
 
@@ -68,7 +72,6 @@ fn (e: ^ent) setscale*(sx, sy: real) {
 }
 
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
-
 	if len(s) == 0 {
 		return 0
 	}
@@ -76,10 +79,18 @@ fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	cscn := []cent{}
 	cps := []polygon.cpoly{}
 
-	for e in s {
-		cps = append(cps, []polygon.cpoly{polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}})
+	for i:=0; i < len(s); i++ {
+		e := s[i]
+		if len(e.p.v) == 0 {
+			continue
+		}
+		cps = append(cps, polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc})
 		ce := cent{null, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
-		cscn = append(cscn, []cent{ce})
+		cscn = append(cscn, ce)
+	}
+
+	if len(cscn) == 0 {
+		return 0
 	}
 
 	cscnp := []^cent{}

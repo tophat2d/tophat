@@ -17,18 +17,34 @@ import (
 	"umka/std/std.um"
 )
 
-fn main() { 
+fn readall*(path: str): str {
+	f := std.fopen(path, "r")
+  const blockSize = 32
+  res := ""
 
+  for ok := true; ok {
+	  var buff: [blockSize + 1]char
+	  ok = std.fread(f, ^[blockSize]char(&buff)) == 1
+	  res += str([]char(buff))
+  }
+
+	std.fclose(f)
+  return res
+}
+
+fn main() { 
 	cam := rectangle.mk(0, 0, 200, 200)
 	tophat.setup("test game", 100, 100)
 	var w, h: int32
 
-	e := entity.mk(polygon.mk(0, 0, []int32{0, 0, 10, 0, 10, 10, 0, 10}), tophat.black, 0)
 	r := raycast.mk(0, 0, 20, 0)
 	vis := entity.mk(polygon.mk(0, 0, []int32{-1, -1, 1, -1, 1, 1, -1, 1}), tophat.cyan, 0)
 
+	t := tilemap.mk(readall("etc/tilemap-test.csv"), []image.img{image.load("etc/test.png")})
+
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
+		t.draw(cam)
 
 		if input.ispressed(input.KEY_Q) {
 			r.r -= round(0.3 * tophat.delta)
@@ -43,21 +59,20 @@ fn main() {
 			r.l += round(0.1 * tophat.delta)
 		}
 
-		e.draw(cam)
-
 		ex, ey := vec.rotatepoint(r.x, r.y-r.l, r.x, r.y, r.r)
 		camx := cam.x-cam.w/2
 		camy := cam.y-cam.h/2
 		rawdraw.drawline(round(r.x-camx), round(r.y-camy), round(ex-camx), round(ey-camy), 4, tophat.red)
 
+
 		r.x, r.y = input.getglobalmousepos(cam)
-		scn := []^entity.ent{&e}
-		if r.getcoll(scn) != 0 {
-			vis.p.x, vis.p.y = raycast.retrievecolldata()
+		var ix, iy: int32
+		if r.get_tmap_coll(t, &ix, &iy) {
+			vis.p.x = ix
+			vis.p.y = iy
+			printf("%d %d\n", ix, iy)
 			vis.draw(cam)
 		}
-		
-		
 	}
 }
 

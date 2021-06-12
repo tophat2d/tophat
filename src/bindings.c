@@ -66,6 +66,7 @@ void _th_umka_bind(void *umka) {
 
 	// rays
 	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
+	umkaAddFunc(umka, "craygettmapcoll", &umraygettmapcoll);
 	
 	// audio
 	umkaAddFunc(umka, "cauload", &umauload);
@@ -365,6 +366,15 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = th_ray_getcoll(ra, scene, count, ix, iy);
 }
 
+void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_ray *ra = (th_ray *)p[3].ptrVal;
+	th_tmap *t = (th_tmap *)p[2].ptrVal;
+	int *ix = (int *)p[1].ptrVal;
+	int *iy = (int *)p[0].ptrVal;
+
+	r->intVal = th_ray_to_tilemap(ra, t, ix, iy);
+}
+
 ///////////////////////
 // misc
 // draws a rectangle showing, where the camera is
@@ -499,11 +509,13 @@ void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int y2 = p[0].intVal;
-	int x2 = p[1].intVal;
-	int y1 = p[2].intVal;
-	int x1 = p[3].intVal;
+	double thickness = p[0].realVal;
+	int y2 = p[1].intVal;
+	int x2 = p[2].intVal;
+	int y1 = p[3].intVal;
+	int x1 = p[4].intVal;
 
+	CNFGSetLineWidth(thickness * scaling);
 	CNFGTackSegment(x1 * scaling, y1 * scaling, x2 * scaling, y2 * scaling);
 }
 

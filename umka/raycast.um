@@ -3,6 +3,7 @@
 import (
 	"entity.um"
 	"polygon.um"
+	"tilemap.um"
 )
 
 type ray* = struct {
@@ -26,15 +27,24 @@ fn mk*(x, y, l, r: int32): ray {
 }
 
 fn craygetcoll(ix, iy: ^int32, count: int32, r: ^cray, s: ^^entity.cent): int32
+fn craygettmapcoll(r: ^cray, t: ^tilemap.ctmap, ix, iy: ^int32): bool
 
 fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 	cscn := []entity.cent{}
 	cps := []polygon.cpoly{}
 
 	for e in s {
-		cps = append(cps, []polygon.cpoly{polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}})
+		if len(e.p.v) == 0 {
+			continue
+		}
+
+		cps = append(cps, polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc})
 		ce := entity.cent{null, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
-		cscn = append(cscn, []entity.cent{ce})
+		cscn = append(cscn, ce)
+	}
+
+	if len(cscn) == 0 {
+		return 0
 	}
 
 	cscnp := []^entity.cent{}
@@ -51,4 +61,17 @@ fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 
 fn retrievecolldata*(): (int32, int32) {
 	return colldatax, colldatay
+}
+
+fn (r: ^ray) get_tmap_coll*(t: tilemap.tmap, ix, iy: ^int32): bool {
+	cr := cray{round(r.x), round(r.y), r.l, round(r.r)}
+
+	ccm := make([]int32, len(t.collmask))
+	for i:=0; i < len(t.collmask); i++ {
+		ccm[i] = int32(t.collmask[i])
+	}
+
+	cm := tilemap.ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
+
+	return craygettmapcoll(&cr, &cm, ix, iy)
 }

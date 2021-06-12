@@ -9,6 +9,8 @@
 #include "collisions.h"
 #include "polygon.h"
 #include "tilemap.h"
+#include "misc.h"
+#include "raycast.h"
 
 // checks collision between two polygons
 int _th_poly_to_poly(th_poly *p1, th_poly *p2, int *ix, int *iy) {
@@ -98,6 +100,10 @@ int _th_poly_to_point(th_poly *a, int px, int py, int *ix, int *iy) {
 		}
 	}
 	return result;
+}
+
+bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
+	// TODO
 }
 
 bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {

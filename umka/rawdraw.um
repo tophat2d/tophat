@@ -45,13 +45,13 @@ fn swapbuffers*()
 
 fn handleinput*()
 
-fn drawsegment*(x1, y1, x2, y2: int32)
+fn drawsegment*(x1, y1, x2, y2: int32, s: real)
 
 fn drawrect*(x1, y1, x2, y2: int32)
 
-fn drawline*(x1, y1, x2, y2, s: int32, color: uint32) {
+fn drawline*(x1, y1, x2, y2: int32, thickness: real, color: uint32) {
 	setcolor(color)
-	drawsegment(x1, y1, x2, y2)
+	drawsegment(x1, y1, x2, y2, thickness)
 }
 
 fn cdrawimage*(img: int, rot: int32, scale: real, x, y: int32)

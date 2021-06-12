@@ -28,6 +28,7 @@ void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r);
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r);
 void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r);
 void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
+void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r);
 void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r);
 void umgettime(UmkaStackSlot *p, UmkaStackSlot *r);
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r);

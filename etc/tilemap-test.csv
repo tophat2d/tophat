@@ -1,4 +1,5 @@
-"tophat tilemap",10,0,8,"scale"
+tophat tilemap,0,0,12,0
+true
 0,1,1,0
 1,1,1,1
 1,1,1,1
