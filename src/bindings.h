@@ -20,6 +20,7 @@ void umispressed(UmkaStackSlot *p, UmkaStackSlot *r);
 void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r);
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 void umentgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
+void umentysort(UmkaStackSlot *p, UmkaStackSlot *r);
 void umauload(UmkaStackSlot *p, UmkaStackSlot *r);
 void umauarr(UmkaStackSlot *p, UmkaStackSlot *r);
 void umsoundloop(UmkaStackSlot *p, UmkaStackSlot *r);

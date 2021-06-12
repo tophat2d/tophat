@@ -112,3 +112,11 @@ fn retrievecolldata*(): (int32, int32) {
 fn (e: ^ent) animate*(fps: int, anim: ^[]image.img) {
 	e.image = anim^[(round(real(tophat.t)/(1000/fps)) % len(anim^))]
 }
+
+fn centysort(e: ^entity.ent, count: int)
+
+fn ysort*(ents: ^[]entity.ent) {
+	if len(ents^) > 0 {
+		centysort(&ents[0], len(ents^))
+	}
+}

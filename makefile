@@ -31,7 +31,7 @@ wbuild: libs
 	$(MINGW) -o tophat.exe $(SRC) $(WIN_FULL) $(RELEASE_FLAGS) -s -Os
 
 run:
-	tcc -o tophat $(SRC) $(LINUX_FULL) -g && ./tophat
+	gcc -o tophat $(SRC) $(LINUX_FULL) -g && ./tophat
 
 $(OBJ): $(SRC)
 	echo $@

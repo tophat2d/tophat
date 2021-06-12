@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 #include <GL/gl.h>
@@ -63,6 +64,7 @@ void _th_umka_bind(void *umka) {
 	// entities
 	umkaAddFunc(umka, "centdraw", &umentdraw);
 	umkaAddFunc(umka, "cgetcoll", &umentgetcoll);
+	umkaAddFunc(umka, "centysort", &umentysort);
 
 	// rays
 	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
@@ -304,8 +306,19 @@ void umentgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = th_ent_getcoll(e, scene, count, ix, iy);
 }
 
+int _th_ysort_test(const void *a, const void *b) {
+	return (*(double *)(a + sizeof(double)) - *(double *)(b + sizeof(double)));
+}
+
+void umentysort(UmkaStackSlot *p, UmkaStackSlot *r) {
+	void *ents = (void *)p[1].ptrVal;
+	int count = p[0].intVal;
+
+	qsort(ents, count, 140, _th_ysort_test);
+}
+
 ///////////////////////
-// entities
+// audio
 void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_sound *s = malloc(sizeof(th_sound));
 	th_sound_load(s, (char *)p->ptrVal);
