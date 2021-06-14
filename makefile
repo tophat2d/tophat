@@ -19,7 +19,7 @@ WIN_FULL=$(SOURCES) lib/rawdraw/chew.c lib/windows/libumka_static.a $(WARNINGS) 
 #build: $(OBJ)
 #	$(CC) $(OBJ) $(LINUX_FULL) -o tophat
 
-VERSION=v0.3
+VERSION=v0.3-$(git rev-parse --short HEAD)
 
 build: libs
 	$(CC) -o tophat $(SRC) $(LINUX_FULL) $(RELEASE_FLAGS) -s -Os
@@ -49,17 +49,22 @@ libs:
 	echo "};" >> src/umkalibs.h
 	echo "#endif" >> src/umkalibs.h
 
+release: build wbuild package win-package
+	cd ../tophat-bin
+	git add -A
+	git commit -m "update packages"
+	git push
+
 package:
 	mkdir -p tophat-release/bin
 	cp tophat     tophat-release/bin/tophat-linux
 	cp tophat.exe tophat-release/bin/tophat-win.exe
 	echo $(VERSION) > tophat-release/version
-	echo $(VERSION) > bin/version
+	echo $(VERSION) > version
 	cp examples/preset/*.um tophat-release
 	rm -rf bin/tophat.zip
-	zip -r tophat.zip tophat-release
+	zip -r ../tophat-bin/tophat.zip tophat-release
 	rm -r tophat-release
-	mv tophat.zip bin
 
 win-package:
 	mkdir -p tophat-win/bin
@@ -73,7 +78,7 @@ win-package:
 	cp cmd/package.bat tophat-win/
 	cp etc/win-readme tophat-win/readme.txt
 	rm -rf bin/tophat-win.zip
-	zip -Z store -y -q -r bin/tophat-win.zip tophat-win 
+	zip -Z store -y -q -r ../tophat-bin/tophat-win.zip tophat-win 
 	rm -r tophat-win
 
 deps:
