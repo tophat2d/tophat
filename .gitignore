@@ -6,3 +6,5 @@ src/umkalibs.h
 cmd/embedder/embedder
 lib/stb_image.h
 lib/miniaudio.h
+bin/tophat.zip
+bin/tophat-win.zip

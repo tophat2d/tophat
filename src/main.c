@@ -15,12 +15,17 @@ char *respath;
 int destroyfunc;
 void *umka;
 
-void HandleDestroy() {
+void die() {
 	th_audio_deinit();
-
 	if (destroyfunc) {
 		umkaCall(umka, destroyfunc, 0, NULL, NULL);
 	}
+
+	umkaFree(umka);
+}
+
+void HandleDestroy() {
+	die();
 }
 
 int main(int argc, char *argv[]) {
@@ -83,6 +88,7 @@ int main(int argc, char *argv[]) {
 		printf("Umka runtime error %s (%d): %s\n", error.fileName, error.line, error.msg);
 	}
 
-	umkaFree(umka);
+	die();
+
 	return 0;
 }
