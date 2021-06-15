@@ -4,7 +4,7 @@ Path=/usr/share/tophat
 
 function get () {
 	echo "downloading tophat"
-	curl "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/tophat.zip" -o tophat.zip
+	curl "https://github.com/marekmaskarinec/tophat-bin/blob/master/tophat.zip?raw=true" -o tophat.zip
 	if [ -f "tophat.zip" ]; then
 		echo "download completed"
 	else
@@ -26,14 +26,14 @@ function clean () {
 function setup () {
 	rm -rf $Path
 	mkdir $Path
-	unzip -q $1 -d $Path
+	unzip $1 -d $Path
 	mv $Path/tophat-release/* $Path
 	rm -r $Path/tophat-release
 }
 
 function update() {
 	echo "checking for new versions"
-	upversion=$(curl -s "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/bin/version")
+	upversion=$(curl -s "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/version")
 	if [ $upversion = $(cat $Path/version) ]; then
 		echo "tophat is already up to date"
 		exit 0
@@ -41,7 +41,7 @@ function update() {
 
 	echo "updating to $upversion"
 
-	get; setup tophat.zip
+	get && setup ./tophat.zip
 
 	echo "done"
 }
@@ -118,7 +118,7 @@ case $1 in
 	;;
 	("update")
 		update
-		rm tophat.zip
+		#rm tophat.zip
 	;;
 	("uninstall")
 		clean

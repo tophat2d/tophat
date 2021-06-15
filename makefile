@@ -45,15 +45,9 @@ libs:
 	echo "#ifndef UMKALIBS_H" > src/umkalibs.h
 	echo "#define UMKALIBS_H" >> src/umkalibs.h
 	echo "const char *libs[] = {" >> src/umkalibs.h
-	./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um >> src/umkalibs.h
+	./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um umka/std/std.um >> src/umkalibs.h
 	echo "};" >> src/umkalibs.h
 	echo "#endif" >> src/umkalibs.h
-
-release: build wbuild package win-package
-	cd ../tophat-bin
-	git add -A
-	git commit -m "update packages"
-	git push
 
 package:
 	mkdir -p tophat-release/bin
