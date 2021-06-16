@@ -104,6 +104,7 @@ int _th_poly_to_point(th_poly *a, int px, int py, int *ix, int *iy) {
 
 bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 	// TODO
+	return false;
 }
 
 bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {

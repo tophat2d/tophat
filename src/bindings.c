@@ -307,7 +307,7 @@ void umentgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 int _th_ysort_test(const void *a, const void *b) {
-	return (*(double *)(a + sizeof(double)) - *(double *)(b + sizeof(double)));
+	return *((double *)a + 1) - *((double *)b + 1);
 }
 
 void umentysort(UmkaStackSlot *p, UmkaStackSlot *r) {

@@ -42,7 +42,8 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	for (int i=sx; i < sx+sw; i++) for (int j=sy; j < sy+sh; j++) {
 		if (t->cells[j*t->w+i] == 0) continue;
 
-		int scalex, scaley = 0;
+		int scalex = 0;
+		int scaley = 0;
 		switch (t->scaletype) {
 		case STRETCH:
 			scalex = t->cellsize;
