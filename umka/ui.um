@@ -137,7 +137,7 @@ fn (b: ^box) calculate*() {
 		b.imgy = b.dimensions.y + (b.dimensions.h-h)/2
 	case SCALE:
 
-		w, h = b.image.getdims()
+		w, h := b.image.getdims()
 
 		sx := b.dimensions.w / w
 		sy := b.dimensions.h / h
