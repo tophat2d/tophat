@@ -17,29 +17,23 @@ import (
 	"umka/std/std.um"
 )
 
+fn debug()
+fn debug2(t: int)
+
 fn main() { 
 	cam := rectangle.mk(0, 0, 200, 200)
 	tophat.setup("test game", 100, 100)
 	var w, h: int32
 
-	ents := make([]entity.ent, 20)
+	t := 0
 
-	for i, _ in ents {
-		ents[i] = entity.mk(polygon.mk(std.rand()%8, std.rand()%32, []int32{0, 0, 10, 0, 10, 10, 0, 10}), std.rand()%tophat.white | 0xff, 0)
-	}
-
-	//printf("%d\n", sizeof(ents))
-	//printf("%s\n", repr(ents))
-	entity.ysort(&ents)
-	//printf("%s\n", repr(ents))
-
+	debug()
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
+		t += tophat.delta
 
-		for _, e in ents {
-			e.draw(cam)
-		}
+		debug2(t)
 	}
 }
 

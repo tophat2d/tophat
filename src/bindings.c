@@ -20,6 +20,7 @@
 #include "image.h"
 #include "collisions.h"
 #include "misc.h"
+#include "particles.h"
 
 #ifdef RELEASE_BUILD
 #include "umkalibs.h"
@@ -35,8 +36,25 @@ extern char *respath;
 extern th_sound **sounds;
 extern int sound_count;
 
+th_particles ps;
+
+void debug(UmkaStackSlot *p, UmkaStackSlot *r) {
+	ps = (th_particles){.px = 100, .py = 100, .angle_min = -20, .angle_max = 60, .lifetime = 300, .velocity = 0.2, .size = 4, .particles = malloc(sizeof(_th_particle) * 40), .particle_c = 40};
+
+	for (int i=0; i < 40; i++) {
+		ps.particles[i].seed = rand();
+		ps.particles[i].start_time = rand()%ps.lifetime - 10;
+	}
+}
+
+void debug2(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_particles_draw(&ps, p->intVal);
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
+	umkaAddFunc(umka, "debug", &debug);
+	umkaAddFunc(umka, "debug2", &debug2);
 	umkaAddFunc(umka, "cfopen", &umfopen);
 
 	umkaAddFunc(umka, "cdrawcone", &umdrawcone);
