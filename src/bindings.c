@@ -39,12 +39,17 @@ extern int sound_count;
 th_particles ps;
 
 void debug(UmkaStackSlot *p, UmkaStackSlot *r) {
-	ps = (th_particles){.px = 100, .py = 100, .angle_min = -20, .angle_max = 60, .lifetime = 300, .velocity = 0.2, .size = 4, .particles = malloc(sizeof(_th_particle) * 40), .particle_c = 40};
+	const int particle_c = 600;
+	ps = (th_particles){.px = 200, .py = 200, .w = 12, .h = 12, .angle_min = -91, .angle_max = -89, .lifetime = 800, .lifetime_randomness = 0.4, .velocity = 0.2, .velocity_randomness = 0.5, .size = 4, .size_randomness = 2, .colors = malloc(sizeof(uint32_t) * 4), .color_c = 3, .particles = malloc(sizeof(_th_particle) * particle_c), .particle_c = particle_c};
 
-	for (int i=0; i < 40; i++) {
+	for (int i=0; i < particle_c; i++) {
 		ps.particles[i].seed = rand();
 		ps.particles[i].start_time = rand()%ps.lifetime - 10;
 	}
+
+	ps.colors[0] = 0x000000ff;
+	ps.colors[1] = 0x880000ee;
+	ps.colors[2] = 0xff000066;
 }
 
 void debug2(UmkaStackSlot *p, UmkaStackSlot *r) {

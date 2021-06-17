@@ -2,6 +2,7 @@
 #define PARTICLES_H
 
 #include <stdbool.h>
+#include <stdint.h>
 
 typedef struct {
 	int start_time;
@@ -10,23 +11,24 @@ typedef struct {
 
 typedef struct {
 	int px, py;
+	int w, h;
 	int seed;
 	
 	int angle_min, angle_max;
 	
 	int lifetime;
-	bool random_lifetime;
-	int lifetime_randomness_max;
+	int lifetime_randomness;
 
 	double velocity;
-	bool random_velocity;
-	double velocity_randomness_max;
+	double velocity_randomness;
 
 	double size;
-	bool random_size;
-	double size_randomness_max;
+	double size_randomness;
 	//double rotation; TODO
 	
+	uint32_t *colors;
+	int color_c;
+
 	_th_particle *particles;
 	int particle_c;
 } th_particles;
