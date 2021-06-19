@@ -30,7 +30,7 @@ fn main() {
 	debug()
 
 	for true {
-		tophat.cycle(&w, &h, 0xffffffff, cam)
+		tophat.cycle(&w, &h, 0x000080ff, cam)
 		t += tophat.delta
 
 		debug2(t)

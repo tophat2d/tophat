@@ -8,12 +8,12 @@ SRC=src/*.c
 OBJ=src/*.o
 
 LINUX_LFLAGS=-lm -lX11 -L /lib64 -ldl -lGL -lpthread
-LINUX_UMKA=-Llib/umka/build -lumka lib/umka/build/libumka.a
+LINUX_UMKA=lib/umka/build/libumka.a
 
 WIN_LFLAGS=-lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread
 WIN_UMKA=-Llib/windows -lumka_static
 
-LINUX_FULL=lib/umka/build/libumka.a $(LINUX_LFLAGS) $(WARNINGS) $(DEFINES)
+LINUX_FULL=$(LINUX_LFLAGS) $(WARNINGS) $(DEFINES)
 WIN_FULL=$(SOURCES) lib/rawdraw/chew.c lib/windows/libumka_static.a $(WARNINGS) $(WIN_LFLAGS) $(WIN_UMKA) $(DEFINES) -DNO_OPENGL_HEADERS
 
 #build: $(OBJ)
@@ -21,33 +21,38 @@ WIN_FULL=$(SOURCES) lib/rawdraw/chew.c lib/windows/libumka_static.a $(WARNINGS) 
 
 VERSION=v0.3-$(git rev-parse --short HEAD)
 
-build: libs
-	$(CC) -o tophat $(SRC) $(LINUX_FULL) $(RELEASE_FLAGS) -s -Os
+OBJS=$(patsubst src/%.c, src/%.o, $(wildcard src/*.c))
 
-install: libs
-	tcc -o tophat $(SRC) $(LINUX_FULL) $(RELEASE_FLAGS) -g && sudo cp tophat /usr/share/tophat/bin/tophat-linux
+src/%.o: src/%.c
+	@echo "building $@"
+	@$(CC) -o $@ -c $< $(LINUX_FULL) $(RELEASE_FLAGS)
+
+build: libs $(OBJS)
+	@echo "building binary"
+	@$(CC) $(OBJS) $(LINUX_UMKA) $(LINUX_FULL) -o tophat
+
+install: build
+	sudo cp tophat /usr/share/tophat/bin/tophat-linux
 
 wbuild: libs
 	$(MINGW) -o tophat.exe $(SRC) $(WIN_FULL) $(RELEASE_FLAGS) -s -Os
 
-run:
-	tcc -o tophat $(SRC) $(LINUX_FULL) -g && ./tophat
-
-$(OBJ): $(SRC)
-	echo $@
-	$(CC) $(LINUX_FULL) -c $< -o $@
+run: build
+	./tophat
 
 clean:
 	rm -rf tophat-release
 	rm -f tophat tophat.exe src/umkalibs.h
+	rm src/*.o
 
 libs:
-	echo "#ifndef UMKALIBS_H" > src/umkalibs.h
-	echo "#define UMKALIBS_H" >> src/umkalibs.h
-	echo "const char *libs[] = {" >> src/umkalibs.h
-	./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um umka/std/std.um >> src/umkalibs.h
-	echo "};" >> src/umkalibs.h
-	echo "#endif" >> src/umkalibs.h
+	@echo "embedding tophat std"
+	@echo "#ifndef UMKALIBS_H" > src/umkalibs.h
+	@echo "#define UMKALIBS_H" >> src/umkalibs.h
+	@echo "const char *libs[] = {" >> src/umkalibs.h
+	@./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/map.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um umka/std/std.um >> src/umkalibs.h
+	@echo "};" >> src/umkalibs.h
+	@echo "#endif" >> src/umkalibs.h
 
 package:
 	mkdir -p tophat-release/bin
