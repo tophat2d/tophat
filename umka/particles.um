@@ -1,0 +1,79 @@
+
+import "umka/rectangle.um"
+
+type particle* = struct {
+	start_time: int32
+	seed: int32
+}
+
+type emitter* = struct {
+	px, py: int32
+	w, h: int32
+	seed: int32
+	
+	angle_min, angle_max: int32
+
+	lifetime: int32
+	lifetime_randomness: real
+
+	velocity: real
+	velocity_randomness: real
+
+	size: real
+	size_randomness: real
+	max_size: real
+
+	rotation: int32
+	rotation_randomness: real
+	max_rotation: int32
+
+	colors: []uint32
+	
+	particles: []particle
+}
+
+type c_emitter = struct {
+	px, py: int32
+	w, h: int32
+	seed: int32
+	
+	angle_min, angle_max: int32
+
+	lifetime: int32
+	lifetime_randomness: real
+
+	velocity: real
+	velocity_randomness: real
+
+	size: real
+	size_randomness: real
+	max_size: real
+
+	rotation: int32
+	max_rotation: int32
+	rotation_randomness: real
+
+	colors: ^uint32
+	color_c: int32
+	
+	particles: ^particle
+	particle_c: int32
+}
+
+fn c_particles_draw(p: ^c_emitter, cam: ^rectangle.rect, t: int32)
+
+fn (e: ^emitter) draw(cam: rectangle.rect, t: int32) {
+	ce := c_emitter{
+		e.px, e.py,
+		e.w, e.h,
+		e.seed,
+		e.angle_min, e.angle_max,
+		e.lifetime, e.lifetime_randomness,
+		e.velocity, e.velocity_randomness,
+		e.size, e.size_randomness, e.max_size,
+		e.rotation, e.max_rotation, e.rotation_randomness,
+		&e.colors[0], len(e.colors),
+		&e.particles[0], len(e.particles)}
+
+	c_particles_draw(&ce, &cam, t)
+}

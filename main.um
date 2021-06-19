@@ -13,12 +13,10 @@ import (
 	"umka/tilemap.um"
 	"umka/tween.um"
 	"umka/light.um"
+	"umka/particles.um"
 
 	"umka/std/std.um"
 )
-
-fn debug()
-fn debug2(t: int)
 
 fn main() { 
 	cam := rectangle.mk(0, 0, 200, 200)
@@ -27,13 +25,29 @@ fn main() {
 
 	t := 0
 
-	debug()
+	e := particles.emitter{
+		px: 10, py: 0,
+		w: 10, h: 10,
+		seed: std.rand(),
+		angle_min: -100, angle_max: -80,
+		lifetime: 1800, lifetime_randomness: 0.4,
+		velocity: 0.05, velocity_randomness: 0.5,
+		size: 2, size_randomness: 2, max_size: 4,
+		rotation: 0, rotation_randomness: 0, max_rotation: 0}
+
+	e.colors = []uint32{0xff, 0xffff, 0xff00ff, 0xff0000ff}
+	e.particles = make([]particles.particle, 600)
+
+	for i, _ in e.particles {
+		e.particles[i].start_time = std.rand()%e.lifetime
+		e.particles[i].seed = std.rand()
+	}
 
 	for true {
 		tophat.cycle(&w, &h, 0x000080ff, cam)
 		t += tophat.delta
 
-		debug2(t)
+		e.draw(cam, t)
 	}
 }
 

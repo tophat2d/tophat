@@ -3,6 +3,7 @@
 
 void _th_umka_bind(void *umka);
 void umfopen(UmkaStackSlot *p, UmkaStackSlot *r);
+void umparticlesdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 void umdrawcone(UmkaStackSlot *p, UmkaStackSlot *r);
 void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r);
 void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
