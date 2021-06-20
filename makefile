@@ -62,7 +62,7 @@ package:
 	echo $(VERSION) > version
 	cp examples/preset/*.um tophat-release
 	rm -rf bin/tophat.zip
-	zip -r ../tophat-bin/tophat.zip tophat-release
+	zip -r tophat.zip tophat-release
 	rm -r tophat-release
 
 win-package:
@@ -77,7 +77,7 @@ win-package:
 	cp cmd/package.bat tophat-win/
 	cp etc/win-readme tophat-win/readme.txt
 	rm -rf bin/tophat-win.zip
-	zip -Z store -y -q -r ../tophat-bin/tophat-win.zip tophat-win 
+	zip -Z store -y -q -r tophat-win.zip tophat-win 
 	rm -r tophat-win
 
 deps:

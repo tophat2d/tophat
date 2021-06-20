@@ -24,6 +24,11 @@ function clean () {
 }
 
 function setup () {
+	if [ ! $(whoami) = "root" ]; then
+		echo "not running as root"
+		exit 1
+	fi
+
 	rm -rf $Path
 	mkdir $Path
 	unzip $1 -d $Path
@@ -106,6 +111,35 @@ function package() {
 	echo "done"
 }
 
+function check() {
+	installed=FAILED
+	linux_bin=FAILED
+	windows_bin=FAILED
+	presets=FAILED
+
+	if [ -f $Path/version ]; then
+		installed=OK
+		echo "version..........$(cat $Path/version)"
+	fi
+
+	if [ -f $Path/bin/tophat-linux ]; then
+		linux_bin=OK
+	fi
+
+	if [ -f $Path/bin/tophat-win.exe ]; then
+		windows_bin=OK
+	fi
+
+	if [ -f $Path/main.um ]; then
+		presets=OK
+	fi
+
+	echo "tophat install...$installed"
+	echo "linux bin........$linux_bin"
+	echo "windows bin......$windows_bin"
+	echo "presets..........$presets"
+}
+
 case $1 in
 	("run")
 		$Path/bin/tophat-linux
@@ -135,6 +169,9 @@ case $1 in
 		else
 			echo "tophat is not installed"
 		fi
+	;;
+	("check")
+		check
 	;;
 	*)
 		echo "tophat v0.3 cli tool"
