@@ -60,9 +60,12 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 		double vx = p->velocity * cos(direction);
 		double vy = p->velocity * sin(direction);
 		if (p->velocity_randomness != 0) {
-			vx += FRAND*(p->velocity*p->velocity_randomness);
-			vy += FRAND*(p->velocity*p->velocity_randomness);
+				vx += FRAND*(p->velocity*p->velocity_randomness);
+				vy += FRAND*(p->velocity*p->velocity_randomness);
 		}
+
+		vx *= p->gravity_x;
+		vy *= p->gravity_y;
 
 		int px = p->px + rand()%p->w + vx * (t - p->particles[i].start_time);
 		int py = p->py + rand()%p->h + vy * (t - p->particles[i].start_time);
@@ -78,7 +81,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 			col = get_particle_color(p, p->particles[i], t);
 
 		int rot = p->rotation;
-		//if (p->rotation != p->max_rotation)
+		if (p->rotation != p->max_rotation)
 			rot = get_particle_rotation(p, p->particles[i], t);
 
 		rot += FRAND * (p->size * p->rotation_randomness);

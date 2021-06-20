@@ -27,15 +27,16 @@ fn main() {
 
 	e := particles.emitter{
 		px: 10, py: 0,
-		w: 10, h: 10,
+		w: 5, h: 10,
+		gravity_x: 1, gravity_y: 1,
 		seed: std.rand(),
-		angle_min: -100, angle_max: -80,
+		angle_min: -110, angle_max: -90,
 		lifetime: 1800, lifetime_randomness: 0.4,
 		velocity: 0.05, velocity_randomness: 0.5,
-		size: 2, size_randomness: 2, max_size: 4,
-		rotation: 0, rotation_randomness: 0, max_rotation: 0}
+		size: 2, size_randomness: 2, max_size: 12,
+		rotation: 46, rotation_randomness: 2, max_rotation: 360}
 
-	e.colors = []uint32{0xff, 0xffff, 0xff00ff, 0xff0000ff}
+	e.colors = []uint32{0xff, 0xffaa, 0xff0088, 0xff000022}
 	e.particles = make([]particles.particle, 600)
 
 	for i, _ in e.particles {

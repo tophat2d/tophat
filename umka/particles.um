@@ -9,6 +9,7 @@ type particle* = struct {
 type emitter* = struct {
 	px, py: int32
 	w, h: int32
+	gravity_x, gravity_y: real
 	seed: int32
 	
 	angle_min, angle_max: int32
@@ -35,6 +36,7 @@ type emitter* = struct {
 type c_emitter = struct {
 	px, py: int32
 	w, h: int32
+	gravity_x, gravity_y: real
 	seed: int32
 	
 	angle_min, angle_max: int32
@@ -66,6 +68,7 @@ fn (e: ^emitter) draw(cam: rectangle.rect, t: int32) {
 	ce := c_emitter{
 		e.px, e.py,
 		e.w, e.h,
+		e.gravity_x, e.gravity_y,
 		e.seed,
 		e.angle_min, e.angle_max,
 		e.lifetime, e.lifetime_randomness,

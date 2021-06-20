@@ -15,6 +15,7 @@ typedef struct {
 typedef struct {
 	int px, py;
 	int w, h;
+	double gravity_x, gravity_y;
 	int seed;
 	
 	int angle_min, angle_max;
