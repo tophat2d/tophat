@@ -1,3 +1,8 @@
+// Tilemaps allow for easy level
+// construction. Similar to
+// godot or unity. They can
+// be loaded from csv or created
+// from raw data.
 
 import (
 	"csv.um"
@@ -8,15 +13,16 @@ import (
 	"polygon.um"
 )
 
+// Tilemap struct
 type tmap* = struct {
-	tiles: []image.img
-	x: int
+	tiles: []image.img // tiles that are used to draw (you can replace them mid game for animation)
+	x: int // position
 	y: int
-	w: int
-	cells: []int32
-	collmask: []bool
-	cellsize: int
-	scaletype: int
+	w: int // width of tilemap
+	cells: []int32 // all cells (this will draw the tile in tiles with number in cells - 1)
+	collmask: []bool // if true, the tile collides
+	cellsize: int // cellsize
+	scaletype: int // how image scale is handled. 0: stretch, 1: top left
 }
 
 type ctmap* = struct {
@@ -52,6 +58,7 @@ fn parse_num(inp: char): (int, bool) {
 	return 0, false
 }
 
+// Makes a tilemap from csv string
 fn mk*(inp: str, images: []image.img): tmap {
 	res := csv.parse(inp)
 
@@ -91,10 +98,14 @@ fn mk*(inp: str, images: []image.img): tmap {
 	return tmap{images, std.atoi(res[0][1]), std.atoi(res[0][2]), len(res[2]), cells, collmask, std.atoi(res[0][3]), std.atoi(res[0][4])}
 }
 
-fn (t: ^tmap) edit*(x, y, tile: int) { t.cells[y*t.w + x] = tile }
+// Sets tile at [x, y] to tile.
+fn (t: ^tmap) edit*(x, y, tile: int) {
+	t.cells[y*t.w + x] = tile
+}
 
 fn cdrawtmap(ct: ^ctmap, cam: ^rectangle.rect)
 
+// Draws the tilemap.
 fn (t: ^tmap) draw*(cam: rectangle.rect) {
 	if len(t.cells) == 0 { return }
 
@@ -109,6 +120,13 @@ fn (t: ^tmap) draw*(cam: rectangle.rect) {
 
 fn ctmapgetcoll(tx, ty, x, y: ^int32, t: ^ctmap, e: ^entity.cent): int32
 
+// Checks, if t collides with e.
+// [rx, ry] is where the collision
+// happened (usually one of the
+// vertices)
+// [tx, ty] is on which tile it
+// happened.
+// You need to pass a valid pointer (TODO)
 fn (t: ^tmap) getcoll*(e: entity.ent, rx, ry, tx, ty: ^int32): bool {
 	if len(t.cells) == 0 { return false }
 

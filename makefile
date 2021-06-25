@@ -25,11 +25,11 @@ OBJS=$(patsubst src/%.c, src/%.o, $(wildcard src/*.c))
 
 src/%.o: src/%.c
 	@echo "building $@"
-	@$(CC) -o $@ -c $< $(LINUX_FULL) $(RELEASE_FLAGS) -Ofast -g
+	@$(CC) -o $@ -c $< $(LINUX_FULL) $(RELEASE_FLAGS) -Ofast -g -pg
 
 build: libs $(OBJS)
 	@echo "building binary"
-	@$(CC) $(OBJS) $(LINUX_UMKA) $(LINUX_FULL) -o tophat -g
+	@$(CC) $(OBJS) $(LINUX_UMKA) $(LINUX_FULL) -o tophat -g -pg
 
 install: build
 	sudo cp tophat /usr/share/tophat/bin/tophat-linux

@@ -1,22 +1,28 @@
-// vim: filetype=umka
+// Polygon type and functions.
 
 import (
 	"std/std.um"
 	"vec.um"
 	"rawdraw.um"
 )
+
+// Polygon type. Mainly
+// used by ent for collisions
+// and for fallback drawing
+// Don't create by hand.
 type poly* = struct {
-    x: real
+    x: real // position
     y: real
-    v: []int32
-		rv: []int32
+    v: []int32 // vertices [x, y, x, y]. Might be soon converted to real.
+		rv: []int32 // don't touch
 		rw: int32
-		rh: int32
-    w: int32
-    h: int32
-    vc: int32
+		rh: int32 // end of don't touch
+    w: int32 // width **TO BE REMOVED**
+    h: int32 // height **TO BE REMOVED**
+    vc: int32 // vertex count **TO BE REMOVED**
 }
 
+// Representation of poly in c.
 type cpoly* = struct {
 	x: int32
 	y: int32
@@ -26,6 +32,7 @@ type cpoly* = struct {
 	vc: int32
 }
 
+// Makes a polygon. *USE* this.
 fn mk*(x, y: real, v: []int32): poly {
 	var p: poly
 
@@ -51,6 +58,7 @@ fn mk*(x, y: real, v: []int32): poly {
 	return p
 }
 
+// Rotates and scales the polygon (scales first)
 fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 	var x, y, cx, cy: real
 
@@ -85,6 +93,7 @@ fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 
 fn cdrawpoly*(color: uint32, p: ^polygon.cpoly)
 
+// Draws this without accounting for camera.
 fn (p: ^poly) draw*(color: uint32) {
 	cp := polygon.cpoly{round(p.x), round(p.y), &p.v[0], p.w, p.h, p.vc}
 

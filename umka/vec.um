@@ -1,6 +1,10 @@
+// small 2d vector library
+// ask for features in issues
 
 import "std/std.um"
 
+// rotates point [x, y] around [cx, cy] with
+// rot in degrees
 fn rotatepoint*(x, y, cx, cy, rot: real): (real, real) {
 	angle := (rot * std.pi) / 180
 
@@ -13,9 +17,16 @@ fn rotatepoint*(x, y, cx, cy, rot: real): (real, real) {
 	return x2 + cx, y2 + cy
 }
 
-fn distanceto*(x1, y1, x2, y2: real): real { return std.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2)) }
+// Distance of [x1, y1] to [x2, [y2]].
+// It won't be negative.
+fn distanceto*(x1, y1, x2, y2: real): real {
+	return std.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+}
 
-fn angleto*(x1, y1, x2, y2: real): real { return atan2(y2 - y1, x2 - x1) * 180 / std.pi + 180 }
+// Angle between [x1, y1] and [x2, y2]
+fn angleto*(x1, y1, x2, y2: real): real {
+	return atan2(y2 - y1, x2 - x1) * 180 / std.pi + 180
+}
 
 fn abs*(x, y: real): (real, real) { return fabs(x), fabs(y) }
 

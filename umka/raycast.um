@@ -1,4 +1,5 @@
-// vim: filetype=umka
+// Rays allow for vroom fast
+// collisions.
 
 import (
 	"entity.um"
@@ -6,11 +7,12 @@ import (
 	"tilemap.um"
 )
 
+// Ray type.
 type ray* = struct {
-	x: real
+	x: real // position
 	y: real
-	l: int32
-	r: real
+	l: int32 // length
+	r: real // rotation
 }
 
 type cray = struct {
@@ -22,6 +24,7 @@ type cray = struct {
 
 var colldatax, colldatay: int32
 
+// Makes a ray. Just for consistency.
 fn mk*(x, y, l, r: int32): ray {
 	return ray{x, y, l, r}
 }
@@ -29,6 +32,7 @@ fn mk*(x, y, l, r: int32): ray {
 fn craygetcoll(ix, iy: ^int32, count: int32, r: ^cray, s: ^^entity.cent): int32
 fn craygettmapcoll(r: ^cray, t: ^tilemap.ctmap, ix, iy: ^int32): bool
 
+// Same as ent.getcoll. Same changes will apply.
 fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 	cscn := []entity.cent{}
 	cps := []polygon.cpoly{}
@@ -59,11 +63,12 @@ fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 	return craygetcoll(&colldatax, &colldatay, len(cscnp), &cr, &cscnp[0])
 }
 
+// Returns, where the last collision happened.
 fn retrievecolldata*(): (int32, int32) {
 	return colldatax, colldatay
 }
 
-fn (r: ^ray) get_tmap_coll*(t: tilemap.tmap, ix, iy: ^int32): bool {
+fn (r: ^ray) get_tmap_coll(t: tilemap.tmap, ix, iy: ^int32): bool {
 	cr := cray{round(r.x), round(r.y), r.l, round(r.r)}
 
 	ccm := make([]int32, len(t.collmask))

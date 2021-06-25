@@ -1,5 +1,10 @@
-// vim: filetype=umka
+// Sound module for tophat.
+// It serves for all kinds of
+// sound operation.
 
+// Sound type. It is an opaque
+// pointer to c, so don't create
+// it by hand.
 type sound* = struct {
 	handle: int
 }
@@ -22,6 +27,7 @@ fn csoundvol(s: int, vol: real)
 
 fn csoundvalidate(s: int): int
 
+// Loads sound at path relative to main.um
 fn load*(path: str): sound {
 	s := sound{cauload(path)}
 
@@ -31,10 +37,13 @@ fn load*(path: str): sound {
 	return s
 }
 
+// Sets the array of sounds that are handled
+// in the background. **DEPRECATED**
 fn setsounds*(ss: []sound) {
 	cauarr(&ss[0], len(ss))
 }
 
+// Sets the sound as looping. Off by default.
 fn (s: ^sound) looping*(l: bool) {
 	if l {
 		csoundloop(s.handle, 1)
@@ -44,18 +53,33 @@ fn (s: ^sound) looping*(l: bool) {
 	csoundloop(s.handle, 0)
 }
 
+// Plays the sound. If it is already
+// playing, it won't do anything.
+// I plan on making it replay the
+// sound if playing.
 fn (s: ^sound) play*() {
 	csoundplay(s.handle)
 }
 
+// Stops the sound and **resets** the progress.
 fn (s: ^sound) stop*() {
 	csoundstop(s.handle)
 }
 
+// Set's the volume of the sound as a
+// multiplier of it's volume.
+// 2 => 2 times the volume
+// 1 => original
+// 0.5 => half the volume
+// 0 => silent
 fn (s: ^sound) vol*(vol: real) {
 	csoundvol(s.handle, vol)
 }
 
+// Returns true, if the sound is
+// valid. That doesn't mean, it
+// is not corrupted, but it generally
+// means it was loaded.
 fn (s: ^sound) validate*(): bool {
 	return bool(csoundvalidate(s.handle))
 }

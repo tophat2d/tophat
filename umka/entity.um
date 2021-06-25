@@ -1,3 +1,8 @@
+// Module for entity functions.
+// Entity is basically the main
+// object type you will be working
+// with.
+
 import (
 	"polygon.um"
 	"tophat.um"
@@ -6,6 +11,13 @@ import (
 	"image.um"
 )
 
+// Entity struct. It has polygon,
+// image, scale, rotation, color
+// and id. Scale and rotation is
+// set using functions.
+// If image is invalid (or missing),
+// the polygon is drawn with the defined
+// color. Id is used for collisions.
 type ent* = struct {
 	p: polygon.poly
 	image: image.img
@@ -30,6 +42,7 @@ var colldatax, colldatay: int32
 
 fn centdraw(e: cent, c: rectangle.rect)
 
+// Draws the entity with camera c in mind.
 fn (e: ^ent) draw*(c: rectangle.rect) {
 	if len(e.p.v) == 0 {
 		return
@@ -43,6 +56,7 @@ fn (e: ^ent) draw*(c: rectangle.rect) {
 
 fn cgetcoll(ix, iy: ^int32, count: int32, e: ^cent, s: ^^cent): int32
 
+// ent's constructor
 fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
 	if id == 0 {
 		id = std.rand() + 1
@@ -60,17 +74,32 @@ fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
 	return e
 }
 
+// Sets absolute rotation of the entity.
+// It affects the polygon too
+// and by extension the collision
+// if you don't want to affect that,
+// just edit the fields.
 fn (e: ^ent) setrot*(rot: real) {
 	e.rot = rot
 	e.p.transform(e.sx, e.sy, round(rot))
 }
 
+// Same as setrot, but for scale.
 fn (e: ^ent) setscale*(sx, sy: real) {
 	e.sx = sx
 	e.sy = sy
 	e.p.transform(sx, sy, round(e.rot))
 }
 
+// Checks, if e collides with any
+// of the entities in s and returns it's
+// id. **NOTE**: this function will recieve
+// a lot of changes. First of all, it will
+// take a new `entitable` interface, which
+// needs `getent(): ^entity.ent`. Other is
+// (and this one might break something)
+// that it won't return the id, but the
+// index of the ent, which collided.
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	if len(s) == 0 {
 		return 0
@@ -105,16 +134,21 @@ fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	return cgetcoll(&colldatax, &colldatay, len(cscnp), &ce, &cscnp[0])
 }
 
+// Returns, where the last collision happened.
 fn retrievecolldata*(): (int32, int32) {
 	return colldatax, colldatay	
 }
 
+// Animates the entity's image with one of
+// the `anim` array. **Won't** begin on the
+// first frame.
 fn (e: ^ent) animate*(fps: int, anim: ^[]image.img) {
 	e.image = anim^[(round(real(tophat.t)/(1000/fps)) % len(anim^))]
 }
 
 fn centysort(e: ^entity.ent, count: int)
 
+// Performs a y sort on entities.
 fn ysort*(ents: ^[]entity.ent) {
 	if len(ents^) > 0 {
 		centysort(&ents[0], len(ents^))

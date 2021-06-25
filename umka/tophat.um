@@ -1,4 +1,8 @@
-// vim: filetype=umka
+// Module for interacting with
+// the engine.
+// Useful variables:
+//   delta: length of last cycle
+//   platform: either "linux" or "windows"
 
 import (
 	"rawdraw.um"
@@ -23,8 +27,11 @@ var t*, start, end, delta*: int
 
 var platform*: str = "linux"
 
+// Gets time since the game started **DEPRECATED**
 fn gettime*(): int
 
+// Set's up the engine and opens
+// a window.
 fn setup*(title: str, w, h: int32) {
 	rawdraw.setup(title, w, h)
 	rawdraw.setbgcolor(0x000000ff)
@@ -40,10 +47,18 @@ fn setup*(title: str, w, h: int32) {
 	t = gettime()
 }
 
+// Sets window title on runtime
 fn setwindowtitle*(title: str)
 fn visualizecam(w, h: int32, color: uint32)
 fn updatescaling(w, h, camw, camh: int32)
 
+// Function called each cycle.
+// W and H will return the
+// window size, bgcolor will
+// be the background color
+// of the window and cam
+// is used for in engine
+// stuff.
 fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 	rawdraw.setcolor(0x000000ff)
 	rawdraw.drawrect(0, cam.h, w^, h^)

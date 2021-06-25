@@ -501,10 +501,10 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int y2 = p[0].intVal;
-	int x2 = p[1].intVal;
-	int y1 = p[2].intVal;
-	int x1 = p[3].intVal;
+	double y2 = p[0].realVal;
+	double x2 = p[1].realVal;
+	double y1 = p[2].realVal;
+	double x1 = p[3].realVal;
 
 	CNFGTackRectangle(x1 * scaling, y1 * scaling, (x2 + x1) * scaling, (y2 + y1) * scaling);
 }

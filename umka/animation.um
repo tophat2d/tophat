@@ -4,6 +4,10 @@ import (
 	"rectangle.um"
 )
 
+// Anim can turn an array of images into an animation.
+// The difference between anim and ent.animate is that
+// anim has starting time, so it is really good for
+// one shot animations.
 type anim* = struct {
 	anim: []image.img
 	rot: real
@@ -19,6 +23,7 @@ type anim* = struct {
 	frame: int
 }
 
+// Anim's constructor.
 fn mk*(px, py: int32, anm: []image.img, fps: int): anim {
 	a := anim{}
 
@@ -36,10 +41,12 @@ fn mk*(px, py: int32, anm: []image.img, fps: int): anim {
 	return a
 }
 
+// Starts animation with start_time of t.
 fn (a: ^anim) start*(t: int) {
 	a.zerotime = t
 }
 
+// This draws the animation. Returns true, if the animation ends.
 fn (a: ^anim) handle*(t: int, cam: rectangle.rect): bool {
 	a.frame = (round(real(t-a.zerotime)/round((1000.0/a.fps))) % len(a.anim))
 

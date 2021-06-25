@@ -106,6 +106,8 @@ fn setwinmap*() {
 
 fn cgetmouse(x, y: ^int32)
 
+// Returns the position of mouse cursor
+// in relation to the screen.
 fn getmousepos*(): (int32, int32) {
 	var w, h: int32
 
@@ -114,6 +116,8 @@ fn getmousepos*(): (int32, int32) {
 	return w, h
 }
 
+// Returns the position of mouse cursor
+// in relation to cam.
 fn getglobalmousepos*(cam: rectangle.rect): (int32, int32) {
 	w, h := getmousepos()
 
@@ -124,11 +128,16 @@ fn cispressed(keycode: int32): int32
 
 fn cisjustpressed(key: int32): int32
 
+// Returns if key is pressed. Either use
+// codes defined in the file above, or
+// pass lower case char/number.
 fn ispressed*(code: int32): bool {
 	val := bool(cispressed(code))
 	return val
 }
 
+// Returns, if code was just pressed
+// this loop.
 fn isjustpressed*(code: int32): bool {
 	return bool(cisjustpressed(code))
 }

@@ -1,3 +1,4 @@
+// Rectangle is used mainly as camera.
 
 type rect* = struct {
 	x: int32

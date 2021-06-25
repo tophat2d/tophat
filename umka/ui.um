@@ -1,3 +1,8 @@
+// Small and modulat ui module useful
+// for stuff like menus.
+// set any element as
+// ui.mainelement and it
+// will be the root.
 
 import (
 	"rectangle.um"
@@ -19,50 +24,61 @@ const (
 	SCALE* = 5
 )
 
+// Elements is the interface for all
+// ui elements. You can make your
+// own elements.
 type element* = interface {
-	draw()
-	calculate()
-	handle()
-	gspan(): ^int
-	gpadding(): ^rectangle.rect
-	gdimensions(): ^rectangle.rect
+	draw() // draws the element
+	calculate() // calculates it's dimensions
+	handle() // handle cycle
+	gspan(): ^int // returns pointer to it's span
+	gpadding(): ^rectangle.rect // returns pointer to it's padding
+	gdimensions(): ^rectangle.rect // returns pointer to it's dimensions
 }
 
+// Box can be used to oranize
+// elements in a v/hbox style or
+// to draw image (or both).
+// It has children, which are organized
+// on it's calculate call.
 type box* = struct {
 	children: []element
 	padding, dimensions: rectangle.rect
-	span: int
-	vertical: bool 
+	span: int // how many elements in box it spans
+	vertical: bool // false: hbox
 
 	image: image.img
-	imagemode: int
-	imgs: int
-	imgx, imgy: int
+	imagemode: int // CENTER, STRETCH, SCALE
+	imgs: int // ignore
+	imgx, imgy: int // ignore
 }
 
+// Label can be used to draw text.
 type label* = struct {
 	text: str
 	textsize: real
 	textcolor: uint32
-	valign: int
+	valign: int // alignment
 	halign: int
 	bgcolor: uint32
 	padding, dimensions: rectangle.rect
 	span: int
 }
 
+// Button checks for clicks on it's
+// handle function. Clicks can be recieved
+// the input way, or as callbacks.
 type button* = struct {
-	label: label
-	toggled: bool
-	pressed: bool
-	justpressed: bool
-	justreleased: bool
-	clickfunc: bool
+	label: label // Label (this is what is actually drawn)
+	toggled: bool // is toggled
+	pressed: bool // is pressed
+	justpressed: bool // is just pressed
+	justreleased: bool // is just release
 
 	padding, dimensions: rectangle.rect
 	span: int
 
-	onpress, onjustpress, onrelease: fn()
+	onpress, onjustpress, onrelease: fn() // callbacks
 	ontoggle: fn(toggled: bool)
 }
 
@@ -325,6 +341,7 @@ fn (b: ^button) handle*() {
 
 var mainelement*: element
 
+// no need to call this
 fn update*(w, h: int32) {
 	dims := mainelement.gdimensions()
 	padd := mainelement.gpadding()
@@ -335,6 +352,7 @@ fn update*(w, h: int32) {
 	mainelement.calculate()
 }
 
+// call this every loop
 fn handle*(w, h: int32) {
 	if tophat.t % 100 < 32 {
 		update(w, h)
