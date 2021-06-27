@@ -3,6 +3,9 @@
 
 void _th_umka_bind(void *umka);
 void umfopen(UmkaStackSlot *p, UmkaStackSlot *r);
+void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r);
+void umlightmaskdraw(UmkaStackSlot *p, UmkaStackSlot *r);
+void umspotlightstamp(UmkaStackSlot *p, UmkaStackSlot *r);
 void umparticlesdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 void umdrawcone(UmkaStackSlot *p, UmkaStackSlot *r);
 void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r);

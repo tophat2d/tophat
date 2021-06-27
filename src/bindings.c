@@ -40,9 +40,11 @@ void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
 
-	umkaAddFunc(umka, "c_particles_draw", &umparticlesdraw);
+	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
+	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
+	umkaAddFunc(umka, "cspotlightstamp", &umspotlightstamp);
 
-	umkaAddFunc(umka, "cdrawcone", &umdrawcone);
+	umkaAddFunc(umka, "c_particles_draw", &umparticlesdraw);
 
 	// tilemaps
 	umkaAddFunc(umka, "cdrawtmap", &umdrawtmap);
@@ -110,17 +112,16 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "entity.um", libs[3]);
 	umkaAddModule(umka, "image.um", libs[4]);
 	umkaAddModule(umka, "input.um", libs[5]);
-	umkaAddModule(umka, "map.um", libs[6]);
-	umkaAddModule(umka, "misc.um", libs[7]);
-	umkaAddModule(umka, "polygon.um", libs[8]);
-	umkaAddModule(umka, "rawdraw.um", libs[9]);
-	umkaAddModule(umka, "raycast.um", libs[10]);
-	umkaAddModule(umka, "rectangle.um", libs[11]);
-	umkaAddModule(umka, "tilemap.um", libs[12]);
-	umkaAddModule(umka, "tophat.um", libs[13]);
-	umkaAddModule(umka, "ui.um", libs[14]);
-	umkaAddModule(umka, "vec.um", libs[15]);
-	umkaAddModule(umka, "std.um", libs[16]);
+	umkaAddModule(umka, "misc.um", libs[6]);
+	umkaAddModule(umka, "polygon.um", libs[7]);
+	umkaAddModule(umka, "rawdraw.um", libs[8]);
+	umkaAddModule(umka, "raycast.um", libs[9]);
+	umkaAddModule(umka, "rectangle.um", libs[10]);
+	umkaAddModule(umka, "tilemap.um", libs[11]);
+	umkaAddModule(umka, "tophat.um", libs[12]);
+	umkaAddModule(umka, "ui.um", libs[13]);
+	umkaAddModule(umka, "vec.um", libs[14]);
+	umkaAddModule(umka, "std.um", libs[15]);
 #endif
 }
 
@@ -137,20 +138,44 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 ///////////////////////
 // particles
+// sets values of all dots to lightmask's color
+void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_lightmask *l = (th_lightmask *)p[0].ptrVal;
+
+	th_lightmask_clear(l);
+}
+
+// draws the lightmask
+void umlightmaskdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_lightmask *l = (th_lightmask *)p[0].ptrVal;
+
+	th_lightmask_draw(l);
+}
+
+// "stamps" the spotlight on the mask
+void umspotlightstamp(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_rect *cam = (th_rect *)p[0].ptrVal;
+	th_lightmask *l = (th_lightmask *)p[1].ptrVal;
+	th_spotlight *s = (th_spotlight *)p[2].ptrVal;
+	
+	int x = s->x, y = s->y;
+	s->x -= (cam->x - cam->w/2) / l->rect_size;
+	s->y -= (cam->y - cam->h/2) / l->rect_size;
+
+	th_spotlight_stamp(s, l);
+
+	s->x = x;
+	s->y = y;
+}
+
+///////////////////////
+// particles
 void umparticlesdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_particles *emitter = (th_particles *)p[2].ptrVal;
 	th_rect *cam = (th_rect *)p[1].ptrVal;
 	int t = p[0].intVal;
 
 	th_particles_draw(emitter, *cam, t);
-}
-
-///////////////////////
-// lightcone
-void umdrawcone(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_lightcone *lc = (th_lightcone *)p[1].ptrVal;
-	th_rect *cam = (th_rect *)p[0].ptrVal;
-	th_draw_lightcone(lc, cam);
 }
 
 ///////////////////////

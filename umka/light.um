@@ -1,0 +1,71 @@
+
+import (
+	"rectangle.um"
+)
+
+type mask* = struct {
+	dots: []uint32
+	w, h: int32
+	rect_size: real
+	color: uint32
+}
+
+type cmask = struct {
+	dots: ^uint32
+	w, h: int32
+	rect_size: real
+	color: uint32
+}
+
+type spotlight* = struct {
+	x, y: int32
+	radius: int32
+}
+
+fn clightmaskclear(m: ^cmask)
+
+fn (m: ^mask) clear*() {
+	cm := cmask {
+		&m.dots[0],
+		m.w, m.h, m.rect_size,
+		m.color}
+
+	clightmaskclear(&cm)
+}
+
+fn mk*(color: uint32, rect_size: real, cam: rectangle.rect): mask {
+	d := mask{}
+
+	d.dots = make([]uint32, round(cam.w * cam.h / rect_size))
+	d.rect_size = rect_size
+	d.w = round(cam.w / rect_size)
+	d.h = round(cam.h / rect_size)
+	d.color = color
+
+	d.clear()
+
+	return d
+}
+
+fn clightmaskdraw(m: ^cmask)
+
+fn (m: ^mask) draw*() {
+	cm := cmask {
+		&m.dots[0],
+		m.w, m.h, m.rect_size,
+		m.color}
+
+	clightmaskdraw(&cm)
+}
+
+fn cspotlightstamp(s: ^spotlight, m: ^cmask, cam: ^rectangle.rect)
+
+fn (s: ^spotlight) stamp*(m: ^mask, cam: rectangle.rect) {
+	cm := cmask {
+		&m.dots[0],
+		m.w, m.h, m.rect_size,
+		m.color}
+
+	cspotlightstamp(s, &cm, &cam)
+}
+

@@ -1,18 +1,21 @@
 #ifndef LIGHT_H
 #define LIGHT_H
 
-#include "rect.h"
-#include <stdint.h>
+typedef struct {
+	uint32_t *dots;
+	int w, h;
+	double rect_size;
+	uint32_t color;
+} th_lightmask;
 
 typedef struct {
-	int px;
-	int py;
-	int rotation;
-	int lenght;
-	int width;
-	uint32_t color;
-} th_lightcone;
+	int x, y;
+	int radius;
+} th_spotlight;
 
-void th_draw_lightcone(th_lightcone *l, th_rect *cam);
+void th_lightmask_clear(th_lightmask *d);
+void th_lightmask_draw(th_lightmask *d);
+void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color);
+void th_spotlight_stamp(th_spotlight *l, th_lightmask *d);
 
 #endif

@@ -1,40 +1,53 @@
-#include <GL/gl.h>
-#include <stdio.h>
+#include <string.h>
+#include <stdint.h>
+#include <math.h>
 
-#include "light.h"
-#include "misc.h"
-#include "rect.h"
 #include "../lib/rawdraw/CNFG.h"
+#include "light.h"
 
-extern float CNFGVertDataV[CNFG_BATCH*3];
-extern uint32_t CNFGVertDataC[CNFG_BATCH];
-extern int CNFGVertPlace;
+#define INTERP(x0, y0, x1, y1, x) (y0 + (x - x0) * ((y1 - y0) / (x1 - x0)))
+
 extern float scaling;
 
-void th_draw_lightcone(th_lightcone *l, th_rect *cam) {
-	if (CNFGVertPlace >= CNFG_BATCH-3)
-		CNFGFlushRender();
+void th_lightmask_clear(th_lightmask *d) {
+	for (int i=0; i < d->w * d->h; i++)
+		d->dots[i] = d->color;
+}
 
-	int camx, camy;
-	camx = cam->x - (cam->w / 2);
-	camy = cam->y - (cam->h / 2);
+void th_lightmask_draw(th_lightmask *d) {
+	for (int x=0; x < d->w; x++) {
+		for (int y=0; y < d->h; y++) {
+			CNFGColor(d->dots[y * d->w + x]);
+			CNFGTackRectangle(x * d->rect_size * scaling, y * d->rect_size * scaling, (x * d->rect_size + d->rect_size) * scaling, (y * d->rect_size + d->rect_size) * scaling);
+		}
+	}
+}
 
-	//if (l->px < camx || l->px > camx + cam->w)
-		//return;
+void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color) {
+	if (x < 0 || y < 0 || x >= d->w || y >= d->h)
+		return;
 
-//	if (l->py < camy || l->py > camy + cam->h)
-		//return;
+	if ((color & 0xff) < (d->dots[y * d->w + x] & 0xff))
+		d->dots[y * d->w + x] = color;
+}
 
-	float *verts = &CNFGVertDataV[CNFGVertPlace*3];
-	verts[0] = (l->px - camx) * scaling;           verts[1] = (l->py - camy) * scaling;
-	verts[3] = (l->px-l->lenght - camx) * scaling; verts[4] = (l->py-l->width/2 - camy) * scaling;
-	verts[6] = (l->px-l->lenght - camx) * scaling; verts[7] = (l->py+l->width/2 - camy) * scaling;
-	th_rotate_point(&verts[3], &verts[4], verts[0], verts[1], l->rotation);
-	th_rotate_point(&verts[6], &verts[7], verts[0], verts[1], l->rotation);
-	uint32_t *colors = &CNFGVertDataC[CNFGVertPlace];
-	uint32_t discolor = l->color & 0xffffff22;
-	colors[0] = l->color;
-	colors[1] = discolor;
-	colors[2] = discolor;
-	CNFGVertPlace += 3;
+void th_spotlight_stamp(th_spotlight *l, th_lightmask *d) {
+	int tile_r = l->radius / d->rect_size;
+	
+	// this is kinda naive way to rasterize a circle, since it calls sqrt every cycle. TODO use bresenham circle
+	for (int y=-tile_r; y < tile_r; y++) for (int x=-tile_r; x < tile_r; x++) {
+		double dist = sqrt(x * x + y * y);
+
+		if (dist >= tile_r) {
+			continue;
+		}
+
+		uint32_t color = 0;
+
+		if (dist > tile_r/3) { // TODO this being tweakable
+			color = INTERP(tile_r/3, 0, tile_r, d->color, dist);
+		}
+
+		_th_lightmask_stamp_point(d, l->x / d->rect_size + x, l->y / d->rect_size + y, color);
+	}
 }
