@@ -29,38 +29,20 @@ fn mk*(x, y, l, r: int32): ray {
 	return ray{x, y, l, r}
 }
 
-fn craygetcoll(ix, iy: ^int32, count: int32, r: ^cray, s: ^^entity.cent): int32
+fn craygetcoll(ix, iy: ^int32, count: int32, r: ^cray, s: ^entity.cent): int32
 fn craygettmapcoll(r: ^cray, t: ^tilemap.ctmap, ix, iy: ^int32): bool
 
 // Same as ent.getcoll. Same changes will apply.
 fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
-	cscn := []entity.cent{}
-	cps := []polygon.cpoly{}
+	cscn := make([]entity.cent, len(s))
 
-	for e in s {
-		if len(e.p.v) == 0 {
-			continue
-		}
-
-		cps = append(cps, polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc})
-		ce := entity.cent{null, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
-		cscn = append(cscn, ce)
-	}
-
-	if len(cscn) == 0 {
-		return 0
-	}
-
-	cscnp := []^entity.cent{}
-
-	for i:=0; i < len(cps); i++ {
-		cscn[i].p = &cps[i]
-		cscnp = append(cscnp, &cscn[i])
+	for i, e in s {
+		cscn[i] = e.toc()
 	}
 
 	cr := cray{round(r.x), round(r.y), r.l, round(r.r)}
 
-	return craygetcoll(&colldatax, &colldatay, len(cscnp), &cr, &cscnp[0])
+	return craygetcoll(&colldatax, &colldatay, len(cscn), &cr, &cscn[0])
 }
 
 // Returns, where the last collision happened.

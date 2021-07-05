@@ -136,11 +136,8 @@ fn (t: ^tmap) getcoll*(e: entity.ent, rx, ry, tx, ty: ^int32): bool {
 	}
 
 	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
-	
-	cp := polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}
-	ce := entity.cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
 
-	c := ctmapgetcoll(tx, ty, rx, ry, &cm, &ce)
+	c := ctmapgetcoll(tx, ty, rx, ry, &cm, &e.toc())
 
 	return bool(c)
 }

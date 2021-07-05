@@ -37,7 +37,9 @@ install: build
 wbuild: libs
 	$(MINGW) -o tophat.exe $(SRC) $(WIN_FULL) $(RELEASE_FLAGS) -s -Os
 
-run: build
+run:
+	rm src/bindings.o
+	make build
 	./tophat
 
 clean:

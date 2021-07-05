@@ -4,7 +4,7 @@
 #include "rect.h"
 #include "misc.h"
 
-int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, int *ix, int *iy) {
+int th_ray_getcoll(th_ray *ra, th_ent *scene, int count, int *ix, int *iy) {
 	float rx, ry;
 	rx = ra->x;
 	ry = ra->y - ra->l;
@@ -24,18 +24,18 @@ int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, int *ix, int *iy) {
 	}
 
 	for (int i=0; i < count; i++) {
-		if (rr.x > scene[i]->p->x + scene[i]->p->w) continue;
-		if (rr.y > scene[i]->p->y + scene[i]->p->h) continue;
-		if (rr.w < scene[i]->p->x) continue;
-		if (rr.h < scene[i]->p->y) continue;
+		if (rr.x > scene[i].p.x + scene[i].p.w) continue;
+		if (rr.y > scene[i].p.y + scene[i].p.h) continue;
+		if (rr.w < scene[i].p.x) continue;
+		if (rr.h < scene[i].p.y) continue;
 
-		coll = _th_poly_to_line(scene[i]->p, ra->x, ra->y, rx, ry, ix, iy);
+		coll = _th_poly_to_line(&scene[i].p, ra->x, ra->y, rx, ry, ix, iy);
 		if (coll)
-			return scene[i]->id;
+			return scene[i].id;
 
-		coll = _th_poly_to_point(scene[i]->p, rx, ry, ix, iy);
+		coll = _th_poly_to_point(&scene[i].p, rx, ry, ix, iy);
 		if (coll)
-			return scene[i]->id;
+			return scene[i].id;
 	}
 	return 0;
 }

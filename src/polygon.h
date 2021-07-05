@@ -3,6 +3,7 @@
 
 #include "../lib/rawdraw/CNFG.h"
 
+#pragma pack(push, 1)
 typedef struct {
 	int x;
 	int y;
@@ -11,6 +12,7 @@ typedef struct {
 	int h;
 	int vc;
 } th_poly;
+#pragma pack(pop)
 
 void th_new_poly(th_poly *p, int px, int py, int vertnum, ...);
 void th_free_poly(th_poly *p);

@@ -32,6 +32,17 @@ type cpoly* = struct {
 	vc: int32
 }
 
+// Internal function converting p to c compatible polygon
+fn (p: ^poly) toc*(): cpoly {
+	if len(p.v) == 0 {
+		return cpoly{}
+	}
+
+	return cpoly{
+		round(p.x), round(p.y),
+		&p.v[0], p.w, p.h, len(p.v) * 2}
+}
+
 // Makes a polygon. *USE* this.
 fn mk*(x, y: real, v: []int32): poly {
 	var p: poly

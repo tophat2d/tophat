@@ -10,6 +10,6 @@ typedef struct {
 	int r;
 } th_ray;
 
-int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, int *ix, int *iy);
+int th_ray_getcoll(th_ray *ra, th_ent *scene, int count, int *ix, int *iy);
 
 #endif

@@ -29,8 +29,8 @@ type ent* = struct {
 }
 
 type cent* = struct {
-	p: ^polygon.cpoly
-	image: image.img
+	p: polygon.cpoly
+	image: int
 	sx: real
 	sy: real
 	rot: int32	
@@ -42,19 +42,24 @@ var colldatax, colldatay: int32
 
 fn centdraw(e: cent, c: rectangle.rect)
 
+// Internal function to convert e to c compatible entity.
+fn (e: ^ent) toc*(): cent {
+	return cent {
+		e.p.toc(),
+		e.image.handle, e.sx, e.sy,
+		round(e.rot), e.color, e.id}
+}
+
 // Draws the entity with camera c in mind.
 fn (e: ^ent) draw*(c: rectangle.rect) {
 	if len(e.p.v) == 0 {
 		return
 	}
-	
-	cp := polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}
-	ce := cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
 
-	centdraw(ce, c)
+	centdraw(e.toc(), c)
 }
 
-fn cgetcoll(ix, iy: ^int32, count: int32, e: ^cent, s: ^^cent): int32
+fn cgetcoll(ix, iy: ^int32, count: int32, e: ^cent, s: ^cent): int32
 
 // ent's constructor
 fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
@@ -93,45 +98,18 @@ fn (e: ^ent) setscale*(sx, sy: real) {
 
 // Checks, if e collides with any
 // of the entities in s and returns it's
-// id. **NOTE**: this function will recieve
-// a lot of changes. First of all, it will
-// take a new `entitable` interface, which
-// needs `getent(): ^entity.ent`. Other is
-// (and this one might break something)
-// that it won't return the id, but the
-// index of the ent, which collided.
+// id.
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	if len(s) == 0 {
 		return 0
 	}
 
-	cscn := []cent{}
-	cps := []polygon.cpoly{}
-
-	for i:=0; i < len(s); i++ {
-		e := s[i]
-		if len(e.p.v) == 0 {
-			continue
-		}
-		cps = append(cps, polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc})
-		ce := cent{null, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
-		cscn = append(cscn, ce)
+	cscn := make([]cent, len(s))
+	for i, e in s {
+		cscn[i] = e.toc()
 	}
 
-	if len(cscn) == 0 {
-		return 0
-	}
-
-	cscnp := []^cent{}
-
-	for i:=0; i < len(cps); i++ {
-		cscn[i].p = &cps[i]
-		cscnp = append(cscnp, &cscn[i])
-	}
-
-	cp := polygon.cpoly{round(e.p.x), round(e.p.y), &e.p.v[0], e.p.w, e.p.h, e.p.vc}
-	ce := cent{&cp, e.image, e.sx, e.sy, round(e.rot), e.color, e.id}
-	return cgetcoll(&colldatax, &colldatay, len(cscnp), &ce, &cscnp[0])
+	return cgetcoll(&colldatax, &colldatay, len(cscn), &e.toc(), &cscn[0])
 }
 
 // Returns, where the last collision happened.
