@@ -92,13 +92,15 @@ int main(int argc, char *argv[]) {
 			char fnName[UMKA_MSG_LEN + 1];
 			int fnOffset;
       
-			if (!umkaGetCallStack(umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1))
+			if (!umkaGetCallStack(umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1)) {
 				break;
+				fprintf(stderr, "\t\t...\n");
+			}
 
 #ifndef _WIN32
 			fprintf(stderr, "\033[34m");
 #endif
-			fprintf(stderr, "\t%08d: ", fnOffset);
+			fprintf(stderr, "\t\t%08d: ", fnOffset);
 #ifndef _WIN32
 			fprintf(stderr, "\033[0m");
 #endif
