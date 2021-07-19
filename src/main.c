@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
 		return 1;
 	}
-	umkaOK = umkaInit(umka, scriptpath, NULL, 1024 * 1024, 1024 * 1024, 0, NULL);
+	umkaOK = umkaInit(umka, scriptpath, NULL, 1024 * 1024, 1024 * 1024, NULL, 0, NULL);
 
 	th_audio_init();
 
@@ -73,7 +73,7 @@ int main(int argc, char *argv[]) {
 	if (!umkaOK) {
 		UmkaError error;
 		umkaGetError(umka, &error);
-		printf("Umka error %s (%d, %d): %s\n", error.fileName, error.line, error.pos, error.msg);
+		th_error("%s (%d, %d): %s\n", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}
 
@@ -85,7 +85,25 @@ int main(int argc, char *argv[]) {
 	if (!umkaOK) {
 		UmkaError error;
 		umkaGetError(umka, &error);
-		printf("Umka runtime error %s (%d): %s\n", error.fileName, error.line, error.msg);
+		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
+		fprintf(stderr, "\tStack trace:\n");
+
+		for (int depth = 0; depth < 10; depth++) {
+			char fnName[UMKA_MSG_LEN + 1];
+			int fnOffset;
+      
+			if (!umkaGetCallStack(umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1))
+				break;
+
+#ifndef _WIN32
+			fprintf(stderr, "\033[34m");
+#endif
+			fprintf(stderr, "\t%08d: ", fnOffset);
+#ifndef _WIN32
+			fprintf(stderr, "\033[0m");
+#endif
+			fprintf(stderr, "%s\n", fnName);
+		}
 	}
 
 	die();
