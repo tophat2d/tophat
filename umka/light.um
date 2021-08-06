@@ -36,10 +36,10 @@ fn (m: ^mask) clear*() {
 fn mk*(color: uint32, rect_size: real, cam: rectangle.rect): mask {
 	d := mask{}
 
-	d.dots = make([]uint32, round(cam.w * cam.h / rect_size))
 	d.rect_size = rect_size
 	d.w = round(cam.w / rect_size)
 	d.h = round(cam.h / rect_size)
+	d.dots = make([]uint32, d.w * d.h)
 	d.color = color
 
 	d.clear()

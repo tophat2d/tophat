@@ -15,12 +15,18 @@ void th_lightmask_clear(th_lightmask *d) {
 }
 
 void th_lightmask_draw(th_lightmask *d) {
-	for (int x=0; x < d->w; x++) {
+	unsigned tex = CNFGTexImage(d->dots, d->w, d->h);
+	CNFGBlitTex(tex, 0, 0,
+	            d->w * scaling,
+							d->h * scaling);
+	CNFGDeleteTex(tex);
+
+	/*for (int x=0; x < d->w; x++) {
 		for (int y=0; y < d->h; y++) {
 			CNFGColor(d->dots[y * d->w + x]);
 			CNFGTackRectangle(x * d->rect_size * scaling, y * d->rect_size * scaling, (x * d->rect_size + d->rect_size) * scaling, (y * d->rect_size + d->rect_size) * scaling);
 		}
-	}
+	}*/
 }
 
 void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color) {
