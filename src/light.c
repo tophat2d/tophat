@@ -20,13 +20,6 @@ void th_lightmask_draw(th_lightmask *d) {
 	            d->w * scaling,
 							d->h * scaling);
 	CNFGDeleteTex(tex);
-
-	/*for (int x=0; x < d->w; x++) {
-		for (int y=0; y < d->h; y++) {
-			CNFGColor(d->dots[y * d->w + x]);
-			CNFGTackRectangle(x * d->rect_size * scaling, y * d->rect_size * scaling, (x * d->rect_size + d->rect_size) * scaling, (y * d->rect_size + d->rect_size) * scaling);
-		}
-	}*/
 }
 
 void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color) {
@@ -34,7 +27,7 @@ void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color) {
 		return;
 
 	if ((color & 0xff) < (d->dots[y * d->w + x] & 0xff))
-		d->dots[y * d->w + x] = color;
+		d->dots[y * d->w + x] = color; 
 }
 
 void th_spotlight_stamp(th_spotlight *l, th_lightmask *d) {
@@ -51,8 +44,18 @@ void th_spotlight_stamp(th_spotlight *l, th_lightmask *d) {
 		uint32_t color = 0;
 
 		if (dist > tile_r/3) { // TODO this being tweakable
-			color = INTERP(tile_r/3, 0, tile_r, d->color, dist);
+			color = ((dist - tile_r/3) / (tile_r - tile_r/3)) * d->color;
 		}
+
+		if (l->tint) {
+			float a = dist / tile_r;
+      
+			for (int i=0; i < 32; i+=8) {
+				color += (int)((1 - a) * ((l->tint >> i) & 0xff)) << i;
+			}
+		}
+
+		//color += (int)(0xff000000 * INTERP(0, 1000, tile_r, 0, dist) / 1000) << 24;
 
 		_th_lightmask_stamp_point(d, l->x / d->rect_size + x, l->y / d->rect_size + y, color);
 	}

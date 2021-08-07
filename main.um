@@ -25,10 +25,10 @@ fn main() {
 
 	t := 0
 
-	m := light.mk(0xff, 0.2, cam)
+	m := light.mk(0xff, 1, cam)
 
-	spot := light.spotlight{0, 0, 20}
-	spot2 := light.spotlight{0, 0, 40}
+	spot := light.spotlight{0, 0, 20, 0xff000000}
+	spot2 := light.spotlight{0, 0, 40, 0xffff0000}
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
@@ -58,7 +58,9 @@ fn main() {
 			cam.y -= round(0.1 * tophat.delta)
 		}
 
-		rawdraw.drawtext(repr(1000/tophat.delta), 0, 0, tophat.white, 2)
+		if tophat.delta != 0 {
+			rawdraw.drawtext(repr(1000/tophat.delta), 0, 0, tophat.white, 2)
+		}
 	}
 }
 

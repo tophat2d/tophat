@@ -20,6 +20,7 @@ type cmask = struct {
 type spotlight* = struct {
 	x, y: int32
 	radius: int32
+	tint: uint32
 }
 
 fn clightmaskclear(m: ^cmask)

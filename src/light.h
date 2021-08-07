@@ -11,6 +11,7 @@ typedef struct {
 typedef struct {
 	int x, y;
 	int radius;
+	uint32_t tint;
 } th_spotlight;
 
 void th_lightmask_clear(th_lightmask *d);
