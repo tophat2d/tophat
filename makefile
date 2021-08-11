@@ -11,13 +11,10 @@ LINUX_LFLAGS=-lm -lX11 -L /lib64 -ldl -lGL -lpthread
 LINUX_UMKA=lib/umka/build/libumka.a
 
 WIN_LFLAGS=-lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread
-WIN_UMKA=-Llib/windows -lumka_static
+UMKA_SRC=lib/umka/src/umka_common.c lib/umka/src/umka_const.c lib/umka/src/umka_expr.c lib/umka/src/umka_ident.c lib/umka/src/umka_runtime.c lib/umka/src/umka_types.c lib/umka/src/umka_api.c lib/umka/src/umka_compiler.c lib/umka/src/umka_decl.c lib/umka/src/umka_gen.c lib/umka/src/umka_lexer.c lib/umka/src/umka_stmt.c lib/umka/src/umka_vm.c
 
 LINUX_FULL=$(LINUX_LFLAGS) $(WARNINGS) $(DEFINES)
-WIN_FULL=$(SOURCES) lib/rawdraw/chew.c lib/windows/libumka_static.a $(WARNINGS) $(WIN_LFLAGS) $(WIN_UMKA) $(DEFINES) -DNO_OPENGL_HEADERS
-
-#build: $(OBJ)
-#	$(CC) $(OBJ) $(LINUX_FULL) -o tophat
+WIN_FULL=$(SOURCES) lib/rawdraw/chew.c $(WARNINGS) $(WIN_LFLAGS) $(UMKA_SRC) $(DEFINES) -DNO_OPENGL_HEADERS
 
 VERSION=v0.3-$(git rev-parse --short HEAD)
 
