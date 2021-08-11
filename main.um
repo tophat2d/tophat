@@ -25,7 +25,7 @@ fn main() {
 
 	t := 0
 
-	m := light.mk(0xff, 1, cam)
+	m := light.mk(0xff, 0.1, cam)
 
 	spot := light.spotlight{0, 0, 20, 0xff000000}
 	spot2 := light.spotlight{0, 0, 40, 0xffff0000}
@@ -40,7 +40,7 @@ fn main() {
 
 		spot.stamp(&m, cam)
 		spot2.stamp(&m, cam)
-		m.draw()
+		m.draw(cam)
 
 		if input.ispressed(int32('a')) {
 			cam.x += round(0.1 * tophat.delta)

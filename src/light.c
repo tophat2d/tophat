@@ -4,6 +4,7 @@
 
 #include "../lib/rawdraw/CNFG.h"
 #include "light.h"
+#include "rect.h"
 
 #define INTERP(x0, y0, x1, y1, x) (y0 + (x - x0) * ((y1 - y0) / (x1 - x0)))
 
@@ -14,11 +15,11 @@ void th_lightmask_clear(th_lightmask *d) {
 		d->dots[i] = d->color;
 }
 
-void th_lightmask_draw(th_lightmask *d) {
+void th_lightmask_draw(th_lightmask *d, th_rect *cam) {
 	unsigned tex = CNFGTexImage(d->dots, d->w, d->h);
 	CNFGBlitTex(tex, 0, 0,
-	            d->w * scaling,
-							d->h * scaling);
+	            cam->w * scaling,
+							cam->h * scaling);
 	CNFGDeleteTex(tex);
 }
 
@@ -54,8 +55,6 @@ void th_spotlight_stamp(th_spotlight *l, th_lightmask *d) {
 				color += (int)((1 - a) * ((l->tint >> i) & 0xff)) << i;
 			}
 		}
-
-		//color += (int)(0xff000000 * INTERP(0, 1000, tile_r, 0, dist) / 1000) << 24;
 
 		_th_lightmask_stamp_point(d, l->x / d->rect_size + x, l->y / d->rect_size + y, color);
 	}

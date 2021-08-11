@@ -147,9 +147,10 @@ void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // draws the lightmask
 void umlightmaskdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_lightmask *l = (th_lightmask *)p[0].ptrVal;
+	th_lightmask *l = (th_lightmask *)p[1].ptrVal;
+	th_rect *cam = (th_rect *)p[0].ptrVal;
 
-	th_lightmask_draw(l);
+	th_lightmask_draw(l, cam);
 }
 
 // "stamps" the spotlight on the mask
@@ -159,8 +160,8 @@ void umspotlightstamp(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_spotlight *s = (th_spotlight *)p[2].ptrVal;
 	
 	int x = s->x, y = s->y;
-	s->x -= (cam->x - cam->w/2) / l->rect_size;
-	s->y -= (cam->y - cam->h/2) / l->rect_size;
+	s->x -= (cam->x - cam->w/2);
+	s->y -= (cam->y - cam->h/2);
 
 	th_spotlight_stamp(s, l);
 

@@ -48,15 +48,15 @@ fn mk*(color: uint32, rect_size: real, cam: rectangle.rect): mask {
 	return d
 }
 
-fn clightmaskdraw(m: ^cmask)
+fn clightmaskdraw(m: ^cmask, cam: ^rectangle.rect)
 
-fn (m: ^mask) draw*() {
+fn (m: ^mask) draw*(cam: rectangle.rect) {
 	cm := cmask {
 		&m.dots[0],
 		m.w, m.h, m.rect_size,
 		m.color}
 
-	clightmaskdraw(&cm)
+	clightmaskdraw(&cm, &cam)
 }
 
 fn cspotlightstamp(s: ^spotlight, m: ^cmask, cam: ^rectangle.rect)
