@@ -1,16 +1,13 @@
 // audio file
 // inpired by https://github.com/drmargarido's sound module
-
+#include <stdlib.h>
+#include <string.h>
 #include <stdint.h>
 
-#define MA_NO_FLAC
-#define MA_NO_ENCODING
-#define MA_NO_COREAUDIO
-#define MA_NO_WEBAUDIO
-#define MINIAUDIO_IMPLEMENTATION
-#include "../lib/miniaudio.h"
-
 #include "tophat.h"
+
+#include "../lib/miniaudio.h"
+#define ma_countof(x) (sizeof(x) / sizeof(x[0]))
 
 #define SAMPLE_FORMAT ma_format_f32
 #define CHANNEL_COUNT 2

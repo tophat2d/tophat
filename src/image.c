@@ -1,14 +1,9 @@
-
+#include <string.h>
 #include <stdint.h>
 
 #include <GL/gl.h>
 
-#ifdef __TINYC__
-#define STBI_NO_SIMD
-#endif
-#define STB_IMAGE_IMPLEMENTATION
 #include "../lib/stb_image.h"
-
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/rawdraw/chew.h"
 
