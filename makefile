@@ -1,48 +1,59 @@
-CC=gcc
-MINGW=x86_64-w64-mingw32-gcc
+platform := $(shell uname -s)
+shortplatform := $(shell (X=`uname -s`; echo $${X:0:10}))
+
+BUILDPATH = build
+
+ifeq ($(platform), Linux)
+  LFLAGS = -lm -lX11 -L /lib64 -ldl -lGL -lpthread
+  LPATH = LD_LIBRARY_PATH
+  CROSS_CC=x86_64-w64-mingw32-gcc
+  FULL=$(LFLAGS) $(WARNINGS) $(DEFINES)
+  BINARY=tophat
+else
+ifeq ($(shortplatform), MINGW64_NT)
+  LFLAGS=-lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread
+  LPATH = PATH
+  FULL=lib/rawdraw/chew.c $(WARNINGS) $(LFLAGS) $(DEFINES) -DNO_OPENGL_HEADERS
+  BINARY=tophat.exe
+endif
+endif
 
 WARNINGS=-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare -Wno-old-style-declaration -Wno-implicit-fallthrough
 DEFINES=-DCNFGOGL -DUMKA_STATIC
 RELEASE_FLAGS=-DRELEASE_BUILD
+UMKA = lib/umka/build/libumka.a
+
 SRC=src/*.c
 OBJ=src/*.o
 
-LINUX_LFLAGS=-lm -lX11 -L /lib64 -ldl -lGL -lpthread
-LINUX_UMKA=lib/umka/build/libumka.a
-
-WIN_LFLAGS=-lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread
 UMKA_SRC=lib/umka/src/umka_common.c lib/umka/src/umka_const.c lib/umka/src/umka_expr.c lib/umka/src/umka_ident.c lib/umka/src/umka_runtime.c lib/umka/src/umka_types.c lib/umka/src/umka_api.c lib/umka/src/umka_compiler.c lib/umka/src/umka_decl.c lib/umka/src/umka_gen.c lib/umka/src/umka_lexer.c lib/umka/src/umka_stmt.c lib/umka/src/umka_vm.c
 
-LINUX_FULL=$(LINUX_LFLAGS) $(WARNINGS) $(DEFINES)
-WIN_FULL=$(SOURCES) lib/rawdraw/chew.c $(WARNINGS) $(WIN_LFLAGS) $(UMKA_SRC) $(DEFINES) -DNO_OPENGL_HEADERS
-
-VERSION=v0.3-$(git rev-parse --short HEAD)
+VERSION=v0.3-$(shell git rev-parse --short HEAD)
 
 OBJS=$(patsubst src/%.c, src/%.o, $(wildcard src/*.c))
 
 src/%.o: src/%.c
-	@echo "building $@"
-	@$(CC) -o $@ -c $< $(LINUX_FULL) $(RELEASE_FLAGS) -Ofast
+	@echo CC $@
+	@$(CC) -o $@ -c $< $(FULL) $(RELEASE_FLAGS) -Ofast
 
 build: libs $(OBJS)
-	@echo "building binary"
-	@$(CC) $(OBJS) $(LINUX_UMKA) $(LINUX_FULL) -o tophat
+	@mkdir -p $(BUILDPATH)
+	@echo LD $(BUILDPATH)/$(BINARY)
+	@$(CC) $(OBJS) $(UMKA) $(FULL) -o $(BUILDPATH)/$(BINARY)
 
-install: build
-	sudo cp tophat /usr/share/tophat/bin/tophat-linux
-
-wbuild: libs
-	$(MINGW) -o tophat.exe $(SRC) $(WIN_FULL) $(RELEASE_FLAGS) -s -Os
+cross: libs
+	$(CROSS_CC) -o tophat.exe $(SRC) $(WIN_FULL) $(RELEASE_FLAGS) -s -Os
 
 run:
-	rm src/bindings.o
-	make build
-	./tophat
+	@rm src/bindings.o
+	@make build
+	./$(BUILDPATH)/$(BINARY)
 
 clean:
-	rm -rf tophat-release
-	rm -f tophat tophat.exe src/umkalibs.h
-	rm src/*.o
+	rm -rf tophat-release tophat-win
+	rm -rf $(BUILDPATH)
+	rm -f src/umkalibs.h
+	rm -f src/*.o
 
 libs:
 	@echo "embedding tophat std"
@@ -63,6 +74,7 @@ package:
 	rm -rf bin/tophat.zip
 	zip -r tophat.zip tophat-release
 	rm -r tophat-release
+	rm version
 
 win-package:
 	mkdir -p tophat-win/bin
