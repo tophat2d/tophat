@@ -3,10 +3,9 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "particles.h"
-#include "misc.h"
-#include "rect.h"
 #include "../lib/rawdraw/CNFG.h"
+
+#include "tophat.h"
 
 #define FRAND (double)rand()/0x7FFFFFFF
 

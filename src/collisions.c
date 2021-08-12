@@ -1,16 +1,11 @@
 //
 // largely inspired by (copied from :]) this guide: http://jeffreythompson.org/collision-detection/table_of_contents.php
 //
-#include "entity.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
 
-#include "collisions.h"
-#include "polygon.h"
-#include "tilemap.h"
-#include "misc.h"
-#include "raycast.h"
+#include "tophat.h"
 
 // checks collision between two polygons
 int _th_poly_to_poly(th_poly *p1, th_poly *p2, int *ix, int *iy) {

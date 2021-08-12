@@ -1,8 +1,4 @@
-#include "raycast.h"
-#include "collisions.h"
-#include "entity.h"
-#include "rect.h"
-#include "misc.h"
+#include "tophat.h"
 
 int th_ray_getcoll(th_ray *ra, th_ent *scene, int count, int *ix, int *iy) {
 	float rx, ry;

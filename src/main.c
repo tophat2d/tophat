@@ -5,9 +5,7 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/umka/src/umka_api.h"
 #include "bindings.h"
-#include "audio.h"
-#include "misc.h"
-#include "input.h"
+#include "tophat.h"
 
 float scaling;
 char *respath;

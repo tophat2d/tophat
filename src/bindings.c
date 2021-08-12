@@ -11,16 +11,8 @@
 #include "../lib/stb_image.h"
 
 #include "bindings.h"
-#include "polygon.h"
-#include "tilemap.h"
-#include "light.h"
-#include "audio.h"
-#include "entity.h"
-#include "raycast.h"
-#include "image.h"
-#include "collisions.h"
-#include "misc.h"
-#include "particles.h"
+
+#include "tophat.h"
 
 #ifdef RELEASE_BUILD
 #include "umkalibs.h"

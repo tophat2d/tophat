@@ -3,8 +3,8 @@
 #include <math.h>
 
 #include "../lib/rawdraw/CNFG.h"
-#include "light.h"
-#include "rect.h"
+
+#include "tophat.h"
 
 #define INTERP(x0, y0, x1, y1, x) (y0 + (x - x0) * ((y1 - y0) / (x1 - x0)))
 

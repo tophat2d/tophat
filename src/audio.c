@@ -10,8 +10,7 @@
 #define MINIAUDIO_IMPLEMENTATION
 #include "../lib/miniaudio.h"
 
-#include "audio.h"
-#include "misc.h"
+#include "tophat.h"
 
 #define SAMPLE_FORMAT ma_format_f32
 #define CHANNEL_COUNT 2

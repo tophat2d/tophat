@@ -5,8 +5,7 @@
 
 #include "../lib/rawdraw/CNFG.h"
 
-#include "tilemap.h"
-#include "rect.h"
+#include "tophat.h"
 
 extern float scaling;
 

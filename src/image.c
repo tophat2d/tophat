@@ -12,9 +12,7 @@
 #include "../lib/rawdraw/CNFG.h"
 #include "../lib/rawdraw/chew.h"
 
-#include "image.h"
-
-#include "misc.h"
+#include "tophat.h"
 
 extern GLuint gRDShaderProg;
 extern GLuint gRDBlitProg;

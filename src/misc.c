@@ -1,7 +1,8 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <math.h>
-#include "misc.h"
+
+#include "tophat.h"
 
 float th_get_scaling(int w, int h, int camw, int camh) {
 	if ((float)w/camw < (float)h/camh)

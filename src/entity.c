@@ -1,11 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "../lib/rawdraw/CNFG.h"
-#include "entity.h"
-#include "rect.h"
-#include "polygon.h"
-#include "misc.h"
-#include "collisions.h"
+
+#include "tophat.h"
 
 extern float scaling;
 
