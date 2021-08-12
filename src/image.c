@@ -184,26 +184,22 @@ void th_image_crop(th_image *img, int x1, int y1, int x2, int y2) {
 }
 
 void _th_rdimg(th_image *img, unsigned char *data) {
-	uint32_t *rd;
-	rd = malloc(sizeof(int) * img->w * img->h);
-	uint32_t current = 0;
+	uint32_t *rd = malloc(sizeof(uint32_t) * img->w * img->h);
 
-	for (int y=0; y < img->h; y += 1) {
-		for (int x=0; x < img->w; x += 1) {
-			current = 0;
-			for (int i=0; i < img->c; i++) {
-				current = current << 8;
-				current += (uint32_t)data[(y * img->w + x) * img->c + i];
+	for (int x=0; x < img->w; x++) {
+		for (int y=0; y < img->h; y++) {
+			int rd_index = (y * img->w) + x;
+			int data_index = ((y * img->w) + x) * img->c;
+			rd[rd_index] = 0;
+
+			for (int poff=0; poff < img->c; poff++) {
+				rd[rd_index] += data[data_index + poff] << ((3 - poff) * 8);
 			}
-			for (int i=0; i < 4 - img->c; i++) {
-				if (current == 1) {
-					current = 0x00 | current<<8;
-					continue;
-				}
-				current = 0xff | current<<8;
-			}
-			rd[(y * img->w + x)] = current;
+
+			if (img->c == 3)
+				rd[rd_index] += 0xff;
 		}
 	}
+
 	img->rdimg = rd;
 }

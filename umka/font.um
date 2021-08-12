@@ -1,0 +1,10 @@
+
+import (
+	"image.um"								
+)
+
+type ttf* = struct {
+	handle: int
+}
+
+fn (t: ^ttf) render(text: str, scale: real): image.img

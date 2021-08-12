@@ -30,11 +30,15 @@ fn main() {
 	spot := light.spotlight{0, 0, 20, 0xff000000}
 	spot2 := light.spotlight{0, 0, 40, 0xffff0000}
 
+	img := image.load("etc/test.png")
+
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 		t += tophat.delta
 
 		m.clear()
+
+		img.draw(0, 0, 0, 10)
 
 		spot.x, spot.y = input.getglobalmousepos(cam)
 
