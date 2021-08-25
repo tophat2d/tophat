@@ -1,5 +1,5 @@
 # author: @prokoprandacek
-.PHONY : all clean deepclean umka
+.PHONY : all clean deepclean umka bulk
 
 LDLIBS = -lm -lX11 -ldl -lGL -lpthread
 CFLAGS ?= -O3 -pipe

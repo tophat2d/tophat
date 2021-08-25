@@ -31,6 +31,9 @@ UMKA_SRC=lib/umka/src/umka_common.c lib/umka/src/umka_const.c lib/umka/src/umka_
 cross: $(UMKA_LIB)
 	$(CROSS_CC) $(CFLAGS) -o tophat.exe $(SRCS) $(UMKA_SRC) $(CROSS_FLAGS) lib/rawdraw/chew.c -s -Os
 
+bulk: $(UMKA_LIB) $(UMKA_LIBRARY)
+	$(CC) -o $(TARGET) $(CFLAGS) $(SRCS) $(LDFLAGS) $(LDLIBS)
+
 clean::
 	$(RM) $(OBJS)
 	$(RM) $(DEPS)
