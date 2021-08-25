@@ -2,7 +2,7 @@
 #include <stdint.h>
 #include <math.h>
 
-#include "../lib/rawdraw/CNFG.h"
+#include <CNFG.h>
 
 #include "tophat.h"
 
@@ -28,12 +28,12 @@ void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color) {
 		return;
 
 	if ((color & 0xff) < (d->dots[y * d->w + x] & 0xff))
-		d->dots[y * d->w + x] = color; 
+		d->dots[y * d->w + x] = color;
 }
 
 void th_spotlight_stamp(th_spotlight *l, th_lightmask *d) {
 	int tile_r = l->radius / d->rect_size;
-	
+
 	// this is kinda naive way to rasterize a circle, since it calls sqrt every cycle. TODO use bresenham circle
 	for (int y=-tile_r; y < tile_r; y++) for (int x=-tile_r; x < tile_r; x++) {
 		double dist = sqrt(x * x + y * y);
@@ -50,7 +50,7 @@ void th_spotlight_stamp(th_spotlight *l, th_lightmask *d) {
 
 		if (l->tint) {
 			float a = dist / tile_r;
-      
+
 			for (int i=0; i < 32; i+=8) {
 				color += (int)((1 - a) * ((l->tint >> i) & 0xff)) << i;
 			}

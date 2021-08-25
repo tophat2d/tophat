@@ -3,7 +3,7 @@
 #include <stdint.h>
 #include <stdio.h>
 
-#include "../lib/rawdraw/CNFG.h"
+#include <CNFG.h>
 
 #include "tophat.h"
 
@@ -55,7 +55,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 		srand(p->particles[i].seed);
 
 		double direction = (rand()%(p->angle_max - p->angle_min) + p->angle_min) * M_PI / 180;
-		
+
 		double vx = p->velocity * cos(direction);
 		double vy = p->velocity * sin(direction);
 		if (p->velocity_randomness != 0) {

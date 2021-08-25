@@ -3,9 +3,9 @@
 
 #include <GL/gl.h>
 
-#include "../lib/stb_image.h"
-#include "../lib/rawdraw/CNFG.h"
-#include "../lib/rawdraw/chew.h"
+#include <stb_image.h>
+#include <CNFG.h>
+#include <chew.h>
 
 #include "tophat.h"
 

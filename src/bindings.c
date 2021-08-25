@@ -5,10 +5,10 @@
 #include <sys/time.h>
 #include <GL/gl.h>
 
-#include "../lib/rawdraw/CNFG.h"
-#include "../lib/rawdraw/chew.h"
-#include "../lib/umka/src/umka_api.h"
-#include "../lib/stb_image.h"
+#include <CNFG.h>
+#include <chew.h>
+#include <umka_api.h>
+#include <stb_image.h>
 
 #include "bindings.h"
 
@@ -66,7 +66,7 @@ void _th_umka_bind(void *umka) {
 	// rays
 	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
 	umkaAddFunc(umka, "craygettmapcoll", &umraygettmapcoll);
-	
+
 	// audio
 	umkaAddFunc(umka, "cauload", &umauload);
 	umkaAddFunc(umka, "cauarr", &umauarr);
@@ -150,7 +150,7 @@ void umspotlightstamp(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_rect *cam = (th_rect *)p[0].ptrVal;
 	th_lightmask *l = (th_lightmask *)p[1].ptrVal;
 	th_spotlight *s = (th_spotlight *)p[2].ptrVal;
-	
+
 	int x = s->x, y = s->y;
 	s->x -= (cam->x - cam->w/2);
 	s->y -= (cam->y - cam->h/2);
@@ -571,6 +571,6 @@ void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	double s = p[2].realVal;
 	int rot = p[3].intVal;
-	
+
 	th_blit_tex(img->tex, x * scaling, y * scaling, img->w * s * scaling, img->h * s * scaling, rot);
 }

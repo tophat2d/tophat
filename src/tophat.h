@@ -2,8 +2,8 @@
 #define TOPHAT_H
 
 #include <stdbool.h>
-#include "../lib/miniaudio.h"
-#include "../lib/rawdraw/CNFG.h"
+#include <miniaudio.h>
+#include <CNFG.h>
 
 typedef struct {
     ma_decoder decoder;
@@ -67,9 +67,9 @@ typedef struct {
 	int w, h;
 	double gravity_x, gravity_y;
 	int seed;
-	
+
 	int angle_min, angle_max;
-	
+
 	int lifetime;
 	double lifetime_randomness;
 
@@ -79,7 +79,7 @@ typedef struct {
 	double size;
 	double size_randomness;
 	double max_size;
-	
+
 	int rotation;
 	int max_rotation;
 	double rotation_randomness;

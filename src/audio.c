@@ -6,7 +6,7 @@
 
 #include "tophat.h"
 
-#include "../lib/miniaudio.h"
+#include <miniaudio.h>
 #define ma_countof(x) (sizeof(x) / sizeof(x[0]))
 
 #define SAMPLE_FORMAT ma_format_f32
@@ -50,7 +50,7 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
             break;  /* Reached EOF. */
         }
     }
-    
+
     return totalFramesRead;
 }
 
@@ -68,7 +68,7 @@ void _th_audio_data_callback(ma_device * pDevice, void *pOutput, const void *pIn
 			continue;
 
 		ma_uint32 framesread = __read_and_mix_pcm_frames_f32(&csound->decoder, (float *)pOutput, frameCount, csound->volume);
-										
+
 		if (framesread <= 0) {
 			ma_decoder_seek_to_pcm_frame(&csound->decoder, 0);
 			if (csound->looping)

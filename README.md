@@ -33,19 +33,17 @@ If you know/have made a game in tophat, don't hesitate and make a pr to add it h
   - libGL headers
   - libX11 headers for linux build
  
-...
+!!! Make sure that you cloned this repository with the `--recursive` flag !!!  
+In case you didn't, run this: `git submodule init && git submodule update`  
+  
+Tip: run make with `-j$(nproc)` for parallel compiling.
 
-- `make deps` - downloads all submodules and libraries and builds umka
-- `make run` - to build without optimizations and embedding + run
-- `make install` - build and install, so you can test on existing projects
-- `make build` - release build
-- `make wbuild` - build for windows
-- `make package` - creates a package, that can be installed using linux shell tool
-- `make win-package` - same as above, but is makes a windows package
+- `make` - builds tophat
+- `make run` - builds tophat and runs it
 
 ## todo
 
-- tranparency on images
+- transparency on images
 - navigation on tilemaps
 - `move_and_slide`-like function
 - convert backend to reals and allow for pixel imperfect movement
