@@ -17,7 +17,10 @@ Tophat is a 2d game engine focused on minimalism and not taking power away from 
 If you just want to see, how a game made using tophat looks like, you can find some in the `examples` folder.
 If you like the engine and want to get started, read the [getting started article](https://github.com/marekmaskarinec/tophat/tree/main/doc/getting-started.md).
 Documentation for all umka modules can be found in the [doc](https://github.com/marekmaskarinec/tophat/tree/main/doc) folder.
-C documentation coming soon.
+
+## documentation
+
+You can generate the documentation by calling `doxygen` in the repo root.
 
 ## games made with tophat
 
