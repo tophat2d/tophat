@@ -1,8 +1,11 @@
 # author: @prokoprandacek
 .PHONY : all clean deepclean umka
 
+#CROSS_CC = x86_64-w64-mingw32-gcc
+
+LDLIBS = -lm -lX11 -ldl -lGL -lpthread
+
 CFLAGS ?= -O3 -pipe
-LDLIBS += -lm -lX11 -ldl -lGL -lpthread
 
 CFLAGS += -Ilib/stb/ \
 		  -Ilib/rawdraw/ \
@@ -17,7 +20,6 @@ WARNS = \
 CFLAGS += $(WARNS) $(DEFS)
 
 TARGET = tophat
-VERSION = v0.3-$(shell git rev-parse --short HEAD)
 
 all: $(TARGET)
 
