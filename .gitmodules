@@ -4,3 +4,6 @@
 [submodule "lib/rawdraw"]
 	path = lib/rawdraw
 	url = https://github.com/cntools/rawdraw.git
+[submodule "doxygen-awesome-css"]
+	path = doxygen-awesome-css
+	url = https://github.com/jothepro/doxygen-awesome-css.git
