@@ -29,7 +29,7 @@ If you know/have made a game in tophat, don't hesitate and make a pr to add it h
 ## build instructions
 
 ### deps:
-  - compiler - gcc, tcc and clang work. I didn't test any others.
+  - compiler - `gcc` and `clang` work, `tcc` doesn't work (we need the `-M` flag). I didn't test any others.
   - libGL headers
   - libX11 headers for linux build
  
@@ -38,8 +38,10 @@ In case you didn't, run this: `git submodule init && git submodule update`
   
 Tip: run make with `-j$(nproc)` for parallel compiling.
 
-- `make` - builds tophat
-- `make run` - builds tophat and runs it
+- `make` - builds tophat (located at `./tophat`).
+- `make run` - builds tophat and runs it.
+- `make clean` - clean repository after build.
+- `make deepclean` - like `clean` but also clean submodules.
 
 ## todo
 
