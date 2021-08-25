@@ -42,6 +42,7 @@ Tip: run make with `-j$(nproc)` for parallel compiling.
 - `make run` - builds tophat and runs it.
 - `make clean` - clean repository after build.
 - `make deepclean` - like `clean` but also clean submodules.
+- `make cross` - build windows executable (located at `./tophat.exe`)
 
 ## todo
 
