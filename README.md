@@ -29,23 +29,25 @@ If you know/have made a game in tophat, don't hesitate and make a pr to add it h
 ## build instructions
 
 ### deps:
-  - compiler - gcc, tcc and clang work. I didn't test any others.
+  - compiler - both `gcc` and `clang` work, `tcc` should work only with the `bulk` rule. I didn't test any others.
   - libGL headers
   - libX11 headers for linux build
  
-...
+!!! Make sure that you cloned this repository with the `--recursive` flag !!!  
+In case you didn't, run this: `git submodule init && git submodule update`  
+  
+Tip: run make with `-j$(nproc)` for parallel compiling.
 
-- `make deps` - downloads all submodules and libraries and builds umka
-- `make run` - to build without optimizations and embedding + run
-- `make install` - build and install, so you can test on existing projects
-- `make build` - release build
-- `make wbuild` - build for windows
-- `make package` - creates a package, that can be installed using linux shell tool
-- `make win-package` - same as above, but is makes a windows package
+- `make` - builds tophat (located at `./tophat`).
+- `make run` - builds tophat and runs it.
+- `make clean` - clean repository after build.
+- `make deepclean` - like `clean` but also clean submodules.
+- `make cross` - build windows executable (located at `./tophat.exe`)
+- `make bulk` - same as `make` but (re)compile all sources at once
 
 ## todo
 
-- tranparency on images
+- transparency on images
 - navigation on tilemaps
 - `move_and_slide`-like function
 - convert backend to reals and allow for pixel imperfect movement

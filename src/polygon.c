@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <stdarg.h>
-#include "../lib/rawdraw/CNFG.h"
+#include <CNFG.h>
 
 #include "tophat.h"
 

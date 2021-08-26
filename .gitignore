@@ -9,4 +9,5 @@ lib/miniaudio.h
 tophat.zip
 tophat-win.zip
 src/*.o
+src/*.d
 **/gmon.out
