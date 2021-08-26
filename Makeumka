@@ -1,0 +1,17 @@
+# author: @prokoprandacek
+# vim: ft=make
+
+UMKA_DIR     ?= ./lib/umka
+UMKA_LIBRARY ?= $(UMKA_DIR)/build/libumka.a
+
+umka: $(UMKA_LIBRARY)
+
+$(UMKA_LIBRARY):
+	cd $(UMKA_DIR)/ && $(MAKE) -j$(shell nproc)
+
+deepclean::
+	cd $(UMKA_DIR)/ && $(MAKE) clean && $(RM) src/umka_runtime_src.h
+
+LDLIBS += $(UMKA_LIBRARY)
+CFLAGS += -I$(UMKA_DIR)/src/
+

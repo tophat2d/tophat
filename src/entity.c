@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "../lib/rawdraw/CNFG.h"
+#include <CNFG.h>
 
 #include "tophat.h"
 
@@ -43,7 +43,7 @@ int th_ent_getcoll(th_ent *e, th_ent *scene, int count, int *ix, int *iy) {
 	int ey = e->p.y;
 	int ew = e->p.w;
 	int eh = e->p.h;
-	
+
 	if (!ex || !ey)
 		return 0;
 
@@ -59,7 +59,7 @@ int th_ent_getcoll(th_ent *e, th_ent *scene, int count, int *ix, int *iy) {
 		int sy = e->p.y;
 		int sw = e->p.w;
 		int sh = e->p.h;
-		
+
 		if (sw < 0)
 			sw = abs(sw);
 		if (sh < 0)

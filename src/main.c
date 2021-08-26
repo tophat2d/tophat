@@ -2,8 +2,8 @@
 #include <string.h>
 
 #define CNFG_IMPLEMENTATION
-#include "../lib/rawdraw/CNFG.h"
-#include "../lib/umka/src/umka_api.h"
+#include <CNFG.h>
+#include <umka_api.h>
 #include "bindings.h"
 #include "tophat.h"
 
@@ -28,11 +28,11 @@ void HandleDestroy() {
 
 int main(int argc, char *argv[]) {
 	umka = umkaAlloc();
-	int umkaOK;	
+	int umkaOK;
 
 	char rp[255];
 	respath = &rp[0];
-	
+
 	FILE *f;
 	char scriptpath[20];
 	if ((f = fopen("main.um", "r"))) {
@@ -89,7 +89,7 @@ int main(int argc, char *argv[]) {
 		for (int depth = 0; depth < 10; depth++) {
 			char fnName[UMKA_MSG_LEN + 1];
 			int fnOffset;
-      
+
 			if (!umkaGetCallStack(umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1)) {
 				break;
 				fprintf(stderr, "\t\t...\n");

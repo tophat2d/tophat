@@ -6,8 +6,11 @@ doxydocs/
 lib/miniaudio.h
 lib/stb_image.h
 src/*.o
+src/*.d
 src/umkalibs.h
 tophat
 tophat-win.zip
 tophat.exe
 tophat.zip
+tophat-win.zip
+**/gmon.out

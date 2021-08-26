@@ -3,7 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 
-#include "../lib/rawdraw/CNFG.h"
+#include <CNFG.h>
 
 #include "tophat.h"
 
@@ -18,7 +18,7 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	int camx = cam->x - (cam->w / 2);
 	int camy = cam->y - (cam->h / 2);
 
-	if (camx > t->x + t->w*t->cellsize) 
+	if (camx > t->x + t->w*t->cellsize)
 		return;
 	if (camy > t->y + t->h*t->cellsize)
 		return;
