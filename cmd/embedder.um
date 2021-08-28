@@ -75,10 +75,14 @@ fn strtoc(inp: str): str {
 }
 
 fn main() {
+	printf("#ifndef UMKALIBS_H\n#define UMKALIBS_H\nconst char *libs[] = {\n")
+
 	for i:=1; i < std.argc(); i++ {
 		f := std.fopen(std.argv(i), "r")
 		data := readall(f)
 		printf("%s\n", strtoc(data)+",")
 		std.fclose(f)
 	}
+
+	printf("};\n#endif\n")
 }
