@@ -6,7 +6,7 @@ import "umka/rectangle.um"
 
 // Particle struct. You
 // can tweak the start_time
-// for godot like explossivness.
+// for godot-like explossivness.
 type particle* = struct {
 	start_time: int32
 	seed: int32
@@ -19,6 +19,8 @@ type emitter* = struct {
 	w, h: int32 // size of the emittion area
 	gravity_x, gravity_y: real // gravity
 	seed: int32 // **DEPRECATED**
+	repeat: bool // if false, particle won't be renewed
+	active: bool // false, if there aren't any active particles anymore
 	
 	angle_min, angle_max: int32 // angle in which particles are emitted
 
@@ -46,6 +48,8 @@ type c_emitter = struct {
 	w, h: int32
 	gravity_x, gravity_y: real
 	seed: int32
+	repeat: bool
+	active: bool
 	
 	angle_min, angle_max: int32
 
@@ -79,6 +83,7 @@ fn (e: ^emitter) draw*(cam: rectangle.rect, t: int32) {
 		e.w, e.h,
 		e.gravity_x, e.gravity_y,
 		e.seed,
+		e.repeat, e.active,
 		e.angle_min, e.angle_max,
 		e.lifetime, e.lifetime_randomness,
 		e.velocity, e.velocity_randomness,
@@ -88,4 +93,5 @@ fn (e: ^emitter) draw*(cam: rectangle.rect, t: int32) {
 		&e.particles[0], len(e.particles)}
 
 	c_particles_draw(&ce, &cam, t)
+	e.active = ce.active
 }

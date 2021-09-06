@@ -67,6 +67,8 @@ typedef struct {
 	int w, h;
 	double gravity_x, gravity_y;
 	int seed;
+	bool repeat;
+	bool active;
 
 	int angle_min, angle_max;
 

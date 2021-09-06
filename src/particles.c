@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include <CNFG.h>
 
@@ -50,8 +51,13 @@ int get_particle_rotation(th_particles *p, _th_particle pa, int t) {
 
 void th_particles_draw(th_particles *p, th_rect cam, int t) {
 	int camx = cam.x - cam.w/2, camy = cam.y - cam.h/2;
+	p->active = false;
 
 	for (int i=0; i < p->particle_c; i++) {
+		if (t < p->particles[i].start_time)
+			continue;
+
+		p->active = true;
 		srand(p->particles[i].seed);
 
 		double direction = (rand()%(p->angle_max - p->angle_min) + p->angle_min) * M_PI / 180;
@@ -75,32 +81,49 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 
 		size += FRAND * (p->size * p->size_randomness);
 
-		uint32_t col = 0;
+		uint32_t col = 0xff;
 		if (p->color_c > 0)
 			col = get_particle_color(p, p->particles[i], t);
-
-		int rot = p->rotation;
-		if (p->rotation != p->max_rotation)
-			rot = get_particle_rotation(p, p->particles[i], t);
-
-		rot += FRAND * (p->size * p->rotation_randomness);
-
-		RDPoint points[4] = {{px, py}, {px + size, py}, {px + size, py + size}, {px, py + size}};
-		for (int i=0; i < 4; i++) {
-			float x = points[i].x;
-			float y = points[i].y;
-			th_rotate_point(&x, &y, px + size/2, py+size/2, rot);
-			points[i].x = (x - camx) * scaling;
-			points[i].y = (y - camy) * scaling;
-		}
-
 		CNFGColor(col);
-		CNFGTackPoly(points, 4); // TODO camera
+
+		if (p->max_rotation) {
+			int rot = p->rotation;
+			if (p->rotation != p->max_rotation)
+				rot = get_particle_rotation(p, p->particles[i], t);
+      
+			rot += FRAND * (p->size * p->rotation_randomness);
+      
+			RDPoint points[4] = {{px, py}, {px + size, py}, {px + size, py + size}, {px, py + size}};
+			for (int i=0; i < 4; i++) {
+				float x = points[i].x;
+				float y = points[i].y;
+				th_rotate_point(&x, &y, px + size/2, py+size/2, rot);
+				points[i].x = (x - camx) * scaling;
+				points[i].y = (y - camy) * scaling;
+			}
+      
+			CNFGTackPoly(points, 4);
+		} else { // optimize drawing without rotations
+			int x = px;
+			int y = py;
+			int w = px + size;
+			int h = py + size;
+
+			CNFGTackRectangle(
+				(x - camx) * scaling,
+				(y - camy) * scaling,
+				(w - camx) * scaling,
+				(h - camy) * scaling);
+		}
 
 		int lt = p->lifetime + FRAND*(p->lifetime * p->lifetime_randomness);
 		if (t - p->particles[i].start_time >= lt) {
-			p->particles[i].start_time = t - rand()%(p->lifetime / 4);
-			p->particles[i].seed = rand();
+			if (p->repeat) {
+				p->particles[i].start_time = t - rand()%(p->lifetime / 4);
+				p->particles[i].seed = rand();
+			} else {
+				p->particles[i].start_time = -1;
+			}
 		}
 	}
 }
