@@ -1,12 +1,12 @@
+// Module for frame based animation.
 
 import (
 	"image.um"
 	"rectangle.um"
 )
 
-// Anim can turn an array of images into an animation.
-// The difference between anim and ent.animate is that
-// anim has starting time, so it is really good for
+// Anim can turn an array of images into an animation. The difference between
+// anim and ent.animate is that anim has starting time, so it is useful for
 // one shot animations.
 type anim* = struct {
 	anim: []image.img

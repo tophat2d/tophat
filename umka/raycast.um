@@ -1,5 +1,4 @@
-// Rays allow for vroom fast
-// collisions.
+// Raycasts allow for vroom fast collisions.
 
 import (
 	"entity.um"

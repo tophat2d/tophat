@@ -1,4 +1,3 @@
-// Polygon type and functions.
 
 import (
 	"std/std.um"
@@ -6,9 +5,7 @@ import (
 	"rawdraw.um"
 )
 
-// Polygon type. Mainly
-// used by ent for collisions
-// and for fallback drawing
+// Polygon type. Mainly used by ent for collisions and for fallback drawing.
 // Don't create by hand.
 type poly* = struct {
     x: real // position
@@ -32,7 +29,7 @@ type cpoly* = struct {
 	vc: int32
 }
 
-// Internal function converting p to c compatible polygon
+// Internal function converting p to c compatible polygon.
 fn (p: ^poly) toc*(): cpoly {
 	if len(p.v) == 0 {
 		return cpoly{}
@@ -43,7 +40,7 @@ fn (p: ^poly) toc*(): cpoly {
 		&p.v[0], p.w, p.h, len(p.v) * 2}
 }
 
-// Makes a polygon. *USE* this.
+// Makes a polygon. USE this.
 fn mk*(x, y: real, v: []int32): poly {
 	var p: poly
 
@@ -69,7 +66,9 @@ fn mk*(x, y: real, v: []int32): poly {
 	return p
 }
 
-// Rotates and scales the polygon (scales first)
+// Rotates and scales the polygon (scales first). This function operates on
+// said polygon's default values, not it's current. If you scale it to 0.5
+// and then to 2, it will be 2x it's initial scale. Not 1x.
 fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 	var x, y, cx, cy: real
 
@@ -102,6 +101,7 @@ fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 	p.h = h
 }
 
+// Internal
 fn cdrawpoly*(color: uint32, p: ^polygon.cpoly)
 
 // Draws this without accounting for camera.

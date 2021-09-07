@@ -1,19 +1,15 @@
-// Particles allow for *performant*
-// and random particle systems.
+// Particles allow for *performant* and random particle systems.
 // TODO: a better constructor
 
 import "umka/rectangle.um"
 
-// Particle struct. You
-// can tweak the start_time
-// for godot-like explossivness.
+// Particle struct. You can tweak the start_time for godot-like explossivness.
 type particle* = struct {
 	start_time: int32
 	seed: int32
 }
 
-// Emitter. This is where
-// everything is configured.
+// Emitter. This is where everything is configured.
 type emitter* = struct {
 	px, py: int32 // position
 	w, h: int32 // size of the emittion area

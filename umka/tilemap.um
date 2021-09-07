@@ -1,8 +1,5 @@
-// Tilemaps allow for easy level
-// construction. Similar to
-// godot or unity. They can
-// be loaded from csv or created
-// from raw data.
+// Tilemaps allow for easy level construction or fast collisions. You can even
+// use them for some games instead of entities (tetris comes to mind)
 
 import (
 	"csv.um"
@@ -121,11 +118,8 @@ fn (t: ^tmap) draw*(cam: rectangle.rect) {
 fn ctmapgetcoll(tx, ty, x, y: ^int32, t: ^ctmap, e: ^entity.cent): int32
 
 // Checks, if t collides with e.
-// [rx, ry] is where the collision
-// happened (usually one of the
-// vertices)
-// [tx, ty] is on which tile it
-// happened.
+// [rx, ry] is where the collision happened (usually one of the vertices)
+// [tx, ty] is on which tile it happened.
 // You need to pass a valid pointer (TODO)
 fn (t: ^tmap) getcoll*(e: entity.ent, rx, ry, tx, ty: ^int32): bool {
 	if len(t.cells) == 0 { return false }

@@ -11,7 +11,7 @@ fn stepify*(val, step: real): real {
 	return val
 }
 
-// **DEPRECATED**. Replaces by entity.ysort
+// **DEPRECATED**. Replaced by entity.ysort
 fn ysort*(ents: []entity.ent): []entity.ent {
 	swapped := true
 

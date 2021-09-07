@@ -56,6 +56,7 @@ var (
 	KEY_SPACE*: int32 = 32
 )
 
+// Internal function for setting input map for windows.
 fn setwinmap*() {
 	KEY_BACKSPACE = 8
 	KEY_ESCAPE = 27
@@ -106,8 +107,7 @@ fn setwinmap*() {
 
 fn cgetmouse(x, y: ^int32)
 
-// Returns the position of mouse cursor
-// in relation to the screen.
+// Returns the position of mouse cursor in relation to the screen.
 fn getmousepos*(): (int32, int32) {
 	var w, h: int32
 
@@ -116,8 +116,7 @@ fn getmousepos*(): (int32, int32) {
 	return w, h
 }
 
-// Returns the position of mouse cursor
-// in relation to cam.
+// Returns the position of mouse cursor in relation to cam.
 fn getglobalmousepos*(cam: rectangle.rect): (int32, int32) {
 	w, h := getmousepos()
 
@@ -136,7 +135,7 @@ fn ispressed*(code: int32): bool {
 	return val
 }
 
-// Returns, if code was just pressed
+// Returns, whether code was just pressed
 // this loop.
 fn isjustpressed*(code: int32): bool {
 	return bool(cisjustpressed(code))

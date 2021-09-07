@@ -1,7 +1,3 @@
-// Module for entity functions.
-// Entity is basically the main
-// object type you will be working
-// with.
 
 import (
 	"polygon.um"
@@ -11,13 +7,11 @@ import (
 	"image.um"
 )
 
-// Entity struct. It has polygon,
-// image, scale, rotation, color
-// and id. Scale and rotation is
-// set using functions.
-// If image is invalid (or missing),
-// the polygon is drawn with the defined
-// color. Id is used for collisions.
+// Entity is the main object in most games. It allow for drawing and collisions.
+// Every entity has a polygon and optionally an image. If there is no image,
+// polygon is drawn. Polygon is used for collisions too. Entity has rot and
+// scale fields. You can set them manually (myent.rot = 20), but that won't
+// change the polygon. For changing the polygon itself, use setrot and setscale.
 type ent* = struct {
 	p: polygon.poly
 	image: image.img
@@ -42,7 +36,7 @@ var colldatax, colldatay: int32
 
 fn centdraw(e: cent, c: rectangle.rect)
 
-// Internal function to convert e to c compatible entity.
+// Internal function to convert e to c compatible entity. Internal.
 fn (e: ^ent) toc*(): cent {
 	return cent {
 		e.p.toc(),
@@ -50,7 +44,7 @@ fn (e: ^ent) toc*(): cent {
 		round(e.rot), e.color, e.id}
 }
 
-// Draws the entity with camera c in mind.
+// Draws the entity onto the screen in relaction to camera c.
 fn (e: ^ent) draw*(c: rectangle.rect) {
 	if len(e.p.v) == 0 {
 		return
@@ -79,11 +73,8 @@ fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
 	return e
 }
 
-// Sets absolute rotation of the entity.
-// It affects the polygon too
-// and by extension the collision
-// if you don't want to affect that,
-// just edit the fields.
+// Sets the entity's rotation in degrees. This will transform the polygon,
+// by extension affecting collisions.
 fn (e: ^ent) setrot*(rot: real) {
 	e.rot = rot
 	e.p.transform(e.sx, e.sy, round(rot))
@@ -96,9 +87,11 @@ fn (e: ^ent) setscale*(sx, sy: real) {
 	e.p.transform(sx, sy, round(e.rot))
 }
 
-// Checks, if e collides with any
-// of the entities in s and returns it's
-// id.
+// Checks whether e collides with any of the entities in s. If e has the same
+// is as any of the entities in s, they will be skipped. Collision returns
+// id of the colliding entity.
+// WARNING: This function will recieve a lot of changes. It will return an
+//   an array of indexes in s, where colliding entities lie.
 fn (e: ^ent) getcoll*(s: []^ent): int32 {
 	if len(s) == 0 {
 		return 0
@@ -117,9 +110,8 @@ fn retrievecolldata*(): (int32, int32) {
 	return colldatax, colldatay	
 }
 
-// Animates the entity's image with one of
-// the `anim` array. **Won't** begin on the
-// first frame.
+// Animates the entity's image with one of the `anim` array. **Won't** begin on
+// the first frame. If you with that, use animation.anim.
 fn (e: ^ent) animate*(fps: int, anim: ^[]image.img) {
 	e.image = anim^[(round(real(tophat.t)/(1000/fps)) % len(anim^))]
 }

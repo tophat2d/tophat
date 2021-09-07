@@ -1,8 +1,12 @@
+// ligthing system
 
 import (
 	"rectangle.um"
 )
 
+// Mask is a set of dots that can be edited and drawn to emulate light.
+// You can even edit the dots yourself, but it won't look good with multiple
+// lights. A function for plotting a pixel will be available soon.
 type mask* = struct {
 	dots: []uint32
 	w, h: int32
@@ -17,6 +21,7 @@ type cmask = struct {
 	color: uint32
 }
 
+// A circular light that can be plotted onto a mask.
 type spotlight* = struct {
 	x, y: int32
 	radius: int32
@@ -25,6 +30,7 @@ type spotlight* = struct {
 
 fn clightmaskclear(m: ^cmask)
 
+// Clears the lightmask to have it's own default color.
 fn (m: ^mask) clear*() {
 	cm := cmask {
 		&m.dots[0],
@@ -50,6 +56,7 @@ fn mk*(color: uint32, rect_size: real, cam: rectangle.rect): mask {
 
 fn clightmaskdraw(m: ^cmask, cam: ^rectangle.rect)
 
+// Draws a lightmask.
 fn (m: ^mask) draw*(cam: rectangle.rect) {
 	cm := cmask {
 		&m.dots[0],
@@ -61,6 +68,7 @@ fn (m: ^mask) draw*(cam: rectangle.rect) {
 
 fn cspotlightstamp(s: ^spotlight, m: ^cmask, cam: ^rectangle.rect)
 
+// Stamps a spotlight onto a mask.
 fn (s: ^spotlight) stamp*(m: ^mask, cam: rectangle.rect) {
 	cm := cmask {
 		&m.dots[0],

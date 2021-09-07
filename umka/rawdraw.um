@@ -1,14 +1,12 @@
-// Raw canvas library named after
-// cnlohr's rawdraw library,
-// which is what tophat uses.
+// Raw canvas library named after cnlohr's rawdraw library, the library
+// tophat uses.
 
 import (
 	"std/std.um"
 	"polygon.um"
 )
 
-// Draws text. Fonts are comming
-// eventually.
+// Draws text. Fonts are comming eventually.
 fn drawtext*(text: str, x: int32, y: int32, color: uint32, size: real)
 
 // Precomputes a text dimensions.
@@ -70,5 +68,5 @@ fn drawline*(x1, y1, x2, y2: int32, thickness: real, color: uint32) {
 	drawsegment(x1, y1, x2, y2, thickness)
 }
 
-// Ignore.
+// Internal.
 fn cdrawimage*(img: int, rot: int32, scale: real, x, y: int32)

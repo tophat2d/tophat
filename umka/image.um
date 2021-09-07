@@ -1,13 +1,13 @@
-// Module for loading and operating
-// with images.
 
 import (
 	"rawdraw.um"
 )
 
-// Img is an opaque pointer
-// to c same as sound. It needs
-// to be freed by img.delete()
+// img is an opaque pointer to c. It needs to be free'd with it's delete()
+// method, otherwise it will cause a memory leak. This is usually ok as
+// you only load images at the start of the game and need them until the
+// end, but function operating on images might need to keep the memory in
+// mind. 
 type img* = struct {
 	handle: int
 }
@@ -42,8 +42,7 @@ fn (i: ^img) delete*() {
 	deleteimg(i.handle)
 }
 
-// Set's i as window icon.
-// Works only on linux.
+// Set's i as window icon. Works only on linux.
 // **DEPRECATED**
 fn (i: ^img) setasicon*() {
 	iconset(i.handle)
@@ -64,12 +63,12 @@ fn (i: ^img) draw*(x, y, rot: int32, scale: real)  {
 	rawdraw.cdrawimage(i.handle, rot, scale, x, y)
 }
 
-// Returns true, if i is valid.
+// Returns true, if i is valid. This doesn't mean it isn't corrupted.
 fn (i: ^img) validate*(): bool {
 	return bool(imgvalid(i.handle))
 }
 
-// Returns the dimensions in pixels of i.
+// Returns width and heigth.
 fn (i: ^img) getdims*(): (int32, int32) {
 	var w, h: int32
 	imggetdims(&w, &h, i.handle)
@@ -77,7 +76,7 @@ fn (i: ^img) getdims*(): (int32, int32) {
 	return w, h
 }
 
-// Crops out the rectangle from image.
+// Crops out the rectangle from image. (destructive)
 fn (i: ^img) crop*(x1, y1, x2, y2: int32) {
 	imgcrop(i.handle, x1, x2, y1, y2)
 }

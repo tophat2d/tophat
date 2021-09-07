@@ -1,8 +1,5 @@
-// Small and modulat ui module useful
-// for stuff like menus.
-// set any element as
-// ui.mainelement and it
-// will be the root.
+// Small and modulat ui module useful for stuff like menus.
+// Set any element as ui.mainelement and it will be the root.
 
 import (
 	"rectangle.um"
@@ -24,9 +21,7 @@ const (
 	SCALE* = 5
 )
 
-// Elements is the interface for all
-// ui elements. You can make your
-// own elements.
+// Elements is the interface for all ui elements. You can make your own elements.
 type element* = interface {
 	draw() // draws the element
 	calculate() // calculates it's dimensions

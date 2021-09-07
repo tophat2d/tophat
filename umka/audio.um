@@ -1,10 +1,6 @@
-// Sound module for tophat.
-// It serves for all kinds of
-// sound operation.
+// Sound module for audio loading and playing.
 
-// Sound type. It is an opaque
-// pointer to c, so don't create
-// it by hand.
+// sound is an opaque pointer to c. Creating it manually will cause a crash.
 type sound* = struct {
 	handle: int
 }
@@ -19,7 +15,7 @@ fn cauarr(s: ^sound, count: int32)
 
 fn csoundloop(s: int, looping: int32)
 
-fn csoundplay(s: int)
+fn csoundplay(s: int) 
 
 fn csoundstop(s: int)
 
@@ -37,8 +33,7 @@ fn load*(path: str): sound {
 	return s
 }
 
-// Sets the array of sounds that are handled
-// in the background. **DEPRECATED**
+// Sets the array of sounds that are handled in the background. **DEPRECATED**
 fn setsounds*(ss: []sound) {
 	cauarr(&ss[0], len(ss))
 }
@@ -53,33 +48,24 @@ fn (s: ^sound) looping*(l: bool) {
 	csoundloop(s.handle, 0)
 }
 
-// Plays the sound. If it is already
-// playing, it won't do anything.
-// I plan on making it replay the
-// sound if playing.
+// Plays the sound. If it is already playing, it won't do anything. Soon this
+// behaviour will be changed.
 fn (s: ^sound) play*() {
 	csoundplay(s.handle)
 }
 
-// Stops the sound and **resets** the progress.
+// Stops the sound and resets the progress.
 fn (s: ^sound) stop*() {
 	csoundstop(s.handle)
 }
 
-// Set's the volume of the sound as a
-// multiplier of it's volume.
-// 2 => 2 times the volume
-// 1 => original
-// 0.5 => half the volume
-// 0 => silent
+// Set's the volume of the sound as a multiplier of it's default volume.
 fn (s: ^sound) vol*(vol: real) {
 	csoundvol(s.handle, vol)
 }
 
-// Returns true, if the sound is
-// valid. That doesn't mean, it
-// is not corrupted, but it generally
-// means it was loaded.
+// Returns true, if the sound is valid. That doesn't mean, it isn't corrupted,
+// but it generally means it was loaded.
 fn (s: ^sound) validate*(): bool {
 	return bool(csoundvalidate(s.handle))
 }

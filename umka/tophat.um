@@ -30,8 +30,7 @@ var platform*: str = "linux"
 // Gets time since the game started **DEPRECATED**
 fn gettime*(): int
 
-// Set's up the engine and opens
-// a window.
+// Set's up the engine and opens a window.
 fn setup*(title: str, w, h: int32) {
 	rawdraw.setup(title, w, h)
 	rawdraw.setbgcolor(0x000000ff)
