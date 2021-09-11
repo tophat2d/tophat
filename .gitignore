@@ -6,7 +6,7 @@ tophat.exe
 src/umkalibs.h
 lib/stb_image.h
 lib/miniaudio.h
-tophat.zip
+tophat-linux.zip
 tophat-win.zip
 src/*.o
 src/*.d

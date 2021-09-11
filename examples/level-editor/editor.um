@@ -55,7 +55,7 @@ fn init*() {
 		^ui.box(mainbox.children[i+1]).image = images[i]
 	}
 
-	mainbox.padding.w = 120
+	mainbox.g.padding.w = 120
 	ui.mainelement = mainbox
 
 	brush := 1

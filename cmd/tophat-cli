@@ -32,8 +32,8 @@ function setup () {
 	rm -rf $Path
 	mkdir $Path
 	unzip $1 -d $Path
-	mv $Path/tophat-release/* $Path
-	rm -r $Path/tophat-release
+	mv $Path/linux/* $Path
+	rm -r $Path/linux
 }
 
 function update() {
