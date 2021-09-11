@@ -1,9 +1,9 @@
 
 import (
-	"tophat/ui.um"
-	"tophat/rectangle.um"
+	"ui.um"
+	"rectangle.um"
 
-	"tophat/std/std.um"
+	"std.um"
 
 	"global.um"
 	"gamescn.um"
@@ -36,17 +36,17 @@ fn menupress() {
 fn init*() {
 	retrybutton = ui.mkbutton(ui.mklabel("RETRY", 1, 0x22ff))
 	retrybutton.label.bgcolor = 0xeeeeeeff
-	retrybutton.padding = rectangle.mk(10, 10, 10, 10)
+	retrybutton.g.padding = rectangle.mk(10, 10, 10, 10)
 	retrybutton.onrelease = retrypress
 
 	menubutton = ui.mkbutton(ui.mklabel("TO MENU", 1, 0x22ff))
 	menubutton.label.bgcolor = 0xeeeeeeff
-	menubutton.padding = rectangle.mk(10, 10, 10, 10)
+	menubutton.g.padding = rectangle.mk(10, 10, 10, 10)
 	menubutton.onrelease = menupress
 
 	mainbox = ui.mkbox([]ui.element{ui.mkbox([]ui.element{ui.mklabel("GAME OVER", 2, 0xeeeeeeff), ui.mklabel("SCORE " + repr(global.score), 1, 0xeeeeeeff)}, false),
 	 &retrybutton, &menubutton}, false)
-	mainbox.padding = rectangle.mk(10, 10, 10, 10)
+	mainbox.g.padding = rectangle.mk(10, 10, 10, 10)
 
 	ui.mainelement = mainbox
 }

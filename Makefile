@@ -21,14 +21,14 @@ CFLAGS += -Ilib/stb/ \
 		  -Ilib/rawdraw/ \
 		  -Ilib/miniaudio/
 
-DEFS += -DCNFGOGL -DUMKA_STATIC
+DEFS += -DCNFGOGL -DUMKA_STATIC -DRELEASE_BUILD
 WARNS = \
 		-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
 		-Wno-old-style-declaration -Wno-implicit-fallthrough
 
 CFLAGS += $(WARNS) $(DEFS)
 
-all: $(TARGET)
+all: $(UMKA_LIB) $(TARGET)
 
 run: $(TARGET)
 	./$(TARGET)

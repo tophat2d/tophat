@@ -1,7 +1,7 @@
 
 import (
-	"tophat/rectangle.um"
-	"tophat/tophat.um"
+	"rectangle.um"
+	"tophat.um"
 
 	"effects.um" // global shouldn't import anything else, than tophat package. TODO
 )

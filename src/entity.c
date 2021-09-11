@@ -28,12 +28,13 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 		return;
 	}
 
-	th_blit_tex(o->img->tex,
-	           (o->p.x-camx) * scaling,
-	           (o->p.y-camy) * scaling,
-						  o->img->w * o->sx * scaling,
-							o->img->h * o->sy * scaling,
-							o->rot);
+	th_blit_tex(
+		o->img->tex,
+	  (o->p.x-camx) * scaling,
+	  (o->p.y-camy) * scaling,
+		o->img->w * o->sx * scaling,
+		o->img->h * o->sy * scaling,
+		o->rot);
 }
 
 int th_ent_getcoll(th_ent *e, th_ent *scene, int count, int *ix, int *iy) {

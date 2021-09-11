@@ -1,11 +1,11 @@
 
 import (
-	"tophat/tophat.um"
-	"tophat/rawdraw.um"
-	"tophat/rectangle.um"
-	"tophat/animation.um"
+	"tophat.um"
+	"rawdraw.um"
+	"rectangle.um"
+	"animation.um"
 
-	"tophat/std/std.um"
+	"std.um"
 )
 
 // type used for star

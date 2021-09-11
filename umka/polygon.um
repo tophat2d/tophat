@@ -37,7 +37,7 @@ fn (p: ^poly) toc*(): cpoly {
 
 	return cpoly{
 		round(p.x), round(p.y),
-		&p.v[0], p.w, p.h, len(p.v) * 2}
+		&p.v[0], p.w, p.h, len(p.v)/2}
 }
 
 // Makes a polygon. USE this.

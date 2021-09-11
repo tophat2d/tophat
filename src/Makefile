@@ -9,16 +9,17 @@ DEPS = $(OBJS:.o=.d)
 
 UMKA_LIB = src/umkalibs.h
 
-$(UMKA_LIB): $(UMKA_LIBRARY)
+umkalibs: $(UMKA_LIBRARY)
 	@echo EM $@
-	@./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um umka/std/std.um >> src/umkalibs.h
+	@./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um umka/std/std.um > src/umkalibs.h
+	rm -f src/bindings.o
 
-%.o: %.c $(UMKA_LIB)
+%.o: %.c
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MM -MG -MF $(patsubst %.o,%.d,$@) -c $<
 	@$(CC) $(CFLAGS) -o $@ -c $<
 
-$(TARGET): $(OBJS) $(UMKA_LIBRARY)
+$(TARGET): umkalibs $(OBJS) $(UMKA_LIBRARY)
 	@echo LD $@
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
 

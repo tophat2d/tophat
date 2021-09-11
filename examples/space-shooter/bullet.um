@@ -1,9 +1,9 @@
 
 import (
-	"tophat/entity.um"
-	"tophat/image.um"
-	"tophat/polygon.um"
-	"tophat/tophat.um"
+	"entity.um"
+	"image.um"
+	"polygon.um"
+	"tophat.um"
 
 	"enemy.um"
 	"global.um"
@@ -27,7 +27,6 @@ fn handle*(scn: []^entity.ent) {
 
 	// goes through all bullets
 	for i:=0; i < len(all); i++ {
-
 		// checks, if they are above the screen, so we don't end up with a lot of them
 		if all[i].p.y < global.cam.y-global.cam.h {
 			all = delete(all, i)

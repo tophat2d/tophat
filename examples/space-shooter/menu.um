@@ -1,7 +1,7 @@
 
 import (
-	"tophat/ui.um"
-	"tophat/rectangle.um"
+	"ui.um"
+	"rectangle.um"
 
 	"gamescn.um"
 	"global.um"
@@ -17,14 +17,14 @@ var (
 fn init*() {
 	playbutton = ui.mkbutton(ui.mklabel("PLAY", 1, 0x22ff))
 	playbutton.label.bgcolor = 0xeeeeeeff
-	playbutton.padding = rectangle.mk(10, 10, 10, 10)
+	playbutton.g.padding = rectangle.mk(10, 10, 10, 10)
 
 	settingsbutton = ui.mkbutton(ui.mklabel("QUIT", 1, 0x22ff))
 	settingsbutton.label.bgcolor = 0xeeeeeeff
-	settingsbutton.padding = rectangle.mk(10, 10, 10, 10)
+	settingsbutton.g.padding = rectangle.mk(10, 10, 10, 10)
 
 	mainbox = ui.mkbox([]ui.element{ui.mklabel("SPACE GAME", 2, 0xeeeeeeff), &playbutton, &settingsbutton}, false)
-	mainbox.padding = rectangle.mk(10, 20, 10, 20)
+	mainbox.g.padding = rectangle.mk(10, 20, 10, 20)
 
 	ui.mainelement = mainbox
 }

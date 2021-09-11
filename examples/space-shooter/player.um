@@ -1,10 +1,10 @@
 
 import (
-	"tophat/entity.um"
-	"tophat/image.um"
-	"tophat/polygon.um"
-	"tophat/input.um"
-	"tophat/tophat.um"
+	"entity.um"
+	"image.um"
+	"polygon.um"
+	"input.um"
+	"tophat.um"
 //	"tophat/audio.um"
 
 	"bullet.um"

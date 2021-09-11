@@ -16,10 +16,10 @@
 
 
 import (
-	"tophat/rectangle.um"
-	"tophat/tophat.um"
-	"tophat/rawdraw.um"
-	"tophat/input.um"
+	"rectangle.um"
+	"tophat.um"
+	"rawdraw.um"
+	"input.um"
 
 	"gamescn.um"
 	"deathscn.um"

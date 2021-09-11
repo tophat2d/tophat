@@ -75,7 +75,7 @@ fn strtoc(inp: str): str {
 }
 
 fn main() {
-	printf("#ifndef UMKALIBS_H\n#define UMKALIBS_H\nconst char *libs[] = {\n")
+	printf("const char *libs[] = {\n")
 
 	for i:=1; i < std.argc(); i++ {
 		f := std.fopen(std.argv(i), "r")
@@ -84,5 +84,5 @@ fn main() {
 		std.fclose(f)
 	}
 
-	printf("};\n#endif\n")
+	printf("};\n")
 }

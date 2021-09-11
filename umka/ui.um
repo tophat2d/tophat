@@ -1,5 +1,5 @@
-// Small and modulat ui module useful for stuff like menus.
-// Set any element as ui.mainelement and it will be the root.
+// Small and modular ui module useful for stuff like menus.
+// Set ui.mainelement to your main element.
 
 import (
 	"rectangle.um"
@@ -11,24 +11,32 @@ import (
 
 const (
 	// text aligns
-	TOP* = 0
-	MID* = 1
-	BOT* = 2
+	MID* = 0
+	TOP*
+	BOT*
 
 	// image modes
-	CENTER* = 3
-	STRETCH* = 4
-	SCALE* = 5
+	CENTER* = 0
+	STRETCH*
+	SCALE*
 )
+
+// These are properties every element should have.
+type generic* = struct {
+	padding: rectangle.rect // amount of space removed from the space available
+	
+	// position and dimensions. You can set them manually, or use box for automatic
+	// placement.
+	dimensions: rectangle.rect
+	span: int // how many elements in a box it spans
+}
 
 // Elements is the interface for all ui elements. You can make your own elements.
 type element* = interface {
 	draw() // draws the element
 	calculate() // calculates it's dimensions
 	handle() // handle cycle
-	gspan(): ^int // returns pointer to it's span
-	gpadding(): ^rectangle.rect // returns pointer to it's padding
-	gdimensions(): ^rectangle.rect // returns pointer to it's dimensions
+	get(): ^generic // returns a pointer to it's generic
 }
 
 // Box can be used to oranize
@@ -37,9 +45,8 @@ type element* = interface {
 // It has children, which are organized
 // on it's calculate call.
 type box* = struct {
+	g: generic
 	children: []element
-	padding, dimensions: rectangle.rect
-	span: int // how many elements in box it spans
 	vertical: bool // false: hbox
 
 	image: image.img
@@ -50,14 +57,13 @@ type box* = struct {
 
 // Label can be used to draw text.
 type label* = struct {
+	g: generic
 	text: str
 	textsize: real
 	textcolor: uint32
 	valign: int // alignment
 	halign: int
 	bgcolor: uint32
-	padding, dimensions: rectangle.rect
-	span: int
 }
 
 // Button checks for clicks on it's
@@ -70,8 +76,7 @@ type button* = struct {
 	justpressed: bool // is just pressed
 	justreleased: bool // is just release
 
-	padding, dimensions: rectangle.rect
-	span: int
+	g: generic
 
 	onpress, onjustpress, onrelease: fn() // callbacks
 	ontoggle: fn(toggled: bool)
@@ -83,10 +88,11 @@ type button* = struct {
 fn mkbox*(c: []element, vertical: bool): box {
 	h := box {}
 
-	h.padding = rectangle.mk(0, 0, 0, 0)
+	h.g = generic{
+		padding: rectangle.rect{},
+		dimensions: rectangle.rect{},
+		span: 1}
 	h.children = c
-	h.dimensions = rectangle.mk(0, 0, 0, 0)
-	h.span = 1
 	h.vertical = vertical
 	h.imagemode = CENTER
 
@@ -94,43 +100,45 @@ fn mkbox*(c: []element, vertical: bool): box {
 }
 
 fn (b: ^box) calculate*() {
+	generics := make([]^generic, len(b.children))
+	for i:=0; i < len(b.children); i++ {
+		generics[i] = b.children[i].get()
+	}
 
 	totalspan := 0.0
 	off := 0
 
 	for i:=0; i < len(b.children); i++ {
-		totalspan += b.children[i].gspan()^
+		totalspan += generics[i].span
 	}
 
 	for i:=0; i < len(b.children); i++ {
+		dims := &generics[i].dimensions
+		padd := &generics[i].padding
 
 		if b.vertical {
-			dims := b.children[i].gdimensions()
-			padd := b.children[i].gpadding()
       
-			dims.x = b.dimensions.x + off + padd.x
-			dims.w = round(real(b.dimensions.w)/totalspan) * b.children[i].gspan()^ - padd.w
+			dims.x = b.g.dimensions.x + off + padd.x
+			dims.w = round(real(b.g.dimensions.w)/totalspan) * generics[i].span - padd.w
       
-			dims.y = b.dimensions.y + padd.y
-			dims.h = b.dimensions.h - padd.h
+			dims.y = b.g.dimensions.y + padd.y
+			dims.h = b.g.dimensions.h - padd.h
       
 			b.children[i].calculate()
       
-			off += round(real(b.dimensions.w)/totalspan) * b.children[i].gspan()^
+			off += round(real(b.g.dimensions.w)/totalspan) * generics[i].span
 		
 		} else {
-			dims := b.children[i].gdimensions()
-			padd := b.children[i].gpadding()
+			dims.x = b.g.dimensions.x + padd.x
+			dims.w = b.g.dimensions.w - padd.w - padd.x
       
-			dims.x = b.dimensions.x + padd.x
-			dims.w = b.dimensions.w - padd.w - padd.x
-      
-			dims.y = b.dimensions.y + off + padd.y
-			dims.h = round(real(b.dimensions.h)/totalspan * b.children[i].gspan()^) - padd.h - padd.y
+			dims.y = b.g.dimensions.y + off + padd.y
+			dims.h = round(real(b.g.dimensions.h)/totalspan * generics[i].span) -
+				padd.h - padd.y
       
 			b.children[i].calculate()
       
-			off += round(real(b.dimensions.h)/totalspan) * b.children[i].gspan()^
+			off += round(real(b.g.dimensions.h)/totalspan) * generics[i].span
 		}
 	}
 
@@ -144,13 +152,13 @@ fn (b: ^box) calculate*() {
 
 		w, h := b.image.getdims()
 
-		b.imgx = b.dimensions.x + (b.dimensions.w-w)/2
-		b.imgy = b.dimensions.y + (b.dimensions.h-h)/2
+		b.imgx = b.g.dimensions.x + (b.g.dimensions.w-w)/2
+		b.imgy = b.g.dimensions.y + (b.g.dimensions.h-h)/2
 	case SCALE:
 		w, h := b.image.getdims()
 
-		sx := b.dimensions.w / w
-		sy := b.dimensions.h / h
+		sx := b.g.dimensions.w / w
+		sy := b.g.dimensions.h / h
 
 		b.imgs = sy
 
@@ -158,8 +166,8 @@ fn (b: ^box) calculate*() {
 			b.imgs = sx
 		}
 
-		b.imgx = b.dimensions.x + (b.dimensions.w - w*b.imgs)/2
-		b.imgy = b.dimensions.y + (b.dimensions.h - h*b.imgs)/2
+		b.imgx = b.g.dimensions.x + (b.g.dimensions.w - w*b.imgs)/2
+		b.imgy = b.g.dimensions.y + (b.g.dimensions.h - h*b.imgs)/2
 	}
 }
 
@@ -174,16 +182,8 @@ fn (hb: ^box) draw*() {
 	}
 }
 
-fn (hb: ^box) gspan*(): ^int {
-	return &hb.span
-}
-
-fn (hb: ^box) gpadding*(): ^rectangle.rect {
-	return &hb.padding
-}
-
-fn (hb: ^box) gdimensions*(): ^rectangle.rect {
-	return &hb.dimensions
+fn (b: ^box) get*(): ^generic {
+	return &b.g
 }
 
 fn (hb: ^box) handle*() {
@@ -198,13 +198,15 @@ fn (hb: ^box) handle*() {
 fn mklabel*(text: str, textsize: real, textcolor: uint32): label {
 	h := label {}
 
+	h.g = generic{
+		padding: rectangle.rect{},
+		dimensions: rectangle.rect{},
+		span: 1}
+
 	h.text = text
 	h.textsize = textsize
 	h.textcolor = textcolor
 	h.bgcolor = 0x0
-	h.padding = rectangle.mk(0, 0, 0, 0)
-	h.dimensions = rectangle.mk(0, 0, 0, 0)
-	h.span = 1
 	h.valign = MID
 	h.halign = MID
 
@@ -216,36 +218,33 @@ fn (l: ^label) calculate*() {
 
 	switch l.valign {
 	case MID:
-		l.padding.y = (l.dimensions.h-sy)/2
+		l.g.padding.y = (l.g.dimensions.h-sy)/2
 	case BOT:
-		l.padding.y = l.dimensions.h - sy
+		l.g.padding.y = l.g.dimensions.h - sy
 	}
 
 	switch l.halign {
 	case MID:
-		l.padding.x = (l.dimensions.w-sx)/2
+		l.g.padding.x = (l.g.dimensions.w-sx)/2
 	case BOT:
-		l.padding.x = l.dimensions.w - sx
+		l.g.padding.x = l.g.dimensions.w - sx
 	}
 }
 
 fn (l: ^label) draw*() {
 	rawdraw.setcolor(l.bgcolor)
-	rawdraw.drawrect(l.dimensions.x - l.padding.x, l.dimensions.y - l.padding.y, l.dimensions.w + l.padding.w, l.dimensions.h + l.padding.h)
+	rawdraw.drawrect(
+		l.g.dimensions.x - l.g.padding.x,
+		l.g.dimensions.y - l.g.padding.y,
+		l.g.dimensions.w + l.g.padding.w,
+		l.g.dimensions.h + l.g.padding.h)
 
-	rawdraw.drawtext(l.text, l.dimensions.x, l.dimensions.y, l.textcolor, l.textsize)
+	rawdraw.drawtext(
+		l.text, l.g.dimensions.x, l.g.dimensions.y, l.textcolor, l.textsize)
 }
 
-fn (l: ^label) gspan*(): ^int {
-	return &l.span
-}
-
-fn (l: ^label) gpadding*(): ^rectangle.rect {
-	return &l.padding
-}
-
-fn (l: ^label) gdimensions*(): ^rectangle.rect {
-	return &l.dimensions
+fn (l: ^label) get*(): ^generic {
+	return &l.g
 }
 
 fn (l: ^label) handle*() {}
@@ -256,12 +255,15 @@ fn (l: ^label) handle*() {}
 fn mkbutton*(l: label): button {
 	b := button{}
 
-	b.padding = l.padding
+	b.g = generic{
+		padding: l.g.padding,
+		dimensions: rectangle.rect{},
+		span: 1}
+
 	b.label = l
 	b.pressed = false
 	b.justpressed = false
 	b.toggled = false
-	b.span = 1
 
 	b.onpress = fn() {}
 	b.onjustpress = fn() {}
@@ -272,38 +274,32 @@ fn mkbutton*(l: label): button {
 }
 
 fn (b: ^button) calculate*() {
-	b.label.dimensions = b.dimensions
+	b.label.g.dimensions = b.g.dimensions
 	b.label.calculate()
-	b.label.dimensions.x += b.label.padding.x
-	b.label.dimensions.w -= b.label.padding.w
+	b.label.g.dimensions.x += b.label.g.padding.x
+	b.label.g.dimensions.w -= b.label.g.padding.w
 
-	b.label.dimensions.y += b.label.padding.y
-	b.label.dimensions.h -= b.label.padding.h
+	b.label.g.dimensions.y += b.label.g.padding.y
+	b.label.g.dimensions.h -= b.label.g.padding.h
 }
 
 fn (b: ^button) draw*() {
 	b.label.draw()
 }
 
-fn (b: ^button) gspan*(): ^int {
-	return &b.span
-}
-
-fn (b: ^button) gpadding*(): ^rectangle.rect {
-	return &b.padding
-}
-
-fn (b: ^button) gdimensions*(): ^rectangle.rect {
-	return &b.dimensions
+fn (b: ^button) get*(): ^generic {
+	return &b.g
 }
 
 fn (b: ^button) handle*() {
 	mx, my := input.getmousepos()
 	mp := input.ispressed(input.LMB)
 
-	ms := (b.dimensions.x <= mx && b.dimensions.y <= my && mx <= b.dimensions.x + b.dimensions.w && my <= b.dimensions.y + b.dimensions.h)
-	//printf("%d, %d, %d, %d\n", b.dimensions.x, b.dimensions.y, b.dimensions.x + b.dimensions.w, b.dimensions.y + b.dimensions.h)
-	//printf("%d, %d, %d, %d\n", mx, my, int(mp), int(ms))
+	ms := (
+		b.g.dimensions.x <= mx &&
+		b.g.dimensions.y <= my &&
+		mx <= b.g.dimensions.x + b.g.dimensions.w &&
+		my <= b.g.dimensions.y + b.g.dimensions.h)
 
 	b.justpressed = false
 	b.justreleased = false 
@@ -327,19 +323,18 @@ fn (b: ^button) handle*() {
 		b.toggled = !b.toggled
 		b.ontoggle(b.toggled)
 	}
-
-	//printf("%d\n", int(b.pressed))
 }
 
 ////////////////////////////////
 // main handler
+// doing it like this is stupid.
 
 var mainelement*: element
 
 // no need to call this
-fn update*(w, h: int32) {
-	dims := mainelement.gdimensions()
-	padd := mainelement.gpadding()
+fn update(w, h: int32) {
+	dims := &mainelement.get().dimensions
+	padd := &mainelement.get().padding
 	dims.x = padd.x
 	dims.y = padd.y
 	dims.w = w - padd.w - padd.x
@@ -347,7 +342,7 @@ fn update*(w, h: int32) {
 	mainelement.calculate()
 }
 
-// call this every loop
+// Call this every loop.
 fn handle*(w, h: int32) {
 	if tophat.t % 100 < 32 {
 		update(w, h)

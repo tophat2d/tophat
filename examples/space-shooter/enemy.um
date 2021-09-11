@@ -1,17 +1,17 @@
 
 import (
-	"tophat/entity.um"
-	"tophat/rectangle.um"
-	"tophat/polygon.um"
-	"tophat/image.um"
-	"tophat/input.um"
-	"tophat/tophat.um"
-	"tophat/rawdraw.um"
-	"tophat/animation.um"
-	"tophat/tophat.um"
-	"tophat/audio.um"
+	"entity.um"
+	"rectangle.um"
+	"polygon.um"
+	"image.um"
+	"input.um"
+	"tophat.um"
+	"rawdraw.um"
+	"animation.um"
+	"tophat.um"
+	"audio.um"
 
-	"tophat/std/std.um"
+	"std.um"
 
 	"global.um"
 	"settings.um"

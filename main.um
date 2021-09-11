@@ -19,48 +19,21 @@ import (
 )
 
 fn main() { 
-	cam := rectangle.mk(0, 0, 250, 250)
+	cam := rectangle.mk(20, 20, 250, 250)
 	tophat.setup("test game", 100, 100)
 	var w, h: int32
 
 	t := 0
 
-	m := light.mk(0xff, 0.1, cam)
-
-	spot := light.spotlight{0, 0, 20, 0xff000000}
-	spot2 := light.spotlight{0, 0, 40, 0xffff0000}
-
-	img := image.load("etc/test.png")
+	p := polygon.mk(100, 100, []int32{0, 0, 5, 0, 5, 5, 0, 5})
+	e := entity.mk(p, tophat.black, 0)
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 		t += tophat.delta
 
-		m.clear()
-
-		img.draw(0, 0, 0, 10)
-
-		spot.x, spot.y = input.getglobalmousepos(cam)
-
-		spot.stamp(&m, cam)
-		spot2.stamp(&m, cam)
-		m.draw(cam)
-
-		if input.ispressed(int32('a')) {
-			cam.x += round(0.1 * tophat.delta)
-		}
-
-		if input.ispressed(int32('d')) {
-			cam.x -= round(0.1 * tophat.delta)
-		}
-
-		if input.ispressed(int32('w')) {
-			cam.y += round(0.1 * tophat.delta)
-		}
-
-		if input.ispressed(int32('s')) {
-			cam.y -= round(0.1 * tophat.delta)
-		}
+		p.draw(0xaa)
+		e.draw(cam)
 
 		if tophat.delta != 0 {
 			rawdraw.drawtext(repr(1000/tophat.delta), 0, 0, tophat.white, 2)

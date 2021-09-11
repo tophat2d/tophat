@@ -1,14 +1,14 @@
 
 import (
-	"tophat/entity.um"
-	"tophat/rectangle.um"
-	"tophat/polygon.um"
-	"tophat/image.um"
-	"tophat/input.um"
-	"tophat/tophat.um"
-	"tophat/rawdraw.um"
+	"entity.um"
+	"rectangle.um"
+	"polygon.um"
+	"image.um"
+	"input.um"
+	"tophat.um"
+	"rawdraw.um"
 
-	"tophat/std/std.um"
+	"std.um"
 
 	"enemy.um"
 	"player.um"
