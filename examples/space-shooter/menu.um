@@ -32,6 +32,7 @@ fn init*() {
 fn run*() {
 	ui.mainelement = mainbox // setting main element
 	ui.handle(global.cam.w, global.cam.h)
+	printf("%s\n", repr(mainbox.children[0].get().padding))
 
 	if playbutton.justreleased {
 		gamescn.retry()

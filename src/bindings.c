@@ -203,7 +203,7 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char pathcpy[512];
 	strcpy(pathcpy, respath);
 	img = th_load_image(strcat(pathcpy, path));
-	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
+	img->gltexture = CNFGTexImage(img->data, img->w, img->h);
 
 	r[0].ptrVal = (intptr_t)img;
 }
@@ -218,7 +218,7 @@ void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 // checks, if image is correctly loaded
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = (th_image *)p[0].ptrVal;
-	if (img->rdimg != NULL) {
+	if (img->data != NULL) {
 		r->intVal = 1;
 		return;
 	}
@@ -231,8 +231,6 @@ void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = (th_image *)p[0].ptrVal;
 
 	th_image_flipv(img);
-	glDeleteTextures(1, &img->tex);
-	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
 
 // flips image
@@ -240,8 +238,6 @@ void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = (th_image *)p[0].ptrVal;
 
 	th_image_fliph(img);
-	glDeleteTextures(1, &img->tex);
-	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
 
 void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -261,8 +257,6 @@ void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int x1 = p[3].intVal;
 
 	th_image_crop(img, x1, y1, x2, y2);
-	glDeleteTextures(1, &img->tex);
-	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 }
 
 // returns a pointer to an image from data
@@ -273,7 +267,6 @@ void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_image *img = malloc(sizeof(th_image));
 	th_image_from_data(img, data, w, h);
-	img->tex = CNFGTexImage(img->rdimg, img->w, img->h);
 
 	r->ptrVal = (intptr_t)img;
 }
@@ -284,8 +277,8 @@ void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *out = calloc(sizeof(th_image), 1);
 	out->w = inp->w;
 	out->h = inp->h;
-	out->rdimg = calloc(sizeof(uint32_t), out->w * out->h);
-	memcpy(out->rdimg, inp->rdimg, sizeof(uint32_t) * out->w * out->h);
+	out->data = calloc(sizeof(uint32_t), out->w * out->h);
+	memcpy(out->data, inp->data, sizeof(uint32_t) * out->w * out->h);
 
 	r->ptrVal = (intptr_t)out;
 }
@@ -532,13 +525,7 @@ void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r) {
-#ifndef _WIN32
-	th_image *img = (th_image *)p[0].ptrVal;
-
-	CNFGSetWindowIconData(img->w, img->h, img->rdimg);
-#else
-	th_error("can't set window icon on this platform");
-#endif
+	th_error("setasicon is deprecated.");
 }
 
 void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -572,5 +559,5 @@ void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
 	double s = p[2].realVal;
 	int rot = p[3].intVal;
 
-	th_blit_tex(img->tex, x * scaling, y * scaling, img->w * s * scaling, img->h * s * scaling, rot);
+	th_blit_tex(img->gltexture, x * scaling, y * scaling, img->w * s * scaling, img->h * s * scaling, rot);
 }

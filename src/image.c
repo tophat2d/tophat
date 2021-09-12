@@ -2,7 +2,6 @@
 #include <stdint.h>
 
 #include <GL/gl.h>
-
 #include <stb_image.h>
 #include <CNFG.h>
 #include <chew.h>
@@ -24,14 +23,14 @@ th_image *th_load_image(char *path) {
 	unsigned char *data = stbi_load(path, &w, &h, &c, 0);
 
 	th_image *img;
-	img = calloc(sizeof(th_image), 1);
+	img = malloc(sizeof(th_image));
 	img->w = w;
 	img->h = h;
-	img->c = c;
+	img->channels = c;
 
 	if (data == NULL) {
 		th_error("could not find image at path %s", path);
-		img->rdimg = NULL;
+		img->data = NULL;
 		return img;
 	}
 
@@ -49,22 +48,24 @@ th_image *th_load_image(char *path) {
 }
 
 void th_free_image(th_image *img) {
-	CNFGDeleteTex(img->tex);
+	CNFGDeleteTex(img->gltexture);
 
-	free(img->rdimg);
+	free(img->data);
 	free(img);
 }
 
 inline void th_image_from_data(th_image *img, uint32_t *data, int w, int h) {
-	img->rdimg = malloc(sizeof(uint32_t) * w * h);
-	memcpy(img->rdimg, data, sizeof(uint32_t) * w * h);
+	img->data = malloc(sizeof(uint32_t) * w * h);
+	memcpy(img->data, data, sizeof(uint32_t) * w * h);
 	img->w = w;
 	img->h = h;
-	img->c = 4;
+	img->channels = 4;
+	CNFGTexImage(img->data, w, h);
 }
 
 void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot) {
-	if( w == 0 || h == 0 ) return;
+	if( w == 0 || h == 0 )
+		return;
 
 	CNFGFlushRender();
 
@@ -76,17 +77,14 @@ void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot) {
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 
-	float cx = w/2;
-	float cy = h/2;
+	const float cx = w/2;
+	const float cy = h/2;
 
-	float zrotx = 0;
-	float zroty = 0;
-	float brotx = w;
-	float broty = h;
-	float wrotx = w;
-	float wroty = 0;
-	float hrotx = 0;
-	float hroty = h;
+	float
+		zrotx = 0, zroty = 0,
+		brotx = w, broty = h,
+		wrotx = w, wroty = 0,
+		hrotx = 0, hroty = h;
 
 	if ( rot != 0 ) {
 		th_rotate_point(&zrotx, &zroty, cx, cy, rot);
@@ -108,39 +106,42 @@ void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot) {
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+// TODO do this inplace
 void th_image_flipv(th_image *img) {
-	if (img->rdimg == NULL) {
+	if (img->data == NULL) {
 		th_error("flipv: image is not valid");
 		return;
 	}
 
-	uint32_t *f;
-	f = malloc(sizeof(uint32_t) * img->w * img->h);
+	uint32_t *f = malloc(sizeof(uint32_t) * img->w * img->h);
 
 	for (int i=0; i < img->w; i++) for (int j=0; j < img->h; j++)
-			f[(j + 1) * img->w - i - 1] = img->rdimg[j * img->w + i];
+			f[(j + 1) * img->w - i - 1] = img->data[j * img->w + i];
 
-	free(img->rdimg);
-	img->rdimg = f;
+	free(img->data);
+	img->data = f;
+	CNFGDeleteTex(img->gltexture);
+	img->gltexture = CNFGTexImage(img->data, img->w, img->h);
 }
 
 void th_image_fliph(th_image *img) {
-	if (img->rdimg == NULL) {
+	if (img->data == NULL) {
 		th_error("fliph: image is not valid");
 		return;
 	}
 
-	uint32_t *f;
-	f = malloc(sizeof(uint32_t) * img->w * img->h);
+	uint32_t *f = malloc(sizeof(uint32_t) * img->w * img->h);
 	for (int i=0; i < img->w; i++) for (int j=0; j < img->h; j++)
-			f[(img->h - j - 1) * img->w + i] = img->rdimg[j * img->w + i];
+			f[(img->h - j - 1) * img->w + i] = img->data[j * img->w + i];
 
-	free(img->rdimg);
-	img->rdimg = f;
+	free(img->data);
+	img->data = f;
+	CNFGDeleteTex(img->gltexture);
+	img->gltexture = CNFGTexImage(img->data, img->w, img->h);
 }
 
 void th_image_crop(th_image *img, int x1, int y1, int x2, int y2) {
-	if (img->rdimg == NULL) {
+	if (img->data == NULL) {
 		th_error("crop: image is not valid");
 		return;
 	}
@@ -167,13 +168,15 @@ void th_image_crop(th_image *img, int x1, int y1, int x2, int y2) {
 
 	for (int x=0; x < x2-x1; x++) {
 		for (int y=0; y < y2-y1; y++) {
-			n[y*(x2-x1)+x] = img->rdimg[(y+y1)*img->w+x+x1];
+			n[y*(x2-x1)+x] = img->data[(y+y1)*img->w+x+x1];
 		}
 	}
-	free(img->rdimg);
+	free(img->data);
 	img->w = x2-x1;
 	img->h = y2-y1;
-	img->rdimg = n;
+	img->data = n;
+	CNFGDeleteTex(img->gltexture);
+	img->gltexture = CNFGTexImage(img->data, img->w, img->h);
 }
 
 void _th_rdimg(th_image *img, unsigned char *data) {
@@ -182,17 +185,17 @@ void _th_rdimg(th_image *img, unsigned char *data) {
 	for (int x=0; x < img->w; x++) {
 		for (int y=0; y < img->h; y++) {
 			int rd_index = (y * img->w) + x;
-			int data_index = ((y * img->w) + x) * img->c;
+			int data_index = ((y * img->w) + x) * img->channels;
 			rd[rd_index] = 0;
 
-			for (int poff=0; poff < img->c; poff++) {
+			for (int poff=0; poff < img->channels; poff++) {
 				rd[rd_index] += data[data_index + poff] << ((3 - poff) * 8);
 			}
 
-			if (img->c == 3)
+			if (img->channels == 3)
 				rd[rd_index] += 0xff;
 		}
 	}
 
-	img->rdimg = rd;
+	img->data = rd;
 }

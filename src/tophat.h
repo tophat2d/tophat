@@ -15,9 +15,9 @@ typedef struct {
 typedef struct {
 	int w;
 	int h;
-	int c;
-	uint32_t *rdimg;
-	unsigned int tex;
+	int channels;
+	uint32_t *data;
+	unsigned int gltexture;
 } th_image;
 
 #pragma pack(push, 1)

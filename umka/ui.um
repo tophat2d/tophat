@@ -64,6 +64,9 @@ type label* = struct {
 	valign: int // alignment
 	halign: int
 	bgcolor: uint32
+
+	offx: real32 // offset used for text alignement
+	offy: real32
 }
 
 // Button checks for clicks on it's
@@ -117,28 +120,26 @@ fn (b: ^box) calculate*() {
 		padd := &generics[i].padding
 
 		if b.vertical {
-      
 			dims.x = b.g.dimensions.x + off + padd.x
-			dims.w = round(real(b.g.dimensions.w)/totalspan) * generics[i].span - padd.w
-      
+			dims.w = trunc(real(b.g.dimensions.w)/totalspan) * generics[i].span - padd.w
+
 			dims.y = b.g.dimensions.y + padd.y
 			dims.h = b.g.dimensions.h - padd.h
       
 			b.children[i].calculate()
       
-			off += round(real(b.g.dimensions.w)/totalspan) * generics[i].span
-		
+			off += trunc(real(b.g.dimensions.w)/totalspan) * generics[i].span
 		} else {
 			dims.x = b.g.dimensions.x + padd.x
 			dims.w = b.g.dimensions.w - padd.w - padd.x
       
 			dims.y = b.g.dimensions.y + off + padd.y
-			dims.h = round(real(b.g.dimensions.h)/totalspan * generics[i].span) -
+			dims.h = trunc(real(b.g.dimensions.h)/totalspan * generics[i].span) -
 				padd.h - padd.y
       
 			b.children[i].calculate()
       
-			off += round(real(b.g.dimensions.h)/totalspan) * generics[i].span
+			off += trunc(real(b.g.dimensions.h)/totalspan) * generics[i].span
 		}
 	}
 
@@ -218,26 +219,26 @@ fn (l: ^label) calculate*() {
 
 	switch l.valign {
 	case MID:
-		l.g.padding.y = (l.g.dimensions.h-sy)/2
+		l.offy = (l.g.dimensions.h - sy - l.g.padding.h)/2
 	case BOT:
-		l.g.padding.y = l.g.dimensions.h - sy
+		l.offy = l.g.dimensions.h - sy - l.g.padding.h
 	}
 
 	switch l.halign {
 	case MID:
-		l.g.padding.x = (l.g.dimensions.w-sx)/2
+		l.offx = (l.g.dimensions.w - sx - l.g.padding.w)/2
 	case BOT:
-		l.g.padding.x = l.g.dimensions.w - sx
+		l.offx = l.g.dimensions.w - sx - l.g.padding.w
 	}
 }
 
 fn (l: ^label) draw*() {
 	rawdraw.setcolor(l.bgcolor)
 	rawdraw.drawrect(
-		l.g.dimensions.x - l.g.padding.x,
-		l.g.dimensions.y - l.g.padding.y,
-		l.g.dimensions.w + l.g.padding.w,
-		l.g.dimensions.h + l.g.padding.h)
+		l.g.dimensions.x - l.offx + l.g.padding.x,
+		l.g.dimensions.y - l.offy + l.g.padding.y,
+		l.g.dimensions.w - l.g.padding.w,
+		l.g.dimensions.h - l.g.padding.h)
 
 	rawdraw.drawtext(
 		l.text, l.g.dimensions.x, l.g.dimensions.y, l.textcolor, l.textsize)
@@ -276,10 +277,10 @@ fn mkbutton*(l: label): button {
 fn (b: ^button) calculate*() {
 	b.label.g.dimensions = b.g.dimensions
 	b.label.calculate()
-	b.label.g.dimensions.x += b.label.g.padding.x
-	b.label.g.dimensions.w -= b.label.g.padding.w
+	b.label.g.dimensions.x += round(b.label.offx) + b.label.g.padding.x
+	b.label.g.dimensions.w -= round(b.label.offy) + b.label.g.padding.y
 
-	b.label.g.dimensions.y += b.label.g.padding.y
+	b.label.g.dimensions.y += b.label.g.padding.w
 	b.label.g.dimensions.h -= b.label.g.padding.h
 }
 
