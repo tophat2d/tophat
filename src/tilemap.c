@@ -54,6 +54,11 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 			break;
 		}
 
-		th_blit_tex(t->tiles[t->cells[j*t->w+i]-1]->tex, (t->x+i*t->cellsize-camx)*scaling, (t->y+j*t->cellsize-camy)*scaling, scalex*scaling+scaling/6, scaley*scaling+scaling/6, 0);
+		th_blit_tex(
+			t->tiles[t->cells[j*t->w+i]-1]->gltexture,
+			(t->x+i*t->cellsize-camx)*scaling,
+			(t->y+j*t->cellsize-camy)*scaling,
+			scalex*scaling+scaling/6,
+			scaley*scaling+scaling/6, 0);
 	}
 }

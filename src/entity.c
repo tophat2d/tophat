@@ -29,7 +29,7 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	}
 
 	th_blit_tex(
-		o->img->tex,
+		o->img->gltexture,
 	  (o->p.x-camx) * scaling,
 	  (o->p.y-camy) * scaling,
 		o->img->w * o->sx * scaling,
