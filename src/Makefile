@@ -16,8 +16,7 @@ umkalibs: $(UMKA_LIBRARY)
 
 %.o: %.c
 	@echo CC $@
-	@$(CC) $(CFLAGS) -MM -MG -MF $(patsubst %.o,%.d,$@) -c $<
-	@$(CC) $(CFLAGS) -o $@ -c $<
+	@$(CC) $(CFLAGS) -MD -o $@ -c $<
 
 $(TARGET): umkalibs $(OBJS) $(UMKA_LIBRARY)
 	@echo LD $@

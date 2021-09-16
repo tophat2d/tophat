@@ -29,7 +29,7 @@ If you know/have made a game in tophat, don't hesitate and make a pr to add it h
 ## build instructions
 
 ### deps:
-  - compiler - both `gcc` and `clang` work, `tcc` should work only with the `bulk` rule. I didn't test any others.
+  - compiler - `gcc`, `tcc` and `clang` should work. I didn't test any others.
   - libGL headers
   - libX11 headers for linux build
  
@@ -42,7 +42,7 @@ Tip: run make with `-j$(nproc)` for parallel compiling.
 - `make run` - builds tophat and runs it.
 - `make clean` - clean repository after build.
 - `make deepclean` - like `clean` but also clean submodules.
-- `make cross` - build windows executable (located at `./tophat.exe`)
+- `make cross` - build windows executable (located at `./tophat.exe`).
 - `make bulk` - same as `make` but (re)compile all sources at once
 
 ## todo
