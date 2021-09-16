@@ -114,6 +114,9 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "ui.um", libs[13]);
 	umkaAddModule(umka, "vec.um", libs[14]);
 	umkaAddModule(umka, "std.um", libs[15]);
+	umkaAddModule(umka, "particles.um", libs[16]);
+	umkaAddModule(umka, "light.um", libs[17]);
+	umkaAddModule(umka, "lerp.um", libs[18]);
 #endif
 }
 

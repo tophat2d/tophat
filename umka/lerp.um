@@ -1,0 +1,59 @@
+// Dead simple linear interpolation.
+
+// Lerper queue item. It interpolates between start and end for the duration
+// of length in ms. Additionally you can enable swap, which instead of
+// dequeueing it spwaps start and end and resets the progress.
+type item* = struct {
+	start, end: real
+	length: int32
+	progress: real32
+	swap: bool
+}
+
+// Lerper is a queue of items. It will lerp the first one and if it ends
+// and it doesn't have swap enabled, it will dequeue it.
+type lerper* = []item
+
+// Removes the first lerper item.
+fn (l: ^lerper) dequeue*() {
+	switch len(l^) {
+	case 0:
+		return
+	case 1:
+		l^ = lerper{}
+	default:
+		l^ = slice(l^, 1)
+	}
+}
+
+// Adds an item to l's queue
+fn (l: ^lerper) enqueue*(i: item) {
+	l^ = append(l^, i)
+}
+
+// Interpolates the front by delta. And returns it's value.
+fn (l: ^lerper) bydelta*(delta: int32): real {
+	if len(l^) == 0 {
+		return 0
+	}
+
+	for l[0].progress >= 1.0 {
+		if l[0].swap {
+			tmp := l[0].start
+			l[0].start = l[0].end
+			l[0].end = tmp
+
+			l[0].progress = 0
+			break
+		}
+
+		l.dequeue()
+		if len(l^) == 0 {
+			return 0
+		}
+	}
+
+	l[0].progress += real32(delta)/l[0].length
+
+	return l[0].progress * (l[0].end-l[0].start) + l[0].start
+}

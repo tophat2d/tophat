@@ -14,6 +14,7 @@ import (
 	"umka/tween.um"
 	"umka/light.um"
 	"umka/particles.um"
+	"umka/lerp.um"
 
 	"umka/std/std.um"
 )
@@ -25,19 +26,32 @@ fn main() {
 
 	t := 0
 
-	p := polygon.mk(100, 100, []int32{0, 0, 5, 0, 5, 5, 0, 5})
-	e := entity.mk(p, tophat.black, 0)
+	e := entity.mk(
+		polygon.mk(0, 0, []int32{0, 0, 10, 0, 10, 10, 0, 10}),
+		tophat.black, 0)
+	wl := lerp.lerper{lerp.item{-1, 2, 1000, 0, true}}
+	hl := lerp.lerper{lerp.item{2, -1, 1000, 0, true}}
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 		t += tophat.delta
 
-		p.draw(0xaa)
-		e.draw(cam)
-
-		if tophat.delta != 0 {
-			rawdraw.drawtext(repr(1000/tophat.delta), 0, 0, tophat.white, 2)
+		/*if len(wl) == 1 {
+			wl.enqueue(lerp.item{
+				wl[0].end, wl[0].start,
+				wl[0].length, 0})
 		}
+
+		if len(hl) == 1 {
+			hl.enqueue(lerp.item{
+				hl[0].end, hl[0].start,
+				hl[0].length, 0})
+		}*/
+
+		e.setscale(
+			wl.bydelta(tophat.delta),
+			hl.bydelta(tophat.delta))
+		e.draw(cam)
 	}
 }
 

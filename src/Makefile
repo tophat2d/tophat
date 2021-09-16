@@ -11,7 +11,7 @@ UMKA_LIB = src/umkalibs.h
 
 umkalibs: $(UMKA_LIBRARY)
 	@echo EM $@
-	@./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um umka/std/std.um > src/umkalibs.h
+	@./lib/umka/build/umka cmd/embedder.um umka/animation.um umka/audio.um umka/csv.um umka/entity.um umka/image.um umka/input.um umka/misc.um umka/polygon.um umka/rawdraw.um umka/raycast.um umka/rectangle.um umka/tilemap.um umka/tophat.um umka/ui.um umka/vec.um umka/std/std.um umka/std/std.um umka/particles.um umka/light.um umka/lerp.um > src/umkalibs.h
 	rm -f src/bindings.o
 
 %.o: %.c
