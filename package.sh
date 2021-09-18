@@ -18,3 +18,4 @@ cp cmd/*.bat windows
 cp tophat.exe windows/bin/tophat-win.exe
 cp tophat windows/bin/tophat
 zip -r -0 tophat-win.zip windows/* # windows doesn't like linux's zip compression
+rm -rf windows

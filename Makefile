@@ -38,6 +38,12 @@ include src/Makefile
 
 deepclean:: clean
 
+install: $(TARGET) cross
+	./package.sh
+	cp cmd/tophat-cli /usr/bin
+	./cmd/tophat-cli install tophat-linux.zip
+	rm tophat-linux.zip tophat-win.zip
+
 clean::
 	$(RM) $(TARGET)
 	$(RM) $(TARGET).exe
