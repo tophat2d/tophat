@@ -29,8 +29,11 @@ fn main() {
 	e := entity.mk(
 		polygon.mk(0, 0, []int32{0, 0, 10, 0, 10, 10, 0, 10}),
 		tophat.black, 0)
-	wl := lerp.lerper{lerp.item{-1, 2, 1000, 0, true}}
-	hl := lerp.lerper{lerp.item{2, -1, 1000, 0, true}}
+	wl := lerp.lerper{lerp.item{-1, 2, 1000, 0, true, &e, fn(ctx: lerp.Any) {
+		e := ^entity.ent(ctx)
+		e.color = std.rand() | 0xff
+	}}}
+	hl := lerp.lerper{lerp.item{2, -1, 1000, 0, true, null, fn(ctx: lerp.Any){}}}
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)

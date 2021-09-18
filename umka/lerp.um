@@ -1,5 +1,7 @@
 // Dead simple linear interpolation.
 
+type Any* = interface{}
+
 // Lerper queue item. It interpolates between start and end for the duration
 // of length in ms. Additionally you can enable swap, which instead of
 // dequeueing it spwaps start and end and resets the progress.
@@ -8,6 +10,8 @@ type item* = struct {
 	length: int32
 	progress: real32
 	swap: bool
+	ctx: Any
+	callback: fn(ctx: Any)
 }
 
 // Lerper is a queue of items. It will lerp the first one and if it ends
@@ -38,6 +42,8 @@ fn (l: ^lerper) bydelta*(delta: int32): real {
 	}
 
 	for l[0].progress >= 1.0 {
+		l[0].callback(l[0].ctx)
+
 		if l[0].swap {
 			tmp := l[0].start
 			l[0].start = l[0].end
