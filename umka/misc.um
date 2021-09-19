@@ -1,7 +1,23 @@
 
 import (
-	"entity.um"								
+	"entity.um"
+	"std.um"							
 )
+
+fn readall*(path: str): str {
+	f := std.fopen(path, "r")
+	const blockSize = 16
+	res := ""
+
+	for ok := true; ok {
+	  var buff: [blockSize + 1]char
+	  ok = std.fread(f, ^[blockSize]char(&buff)) == 1
+	  res += str([]char(buff))
+	}
+
+	std.fclose(f)
+	return res
+}
 
 // Snaps a value to step.
 fn stepify*(val, step: real): real {

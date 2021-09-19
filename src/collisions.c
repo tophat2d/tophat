@@ -7,6 +7,9 @@
 
 #include "tophat.h"
 
+#define MAX(a, b) (a > b ? a : b)
+#define MIN(a, b) (a < b ? a : b)
+
 // checks collision between two polygons
 int _th_poly_to_poly(th_poly *p1, th_poly *p2, int *ix, int *iy) {
 	int next = 0;
@@ -98,8 +101,48 @@ int _th_poly_to_point(th_poly *a, int px, int py, int *ix, int *iy) {
 }
 
 bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
-	// TODO
-	return false;
+	float
+		x0, y0,
+		x1 = ra->x, y1 = ra->y + ra->l;
+
+	th_rotate_point(&x1, &y1, ra->x, ra->y, ra->r);
+	
+	x0 = MIN(ra->x, x1);
+	y0 = MIN(ra->y, y1);
+	x1 = MAX(ra->x, x1);
+	y1 = MAX(ra->y, y1);
+
+	float
+		mx = x1 - x0,
+		my = y1 - y0;
+	th_vector_normalize(&mx, &my);
+
+	float
+		x = x0,
+		y = y0;
+
+	printf("%f %f\n%f %f\n%f %f\n----\n", x0, y0, x1, y1, mx, my);
+
+	bool coll = false;
+	while (x < x1 && y < y1) {
+		int tx = (x - t->x) / t->cellsize;
+		int ty = (y - t->y) / t->cellsize;
+
+		int tile = t->cells[(int)(ty * t->w + tx)] - 1;
+		if (x >= t->x && y >= t->y && tx < t->w && ty < t->h &&
+			tile >= 0 && t->collmask[tile]) {
+			*ix = x;
+			*iy = y;
+			coll = true;
+			if (x1 < x0 || y1 < x0)
+				break;
+		}
+
+		x += mx;
+		y += my;
+	}	
+
+	return coll;
 }
 
 bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {

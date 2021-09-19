@@ -92,7 +92,9 @@ fn mk*(inp: str, images: []image.img): tmap {
 		}
 	}
 
-	return tmap{images, std.atoi(res[0][1]), std.atoi(res[0][2]), len(res[2]), cells, collmask, std.atoi(res[0][3]), std.atoi(res[0][4])}
+	return tmap{
+		images, std.atoi(res[0][1]), std.atoi(res[0][2]),
+		len(res[2]), cells, collmask, std.atoi(res[0][3]), std.atoi(res[0][4])}
 }
 
 // Sets tile at [x, y] to tile.

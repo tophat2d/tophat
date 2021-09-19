@@ -34,17 +34,12 @@ void th_rotate_point(float *x, float *y, float cx, float cy, float rot) {
 	*y = (int)round(y2) + cy;
 }
 
-void th_vector_normalize(float x1, float y1, float x2, float y2, float *rx, float *ry) {
-	float diff_x = x2 - x1;
-	float diff_y = y2 - y1;
-
-
-	if (diff_x < diff_y) {
-		*rx = 1;
-		*ry = diff_y / diff_x;
-		return;
+void th_vector_normalize(float *x, float *y) {
+	if (*x > *y) {
+		*y /= *x;
+		*x = 1;
+	} else {
+		*x /= *y;
+		*y = 1;
 	}
-
-	*rx = diff_x / diff_y;
-	*ry = 1;
 }
