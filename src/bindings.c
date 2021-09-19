@@ -124,6 +124,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "lerp.um", libs[18]);
 	umkaAddModule(umka, "map.um", libs[19]);
 	umkaAddModule(umka, "utf8.um", libs[20]);
+	umkaAddModule(umka, "font.um", libs[21]);
 #endif
 }
 
