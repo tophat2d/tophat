@@ -15,8 +15,14 @@ import (
 	"umka/light.um"
 	"umka/particles.um"
 	"umka/lerp.um"
+	"umka/font.um"
 
 	"umka/std/std.um"
+)
+
+var (
+	f: font.ttf
+	timg: image.img
 )
 
 fn main() { 
@@ -25,6 +31,9 @@ fn main() {
 	var w, h: int32
 
 	t := 0
+
+	f = font.load("font.ttf")
+	timg = f.strtoimg("abq\nabq", 1, 0x00, 100, 100)
 
 	e := entity.mk(
 		polygon.mk(0, 0, []int32{0, 0, 10, 0, 10, 10, 0, 10}),
@@ -39,25 +48,17 @@ fn main() {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 		t += tophat.delta
 
-		/*if len(wl) == 1 {
-			wl.enqueue(lerp.item{
-				wl[0].end, wl[0].start,
-				wl[0].length, 0})
-		}
-
-		if len(hl) == 1 {
-			hl.enqueue(lerp.item{
-				hl[0].end, hl[0].start,
-				hl[0].length, 0})
-		}*/
-
 		e.setscale(
 			wl.bydelta(tophat.delta),
 			hl.bydelta(tophat.delta))
 		e.draw(cam)
+
+		timg.draw(10, 10, 0, 0.05)
 	}
 }
 
 fn windowdestroy() {
+	f.delete()
+	timg.delete()
 	printf("destroying window\n")
 }

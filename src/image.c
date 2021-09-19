@@ -60,7 +60,8 @@ inline void th_image_from_data(th_image *img, uint32_t *data, int w, int h) {
 	img->w = w;
 	img->h = h;
 	img->channels = 4;
-	CNFGTexImage(img->data, w, h);
+
+	img->gltexture = CNFGTexImage(img->data, w, h);
 }
 
 void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot) {

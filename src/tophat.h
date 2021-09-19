@@ -4,6 +4,7 @@
 #include <stdbool.h>
 #include <miniaudio.h>
 #include <CNFG.h>
+#include <stb_truetype.h>
 
 typedef struct {
     ma_decoder decoder;
@@ -120,6 +121,10 @@ typedef struct {
 	int scaletype;
 } th_tmap;
 
+typedef struct {
+	stbtt_fontinfo *info;
+} th_font;
+
 // audio
 void th_audio_init();
 void th_audio_deinit();
@@ -157,6 +162,14 @@ int th_ray_getcoll(th_ray *ra, th_ent *scene, int count, int *ix, int *iy);
 
 // tilemap
 void th_tmap_draw(th_tmap *t, th_rect *cam);
+
+// font
+void th_font_load(th_font *out, char *path);
+void th_str_to_img(
+	th_image *out, th_font *font,
+	uint32_t *runes, int runec,
+	double scale, uint32_t color,
+	int ax, int ay);
 
 //// "unexported" functions
 

@@ -1,0 +1,39 @@
+
+import (
+	"std/map.um"
+	"std/utf8.um"
+	"image.um"
+)
+
+type ptr = uint
+
+// a trutype font. Don't create by hand
+type ttf* = struct {
+	stbtt: ptr
+}
+
+fn ctexttoimg(
+	t: ^ttf, text: ^utf8.Rune,
+	runec: int32, size: real, color: uint32, ax, ay: int): uint
+
+// Creates an image.img from a text. ax and ay are character/line spacings.
+fn (t: ^ttf) strtoimg*(text: str, size: real, color: uint32, ax, ay: int): image.img {
+	runes := utf8.decode(text)
+	return image.img{ctexttoimg(t, &runes[0], len(runes), size, color, ax, ay)}
+}
+
+fn cfontfree(t: ^ttf)
+
+// Frees a font from memory.
+fn (t: ^ttf) delete*() {
+	cfontfree(t)
+}
+
+fn cfontload(t: ^ttf, path: str)
+
+// Loads a font from file.
+fn load*(path: str): ttf {
+	t := ttf{}
+	cfontload(&t, path)
+	return t
+}

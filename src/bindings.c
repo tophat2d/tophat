@@ -32,6 +32,10 @@ void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
 
+	umkaAddFunc(umka, "ctexttoimg", &umfonttexttoimg);
+	umkaAddFunc(umka, "cfontfree", &umfontfree);
+	umkaAddFunc(umka, "cfontload", &umfontload);
+
 	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
 	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
 	umkaAddFunc(umka, "cspotlightstamp", &umspotlightstamp);
@@ -117,6 +121,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "particles.um", libs[16]);
 	umkaAddModule(umka, "light.um", libs[17]);
 	umkaAddModule(umka, "lerp.um", libs[18]);
+	umkaAddModule(umka, "map.um", libs[19]);
+	umkaAddModule(umka, "utf8.um", libs[20]);
 #endif
 }
 
@@ -131,8 +137,32 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->ptrVal = (intptr_t)f;
 }
 
-///////////////////////
-// particles
+void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_font *f = (th_font *)p[6].ptrVal;
+	uint32_t *runes = (uint32_t *)p[5].ptrVal;
+	int runec = p[4].intVal;
+	double scale = p[3].realVal;
+	uint32_t color = p[2].uintVal;
+	int ax = p[1].intVal;
+	int ay = p[0].intVal;
+
+	th_image *img = malloc(sizeof(th_image));
+	th_str_to_img(img, f, runes, runec, scale, color, ax, ay);
+	r->intVal = (intptr_t)img;
+}
+
+void umfontfree(UmkaStackSlot *p, UmkaStackSlot *r) {
+	free((void *)p[0].ptrVal);
+}
+
+void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char buf[512];
+	strcpy(buf, respath);
+	strcat(buf, (char *)p[0].ptrVal);
+
+	th_font_load((th_font *)p[1].ptrVal, buf);
+}
+
 // sets values of all dots to lightmask's color
 void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_lightmask *l = (th_lightmask *)p[0].ptrVal;
