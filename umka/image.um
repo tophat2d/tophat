@@ -32,6 +32,8 @@ fn imgfromdata(data: ^uint32, w: int32, h: int32): int
 
 fn imgcopy(data: int): int
 
+fn imgsetfilter(data, filter: int)
+
 // Loads an image at path.
 fn load*(path: str): img {
 	return img{loadimg(&path[0])}
@@ -92,3 +94,10 @@ fn (i: ^img) copy*(): img {
 	return img{imgcopy(i.handle)}
 }
 
+// Sets a mag/min filter. 0 is linear, others are nearest.
+// This function will regenerate the texture, so it's slow.
+// https://learnopengl.com/img/getting-started/texture_filtering.png
+// left is nearest, right is linear.
+fn (i: ^img) setfilter(filter: int) {
+	imgsetfilter(i.handle, filter)
+}

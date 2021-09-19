@@ -33,7 +33,8 @@ fn main() {
 	t := 0
 
 	f = font.load("font.ttf")
-	timg = f.strtoimg("abq\nabq", 1, 0x00, 100, 100)
+	timg = f.strtoimg("abq\nabq", 0.2, 0x00, 10, 10)
+	timg.setfilter(0)
 
 	e := entity.mk(
 		polygon.mk(0, 0, []int32{0, 0, 10, 0, 10, 10, 0, 10}),
@@ -53,7 +54,7 @@ fn main() {
 			hl.bydelta(tophat.delta))
 		e.draw(cam)
 
-		timg.draw(10, 10, 0, 0.05)
+		timg.draw(10, 10, 0, 0.1)
 	}
 }
 

@@ -27,6 +27,7 @@ th_image *th_load_image(char *path) {
 	img->w = w;
 	img->h = h;
 	img->channels = c;
+	img->filter = 1;
 
 	if (data == NULL) {
 		th_error("could not find image at path %s", path);
@@ -54,16 +55,50 @@ void th_free_image(th_image *img) {
 	free(img);
 }
 
-inline void th_image_from_data(th_image *img, uint32_t *data, int w, int h) {
+void th_image_from_data(th_image *img, uint32_t *data, int w, int h) {
 	img->data = malloc(sizeof(uint32_t) * w * h);
 	memcpy(img->data, data, sizeof(uint32_t) * w * h);
 	img->w = w;
 	img->h = h;
 	img->channels = 4;
+	img->filter = 1;
 
-	img->gltexture = CNFGTexImage(img->data, w, h);
+	img->gltexture = th_gen_texture(img->data, w, h, img->filter);
 }
 
+void th_image_set_filter(th_image *img, int filter) {
+	img->filter = filter;
+	CNFGDeleteTex(img->gltexture);
+	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
+}
+
+// stolen from rawdraw
+unsigned int th_gen_texture(uint32_t *data, int w, int h, unsigned filter) {
+	GLuint tex;
+
+	glGenTextures(1, &tex);
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D, tex);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+
+	if (filter)
+		filter = GL_NEAREST;
+	else
+		filter = GL_LINEAR;
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,  GL_RGBA,
+		GL_UNSIGNED_BYTE, data);
+
+	return (unsigned int)tex;
+}
+
+// stolen from rawdraw
 void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot) {
 	if( w == 0 || h == 0 )
 		return;
@@ -122,7 +157,7 @@ void th_image_flipv(th_image *img) {
 	free(img->data);
 	img->data = f;
 	CNFGDeleteTex(img->gltexture);
-	img->gltexture = CNFGTexImage(img->data, img->w, img->h);
+	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
 }
 
 void th_image_fliph(th_image *img) {
@@ -138,7 +173,7 @@ void th_image_fliph(th_image *img) {
 	free(img->data);
 	img->data = f;
 	CNFGDeleteTex(img->gltexture);
-	img->gltexture = CNFGTexImage(img->data, img->w, img->h);
+	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
 }
 
 void th_image_crop(th_image *img, int x1, int y1, int x2, int y2) {
@@ -177,7 +212,7 @@ void th_image_crop(th_image *img, int x1, int y1, int x2, int y2) {
 	img->h = y2-y1;
 	img->data = n;
 	CNFGDeleteTex(img->gltexture);
-	img->gltexture = CNFGTexImage(img->data, img->w, img->h);
+	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
 }
 
 void _th_rdimg(th_image *img, unsigned char *data) {

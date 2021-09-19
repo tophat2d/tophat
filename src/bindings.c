@@ -56,6 +56,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "imgcrop", &umimgcrop);
 	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
 	umkaAddFunc(umka, "imgcopy", &umimgcopy);
+	umkaAddFunc(umka, "imgsetfilter", &umimgsetfilter);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
@@ -236,7 +237,7 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char pathcpy[512];
 	strcpy(pathcpy, respath);
 	img = th_load_image(strcat(pathcpy, path));
-	img->gltexture = CNFGTexImage(img->data, img->w, img->h);
+	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
 
 	r[0].ptrVal = (intptr_t)img;
 }
@@ -314,6 +315,18 @@ void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
 	memcpy(out->data, inp->data, sizeof(uint32_t) * out->w * out->h);
 
 	r->ptrVal = (intptr_t)out;
+}
+
+void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *img = (th_image *)p[1].ptrVal;
+	int filter = p[0].intVal;
+
+	if (!img) {
+		th_error("setfilter: null image");
+		return;
+	}
+
+	th_image_set_filter(img, filter);
 }
 
 ///////////////////////

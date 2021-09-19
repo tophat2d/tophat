@@ -12,6 +12,11 @@ struct {
 
 void th_font_load(th_font *out, char *path) {
 	FILE *f = fopen(path, "r");
+	if (f == NULL) {
+		th_error("Could not find font at %s.", path);
+		out = NULL;
+		return;
+	}
 
 	fseek(f, 0, SEEK_END);
 	int size = ftell(f);

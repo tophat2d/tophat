@@ -19,6 +19,7 @@ typedef struct {
 	int channels;
 	uint32_t *data;
 	unsigned int gltexture;
+	int filter;
 } th_image;
 
 #pragma pack(push, 1)
@@ -138,6 +139,8 @@ int th_ent_getcoll(th_ent *e, th_ent *scene, int count, int *ix, int *iy);
 th_image *th_load_image(char *path);
 void th_free_image(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, int w, int h);
+void th_image_set_filter(th_image *img, int filter);
+unsigned int th_gen_texture(uint32_t *data, int w, int h, unsigned filter);
 void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot);
 void th_image_flipv(th_image *img);
 void th_image_fliph(th_image *img);
