@@ -107,10 +107,10 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 
 	th_rotate_point(&x1, &y1, ra->x, ra->y, ra->r);
 	
-	x0 = MIN(ra->x, x1);
-	y0 = MIN(ra->y, y1);
-	x1 = MAX(ra->x, x1);
-	y1 = MAX(ra->y, y1);
+	x0 = ra->x;
+	y0 = ra->y;
+	x1 = x1;
+	y1 = y1;
 
 	float
 		mx = x1 - x0,
@@ -119,28 +119,33 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 
 	float
 		x = x0,
-		y = y0;
-
-	printf("%f %f\n%f %f\n%f %f\n----\n", x0, y0, x1, y1, mx, my);
-
+		y = y0,
+		minlen = -1;
 	bool coll = false;
-	while (x < x1 && y < y1) {
+	float len = 0;
+	while (len < ra->l) {
 		int tx = (x - t->x) / t->cellsize;
 		int ty = (y - t->y) / t->cellsize;
 
 		int tile = t->cells[(int)(ty * t->w + tx)] - 1;
 		if (x >= t->x && y >= t->y && tx < t->w && ty < t->h &&
 			tile >= 0 && t->collmask[tile]) {
-			*ix = x;
-			*iy = y;
 			coll = true;
-			if (x1 < x0 || y1 < x0)
-				break;
+			if (minlen == -1 || len < minlen)
+				minlen = len;
 		}
 
 		x += mx;
 		y += my;
+		len += sqrt(mx * mx + my * my);
 	}	
+
+	float
+		fix = ra->x,
+		fiy = ra->y + minlen;
+	th_rotate_point(&fix, &fiy, ra->x, ra->y, ra->r);
+	*ix = fix;
+	*iy = fiy;
 
 	return coll;
 }
