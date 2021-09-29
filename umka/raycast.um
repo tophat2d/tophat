@@ -1,6 +1,7 @@
 // Raycasts allow for vroom fast collisions.
 
 import (
+	"th.um"
 	"entity.um"
 	"polygon.um"
 	"tilemap.um"
@@ -8,28 +9,20 @@ import (
 
 // Ray type.
 type ray* = struct {
-	x: real // position
-	y: real
-	l: int32 // length
-	r: real // rotation
-}
-
-type cray = struct {
-	x: int32
-	y: int32
-	l: int32
-	r: int32
+	pos: th.vf2
+	l: th.fu // length
+	r: th.fu // rotation
 }
 
 var colldatax, colldatay: int32
 
 // Makes a ray. Just for consistency.
-fn mk*(x, y, l, r: int32): ray {
-	return ray{x, y, l, r}
+fn mk*(pos: th.vf2, l, r: th.fu): ray {
+	return ray{pos, l, r}
 }
 
-fn craygetcoll(ix, iy: ^int32, count: int32, r: ^cray, s: ^entity.cent): int32
-fn craygettmapcoll(r: ^cray, t: ^tilemap.ctmap, ix, iy: ^int32): bool
+fn craygetcoll(ix, iy: ^int32, count: int32, r: ^ray, s: ^entity.cent): int32
+fn craygettmapcoll(r: ^ray, t: ^tilemap.ctmap, ix, iy: ^int32): bool
 
 // Same as ent.getcoll. Same changes will apply.
 fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
@@ -39,9 +32,7 @@ fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
 		cscn[i] = e.toc()
 	}
 
-	cr := cray{round(r.x), round(r.y), r.l, round(r.r)}
-
-	return craygetcoll(&colldatax, &colldatay, len(cscn), &cr, &cscn[0])
+	return craygetcoll(&colldatax, &colldatay, len(cscn), r, &cscn[0])
 }
 
 // Returns, where the last collision happened.
@@ -50,14 +41,12 @@ fn retrievecolldata*(): (int32, int32) {
 }
 
 fn (r: ^ray) gettmapcoll*(t: tilemap.tmap, ix, iy: ^int32): bool {
-	cr := cray{round(r.x), round(r.y), r.l, round(r.r)}
-
 	ccm := make([]int32, len(t.collmask))
 	for i:=0; i < len(t.collmask); i++ {
 		ccm[i] = int32(t.collmask[i])
 	}
 
-	cm := tilemap.ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
+	cm := tilemap.ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collmask[0], t.cellsize, t.scaletype}
 
-	return craygettmapcoll(&cr, &cm, ix, iy)
+	return craygettmapcoll(r, &cm, ix, iy)
 }

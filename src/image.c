@@ -24,8 +24,8 @@ th_image *th_load_image(char *path) {
 
 	th_image *img;
 	img = malloc(sizeof(th_image));
-	img->w = w;
-	img->h = h;
+	img->dm.w = w;
+	img->dm.h = h;
 	img->channels = c;
 	img->filter = 1;
 
@@ -55,25 +55,24 @@ void th_free_image(th_image *img) {
 	free(img);
 }
 
-void th_image_from_data(th_image *img, uint32_t *data, int w, int h) {
-	img->data = malloc(sizeof(uint32_t) * w * h);
-	memcpy(img->data, data, sizeof(uint32_t) * w * h);
-	img->w = w;
-	img->h = h;
+void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
+	img->data = malloc(sizeof(uint32_t) * dm.w * dm.h);
+	memcpy(img->data, data, sizeof(uint32_t) * dm.w * dm.h);
+	img->dm = dm;
 	img->channels = 4;
 	img->filter = 1;
 
-	img->gltexture = th_gen_texture(img->data, w, h, img->filter);
+	img->gltexture = th_gen_texture(img->data, dm, img->filter);
 }
 
 void th_image_set_filter(th_image *img, int filter) {
 	img->filter = filter;
 	CNFGDeleteTex(img->gltexture);
-	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
+	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 }
 
 // stolen from rawdraw
-unsigned int th_gen_texture(uint32_t *data, int w, int h, unsigned filter) {
+unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
 	GLuint tex;
 
 	glGenTextures(1, &tex);
@@ -92,7 +91,7 @@ unsigned int th_gen_texture(uint32_t *data, int w, int h, unsigned filter) {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,  GL_RGBA,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dm.w, dm.h, 0,  GL_RGBA,
 		GL_UNSIGNED_BYTE, data);
 
 	return (unsigned int)tex;
@@ -149,15 +148,15 @@ void th_image_flipv(th_image *img) {
 		return;
 	}
 
-	uint32_t *f = malloc(sizeof(uint32_t) * img->w * img->h);
+	uint32_t *f = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
 
-	for (int i=0; i < img->w; i++) for (int j=0; j < img->h; j++)
-			f[(j + 1) * img->w - i - 1] = img->data[j * img->w + i];
+	for (int i=0; i < img->dm.w; i++) for (int j=0; j < img->dm.h; j++)
+			f[(j + 1) * (uu)img->dm.w - i - 1] = img->data[j * (uu)img->dm.w + i];
 
 	free(img->data);
 	img->data = f;
 	CNFGDeleteTex(img->gltexture);
-	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
+	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 }
 
 void th_image_fliph(th_image *img) {
@@ -166,62 +165,61 @@ void th_image_fliph(th_image *img) {
 		return;
 	}
 
-	uint32_t *f = malloc(sizeof(uint32_t) * img->w * img->h);
-	for (int i=0; i < img->w; i++) for (int j=0; j < img->h; j++)
-			f[(img->h - j - 1) * img->w + i] = img->data[j * img->w + i];
+	uint32_t *f = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
+	for (int i=0; i < img->dm.w; i++) for (int j=0; j < img->dm.h; j++)
+			f[(uu)((img->dm.h - j - 1) * img->dm.w + i)] = img->data[(uu)(j * img->dm.w + i)];
 
 	free(img->data);
 	img->data = f;
 	CNFGDeleteTex(img->gltexture);
-	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
+	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 }
 
-void th_image_crop(th_image *img, int x1, int y1, int x2, int y2) {
+void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br) {
 	if (img->data == NULL) {
 		th_error("crop: image is not valid");
 		return;
 	}
 
-	if (x1 < 0 || y1 < 0 || x2 > img->w || y2 > img->h) {
+	if (tl.x < 0 || tl.y < 0 || br.x > img->dm.w || br.y > img->dm.h) {
 		th_error("crop: invalid dimensions");
 		return;
 	}
 
-	if (x1 > x2) {
-		int tmp = x1;
-		x1 = x2;
-		x2 = tmp;
+	if (tl.x > br.x) {
+		int tmp = tl.x;
+		tl.x = br.x;
+		br.x = tmp;
 	}
 
-	if (y1 > y2) {
-		int tmp = y1;
-		y1 = y2;
-		y2 = tmp;
+	if (tl.y > br.y) {
+		int tmp = tl.y;
+		tl.y = br.y;
+		br.y = tmp;
 	}
 
-	uint32_t *n;
- 	n = calloc(sizeof(uint32_t), (x2-x1) * (y2-y1));
+ 	uint32_t *n = calloc(sizeof(uint32_t), (br.x-tl.x) * (br.y-tl.y));
 
-	for (int x=0; x < x2-x1; x++) {
-		for (int y=0; y < y2-y1; y++) {
-			n[y*(x2-x1)+x] = img->data[(y+y1)*img->w+x+x1];
+	for (int x=0; x < br.x-tl.x; x++) {
+		for (int y=0; y < br.y-tl.y; y++) {
+			n[(uu)(y*(br.x-tl.x)+x)] = img->data[(uu)((y+tl.y)*img->dm.w+x+tl.x)];
 		}
 	}
 	free(img->data);
-	img->w = x2-x1;
-	img->h = y2-y1;
+	img->dm.w = br.x-tl.x;
+	img->dm.h = br.y-tl.y;
 	img->data = n;
 	CNFGDeleteTex(img->gltexture);
-	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
+	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 }
 
 void _th_rdimg(th_image *img, unsigned char *data) {
-	uint32_t *rd = malloc(sizeof(uint32_t) * img->w * img->h);
+	uint32_t *rd = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
 
-	for (int x=0; x < img->w; x++) {
-		for (int y=0; y < img->h; y++) {
-			int rd_index = (y * img->w) + x;
-			int data_index = ((y * img->w) + x) * img->channels;
+	for (int x=0; x < img->dm.w; x++) {
+		for (int y=0; y < img->dm.h; y++) {
+			int rd_index = (y * img->dm.w) + x;
+			int data_index = ((y * img->dm.w) + x) * img->channels;
 			rd[rd_index] = 0;
 
 			for (int poff=0; poff < img->channels; poff++) {

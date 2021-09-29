@@ -1,6 +1,7 @@
 // vim: filetype=umka
 
 import (
+	"th.um"
 	"std/std.um"
 	"rectangle.um"
 )
@@ -105,22 +106,21 @@ fn setwinmap*() {
 	KEY_SPACE = 32
 }
 
-fn cgetmouse(x, y: ^int32)
+fn cgetmouse(out: ^th.vf2)
 
 // Returns the position of mouse cursor in relation to the screen.
-fn getmousepos*(): (int32, int32) {
-	var w, h: int32
-
-	cgetmouse(&w, &h)
-
-	return w, h
+fn getmousepos*(): th.vf2 {
+	out := th.vf2{}
+	cgetmouse(&out)
+	return out
 }
 
 // Returns the position of mouse cursor in relation to cam.
-fn getglobalmousepos*(cam: rectangle.rect): (int32, int32) {
-	w, h := getmousepos()
-
-	return w + cam.x - cam.w/2, h + cam.y - cam.h/2	
+fn getglobalmousepos*(cam: rectangle.rect): th.vf2 {
+	v := getmousepos()
+	v.x += cam.x
+	v.y += cam.y
+	return v
 }
 
 fn cispressed(keycode: int32): int32

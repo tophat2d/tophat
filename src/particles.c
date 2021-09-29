@@ -60,22 +60,22 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 		p->active = true;
 		srand(p->particles[i].seed);
 
-		double direction = (rand()%(p->angle_max - p->angle_min) + p->angle_min) * M_PI / 180;
+		fu direction = (rand()%(iu)(p->angle.y - p->angle.x) + p->angle.x) * M_PI / 180;
 
-		double vx = p->velocity * cos(direction);
-		double vy = p->velocity * sin(direction);
+		fu vx = p->velocity * cos(direction);
+		fu vy = p->velocity * sin(direction);
 		if (p->velocity_randomness != 0) {
 				vx += FRAND*(p->velocity*p->velocity_randomness);
 				vy += FRAND*(p->velocity*p->velocity_randomness);
 		}
 
-		vx *= p->gravity_x;
-		vy *= p->gravity_y;
+		vx *= p->gravity.x;
+		vy *= p->gravity.y;
 
-		int px = p->px + rand()%p->w + vx * (t - p->particles[i].start_time);
-		int py = p->py + rand()%p->h + vy * (t - p->particles[i].start_time);
+		fu px = p->pos.x + rand()%(iu)p->dm.w + vx * (t - p->particles[i].start_time);
+		fu py = p->pos.y + rand()%(iu)p->dm.h + vy * (t - p->particles[i].start_time);
 
-		double size = p->size;
+		fu size = p->size;
 		if (p->size != p->max_size)
 			size = get_particle_size(p, p->particles[i], t);
 
@@ -104,10 +104,10 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
       
 			CNFGTackPoly(points, 4);
 		} else { // optimize drawing without rotations
-			int x = px;
-			int y = py;
-			int w = px + size;
-			int h = py + size;
+			fu x = px;
+			fu y = py;
+			fu w = px + size;
+			fu h = py + size;
 
 			CNFGTackRectangle(
 				(x - camx) * scaling,

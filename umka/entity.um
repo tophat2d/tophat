@@ -5,6 +5,7 @@ import (
 	"rectangle.um"
 	"std/std.um"
 	"image.um"
+	"th.um"
 )
 
 // Entity is the main object in most games. It allow for drawing and collisions.
@@ -15,21 +16,19 @@ import (
 type ent* = struct {
 	p: polygon.poly
 	image: image.img
-	sx: real
-	sy: real
-	rot: real 
+	scale: th.vf2
+	rot: th.fu
 	color: uint32
-	id: int32
+	id: th.uu
 }
 
 type cent* = struct {
 	p: polygon.cpoly
 	image: int
-	sx: real
-	sy: real
-	rot: int32	
+	scale: th.vf2
+	rot: th.fu
 	color: uint32
-	id: int32
+	id: th.uu
 }
 
 var colldatax, colldatay: int32
@@ -40,8 +39,8 @@ fn centdraw(e: cent, c: rectangle.rect)
 fn (e: ^ent) toc*(): cent {
 	return cent {
 		e.p.toc(),
-		e.image.handle, e.sx, e.sy,
-		round(e.rot), e.color, e.id}
+		e.image.handle, e.scale,
+		e.rot, e.color, e.id}
 }
 
 // Draws the entity onto the screen in relaction to camera c.
@@ -56,7 +55,7 @@ fn (e: ^ent) draw*(c: rectangle.rect) {
 fn cgetcoll(ix, iy: ^int32, count: int32, e: ^cent, s: ^cent): int32
 
 // ent's constructor
-fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
+fn mk*(p: polygon.poly, color: uint32, id: th.uu): ent {
 	if id == 0 {
 		id = std.rand() + 1
 	}
@@ -64,8 +63,7 @@ fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
 	var e: ent
 	e.p = p
 	e.image = image.img{0}
-	e.sx = 1
-	e.sy = 1
+	e.scale = th.vf2{1, 1}
 	e.rot = 0
 	e.color = color
 	e.id = id
@@ -75,16 +73,15 @@ fn mk*(p: polygon.poly, color: uint32, id: int32): ent {
 
 // Sets the entity's rotation in degrees. This will transform the polygon,
 // by extension affecting collisions.
-fn (e: ^ent) setrot*(rot: real) {
+fn (e: ^ent) setrot*(rot: th.fu) {
 	e.rot = rot
-	e.p.transform(e.sx, e.sy, round(rot))
+	e.p.transform(e.scale.x, e.scale.y, round(rot))
 }
 
 // Same as setrot, but for scale.
-fn (e: ^ent) setscale*(sx, sy: real) {
-	e.sx = sx
-	e.sy = sy
-	e.p.transform(sx, sy, round(e.rot))
+fn (e: ^ent) setscale*(s: th.vf2) {
+	e.scale = s
+	e.p.transform(s.x, s.y, round(e.rot))
 }
 
 // Checks whether e collides with any of the entities in s. If e has the same

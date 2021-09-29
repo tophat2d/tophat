@@ -17,6 +17,7 @@ import (
 	"umka/lerp.um"
 	"umka/font.um"
 	"umka/misc.um"
+	"umka/th.um"
 
 	"umka/std/std.um"
 )
@@ -27,50 +28,17 @@ fn main() {
 	var w, h: int32
 	t := 0
 
-	tm := tilemap.mk(
-		misc.readall("etc/tilemap-test.csv"),
-		[]image.img{image.load("etc/test.png")})
-
-	tm.x = 20
-
-	r := raycast.mk(0, 0, 20, 0)
+	img := image.load("etc/test.png")
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 		t += tophat.delta
 
-		if input.ispressed(int('a')) {
-			r.r -= 0.3 * tophat.delta
+		img.draw(input.getmousepos(), 0, th.vf2{1, 0.5})
+		if tophat.delta == 0 {
+			tophat.delta = 16
 		}
-
-		if input.ispressed(int('d')) {
-			r.r += 0.3 * tophat.delta
-		}
-
-		if input.ispressed(int('w')) {
-			r.l += round(0.1 * tophat.delta)
-		}
-
-		if input.ispressed(int('s')) {
-			r.l -= round(0.1 * tophat.delta)
-		}
-
-		r.x, r.y = input.getglobalmousepos(cam)
-
-		rx := r.x - cam.x + cam.w/2
-		ry := r.y - cam.y + cam.h/2
-		rx2, ry2 := vec.rotatepoint(rx, ry + r.l, rx, ry, r.r)
-
-		tm.draw(cam)
-
-		c := tophat.green
-		var ix, iy: int32
-		if r.gettmapcoll(tm, &ix, &iy) {
-			c = tophat.red
-			rawdraw.setcolor(tophat.red)
-			rawdraw.drawrect(ix - cam.x + cam.w/2, iy - cam.y + cam.h/2, 4, 4)
-		}
-		rawdraw.drawline(round(rx), round(ry), round(rx2), round(ry2), 2, c)
+		rawdraw.drawtext(repr(1000/tophat.delta), th.vf2{0, 0}, tophat.black, 1)
 	}
 }
 

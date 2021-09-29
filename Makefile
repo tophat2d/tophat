@@ -16,7 +16,7 @@ ifeq ($(SHORT_PLATFORM), MINGW64_NT)
 endif
 endif
 
-CFLAGS ?= -Ofast -pipe
+CFLAGS ?= -Ofast -pipe -g
 CFLAGS += -Ilib/stb/ \
 		  -Ilib/rawdraw/ \
 		  -Ilib/miniaudio/

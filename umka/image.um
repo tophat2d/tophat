@@ -1,5 +1,6 @@
 
 import (
+	"th.um"
 	"rawdraw.um"
 )
 
@@ -24,11 +25,11 @@ fn fliphimg(i: int)
 
 fn imgvalid(i: int): int32
 
-fn imggetdims(w, h: ^int32, i: int)
+fn imggetdims(dm: ^th.vf2, i: int)
 
-fn imgcrop(img: int, x1, x2, y1, y2: int32)
+fn imgcrop(img: int, tl, br: th.vf2)
 
-fn imgfromdata(data: ^uint32, w: int32, h: int32): int
+fn imgfromdata(data: ^uint32, dm: th.vf2): int
 
 fn imgcopy(data: int): int
 
@@ -61,8 +62,8 @@ fn (i: ^img) fliph*() {
 }
 
 // Draws the image **not** accounting for camera.
-fn (i: ^img) draw*(x, y, rot: int32, scale: real)  {
-	rawdraw.cdrawimage(i.handle, rot, scale, x, y)
+fn (i: ^img) draw*(pos: th.vf2, rot: th.fu, scale: th.vf2) {
+	rawdraw.cdrawimage(i.handle, rot, scale, pos)
 }
 
 // Returns true, if i is valid. This doesn't mean it isn't corrupted.
@@ -71,22 +72,22 @@ fn (i: ^img) validate*(): bool {
 }
 
 // Returns width and heigth.
-fn (i: ^img) getdims*(): (int32, int32) {
-	var w, h: int32
-	imggetdims(&w, &h, i.handle)
+fn (i: ^img) getdims*(): th.vf2 {
+	out := th.vf2{}
+	imggetdims(&out, i.handle)
 
-	return w, h
+	return out
 }
 
 // Crops out the rectangle from image. (destructive)
-fn (i: ^img) crop*(x1, y1, x2, y2: int32) {
-	imgcrop(i.handle, x1, x2, y1, y2)
+fn (i: ^img) crop*(tl, br: th.vf2) {
+	imgcrop(i.handle, tl, br)
 }
 
 // Creates an image from raw data.
 // **BUGGY**
-fn fromdata*(data: []uint32, w: int): img {
-	return img{imgfromdata(&data[0], w, len(data)/w)}
+fn fromdata*(data: []uint32, dm: th.vf2): img {
+	return img{imgfromdata(&data[0], dm)}
 }
 
 // Copies image into a new one.

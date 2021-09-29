@@ -18,19 +18,19 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	int camx = cam->x - (cam->w / 2);
 	int camy = cam->y - (cam->h / 2);
 
-	if (camx > t->x + t->w*t->cellsize)
+	if (camx > t->pos.x + t->w*t->cellsize)
 		return;
-	if (camy > t->y + t->h*t->cellsize)
+	if (camy > t->pos.y + t->h*t->cellsize)
 		return;
 
-	int sx = abs((abs(t->x)-abs(camx))/t->cellsize);
-	int sy = abs((abs(t->y)-abs(camy))/t->cellsize);
+	int sx = fabs((fabs(t->pos.x)-abs(camx))/t->cellsize);
+	int sy = fabs((fabs(t->pos.y)-abs(camy))/t->cellsize);
 	int sw = cam->w/t->cellsize + 2;
 	int sh = cam->h/t->cellsize + 2;
 
-	if (t->x>=camx)
+	if (t->pos.x>=camx)
 		sx = 0;
-	if (t->y>=camy)
+	if (t->pos.y>=camy)
 		sy = 0;
 
 	if (sw > t->w)
@@ -49,15 +49,15 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 			scaley = t->cellsize;
 			break;
 		case TOPLEFT:
-			scalex = t->tiles[t->cells[j*t->w+i]-1]->w;
-			scaley = t->tiles[t->cells[j*t->w+i]-1]->h;
+			scalex = t->tiles[t->cells[j*t->w+i]-1]->dm.w;
+			scaley = t->tiles[t->cells[j*t->w+i]-1]->dm.h;
 			break;
 		}
 
 		th_blit_tex(
 			t->tiles[t->cells[j*t->w+i]-1]->gltexture,
-			(t->x+i*t->cellsize-camx)*scaling,
-			(t->y+j*t->cellsize-camy)*scaling,
+			(t->pos.x+i*t->cellsize-camx)*scaling,
+			(t->pos.y+j*t->cellsize-camy)*scaling,
 			scalex*scaling+scaling/6,
 			scaley*scaling+scaling/6, 0);
 	}

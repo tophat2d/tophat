@@ -103,15 +103,12 @@ int _th_poly_to_point(th_poly *a, int px, int py, int *ix, int *iy) {
 bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 	float
 		x0, y0,
-		x1 = ra->x, y1 = ra->y + ra->l;
+		x1 = ra->pos.x, y1 = ra->pos.y + ra->l;
 
-	th_rotate_point(&x1, &y1, ra->x, ra->y, ra->r);
+	th_rotate_point(&x1, &y1, ra->pos.x, ra->pos.y, ra->r);
 	
-	x0 = ra->x;
-	y0 = ra->y;
-	x1 = x1;
-	y1 = y1;
-
+	x0 = ra->pos.x;
+	y0 = ra->pos.y;
 	float
 		mx = x1 - x0,
 		my = y1 - y0;
@@ -124,11 +121,11 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 	bool coll = false;
 	float len = 0;
 	while (len < ra->l) {
-		int tx = (x - t->x) / t->cellsize;
-		int ty = (y - t->y) / t->cellsize;
+		int tx = (x - t->pos.x) / t->cellsize;
+		int ty = (y - t->pos.y) / t->cellsize;
 
 		int tile = t->cells[(int)(ty * t->w + tx)] - 1;
-		if (x >= t->x && y >= t->y && tx < t->w && ty < t->h &&
+		if (x >= t->pos.x && y >= t->pos.y && tx < t->w && ty < t->h &&
 			tile >= 0 && t->collmask[tile]) {
 			coll = true;
 			if (minlen == -1 || len < minlen)
@@ -141,9 +138,9 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 	}	
 
 	float
-		fix = ra->x,
-		fiy = ra->y + minlen;
-	th_rotate_point(&fix, &fiy, ra->x, ra->y, ra->r);
+		fix = ra->pos.x,
+		fiy = ra->pos.y + minlen;
+	th_rotate_point(&fix, &fiy, ra->pos.x, ra->pos.y, ra->r);
 	*ix = fix;
 	*iy = fiy;
 
@@ -152,15 +149,15 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 
 bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {
 	for (int i=0; i < p->vc * 2; i += 2) {
-		if (p->x + p->v[i] < t->x || p->y + p->v[i+1] < t->y)
+		if (p->x + p->v[i] < t->pos.x || p->y + p->v[i+1] < t->pos.y)
 			continue;
-		if (p->x + p->v[i] > t->x + t->w * t->cellsize || p->y + p->v[i+1] > t->y + t->h * t->cellsize)
+		if (p->x + p->v[i] > t->pos.x + t->w * t->cellsize || p->y + p->v[i+1] > t->pos.y + t->h * t->cellsize)
 			continue;
 
 		int absx = p->x + p->v[i];
 		int absy = p->y + p->v[i+1];
-		int tx = (absx - t->x) / t->cellsize;
-		int ty = (absy - t->y) / t->cellsize;
+		int tx = (absx - t->pos.x) / t->cellsize;
+		int ty = (absy - t->pos.y) / t->cellsize;
 
 		int tile = t->cells[(t->w * ty) + tx];
 		if (!tile)

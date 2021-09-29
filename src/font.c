@@ -32,9 +32,9 @@ void th_font_load(th_font *out, char *path) {
 
 void th_str_to_img(
 	th_image *out, th_font *font,
-	uint32_t *runes, int runec,
-	double scale, uint32_t color,
-	int ax, int ay) {
+	uint32_t *runes, uu runec,
+	fu scale, uint32_t color,
+	th_vf2 spacing) {
 	__th_font_char *chars = malloc(runec * sizeof(__th_font_char));
 
 	int
@@ -70,10 +70,10 @@ void th_str_to_img(
 		if (chars[i].rune == ' ')
 			w += w/i;
 
-		if (chars[i].h + ay > rh)
-			rh = chars[i].h + ay;
+		if (chars[i].h + spacing.y > rh)
+			rh = chars[i].h + spacing.y;
 
-		w += chars[i].w + ax;
+		w += chars[i].w + spacing.x;
 	}
 	// letters like q might not have enough space. kind of a hack
 	h += 1.5 * rh;
@@ -97,10 +97,10 @@ void th_str_to_img(
 					color | chars[i].data[(py - y) * chars[i].w + (px - x)];
 		free(chars[i].data);
 
-		x += chars[i].w + ax;
+		x += chars[i].w + spacing.x;
 	}
 	free(chars);
 
-	th_image_from_data(out, data, w, h);
+	th_image_from_data(out, data, (th_vf2){.w=w, .h=h});
 	free(data);
 }

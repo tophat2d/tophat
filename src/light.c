@@ -56,6 +56,6 @@ void th_spotlight_stamp(th_spotlight *l, th_lightmask *d) {
 			}
 		}
 
-		_th_lightmask_stamp_point(d, l->x / d->rect_size + x, l->y / d->rect_size + y, color);
+		_th_lightmask_stamp_point(d, l->pos.x / d->rect_size + x, l->pos.y / d->rect_size + y, color);
 	}
 }

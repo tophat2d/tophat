@@ -2,6 +2,7 @@
 // use them for some games instead of entities (tetris comes to mind)
 
 import (
+	"th.um"
 	"csv.um"
 	"image.um"
 	"std.um"
@@ -13,25 +14,22 @@ import (
 // Tilemap struct
 type tmap* = struct {
 	tiles: []image.img // tiles that are used to draw (you can replace them mid game for animation)
-	x: int // position
-	y: int
-	w: int // width of tilemap
-	cells: []int32 // all cells (this will draw the tile in tiles with number in cells - 1)
+	pos: th.vf2
+	w: th.uu // width of tilemap
+	cells: []th.uu // all cells (this will draw the tile in tiles with number in cells - 1)
 	collmask: []bool // if true, the tile collides
-	cellsize: int // cellsize
-	scaletype: int // how image scale is handled. 0: stretch, 1: top left
+	cellsize: th.fu // cellsize
+	scaletype: th.uu // how image scale is handled. 0: stretch, 1: top left
 }
 
 type ctmap* = struct {
 	tiles: ^int
-	x: int32
-	y: int32
-	w: int32
-	h: int32
-	cells: ^int32
-	collmask: ^int32
-	cellsize: int32
-	scaletype: int32
+	pos: th.vf2
+	w, h: th.uu
+	cells: ^th.uu
+	collmask: ^bool
+	cellsize: th.fu
+	scaletype: th.uu
 }
 
 const (
@@ -72,7 +70,7 @@ fn mk*(inp: str, images: []image.img): tmap {
 		collmask[i] = false
 	}
 
-	cells := []int32{}
+	cells := []th.uu{}
 	for i:=2; i < len(res); i++ {
 		for j:=0; j < len(res[i]); j++ {
 			if res[i][j] == "" {
@@ -93,7 +91,7 @@ fn mk*(inp: str, images: []image.img): tmap {
 	}
 
 	return tmap{
-		images, std.atoi(res[0][1]), std.atoi(res[0][2]),
+		images, th.vf2{std.atoi(res[0][1]), std.atoi(res[0][2])},
 		len(res[2]), cells, collmask, std.atoi(res[0][3]), std.atoi(res[0][4])}
 }
 
@@ -108,12 +106,7 @@ fn cdrawtmap(ct: ^ctmap, cam: ^rectangle.rect)
 fn (t: ^tmap) draw*(cam: rectangle.rect) {
 	if len(t.cells) == 0 { return }
 
-	ccm := make([]int32, len(t.collmask))
-	for i:=0; i < len(t.collmask); i++ {
-		ccm[i] = int32(t.collmask[i])
-	}
-
-	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
+	cm := ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collmask[0], t.cellsize, t.scaletype}
 	cdrawtmap(&cm, &cam)
 }
 
@@ -126,12 +119,7 @@ fn ctmapgetcoll(tx, ty, x, y: ^int32, t: ^ctmap, e: ^entity.cent): int32
 fn (t: ^tmap) getcoll*(e: entity.ent, rx, ry, tx, ty: ^int32): bool {
 	if len(t.cells) == 0 { return false }
 
-	ccm := make([]int32, len(t.collmask))
-	for i:=0; i < len(t.collmask); i++ {
-		ccm[i] = int32(t.collmask[i])
-	}
-
-	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
+	cm := ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collmask[0], t.cellsize, t.scaletype}
 
 	c := ctmapgetcoll(tx, ty, rx, ry, &cm, &e.toc())
 

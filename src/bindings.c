@@ -125,6 +125,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "map.um", libs[19]);
 	umkaAddModule(umka, "utf8.um", libs[20]);
 	umkaAddModule(umka, "font.um", libs[21]);
+	umkaAddModule(umka, "th.um", libs[22]);
 #endif
 }
 
@@ -140,16 +141,15 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_font *f = (th_font *)p[6].ptrVal;
-	uint32_t *runes = (uint32_t *)p[5].ptrVal;
-	int runec = p[4].intVal;
-	double scale = p[3].realVal;
-	uint32_t color = p[2].uintVal;
-	int ax = p[1].intVal;
-	int ay = p[0].intVal;
+	th_font *f = (th_font *)p[5].ptrVal;
+	uint32_t *runes = (uint32_t *)p[4].ptrVal;
+	uu runec = p[3].intVal;
+	fu scale = p[2].realVal;
+	uint32_t color = p[1].uintVal;
+	th_vf2 scaling = *(th_vf2 *)&p[0];
 
 	th_image *img = malloc(sizeof(th_image));
-	th_str_to_img(img, f, runes, runec, scale, color, ax, ay);
+	th_str_to_img(img, f, runes, runec, scale, color, scaling);
 	r->intVal = (intptr_t)img;
 }
 
@@ -186,14 +186,14 @@ void umspotlightstamp(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_lightmask *l = (th_lightmask *)p[1].ptrVal;
 	th_spotlight *s = (th_spotlight *)p[2].ptrVal;
 
-	int x = s->x, y = s->y;
-	s->x -= (cam->x - cam->w/2);
-	s->y -= (cam->y - cam->h/2);
+	int x = s->pos.x, y = s->pos.x;
+	s->pos.x -= (cam->x - cam->w/2);
+	s->pos.y -= (cam->y - cam->h/2);
 
 	th_spotlight_stamp(s, l);
 
-	s->x = x;
-	s->y = y;
+	s->pos.x = x;
+	s->pos.y = y;
 }
 
 ///////////////////////
@@ -238,7 +238,7 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char pathcpy[512];
 	strcpy(pathcpy, respath);
 	img = th_load_image(strcat(pathcpy, path));
-	img->gltexture = th_gen_texture(img->data, img->w, img->h, img->filter);
+	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 
 	r[0].ptrVal = (intptr_t)img;
 }
@@ -277,31 +277,26 @@ void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = (th_image *)p[0].ptrVal;
-	int *h = (int *)p[1].ptrVal;
-	int *w = (int *)p[2].ptrVal;
+	th_vf2 *out = (th_vf2 *)p[1].ptrVal;
 
-	*w = img->w;
-	*h = img->h;
+	*out = img->dm;
 }
 
 void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = (th_image *)p[4].ptrVal;
-	int y2 = p[0].intVal;
-	int y1 = p[1].intVal;
-	int x2 = p[2].intVal;
-	int x1 = p[3].intVal;
+	th_vf2 tl = *(th_vf2 *)&p[1];
+	th_vf2 br = *(th_vf2 *)&p[0];
 
-	th_image_crop(img, x1, y1, x2, y2);
+	th_image_crop(img, tl, br);
 }
 
 // returns a pointer to an image from data
 void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int h = p[0].intVal;
-	int w = p[1].intVal;
-	uint32_t *data = (uint32_t *)p[2].ptrVal;
+	th_vf2 dm = *(th_vf2 *)&p[0];
+	uint32_t *data = (uint32_t *)p[1].ptrVal;
 
 	th_image *img = malloc(sizeof(th_image));
-	th_image_from_data(img, data, w, h);
+	th_image_from_data(img, data, dm);
 
 	r->ptrVal = (intptr_t)img;
 }
@@ -310,10 +305,9 @@ void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *inp = (th_image *)p[0].ptrVal;
 
 	th_image *out = calloc(sizeof(th_image), 1);
-	out->w = inp->w;
-	out->h = inp->h;
-	out->data = calloc(sizeof(uint32_t), out->w * out->h);
-	memcpy(out->data, inp->data, sizeof(uint32_t) * out->w * out->h);
+	out->dm = inp->dm;
+	out->data = calloc(sizeof(uint32_t), out->dm.w * out->dm.h);
+	memcpy(out->data, inp->data, sizeof(uint32_t) * out->dm.w * out->dm.h);
 
 	r->ptrVal = (intptr_t)out;
 }
@@ -334,11 +328,9 @@ void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
 // input
 // gets position of mouse cursor
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int *x = (int *)p[1].ptrVal;
-	int *y = (int *)p[0].ptrVal;
-
-	*x = mousex / scaling;
-	*y = mousey / scaling;
+	th_vf2 *out = (th_vf2 *)p[0].ptrVal;
+	out->x = mousex / scaling;
+	out->y = mousey / scaling;
 }
 
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -399,7 +391,7 @@ void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // sets array of sounds to be played
 void umauarr(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int count = p[0].intVal;
+	uu count = p[0].intVal;
 	th_sound **auarr = (th_sound **)p[1].ptrVal;
 
 	sound_count = count;
@@ -423,7 +415,7 @@ void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_sound *s = (th_sound *)p[1].ptrVal;
-	s->volume = (float)p[0].realVal;
+	s->volume = (fu)p[0].realVal;
 }
 
 // checks, if sound is valid
@@ -483,14 +475,13 @@ void umgettime(UmkaStackSlot *p, UmkaStackSlot *r) {
 // rawdraw TODO: hide rawdraw from c lib
 // draws text
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
-	double size = p[0].realVal;
+	fu size = p[0].real32Val;
 	uint32_t color = (uint32_t)p[1].uintVal;
-	int y = (int)p[2].intVal;
-	int x = (int)p[3].intVal;
-	char *text = (char *)p[4].ptrVal;
+	th_vf2 pos = *(th_vf2 *)&p[2];
+	char *text = (char *)p[3].ptrVal;
 
-	CNFGPenX = x * scaling;
-	CNFGPenY = y * scaling;
+	CNFGPenX = pos.x * scaling;
+	CNFGPenY = pos.y * scaling;
 	CNFGColor(color);
 	CNFGSetLineWidth(0.6 * scaling * size);
 	CNFGDrawText(text, size * scaling);
@@ -559,12 +550,9 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r) {
-	double y2 = p[0].realVal;
-	double x2 = p[1].realVal;
-	double y1 = p[2].realVal;
-	double x1 = p[3].realVal;
+	th_rect re = *(th_rect *)&p[0];
 
-	CNFGTackRectangle(x1 * scaling, y1 * scaling, (x2 + x1) * scaling, (y2 + y1) * scaling);
+	CNFGTackRectangle(re.x * scaling, re.y * scaling, (re.x + re.w) * scaling, (re.y + re.h) * scaling);
 }
 
 void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -587,24 +575,20 @@ void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
-	double thickness = p[0].realVal;
-	int y2 = p[1].intVal;
-	int x2 = p[2].intVal;
-	int y1 = p[3].intVal;
-	int x1 = p[4].intVal;
+	float thickness = p[0].real32Val;
+	th_vf2 e = *(th_vf2 *)&p[1];
+	th_vf2 b = *(th_vf2 *)&p[2];
+
 
 	CNFGSetLineWidth(thickness * scaling);
-	CNFGTackSegment(x1 * scaling, y1 * scaling, x2 * scaling, y2 * scaling);
+	CNFGTackSegment(b.x * scaling, b.y * scaling, e.x * scaling, e.y * scaling);
 }
 
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[4].ptrVal;
+	th_image *img = (th_image *)p[3].ptrVal;
+	fu rot = p[2].real32Val;
+	th_vf2 scale = *(th_vf2 *)&p[1];
+	th_vf2 pos = *(th_vf2 *)&p[0];
 
-	int x = p[1].intVal;
-	int y = p[0].intVal;
-
-	double s = p[2].realVal;
-	int rot = p[3].intVal;
-
-	th_blit_tex(img->gltexture, x * scaling, y * scaling, img->w * s * scaling, img->h * s * scaling, rot);
+	th_blit_tex(img->gltexture, pos.x * scaling, pos.y * scaling, img->dm.w * scale.x * scaling, img->dm.h * scale.y * scaling, rot);
 }

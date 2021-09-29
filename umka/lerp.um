@@ -1,14 +1,18 @@
 // Dead simple linear interpolation.
 
+import (
+	"th.um"								
+)
+
 type Any* = interface{}
 
 // Lerper queue item. It interpolates between start and end for the duration
 // of length in ms. Additionally you can enable swap, which instead of
 // dequeueing it spwaps start and end and resets the progress.
 type item* = struct {
-	start, end: real
-	length: int32
-	progress: real32
+	start, end: th.fu
+	length: th.uu
+	progress: th.fu
 	swap: bool
 	ctx: Any
 	callback: fn(ctx: Any)
@@ -36,7 +40,7 @@ fn (l: ^lerper) enqueue*(i: item) {
 }
 
 // Interpolates the front by delta. And returns it's value.
-fn (l: ^lerper) bydelta*(delta: int32): real {
+fn (l: ^lerper) bydelta*(delta: th.uu): th.fu {
 	if len(l^) == 0 {
 		return 0
 	}
@@ -59,7 +63,7 @@ fn (l: ^lerper) bydelta*(delta: int32): real {
 		}
 	}
 
-	l[0].progress += real32(delta)/l[0].length
+	l[0].progress += th.fu(delta)/l[0].length
 
 	return l[0].progress * (l[0].end-l[0].start) + l[0].start
 }

@@ -1,5 +1,9 @@
 // Sound module for audio loading and playing.
 
+import (
+	"th.um"
+)
+
 // sound is an opaque pointer to c. Creating it manually will cause a crash.
 type sound* = struct {
 	handle: int
@@ -11,17 +15,17 @@ fn setsounds*(ss: []sound)
 
 fn cauload(path: str): int
 
-fn cauarr(s: ^sound, count: int32)
+fn cauarr(s: ^sound, count: th.uu)
 
-fn csoundloop(s: int, looping: int32)
+fn csoundloop(s: int, looping: th.uu)
 
 fn csoundplay(s: int) 
 
 fn csoundstop(s: int)
 
-fn csoundvol(s: int, vol: real)
+fn csoundvol(s: int, vol: th.fu)
 
-fn csoundvalidate(s: int): int
+fn csoundvalidate(s: int): th.uu
 
 // Loads sound at path relative to main.um
 fn load*(path: str): sound {
@@ -60,7 +64,7 @@ fn (s: ^sound) stop*() {
 }
 
 // Set's the volume of the sound as a multiplier of it's default volume.
-fn (s: ^sound) vol*(vol: real) {
+fn (s: ^sound) vol*(vol: th.fu) {
 	csoundvol(s.handle, vol)
 }
 

@@ -1,6 +1,7 @@
 // Module for frame based animation.
 
 import (
+	"th.um"
 	"image.um"
 	"rectangle.um"
 )
@@ -10,13 +11,12 @@ import (
 // one shot animations.
 type anim* = struct {
 	anim: []image.img
-	rot: real
-	scale: real
-	fps: int
+	rot: th.fu
+	scale: th.fu
+	fps: th.uu
 	looping: bool
 
-	px: real
-	py: real 
+	pos: th.vf2
 
 	zerotime: int
 
@@ -24,7 +24,7 @@ type anim* = struct {
 }
 
 // Anim's constructor.
-fn mk*(px, py: int32, anm: []image.img, fps: int): anim {
+fn mk*(pos: th.vf2, anm: []image.img, fps: th.uu): anim {
 	a := anim{}
 
 	a.anim = append(anm, anm[len(anm)-1])
@@ -33,8 +33,7 @@ fn mk*(px, py: int32, anm: []image.img, fps: int): anim {
 	a.scale = 1
 	a.rot = 0
 
-	a.px = px
-	a.py = py
+	a.pos = pos
 
 	a.looping = false
 
@@ -47,10 +46,10 @@ fn (a: ^anim) start*(t: int) {
 }
 
 // This draws the animation. Returns true, if the animation ends.
-fn (a: ^anim) handle*(t: int, cam: rectangle.rect): bool {
+fn (a: ^anim) handle*(t: uint, cam: rectangle.rect): bool {
 	a.frame = (round(real(t-a.zerotime)/round((1000.0/a.fps))) % len(a.anim))
 
-	a.anim[a.frame].draw(round(a.px) - cam.x + cam.w/2, round(a.py) - cam.y + cam.h/2, round(a.rot), a.scale)
+	a.anim[a.frame].draw(round(a.pos.x) - cam.x + cam.w/2, round(a.pos.y) - cam.y + cam.h/2, round(a.rot), a.scale)
 
 	if a.frame == len(a.anim) - 1 {
 		if a.looping {

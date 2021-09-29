@@ -2,21 +2,21 @@
 
 int th_ray_getcoll(th_ray *ra, th_ent *scene, int count, int *ix, int *iy) {
 	float rx, ry;
-	rx = ra->x;
-	ry = ra->y - ra->l;
+	rx = ra->pos.x;
+	ry = ra->pos.y - ra->l;
 	int coll;
 
-	th_rotate_point(&rx, &ry, ra->x, ra->y, ra->r);
-	th_rect rr = (th_rect){ra->x, ra->y, rx, ry};
+	th_rotate_point(&rx, &ry, ra->pos.x, ra->pos.y, ra->r);
+	th_rect rr = (th_rect){ra->pos.x, ra->pos.y, rx, ry};
 
-	if (rx < ra->x) {
+	if (rx < ra->pos.x) {
 		rr.x = rx;
-		rr.w = ra->x;
+		rr.w = ra->pos.x;
 	}
 
-	if (ry < ra->y) {
+	if (ry < ra->pos.y) {
 		rr.y = ry;
-		rr.h = ra->y;
+		rr.h = ra->pos.y;
 	}
 
 	for (int i=0; i < count; i++) {
@@ -25,7 +25,7 @@ int th_ray_getcoll(th_ray *ra, th_ent *scene, int count, int *ix, int *iy) {
 		if (rr.w < scene[i].p.x) continue;
 		if (rr.h < scene[i].p.y) continue;
 
-		coll = _th_poly_to_line(&scene[i].p, ra->x, ra->y, rx, ry, ix, iy);
+		coll = _th_poly_to_line(&scene[i].p, ra->pos.x, ra->pos.y, rx, ry, ix, iy);
 		if (coll)
 			return scene[i].id;
 

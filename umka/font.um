@@ -1,5 +1,6 @@
 
 import (
+	"th.um"
 	"std/map.um"
 	"std/utf8.um"
 	"image.um"
@@ -14,12 +15,12 @@ type ttf* = struct {
 
 fn ctexttoimg(
 	t: ^ttf, text: ^utf8.Rune,
-	runec: int32, size: real, color: uint32, ax, ay: int): uint
+	runec: th.uu, size: th.fu, color: uint32, spacing: th.vf2): uint
 
 // Creates an image.img from a text. ax and ay are character/line spacings.
-fn (t: ^ttf) strtoimg*(text: str, size: real, color: uint32, ax, ay: int): image.img {
+fn (t: ^ttf) strtoimg*(text: str, size: th.fu, color: uint32, spacing: th.vf2): image.img {
 	runes := utf8.decode(text)
-	return image.img{ctexttoimg(t, &runes[0], len(runes), size, color, ax, ay)}
+	return image.img{ctexttoimg(t, &runes[0], len(runes), size, color, spacing)}
 }
 
 fn cfontfree(t: ^ttf)

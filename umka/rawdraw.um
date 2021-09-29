@@ -2,15 +2,17 @@
 // tophat uses.
 
 import (
+	"th.um"
 	"std/std.um"
 	"polygon.um"
+	"rectangle.um"
 )
 
 // Draws text. Fonts are comming eventually.
-fn drawtext*(text: str, x: int32, y: int32, color: uint32, size: real)
+fn drawtext*(text: str, pos: th.vf2, color: uint32, size: th.fu)
 
 // Precomputes a text dimensions.
-fn textsize*(text: str, scale: real): (int, int) {
+fn textsize*(text: str, scale: th.fu): th.vf2 {
 	var w, maxw, h: int
 	w = 0
 	maxw = 0
@@ -33,7 +35,7 @@ fn textsize*(text: str, scale: real): (int, int) {
 		maxw = w
 	}
 
-	return round(maxw * scale * 3 - scale), round(h * 6 * scale)
+	return th.vf2{maxw * scale * 3 - scale, h * 6 * scale}
 }
 
 // Sets up a window (use tophat's functions instead).
@@ -57,16 +59,16 @@ fn swapbuffers*()
 // Handles input (already in tophat.cycle)
 fn handleinput*()
 
-fn drawsegment(x1, y1, x2, y2: int32, s: real)
+fn drawsegment(b, e: th.vf2, thickness: th.fu)
 
 // Draws a rectangle.
-fn drawrect*(x1, y1, x2, y2: real)
+fn drawrect*(r: rectangle.rect)
 
 // Draws a line.
-fn drawline*(x1, y1, x2, y2: int32, thickness: real, color: uint32) {
+fn drawline*(b, e: th.vf2, thickness: th.fu, color: uint32) {
 	setcolor(color)
-	drawsegment(x1, y1, x2, y2, thickness)
+	drawsegment(b, e, thickness)
 }
 
 // Internal.
-fn cdrawimage*(img: int, rot: int32, scale: real, x, y: int32)
+fn cdrawimage*(img: int, rot: th.fu, scale: th.vf2, pos: th.vf2)

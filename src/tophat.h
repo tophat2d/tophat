@@ -6,6 +6,15 @@
 #include <CNFG.h>
 #include <stb_truetype.h>
 
+typedef float fu;
+typedef unsigned short uu;
+typedef short iu;
+
+typedef union {
+	struct {fu w, h;};
+	struct {fu x, y;};
+} th_vf2;
+
 typedef struct {
     ma_decoder decoder;
     int playing;
@@ -14,12 +23,11 @@ typedef struct {
 } th_sound;
 
 typedef struct {
-	int w;
-	int h;
-	int channels;
+	th_vf2 dm;
+	uu channels;
 	uint32_t *data;
 	unsigned int gltexture;
-	int filter;
+	uu filter;
 } th_image;
 
 #pragma pack(push, 1)
@@ -37,89 +45,81 @@ typedef struct {
 typedef struct {
 	th_poly p;
 	th_image *img;
-	double sx;
-	double sy;
-	int rot;
+	th_vf2 scale;
+	fu rot;
 	uint32_t color;
-	int id;
+	uu id;
 } th_ent;
 #pragma pack(pop)
 
 typedef struct {
 	uint32_t *dots;
-	int w, h;
-	double rect_size;
+	uu w, h;
+	fu rect_size;
 	uint32_t color;
 } th_lightmask;
 
 typedef struct {
-	int x, y;
-	int radius;
+	th_vf2 pos;
+	uu radius;
 	uint32_t tint;
 } th_spotlight;
 
 typedef struct {
-	int start_time;
+	uint64_t start_time;
 	int seed;
 } _th_particle;
 
 #pragma pack(push, 1)
 typedef struct {
-	int px, py;
-	int w, h;
-	double gravity_x, gravity_y;
-	int seed;
+	th_vf2 pos;
+	th_vf2 dm;
+	th_vf2 gravity;
 	bool repeat;
 	bool active;
 
-	int angle_min, angle_max;
+	th_vf2 angle;
 
-	int lifetime;
-	double lifetime_randomness;
+	uu lifetime;
+	fu lifetime_randomness;
 
-	double velocity;
-	double velocity_randomness;
+	fu velocity;
+	fu velocity_randomness;
 
-	double size;
-	double size_randomness;
-	double max_size;
+	fu size;
+	fu size_randomness;
+	fu max_size;
 
-	int rotation;
-	int max_rotation;
-	double rotation_randomness;
+	fu rotation;
+	fu max_rotation;
+	fu rotation_randomness;
 
 	uint32_t *colors;
-	int color_c;
+	uu color_c;
 
 	_th_particle *particles;
-	int particle_c;
+	uu particle_c;
 } th_particles;
 #pragma pack(pop)
 
 typedef struct {
-	int x;
-	int y;
-	int l;
-	int r;
+	th_vf2 pos;
+	fu l;
+	fu r;
 } th_ray;
 
 typedef struct {
-	int x;
-	int y;
-	int w;
-	int h;
+	fu x, y, w, h;
 } th_rect;
 
 typedef struct {
 	th_image **tiles;
-	int x;
-	int y;
-	int w;
-	int h;
-	int *cells;
-	int *collmask;
-	int cellsize;
-	int scaletype;
+	th_vf2 pos;
+	uu w, h;
+	uu *cells;
+	char *collmask;
+	fu cellsize;
+	uu scaletype;
 } th_tmap;
 
 typedef struct {
@@ -138,13 +138,13 @@ int th_ent_getcoll(th_ent *e, th_ent *scene, int count, int *ix, int *iy);
 // image
 th_image *th_load_image(char *path);
 void th_free_image(th_image *img);
-void th_image_from_data(th_image *img, uint32_t *data, int w, int h);
+void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 void th_image_set_filter(th_image *img, int filter);
-unsigned int th_gen_texture(uint32_t *data, int w, int h, unsigned filter);
+unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot);
 void th_image_flipv(th_image *img);
 void th_image_fliph(th_image *img);
-void th_image_crop(th_image *img, int x1, int y1, int x2, int y2);
+void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
 
 // light
 void th_lightmask_clear(th_lightmask *d);
@@ -170,9 +170,9 @@ void th_tmap_draw(th_tmap *t, th_rect *cam);
 void th_font_load(th_font *out, char *path);
 void th_str_to_img(
 	th_image *out, th_font *font,
-	uint32_t *runes, int runec,
-	double scale, uint32_t color,
-	int ax, int ay);
+	uint32_t *runes, uu runec,
+	fu scale, uint32_t color,
+	th_vf2 spacing);
 
 //// "unexported" functions
 

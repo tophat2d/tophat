@@ -2,6 +2,7 @@
 // Set ui.mainelement to your main element.
 
 import (
+	"th.um"
 	"rectangle.um"
 	"rawdraw.um"
 	"input.um"
@@ -50,9 +51,9 @@ type box* = struct {
 	vertical: bool // false: hbox
 
 	image: image.img
-	imagemode: int // CENTER, STRETCH, SCALE
-	imgs: int // ignore
-	imgx, imgy: int // ignore
+	imagemode: th.uu // CENTER, STRETCH, SCALE
+	imgs: th.fu // ignore
+	imgpos: th.vf2 // ignore
 }
 
 // Label can be used to draw text.
@@ -61,12 +62,10 @@ type label* = struct {
 	text: str
 	textsize: real
 	textcolor: uint32
-	valign: int // alignment
-	halign: int
+	align: th.vf2
 	bgcolor: uint32
 
-	offx: real32 // offset used for text alignement
-	offy: real32
+	off: th.vf2
 }
 
 // Button checks for clicks on it's
@@ -147,19 +146,17 @@ fn (b: ^box) calculate*() {
 		return
 	}
 
+	dm := b.image.getdims()
 	switch b.imagemode {
 	case CENTER:
 		b.imgs = 1
 
-		w, h := b.image.getdims()
 
-		b.imgx = b.g.dimensions.x + (b.g.dimensions.w-w)/2
-		b.imgy = b.g.dimensions.y + (b.g.dimensions.h-h)/2
+		b.imgpos.x = round(b.g.dimensions.x + (b.g.dimensions.w-dm.x)/2)
+		b.imgpos.y = round(b.g.dimensions.y + (b.g.dimensions.h-dm.y)/2)
 	case SCALE:
-		w, h := b.image.getdims()
-
-		sx := b.g.dimensions.w / w
-		sy := b.g.dimensions.h / h
+		sx := round(b.g.dimensions.w / dm.x)
+		sy := round(b.g.dimensions.h / dm.y)
 
 		b.imgs = sy
 
@@ -167,15 +164,15 @@ fn (b: ^box) calculate*() {
 			b.imgs = sx
 		}
 
-		b.imgx = b.g.dimensions.x + (b.g.dimensions.w - w*b.imgs)/2
-		b.imgy = b.g.dimensions.y + (b.g.dimensions.h - h*b.imgs)/2
+		b.imgpos.x = round(b.g.dimensions.x + (b.g.dimensions.w - dm.x*b.imgs)/2)
+		b.imgpos.y = round(b.g.dimensions.y + (b.g.dimensions.h - dm.y*b.imgs)/2)
 	}
 }
 
 fn (hb: ^box) draw*() {
 
 	if hb.image.handle != 0 {
-		hb.image.draw(hb.imgx, hb.imgy, 0, hb.imgs)
+		hb.image.draw(th.vf2{hb.imgpos.x, hb.imgpos.y}, 0, th.vf2{hb.imgs, hb.imgs})
 	}
 
 	for i:=0; i < len(hb.children); i++ {
@@ -208,8 +205,7 @@ fn mklabel*(text: str, textsize: real, textcolor: uint32): label {
 	h.textsize = textsize
 	h.textcolor = textcolor
 	h.bgcolor = 0x0
-	h.valign = MID
-	h.halign = MID
+	h.align = th.vf2{MID, MID}
 
 	return h
 }
@@ -217,31 +213,31 @@ fn mklabel*(text: str, textsize: real, textcolor: uint32): label {
 fn (l: ^label) calculate*() {
 	sx, sy := rawdraw.textsize(l.text, l.textsize)
 
-	switch l.valign {
+	switch round(l.align.y) {
 	case MID:
-		l.offy = (l.g.dimensions.h - sy - l.g.padding.h)/2
+		l.off.y = (l.g.dimensions.h - sy - l.g.padding.h)/2
 	case BOT:
-		l.offy = l.g.dimensions.h - sy - l.g.padding.h
+		l.off.y = l.g.dimensions.h - sy - l.g.padding.h
 	}
 
-	switch l.halign {
+	switch round(l.align.x) {
 	case MID:
-		l.offx = (l.g.dimensions.w - sx - l.g.padding.w)/2
+		l.off.x = (l.g.dimensions.w - sx - l.g.padding.w)/2
 	case BOT:
-		l.offx = l.g.dimensions.w - sx - l.g.padding.w
+		l.off.x = l.g.dimensions.w - sx - l.g.padding.w
 	}
 }
 
 fn (l: ^label) draw*() {
 	rawdraw.setcolor(l.bgcolor)
-	rawdraw.drawrect(
-		l.g.dimensions.x - l.offx + l.g.padding.x,
-		l.g.dimensions.y - l.offy + l.g.padding.y,
-		l.g.dimensions.w - l.g.padding.w,
-		l.g.dimensions.h - l.g.padding.h)
+	rawdraw.drawrect(rectangle.rect{
+		round(l.g.dimensions.x - l.off.x + l.g.padding.x),
+		round(l.g.dimensions.y - l.off.y + l.g.padding.y),
+		round(l.g.dimensions.w - l.g.padding.w),
+		round(l.g.dimensions.h - l.g.padding.h)})
 
 	rawdraw.drawtext(
-		l.text, l.g.dimensions.x, l.g.dimensions.y, l.textcolor, l.textsize)
+		l.text, th.vf2{l.g.dimensions.x, l.g.dimensions.y}, l.textcolor, l.textsize)
 }
 
 fn (l: ^label) get*(): ^generic {
@@ -277,8 +273,8 @@ fn mkbutton*(l: label): button {
 fn (b: ^button) calculate*() {
 	b.label.g.dimensions = b.g.dimensions
 	b.label.calculate()
-	b.label.g.dimensions.x += round(b.label.offx) + b.label.g.padding.x
-	b.label.g.dimensions.w -= round(b.label.offy) + b.label.g.padding.y
+	b.label.g.dimensions.x += round(b.label.off.x) + b.label.g.padding.x
+	b.label.g.dimensions.w -= round(b.label.off.y) + b.label.g.padding.y
 
 	b.label.g.dimensions.y += b.label.g.padding.w
 	b.label.g.dimensions.h -= b.label.g.padding.h

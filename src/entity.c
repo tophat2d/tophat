@@ -32,8 +32,8 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 		o->img->gltexture,
 	  (o->p.x-camx) * scaling,
 	  (o->p.y-camy) * scaling,
-		o->img->w * o->sx * scaling,
-		o->img->h * o->sy * scaling,
+		o->img->dm.w * o->scale.x * scaling,
+		o->img->dm.h * o->scale.y * scaling,
 		o->rot);
 }
 

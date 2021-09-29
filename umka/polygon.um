@@ -1,5 +1,6 @@
 
 import (
+	"th.um"
 	"std/std.um"
 	"vec.um"
 	"rawdraw.um"
@@ -84,16 +85,16 @@ fn (p: ^poly) transform*(sx, sy: real, rot: int32) {
 		x = p.rv[i] * sx
 		y = p.rv[i+1] * sy
 
-		tx, ty := vec.rotatepoint(x, y, cx, cy, rot)
+		t := vec.rotatepoint(th.vf2{x, y}, th.vf2{cx, cy}, rot)
 
-		if tx > w {
-			w = round(tx)
+		if t.x > w {
+			w = round(t.x)
 		}
-		if ty > h {
-			h = round(ty)
+		if t.y > h {
+			h = round(t.y)
 		}
 
-		v = append(v, []int32{round(tx), round(ty)})
+		v = append(v, []int32{round(t.x), round(t.y)})
 	}
 
 	p.v = v

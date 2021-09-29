@@ -1,6 +1,7 @@
 // ligthing system
 
 import (
+	"th.um"
 	"rectangle.um"
 )
 
@@ -9,22 +10,22 @@ import (
 // lights. A function for plotting a pixel will be available soon.
 type mask* = struct {
 	dots: []uint32
-	w, h: int32
-	rect_size: real
+	w, h: th.uu
+	rectsize: th.fu
 	color: uint32
 }
 
 type cmask = struct {
 	dots: ^uint32
-	w, h: int32
-	rect_size: real
+	w, h: th.uu
+	rectsize: th.fu
 	color: uint32
 }
 
 // A circular light that can be plotted onto a mask.
 type spotlight* = struct {
-	x, y: int32
-	radius: int32
+	pos: th.vf2
+	radius: th.uu
 	tint: uint32
 }
 
@@ -34,18 +35,18 @@ fn clightmaskclear(m: ^cmask)
 fn (m: ^mask) clear*() {
 	cm := cmask {
 		&m.dots[0],
-		m.w, m.h, m.rect_size,
+		m.w, m.h, m.rectsize,
 		m.color}
 
 	clightmaskclear(&cm)
 }
 
-fn mk*(color: uint32, rect_size: real, cam: rectangle.rect): mask {
+fn mk*(color: uint32, rectsize: real, cam: rectangle.rect): mask {
 	d := mask{}
 
-	d.rect_size = rect_size
-	d.w = round(cam.w / rect_size)
-	d.h = round(cam.h / rect_size)
+	d.rectsize = rectsize
+	d.w = round(cam.w / rectsize)
+	d.h = round(cam.h / rectsize)
 	d.dots = make([]uint32, d.w * d.h)
 	d.color = color
 
@@ -60,7 +61,7 @@ fn clightmaskdraw(m: ^cmask, cam: ^rectangle.rect)
 fn (m: ^mask) draw*(cam: rectangle.rect) {
 	cm := cmask {
 		&m.dots[0],
-		m.w, m.h, m.rect_size,
+		m.w, m.h, m.rectsize,
 		m.color}
 
 	clightmaskdraw(&cm, &cam)
@@ -72,7 +73,7 @@ fn cspotlightstamp(s: ^spotlight, m: ^cmask, cam: ^rectangle.rect)
 fn (s: ^spotlight) stamp*(m: ^mask, cam: rectangle.rect) {
 	cm := cmask {
 		&m.dots[0],
-		m.w, m.h, m.rect_size,
+		m.w, m.h, m.rectsize,
 		m.color}
 
 	cspotlightstamp(s, &cm, &cam)
