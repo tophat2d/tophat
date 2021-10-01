@@ -95,11 +95,10 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
       
 			RDPoint points[4] = {{px, py}, {px + size, py}, {px + size, py + size}, {px, py + size}};
 			for (int i=0; i < 4; i++) {
-				float x = points[i].x;
-				float y = points[i].y;
-				th_rotate_point(&x, &y, px + size/2, py+size/2, rot);
-				points[i].x = (x - camx) * scaling;
-				points[i].y = (y - camy) * scaling;
+				th_vf2 p = {{points[i].x, points[i].y}};
+				th_rotate_point(&p, (th_vf2){{px + size/2, py+size/2}}, rot);
+				points[i].x = (p.x - camx) * scaling;
+				points[i].y = (p.y - camy) * scaling;
 			}
       
 			CNFGTackPoly(points, 4);

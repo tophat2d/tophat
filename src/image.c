@@ -98,39 +98,22 @@ unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
 }
 
 // stolen from rawdraw
-void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot) {
-	if( w == 0 || h == 0 )
-		return;
-
+void th_blit_tex(unsigned int tex, th_quad q) {
 	CNFGFlushRender();
+
+	th_vf2 p = th_quad_min(q);
 
 	glUseProgram(gRDBlitProg);
 	glUniform4f(gRDBlitProgUX,
 		1.f/gRDLastResizeW, -1.f/gRDLastResizeH,
-		-0.5f+x/(float)gRDLastResizeW, 0.5f-y/(float)gRDLastResizeH);
+		-0.5f+p.x/(float)gRDLastResizeW, 0.5f-p.y/(float)gRDLastResizeH);
 	glUniform1i(gRDBlitProgUT, 0);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
 
-	const float cx = w/2;
-	const float cy = h/2;
-
-	float
-		zrotx = 0, zroty = 0,
-		brotx = w, broty = h,
-		wrotx = w, wroty = 0,
-		hrotx = 0, hroty = h;
-
-	if ( rot != 0 ) {
-		th_rotate_point(&zrotx, &zroty, cx, cy, rot);
-		th_rotate_point(&brotx, &broty, cx, cy, rot);
-		th_rotate_point(&wrotx, &wroty, cx, cy, rot);
-		th_rotate_point(&hrotx, &hroty, cx, cy, rot);
-	}
-
 	const float verts[] = {
-		zrotx, zroty, wrotx, wroty, brotx, broty,
-		zrotx, zroty, brotx, broty, hrotx, hroty };
+		q.tl.x - p.x, q.tl.y - p.y, q.tr.x - p.x, q.tr.y - p.y, q.br.x - p.x, q.br.y - p.y,
+		q.tl.x - p.x, q.tl.y - p.y, q.br.x - p.x, q.br.y - p.y, q.bl.x - p.x, q.bl.y - p.y};
 	static const uint8_t colors[] = {
 		0,0,   255,0,  255,255,
 		0,0,  255,255, 0,255 };

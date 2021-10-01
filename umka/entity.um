@@ -14,74 +14,40 @@ import (
 // scale fields. You can set them manually (myent.rot = 20), but that won't
 // change the polygon. For changing the polygon itself, use setrot and setscale.
 type ent* = struct {
-	p: polygon.poly
-	image: image.img
-	scale: th.vf2
-	rot: th.fu
-	color: uint32
-	id: th.uu
-}
-
-type cent* = struct {
-	p: polygon.cpoly
-	image: int
-	scale: th.vf2
-	rot: th.fu
-	color: uint32
+	r: rectangle.rect
+	i: image.img
+	t: th.transform
+	c: uint32
 	id: th.uu
 }
 
 var colldatax, colldatay: int32
 
-fn centdraw(e: cent, c: rectangle.rect)
-
-// Internal function to convert e to c compatible entity. Internal.
-fn (e: ^ent) toc*(): cent {
-	return cent {
-		e.p.toc(),
-		e.image.handle, e.scale,
-		e.rot, e.color, e.id}
-}
+fn centdraw(e: ^ent, c: ^rectangle.rect)
 
 // Draws the entity onto the screen in relaction to camera c.
 fn (e: ^ent) draw*(c: rectangle.rect) {
-	if len(e.p.v) == 0 {
-		return
-	}
-
-	centdraw(e.toc(), c)
+	centdraw(e, &c)
 }
 
-fn cgetcoll(ix, iy: ^int32, count: int32, e: ^cent, s: ^cent): int32
+fn cgetcoll(ic: ^th.vf2, count: int32, e: ^ent, s: ^^ent): int32
 
 // ent's constructor
-fn mk*(p: polygon.poly, color: uint32, id: th.uu): ent {
+fn mk*(img: image.img, t: th.transform, id: th.uu): ent {
 	if id == 0 {
-		id = std.rand() + 1
+		id = std.rand() & 0xfffe + 1
 	}
 
 	var e: ent
-	e.p = p
-	e.image = image.img{0}
-	e.scale = th.vf2{1, 1}
-	e.rot = 0
-	e.color = color
+	e.i = img
+	e.t = t
+	dm := img.getdims()
+	e.r.w = dm.x
+	e.r.h = dm.y
+	e.c = 0xff
 	e.id = id
 
 	return e
-}
-
-// Sets the entity's rotation in degrees. This will transform the polygon,
-// by extension affecting collisions.
-fn (e: ^ent) setrot*(rot: th.fu) {
-	e.rot = rot
-	e.p.transform(e.scale.x, e.scale.y, round(rot))
-}
-
-// Same as setrot, but for scale.
-fn (e: ^ent) setscale*(s: th.vf2) {
-	e.scale = s
-	e.p.transform(s.x, s.y, round(e.rot))
 }
 
 // Checks whether e collides with any of the entities in s. If e has the same
@@ -89,28 +55,18 @@ fn (e: ^ent) setscale*(s: th.vf2) {
 // id of the colliding entity.
 // WARNING: This function will recieve a lot of changes. It will return an
 //   an array of indexes in s, where colliding entities lie.
-fn (e: ^ent) getcoll*(s: []^ent): int32 {
+fn (e: ^ent) getcoll*(s: []^ent, ic: ^th.vf2): int32 {
 	if len(s) == 0 {
 		return 0
 	}
 
-	cscn := make([]cent, len(s))
-	for i, e in s {
-		cscn[i] = e.toc()
-	}
-
-	return cgetcoll(&colldatax, &colldatay, len(cscn), &e.toc(), &cscn[0])
-}
-
-// Returns, where the last collision happened.
-fn retrievecolldata*(): (int32, int32) {
-	return colldatax, colldatay	
+	return cgetcoll(ic, len(s), e, &s[0])
 }
 
 // Animates the entity's image with one of the `anim` array. **Won't** begin on
 // the first frame. If you with that, use animation.anim.
 fn (e: ^ent) animate*(fps: int, anim: ^[]image.img) {
-	e.image = anim^[(round(real(tophat.t)/(1000/fps)) % len(anim^))]
+	e.i = anim^[(round(real(tophat.t)/(1000/fps)) % len(anim^))]
 }
 
 fn centysort(e: ^entity.ent, count: int)

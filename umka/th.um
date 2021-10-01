@@ -6,3 +6,10 @@ type uu* = uint16
 type vf2* = struct {
 	x, y: fu
 }
+
+type transform* = struct {
+	p: vf2
+	s: vf2
+	o: vf2
+	r: fu
+}

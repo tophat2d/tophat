@@ -225,7 +225,8 @@ void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int *ty = (int *)p[4].ptrVal;
 	int *tx = (int *)p[5].ptrVal;
 
-	r->intVal = _th_coll_on_tilemap(&ent->p, t, x, y, tx, ty);
+	//r->intVal = _th_coll_on_tilemap(&ent->p, t, x, y, tx, ty);
+	r->intVal = 0;
 }
 
 ///////////////////////
@@ -350,23 +351,18 @@ void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 // entities
 // draws an entity
 void umentdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_rect *rc = (th_rect *)&p[0];
-	th_ent *e = (th_ent *)&p[2];
-
-	if (e->img == 0)
-		e->img = NULL;
-
+	th_rect *rc = (th_rect *)p[0].ptrVal;
+	th_ent *e = (th_ent *)p[1].ptrVal;
 	th_ent_draw(e, rc);
 }
 
 void umentgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_ent *scene = (th_ent *)p[0].ptrVal;
+	th_ent **scene = (th_ent **)p[0].ptrVal;
 	th_ent *e = (th_ent *)p[1].ptrVal;
 	int count = p[2].intVal;
-	int *iy = (int *)p[3].ptrVal;
-	int *ix = (int *)p[4].ptrVal;
+	th_vf2 *ic = (th_vf2 *)p[3].ptrVal;
 
-	r->intVal = th_ent_getcoll(e, scene, count, ix, iy);
+	r->intVal = th_ent_getcoll(e, scene, count, ic);
 }
 
 int _th_ysort_test(const void *a, const void *b) {
@@ -436,10 +432,9 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_ent *scene = (th_ent *)p[0].ptrVal;
 	th_ray *ra = (th_ray *)p[1].ptrVal;
 	int count = p[2].intVal;
-	int *iy = (int *)p[3].ptrVal;
-	int *ix = (int *)p[4].ptrVal;
+	th_vf2 *ic = (th_vf2 *)p[3].ptrVal;
 
-	r->intVal = th_ray_getcoll(ra, scene, count, ix, iy);
+	r->intVal = th_ray_getcoll(ra, scene, count, ic);
 }
 
 void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -585,10 +580,13 @@ void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[3].ptrVal;
-	fu rot = p[2].real32Val;
-	th_vf2 scale = *(th_vf2 *)&p[1];
-	th_vf2 pos = *(th_vf2 *)&p[0];
+	th_image *img = (th_image *)p[1].ptrVal;
+	th_transform *t = (th_transform *)p[0].ptrVal;
 
-	th_blit_tex(img->gltexture, pos.x * scaling, pos.y * scaling, img->dm.w * scale.x * scaling, img->dm.h * scale.y * scaling, rot);
+	th_quad q = th_ent_transform(
+		&(th_ent){
+			.rect = (th_rect){.w = img->dm.w, .h = img->dm.h},
+			.t = *t});
+
+	th_blit_tex(img->gltexture, q);
 }

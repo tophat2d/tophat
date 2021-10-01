@@ -1,44 +1,54 @@
 import (
-	"umka/rawdraw.um"
-	"umka/vec.um"
-	"umka/tophat.um"
-	"umka/input.um"
+	"umka/th.um"
+	"umka/image.um"
 	"umka/rectangle.um"
 	"umka/entity.um"
-	"umka/raycast.um"
-	"umka/polygon.um"
-	"umka/ui.um"
-	"umka/image.um"
-	"umka/csv.um"
-	"umka/tilemap.um"
-	"umka/tween.um"
-	"umka/light.um"
-	"umka/particles.um"
-	"umka/lerp.um"
-	"umka/font.um"
-	"umka/misc.um"
-	"umka/th.um"
+	"umka/tophat.um"
+	"umka/input.um"
+	"umka/rawdraw.um"
 
 	"umka/std/std.um"
 )
 
 fn main() { 
-	cam := rectangle.mk(20, 20, 250, 250)
+	cam := rectangle.mk(0, 0, 250, 250)
 	tophat.setup("test game", 100, 100)
 	var w, h: int32
 	t := 0
 
 	img := image.load("etc/test.png")
+	e := entity.mk(img, th.transform{}, 0)
+	e.t.s = th.vf2{1, 1}
+
+	e2 := entity.mk(img, th.transform{}, 0)
+	e2.t.p = th.vf2{20, 20}
+	e2.t.s = th.vf2{2, 2}
+	e2.t.o = th.vf2{0, 0}
+	e2.t.r = 45
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 		t += tophat.delta
 
-		img.draw(input.getmousepos(), 0, th.vf2{1, 0.5})
+		e.t.p = input.getglobalmousepos(cam)
+		e.draw(cam)
+		e2.draw(cam)
+
 		if tophat.delta == 0 {
 			tophat.delta = 16
 		}
 		rawdraw.drawtext(repr(1000/tophat.delta), th.vf2{0, 0}, tophat.black, 1)
+		rawdraw.drawtext(repr(w) + ":" + repr(h), th.vf2{0, 20}, tophat.black, 1)
+
+		ic := th.vf2{}
+		if (e.getcoll([]^entity.ent{&e2}, &ic) >= 0) {
+			rawdraw.setcolor(tophat.red)
+			rawdraw.drawrect(rectangle.rect{ic.x + cam.x + cam.w/2, ic.y + cam.y + cam.h/2, 2, 2})
+		}
+
+		if input.ispressed(int32('a')) {
+			e2.t.r += 0.2 * tophat.delta
+		}
 	}
 }
 

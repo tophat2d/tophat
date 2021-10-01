@@ -1,4 +1,4 @@
-- [ ] - vectors and types
+- [x] - vectors and types
 	- [x] - entity.um
 	- [x] - audio.um
 	- [x] - animation.um
@@ -17,26 +17,11 @@
 	- [x] - tophat.um
 	- [x] - ui.um
 	- [x] - vec.um
+- [ ] - transform struct and rect instead of polygons
+	- [x] - drawing
+	- [x] - collisions
+	- [ ] - rotation
 - [ ] - change naming case
-	- [ ] - entity.um
-	- [ ] - audio.um
-	- [ ] - animation.um
-	- [ ] - csv.um
-	- [ ] - font.um
-	- [ ] - image.um
-	- [ ] - input.um
-	- [ ] - lerp.um
-	- [ ] - light.um
-	- [ ] - misc.um
-	- [ ] - particles.um
-	- [ ] - rawdraw.um
-	- [ ] - raycast.um
-	- [ ] - rectangle.um
-	- [ ] - tilemap.um
-	- [ ] - tophat.um
-	- [ ] - ui.um
-	- [ ] - vec.um
-- [ ] - introduce transform struct
 	- [ ] - entity.um
 	- [ ] - audio.um
 	- [ ] - animation.um

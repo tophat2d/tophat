@@ -23,7 +23,8 @@ const (
 	cyan* = 0x00ffffff
 )
 
-var t*, start, end, delta*: uint
+var t*, start, end: uint
+var delta*: int
 
 var platform*: str = "linux"
 
@@ -66,7 +67,7 @@ fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
 
 	end = gettime()/1000
 	delta = (end - start)
-	if delta < 0 {
+	for delta < 0 {
 		delta += 1000
 	}
 	start = gettime()/1000

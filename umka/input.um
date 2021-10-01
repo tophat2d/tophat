@@ -118,8 +118,8 @@ fn getmousepos*(): th.vf2 {
 // Returns the position of mouse cursor in relation to cam.
 fn getglobalmousepos*(cam: rectangle.rect): th.vf2 {
 	v := getmousepos()
-	v.x += cam.x
-	v.y += cam.y
+	v.x += cam.x - cam.w/2
+	v.y += cam.y - cam.h/2
 	return v
 }
 

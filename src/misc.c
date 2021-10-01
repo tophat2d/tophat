@@ -21,17 +21,17 @@ void th_error(char *text, ...) {
 	fprintf(stderr, "\n");
 }
 
-void th_rotate_point(float *x, float *y, float cx, float cy, float rot) {
+void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
 	float angle = (rot * M_PI)/180;
 
-	float x1 = *x - cx;
-	float y1 = *y - cy;
+	p->x -= o.x;
+	p->y -= o.y;
 
-	float x2 = x1 * cos(angle) - y1 * sin(angle);
-	float y2 = x1 * sin(angle) + y1 * cos(angle);
+	p->x = p->x * cos(angle) - p->y * sin(angle);
+	p->y = p->x * sin(angle) + p->y * cos(angle);
 
-	*x = (int)round(x2) + cx;
-	*y = (int)round(y2) + cy;
+	p->x += o.x;
+	p->y += o.y;
 }
 
 void th_vector_normalize(float *x, float *y) {
