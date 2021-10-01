@@ -60,23 +60,22 @@ uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic) {
 	return th_quad_to_quad(&q1, &q2, ic);
 }
 
-bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
-	/*float
-		x0, y0,
-		x1 = ra->pos.x, y1 = ra->pos.y + ra->l;
+bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic) {
+	th_vf2
+		b = ra->pos,
+		e = ra->pos;
+	e.y += ra->l;
 
-	th_rotate_point(&x1, &y1, ra->pos.x, ra->pos.y, ra->r);
-	
-	x0 = ra->pos.x;
-	y0 = ra->pos.y;
+	th_rotate_point(&e, ra->pos, ra->r);
+
 	float
-		mx = x1 - x0,
-		my = y1 - y0;
+		mx = e.x - b.x,
+		my = e.y - b.y;
 	th_vector_normalize(&mx, &my);
 
 	float
-		x = x0,
-		y = y0,
+		x = b.x,
+		y = b.y,
 		minlen = -1;
 	bool coll = false;
 	float len = 0;
@@ -97,15 +96,11 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 		len += sqrt(mx * mx + my * my);
 	}	
 
-	float
-		fix = ra->pos.x,
-		fiy = ra->pos.y + minlen;
-	th_rotate_point(&fix, &fiy, ra->pos.x, ra->pos.y, ra->r);
-	*ix = fix;
-	*iy = fiy;
+	*ic = ra->pos;
+	ic->y += minlen;
+	th_rotate_point(ic, ra->pos, ra->r);
 
-	return coll;*/ // TODO
-	return 0;
+	return coll;
 }
 
 // This can fail if entity is bigger than a tile. TODO

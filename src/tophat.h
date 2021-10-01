@@ -173,7 +173,7 @@ void th_vector_normalize(float *x, float *y);
 void th_particles_draw(th_particles *p, th_rect cam, int t);
 
 // raycast
-int th_ray_getcoll(th_ray *ra, th_ent *scene, int count, th_vf2 *ic);
+int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, th_vf2 *ic);
 
 // tilemap
 void th_tmap_draw(th_tmap *t, th_rect *cam);
@@ -199,7 +199,7 @@ uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
 uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
 uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
 uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
-bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy);
+bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
 
 // image
 void _th_rdimg(th_image *img, unsigned char *data);

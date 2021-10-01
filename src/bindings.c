@@ -426,7 +426,7 @@ void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // raycast
 void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_ent *scene = (th_ent *)p[0].ptrVal;
+	th_ent **scene = (th_ent **)p[0].ptrVal;
 	th_ray *ra = (th_ray *)p[1].ptrVal;
 	int count = p[2].intVal;
 	th_vf2 *ic = (th_vf2 *)p[3].ptrVal;
@@ -435,12 +435,11 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_ray *ra = (th_ray *)p[3].ptrVal;
-	th_tmap *t = (th_tmap *)p[2].ptrVal;
-	int *ix = (int *)p[1].ptrVal;
-	int *iy = (int *)p[0].ptrVal;
+	th_ray *ra = (th_ray *)p[2].ptrVal;
+	th_tmap *t = (th_tmap *)p[1].ptrVal;
+	th_vf2 *ic = (th_vf2 *)p[0].ptrVal;
 
-	r->intVal = th_ray_to_tilemap(ra, t, ix, iy);
+	r->intVal = th_ray_to_tilemap(ra, t, ic);
 }
 
 ///////////////////////

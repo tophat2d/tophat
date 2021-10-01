@@ -8,6 +8,7 @@ import (
 	"umka/rawdraw.um"
 	"umka/tilemap.um"
 	"umka/misc.um"
+	"umka/raycast.um"
 
 	"umka/std/std.um"
 )

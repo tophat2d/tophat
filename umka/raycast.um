@@ -21,26 +21,15 @@ fn mk*(pos: th.vf2, l, r: th.fu): ray {
 	return ray{pos, l, r}
 }
 
-fn craygetcoll(ix, iy: ^int32, count: int32, r: ^ray, s: ^entity.cent): int32
-fn craygettmapcoll(r: ^ray, t: ^tilemap.ctmap, ix, iy: ^int32): bool
+fn craygetcoll(ic: ^th.vf2, count: int32, r: ^ray, s: ^^entity.ent): int32
+fn craygettmapcoll(r: ^ray, t: ^tilemap.ctmap, ic: ^th.vf2): bool
 
 // Same as ent.getcoll. Same changes will apply.
-fn (r: ^ray) getcoll*(s: []^entity.ent): int32 {
-	cscn := make([]entity.cent, len(s))
-
-	for i, e in s {
-		cscn[i] = e.toc()
-	}
-
-	return craygetcoll(&colldatax, &colldatay, len(cscn), r, &cscn[0])
+fn (r: ^ray) getcoll*(s: []^entity.ent, ic: ^th.vf2): int32 {
+	return craygetcoll(ic, len(s), r, &s[0])
 }
 
-// Returns, where the last collision happened.
-fn retrievecolldata*(): (int32, int32) {
-	return colldatax, colldatay
-}
-
-fn (r: ^ray) gettmapcoll*(t: tilemap.tmap, ix, iy: ^int32): bool {
+fn (r: ^ray) gettmapcoll*(t: tilemap.tmap, ic: ^th.vf2): bool {
 	ccm := make([]int32, len(t.collmask))
 	for i:=0; i < len(t.collmask); i++ {
 		ccm[i] = int32(t.collmask[i])
@@ -48,5 +37,5 @@ fn (r: ^ray) gettmapcoll*(t: tilemap.tmap, ix, iy: ^int32): bool {
 
 	cm := tilemap.ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collmask[0], t.cellsize, t.scaletype}
 
-	return craygettmapcoll(r, &cm, ix, iy)
+	return craygettmapcoll(r, &cm, ic)
 }
