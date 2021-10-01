@@ -27,11 +27,11 @@ void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
 	p->x -= o.x;
 	p->y -= o.y;
 
-	p->x = p->x * cos(angle) - p->y * sin(angle);
-	p->y = p->x * sin(angle) + p->y * cos(angle);
+	fu x = p->x * cos(angle) - p->y * sin(angle);
+	fu y = p->x * sin(angle) + p->y * cos(angle);
 
-	p->x += o.x;
-	p->y += o.y;
+	p->x = o.x + x;
+	p->y = o.y + y;
 }
 
 void th_vector_normalize(float *x, float *y) {

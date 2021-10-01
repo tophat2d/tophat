@@ -23,7 +23,7 @@ fn main() {
 	e2 := entity.mk(img, th.transform{}, 0)
 	e2.t.p = th.vf2{20, 20}
 	e2.t.s = th.vf2{2, 2}
-	e2.t.o = th.vf2{0, 0}
+	e2.t.o = th.vf2{-10, -20}
 	e2.t.r = 45
 
 	for true {
