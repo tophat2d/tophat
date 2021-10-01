@@ -110,18 +110,18 @@ fn (t: ^tmap) draw*(cam: rectangle.rect) {
 	cdrawtmap(&cm, &cam)
 }
 
-fn ctmapgetcoll(tx, ty, x, y: ^int32, t: ^ctmap, e: ^entity.cent): int32
+fn ctmapgetcoll(pos: ^th.vf2, vert: ^th.uu, t: ^ctmap, e: ^entity.ent): int32
 
 // Checks, if t collides with e.
-// [rx, ry] is where the collision happened (usually one of the vertices)
-// [tx, ty] is on which tile it happened.
+// pos is the tile index where the collision happened
+// vert is which index collided
 // You need to pass a valid pointer (TODO)
-fn (t: ^tmap) getcoll*(e: entity.ent, rx, ry, tx, ty: ^int32): bool {
+fn (t: ^tmap) getcoll*(e: entity.ent, vert: ^th.uu, pos: ^th.vf2): bool {
 	if len(t.cells) == 0 { return false }
 
 	cm := ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collmask[0], t.cellsize, t.scaletype}
 
-	c := ctmapgetcoll(tx, ty, rx, ry, &cm, &e.toc())
+	c := ctmapgetcoll(pos, vert, &cm, &e)
 
 	return bool(c)
 }

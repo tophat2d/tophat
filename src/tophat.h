@@ -121,6 +121,7 @@ typedef struct {
 	fu r;
 } th_ray;
 
+#pragma pack(push, 1)
 typedef struct {
 	th_image **tiles;
 	th_vf2 pos;
@@ -130,6 +131,7 @@ typedef struct {
 	fu cellsize;
 	uu scaletype;
 } th_tmap;
+#pragma pack(pop)
 
 typedef struct {
 	stbtt_fontinfo *info;
@@ -196,7 +198,7 @@ int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
 uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
 uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
 uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
-bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty);
+uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
 bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy);
 
 // image

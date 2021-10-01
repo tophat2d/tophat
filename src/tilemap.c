@@ -25,8 +25,8 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	if (camy > t->pos.y + t->h*t->cellsize)
 		return;
 
-	int sx = fabs((fabs(t->pos.x)-abs(camx))/t->cellsize);
-	int sy = fabs((fabs(t->pos.y)-abs(camy))/t->cellsize);
+	int sx = fabs((fabs(t->pos.x)-abs(camx)))/t->cellsize;
+	int sy = fabs((fabs(t->pos.y)-abs(camy)))/t->cellsize;
 	int sw = cam->w/t->cellsize + 2;
 	int sh = cam->h/t->cellsize + 2;
 
@@ -45,24 +45,19 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 
 		switch (t->scaletype) {
 		case STRETCH:
-			tr.scale.x = t->cellsize;
-			tr.scale.y = t->cellsize;
+			tr.scale.x = t->cellsize * scaling;
+			tr.scale.y = t->cellsize * scaling;
 			break;
 		case TOPLEFT:
-			tr.scale.x = t->tiles[t->cells[j*t->w+i]-1]->dm.w;
-			tr.scale.y = t->tiles[t->cells[j*t->w+i]-1]->dm.h;
+			tr.scale.x = t->tiles[t->cells[j*t->w+i]-1]->dm.w * scaling;
+			tr.scale.y = t->tiles[t->cells[j*t->w+i]-1]->dm.h * scaling;
 			break;
 		}
 
 		tr.pos.x = (t->pos.x+i*t->cellsize-camx)*scaling;
 		tr.pos.y = (t->pos.y+j*t->cellsize-camy)*scaling;
 		const th_quad q = th_ent_transform(
-			&(th_ent){
-				.rect = (th_rect){
-					.w = t->tiles[t->cells[j*t->w+i]-1]->dm.w,
-					.h = t->tiles[t->cells[j*t->w+i]-1]->dm.h},
-				.t = tr});
-		th_blit_tex(
-			t->tiles[t->cells[j*t->w+i]-1]->gltexture, q);
+			&(th_ent){ .rect = (th_rect){ .w = 1, .h = 1}, .t = tr});
+		th_blit_tex(t->tiles[t->cells[j*t->w+i]-1]->gltexture, q);
 	}
 }

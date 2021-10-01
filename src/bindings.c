@@ -220,13 +220,10 @@ void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_ent *ent = (th_ent *)p[0].ptrVal;
 	th_tmap *t = (th_tmap *)p[1].ptrVal;
-	int *y = (int *)p[2].ptrVal;
-	int *x = (int *)p[3].ptrVal;
-	int *ty = (int *)p[4].ptrVal;
-	int *tx = (int *)p[5].ptrVal;
+	uu *vert = (uu *)p[2].ptrVal;
+	th_vf2 *tc = (th_vf2 *)p[3].ptrVal;
 
-	//r->intVal = _th_coll_on_tilemap(&ent->p, t, x, y, tx, ty);
-	r->intVal = 0;
+	r->intVal = _th_coll_on_tilemap(ent, t, vert, tc);
 }
 
 ///////////////////////

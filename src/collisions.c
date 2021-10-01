@@ -108,30 +108,30 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy) {
 	return 0;
 }
 
-bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty) {
-	for (int i=0; i < p->vc * 2; i += 2) {
-		if (p->x + p->v[i] < t->pos.x || p->y + p->v[i+1] < t->pos.y)
-			continue;
-		if (p->x + p->v[i] > t->pos.x + t->w * t->cellsize || p->y + p->v[i+1] > t->pos.y + t->h * t->cellsize)
-			continue;
+// This can fail if entity is bigger than a tile. TODO
+uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc) {
+	th_quad q = th_ent_transform(e);
 
-		int absx = p->x + p->v[i];
-		int absy = p->y + p->v[i+1];
-		int tx = (absx - t->pos.x) / t->cellsize;
-		int ty = (absy - t->pos.y) / t->cellsize;
+	for (uu i=0; i < 4; i++) {
+		const iu tx = (q.v[i].x - t->pos.x) / t->cellsize;
+		const iu ty = (q.v[i].y - t->pos.y) / t->cellsize;
 
-		int tile = t->cells[(t->w * ty) + tx];
+		if (q.v[i].x < t->pos.x || q.v[i].y < t->pos.x) continue;
+		if (tx < 0 || ty < 0) continue;
+		if (tx >= t->w || ty >= t->h) continue;
+
+		const int tile = t->cells[(t->w * ty) + tx];
 		if (!tile)
 			continue;
 
 		if (t->collmask[tile - 1]) {
-			*rx = absx;
-			*ry = absy;
-			*rtx = tx;
-			*rty = ty;
-			return true;
+			*vert = i;
+			tc->x = tx;
+			tc->y = ty;
+			return 1;
 		}
 	}
-	return false;
+
+	return 0;
 }
 
