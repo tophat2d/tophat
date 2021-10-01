@@ -20,7 +20,7 @@ fn main() {
 	t := 0
 
 	img := image.load("etc/test.png")
-	e := entity.mk(img, th.transform{}, 0)
+	e := entity.mk(img, th.transform{})
 	e.t.s = th.vf2{1, 1}
 
 	tm := tilemap.mk(misc.readall("etc/tilemap-test.csv"), []image.img{img})

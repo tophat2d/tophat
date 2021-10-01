@@ -61,7 +61,6 @@ typedef struct {
 	th_image *img;
 	th_transform t;
 	uint32_t color;
-	uu id;
 } th_ent;
 #pragma pack(pop)
 

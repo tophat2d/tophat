@@ -55,7 +55,7 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 
 iu th_ent_getcoll(th_ent *e, th_ent **scene, uu count, th_vf2 *ic) {
 	for (int i=0; i < count; i++) {
-		if (e->id == scene[i]->id) continue;
+		if (e == scene[i]) continue;
 
 		if (th_ent_to_ent(scene[i], e, ic))
 			return i;

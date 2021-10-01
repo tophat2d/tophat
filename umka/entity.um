@@ -18,7 +18,6 @@ type ent* = struct {
 	i: image.img
 	t: th.transform
 	c: uint32
-	id: th.uu
 }
 
 var colldatax, colldatay: int32
@@ -33,11 +32,7 @@ fn (e: ^ent) draw*(c: rectangle.rect) {
 fn cgetcoll(ic: ^th.vf2, count: int32, e: ^ent, s: ^^ent): int32
 
 // ent's constructor
-fn mk*(img: image.img, t: th.transform, id: th.uu): ent {
-	if id == 0 {
-		id = std.rand() & 0xfffe + 1
-	}
-
+fn mk*(img: image.img, t: th.transform): ent {
 	var e: ent
 	e.i = img
 	e.t = t
@@ -45,7 +40,6 @@ fn mk*(img: image.img, t: th.transform, id: th.uu): ent {
 	e.r.w = dm.x
 	e.r.h = dm.y
 	e.c = 0xff
-	e.id = id
 
 	return e
 }
