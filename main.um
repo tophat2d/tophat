@@ -9,6 +9,7 @@ import (
 	"umka/tilemap.um"
 	"umka/misc.um"
 	"umka/raycast.um"
+	"umka/animation.um"
 
 	"umka/std/std.um"
 )
@@ -24,7 +25,6 @@ fn main() {
 	e.t.s = th.vf2{1, 1}
 
 	tm := tilemap.mk(misc.readall("etc/tilemap-test.csv"), []image.img{img})
-	printf("%s\n", repr(tm))
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)

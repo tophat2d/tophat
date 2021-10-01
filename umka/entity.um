@@ -1,6 +1,5 @@
 
 import (
-	"polygon.um"
 	"tophat.um"
 	"rectangle.um"
 	"std/std.um"

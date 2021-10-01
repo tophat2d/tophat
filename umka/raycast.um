@@ -3,7 +3,6 @@
 import (
 	"th.um"
 	"entity.um"
-	"polygon.um"
 	"tilemap.um"
 )
 

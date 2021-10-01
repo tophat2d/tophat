@@ -17,10 +17,10 @@
 	- [x] - tophat.um
 	- [x] - ui.um
 	- [x] - vec.um
-- [ ] - transform struct and rect instead of polygons
+- [x] - transform struct and rect instead of polygons
 	- [x] - drawing
 	- [x] - collisions
-	- [ ] - rotation
+	- [x] - rotation
 - [ ] - change naming case
 	- [ ] - entity.um
 	- [ ] - audio.um

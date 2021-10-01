@@ -4,7 +4,6 @@
 import (
 	"th.um"
 	"std/std.um"
-	"polygon.um"
 	"rectangle.um"
 )
 

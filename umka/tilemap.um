@@ -8,7 +8,6 @@ import (
 	"std.um"
 	"rectangle.um"
 	"entity.um"
-	"polygon.um"
 )
 
 // Tilemap struct

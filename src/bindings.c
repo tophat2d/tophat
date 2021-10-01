@@ -103,29 +103,29 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cdrawimage", &umCNFGBlitTex);
 
 #ifdef RELEASE_BUILD
-	umkaAddModule(umka, "animation.um", libs[0]);
-	umkaAddModule(umka, "audio.um", libs[1]);
-	umkaAddModule(umka, "csv.um", libs[2]);
-	umkaAddModule(umka, "entity.um", libs[3]);
-	umkaAddModule(umka, "image.um", libs[4]);
-	umkaAddModule(umka, "input.um", libs[5]);
-	umkaAddModule(umka, "misc.um", libs[6]);
-	umkaAddModule(umka, "polygon.um", libs[7]);
-	umkaAddModule(umka, "rawdraw.um", libs[8]);
-	umkaAddModule(umka, "raycast.um", libs[9]);
-	umkaAddModule(umka, "rectangle.um", libs[10]);
-	umkaAddModule(umka, "tilemap.um", libs[11]);
-	umkaAddModule(umka, "tophat.um", libs[12]);
-	umkaAddModule(umka, "ui.um", libs[13]);
-	umkaAddModule(umka, "vec.um", libs[14]);
-	umkaAddModule(umka, "std.um", libs[15]);
-	umkaAddModule(umka, "particles.um", libs[16]);
-	umkaAddModule(umka, "light.um", libs[17]);
-	umkaAddModule(umka, "lerp.um", libs[18]);
-	umkaAddModule(umka, "map.um", libs[19]);
-	umkaAddModule(umka, "utf8.um", libs[20]);
-	umkaAddModule(umka, "font.um", libs[21]);
-	umkaAddModule(umka, "th.um", libs[22]);
+	int index = 0;
+	umkaAddModule(umka, "animation.um", libs[index++]);
+	umkaAddModule(umka, "audio.um", libs[index++]);
+	umkaAddModule(umka, "csv.um", libs[index++]);
+	umkaAddModule(umka, "entity.um", libs[index++]);
+	umkaAddModule(umka, "image.um", libs[index++]);
+	umkaAddModule(umka, "input.um", libs[index++]);
+	umkaAddModule(umka, "misc.um", libs[index++]);
+	umkaAddModule(umka, "rawdraw.um", libs[index++]);
+	umkaAddModule(umka, "raycast.um", libs[index++]);
+	umkaAddModule(umka, "rectangle.um", libs[index++]);
+	umkaAddModule(umka, "tilemap.um", libs[index++]);
+	umkaAddModule(umka, "tophat.um", libs[index++]);
+	umkaAddModule(umka, "ui.um", libs[index++]);
+	umkaAddModule(umka, "vec.um", libs[index++]);
+	umkaAddModule(umka, "std.um", libs[index++]);
+	umkaAddModule(umka, "particles.um", libs[index++]);
+	umkaAddModule(umka, "light.um", libs[index++]);
+	umkaAddModule(umka, "lerp.um", libs[index++]);
+	umkaAddModule(umka, "map.um", libs[index++]);
+	umkaAddModule(umka, "utf8.um", libs[index++]);
+	umkaAddModule(umka, "font.um", libs[index++]);
+	umkaAddModule(umka, "th.um", libs[index++]);
 #endif
 }
 
