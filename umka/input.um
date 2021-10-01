@@ -3,7 +3,7 @@
 import (
 	"th.um"
 	"std/std.um"
-	"rectangle.um"
+	"rect.um"
 )
 
 var (
@@ -106,18 +106,18 @@ fn setwinmap*() {
 	KEY_SPACE = 32
 }
 
-fn cgetmouse(out: ^th.vf2)
+fn cgetmouse(out: ^th.Vf2)
 
 // Returns the position of mouse cursor in relation to the screen.
-fn getmousepos*(): th.vf2 {
-	out := th.vf2{}
+fn getMousePos*(): th.Vf2 {
+	out := th.Vf2{}
 	cgetmouse(&out)
 	return out
 }
 
 // Returns the position of mouse cursor in relation to cam.
-fn getglobalmousepos*(cam: rectangle.rect): th.vf2 {
-	v := getmousepos()
+fn getGlobalMousePos*(cam: rect.Rect): th.Vf2 {
+	v := getMousePos()
 	v.x += cam.x - cam.w/2
 	v.y += cam.y - cam.h/2
 	return v
@@ -130,13 +130,13 @@ fn cisjustpressed(key: int32): int32
 // Returns if key is pressed. Either use
 // codes defined in the file above, or
 // pass lower case char/number.
-fn ispressed*(code: int32): bool {
+fn isPressed*(code: int32): bool {
 	val := bool(cispressed(code))
 	return val
 }
 
 // Returns, whether code was just pressed
 // this loop.
-fn isjustpressed*(code: int32): bool {
+fn isJustPressed*(code: int32): bool {
 	return bool(cisjustpressed(code))
 }

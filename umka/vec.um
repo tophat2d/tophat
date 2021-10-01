@@ -8,7 +8,7 @@ import (
 
 // rotates point [x, y] around [cx, cy] with
 // rot in degrees
-fn rotatepoint*(pos, origin: th.vf2, rot: th.fu): th.vf2 {
+fn rotatePoint*(pos, origin: th.Vf2, rot: th.fu): th.Vf2 {
 	angle := (rot * std.pi) / 180
 
 	pos.x -= origin.x
@@ -25,25 +25,25 @@ fn rotatepoint*(pos, origin: th.vf2, rot: th.fu): th.vf2 {
 
 // Distance of [x1, y1] to [x2, [y2]].
 // It won't be negative.
-fn distanceto*(p1, p2: th.vf2): th.fu {
+fn distanceTo*(p1, p2: th.Vf2): th.fu {
 	return std.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 }
 
 // Angle between [x1, y1] and [x2, y2]
-fn angleto*(p1, p2: th.vf2): real {
+fn angleTo*(p1, p2: th.Vf2): real {
 	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std.pi + 180
 }
 
-fn abs*(p, p2: th.vf2): th.vf2 { return th.vf2{fabs(p.x), fabs(p.y)} }
+fn abs*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{fabs(p.x), fabs(p.y)} }
 
-fn rnd*(p, p2: th.vf2): th.vf2 { return th.vf2{round(p.x), round(p.y)} }
+fn rnd*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{round(p.x), round(p.y)} }
 
-fn flr*(p, p2: th.vf2): th.vf2 { return th.vf2{trunc(p.x), trunc(p.y)} }
+fn flr*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{trunc(p.x), trunc(p.y)} }
              
-fn sub*(p, p2: th.vf2): th.vf2 { return th.vf2{p.x - p2.x, p.y - p2.y} }
+fn sub*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{p.x - p2.x, p.y - p2.y} }
                                                         
-fn add*(p, p2: th.vf2): th.vf2 { return th.vf2{p.x + p2.x, p.y + p2.y} }
+fn add*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{p.x + p2.x, p.y + p2.y} }
                                                             
-fn div*(p, p2: th.vf2): th.vf2 { return th.vf2{p.x / p2.x, p.y / p2.y} }
+fn div*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{p.x / p2.x, p.y / p2.y} }
                           
-fn mul*(p, p2: th.vf2): th.vf2 { return th.vf2{p.x * p2.x, p.y * p2.y} }
+fn mul*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{p.x * p2.x, p.y * p2.y} }

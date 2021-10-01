@@ -1,50 +1,58 @@
 import (
-	"umka/th.um"
+	"umka/anim.um"
+	"umka/audio.um"
+	"umka/csv.um"
+	"umka/ent.um"
+	"umka/font.um"
 	"umka/image.um"
-	"umka/rectangle.um"
-	"umka/entity.um"
-	"umka/tophat.um"
 	"umka/input.um"
-	"umka/rawdraw.um"
-	"umka/tilemap.um"
+	"umka/lerp.um"
+	"umka/light.um"
 	"umka/misc.um"
-	"umka/raycast.um"
-	"umka/animation.um"
+	"umka/particles.um"
+	"umka/rawdraw.um"
+	"umka/ray.um"
+	"umka/rect.um"
+	"umka/th.um"
+	"umka/tilemap.um"
+	"umka/tophat.um"
+	"umka/ui.um"
+	"umka/vec.um"
 
 	"umka/std/std.um"
 )
 
 fn main() { 
-	cam := rectangle.mk(0, 0, 250, 250)
+	cam := rect.mk(0, 0, 250, 250)
 	tophat.setup("test game", 100, 100)
 	var w, h: int32
 	t := 0
 
 	img := image.load("etc/test.png")
-	e := entity.mk(img, th.transform{})
-	e.t.s = th.vf2{1, 1}
+	e := ent.mk(img, th.Transform{})
+	e.t.s = th.Vf2{1, 1}
 
-	tm := tilemap.mk(misc.readall("etc/tilemap-test.csv"), []image.img{img})
+	tm := tilemap.mk(misc.readall("etc/tilemap-test.csv"), []image.Image{img})
 
 	for true {
 		tophat.cycle(&w, &h, 0xffffffff, cam)
 		t += tophat.delta
 
-		e.t.p = input.getglobalmousepos(cam)
+		e.t.p = input.getGlobalMousePos(cam)
 		e.draw(cam)
 
 		tm.draw(cam)
 
 		var vert: th.uu
-		var tp: th.vf2
-		if tm.getcoll(e, &vert, &tp) {
+		var tp: th.Vf2
+		if tm.getColl(e, &vert, &tp) {
 			printf("coll on %d (%f %f) %d\n", vert, tp.x, tp.y, t)
 		}
 
 		if tophat.delta == 0 {
 			tophat.delta = 16
 		}
-		rawdraw.drawtext(repr(1000/tophat.delta), th.vf2{0, 0}, tophat.black, 1)
+		rawdraw.drawText(repr(1000/tophat.delta), th.Vf2{0, 0}, tophat.black, 1)
 	}
 }
 

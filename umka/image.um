@@ -9,7 +9,7 @@ import (
 // you only load images at the start of the game and need them until the
 // end, but function operating on images might need to keep the memory in
 // mind. 
-type img* = struct {
+type Image* = struct {
 	handle: int
 }
 
@@ -25,80 +25,74 @@ fn fliphimg(i: int)
 
 fn imgvalid(i: int): int32
 
-fn imggetdims(dm: ^th.vf2, i: int)
+fn imggetdims(dm: ^th.Vf2, i: int)
 
-fn imgcrop(img: int, tl, br: th.vf2)
+fn imgcrop(img: int, tl, br: th.Vf2)
 
-fn imgfromdata(data: ^uint32, dm: th.vf2): int
+fn imgfromdata(data: ^uint32, dm: th.Vf2): int
 
 fn imgcopy(data: int): int
 
 fn imgsetfilter(data, filter: int)
 
 // Loads an image at path.
-fn load*(path: str): img {
-	return img{loadimg(&path[0])}
+fn load*(path: str): Image {
+	return Image{loadimg(&path[0])}
 }
 
 // Frees i from memory.
-fn (i: ^img) delete*() {
+fn (i: ^Image) delete*() {
 	deleteimg(i.handle)
 }
 
-// Set's i as window icon. Works only on linux.
-// **DEPRECATED**
-fn (i: ^img) setasicon*() {
-	iconset(i.handle)
-}
-
 // Flips i on it's vertical axis.
-fn (i: ^img) flipv*() {
+fn (i: ^Image) flipv*() {
 	flipvimg(i.handle)
 }
 
 // Flips i on it's horizontal axis.
-fn (i: ^img) fliph*() {
+fn (i: ^Image) fliph*() {
 	fliphimg(i.handle)
 }
 
 // Draws the image **not** accounting for camera.
-fn (i: ^img) draw*(pos: th.vf2, rot: th.fu, scale: th.vf2) {
+fn (i: ^Image) draw*(pos: th.Vf2, rot: th.fu, scale: th.Vf2) {
 	rawdraw.cdrawimage(i.handle, rot, scale, pos)
 }
 
 // Returns true, if i is valid. This doesn't mean it isn't corrupted.
-fn (i: ^img) validate*(): bool {
+fn (i: ^Image) validate*(): bool {
 	return bool(imgvalid(i.handle))
 }
 
 // Returns width and heigth.
-fn (i: ^img) getdims*(): th.vf2 {
-	out := th.vf2{}
+fn (i: ^Image) getDims*(): th.Vf2 {
+	out := th.Vf2{}
 	imggetdims(&out, i.handle)
 
 	return out
 }
 
-// Crops out the rectangle from image. (destructive)
-fn (i: ^img) crop*(tl, br: th.vf2) {
+// Crops out the Rectangle from image. (destructive)
+fn (i: ^Image) crop*(tl, br: th.Vf2) {
 	imgcrop(i.handle, tl, br)
 }
 
 // Creates an image from raw data.
 // **BUGGY**
-fn fromdata*(data: []uint32, dm: th.vf2): img {
-	return img{imgfromdata(&data[0], dm)}
+fn mk*(data: []uint32, dm: th.Vf2): Image {
+	return Image{imgfromdata(&data[0], dm)}
 }
 
 // Copies image into a new one.
-fn (i: ^img) copy*(): img {
-	return img{imgcopy(i.handle)}
+fn (i: ^Image) copy*(): Image {
+	return Image{imgcopy(i.handle)}
 }
 
 // Sets a mag/min filter. 0 is linear, others are nearest.
 // This function will regenerate the texture, so it's slow.
 // https://learnopengl.com/img/getting-started/texture_filtering.png
 // left is nearest, right is linear.
-fn (i: ^img) setfilter(filter: int) {
+fn (i: ^Image) setfilter(filter: int) {
 	imgsetfilter(i.handle, filter)
 }

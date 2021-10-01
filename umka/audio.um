@@ -5,17 +5,17 @@ import (
 )
 
 // sound is an opaque pointer to c. Creating it manually will cause a crash.
-type sound* = struct {
+type Sound* = struct {
 	handle: int
 }
 
-var sarr*: []sound
+var sarr*: []Sound
 
-fn setsounds*(ss: []sound)
+fn setSounds*(ss: []Sound)
 
 fn cauload(path: str): int
 
-fn cauarr(s: ^sound, count: th.uu)
+fn cauarr(s: ^Sound, count: th.uu)
 
 fn csoundloop(s: int, looping: th.uu)
 
@@ -28,22 +28,22 @@ fn csoundvol(s: int, vol: th.fu)
 fn csoundvalidate(s: int): th.uu
 
 // Loads sound at path relative to main.um
-fn load*(path: str): sound {
-	s := sound{cauload(path)}
+fn load*(path: str): Sound {
+	s := Sound{cauload(path)}
 
 	sarr = append(sarr, s)
-	setsounds(sarr)
+	setSounds(sarr)
 
 	return s
 }
 
 // Sets the array of sounds that are handled in the background. **DEPRECATED**
-fn setsounds*(ss: []sound) {
+fn setSounds*(ss: []Sound) {
 	cauarr(&ss[0], len(ss))
 }
 
 // Sets the sound as looping. Off by default.
-fn (s: ^sound) looping*(l: bool) {
+fn (s: ^Sound) looping*(l: bool) {
 	if l {
 		csoundloop(s.handle, 1)
 		return
@@ -54,22 +54,22 @@ fn (s: ^sound) looping*(l: bool) {
 
 // Plays the sound. If it is already playing, it won't do anything. Soon this
 // behaviour will be changed.
-fn (s: ^sound) play*() {
+fn (s: ^Sound) play*() {
 	csoundplay(s.handle)
 }
 
 // Stops the sound and resets the progress.
-fn (s: ^sound) stop*() {
+fn (s: ^Sound) stop*() {
 	csoundstop(s.handle)
 }
 
 // Set's the volume of the sound as a multiplier of it's default volume.
-fn (s: ^sound) vol*(vol: th.fu) {
+fn (s: ^Sound) vol*(vol: th.fu) {
 	csoundvol(s.handle, vol)
 }
 
 // Returns true, if the sound is valid. That doesn't mean, it isn't corrupted,
 // but it generally means it was loaded.
-fn (s: ^sound) validate*(): bool {
+fn (s: ^Sound) validate*(): bool {
 	return bool(csoundvalidate(s.handle))
 }

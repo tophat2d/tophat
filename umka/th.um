@@ -3,13 +3,13 @@ type fu* = real32
 type iu* = int16
 type uu* = uint16
 
-type vf2* = struct {
+type Vf2* = struct {
 	x, y: fu
 }
 
-type transform* = struct {
-	p: vf2
-	s: vf2
-	o: vf2
+type Transform* = struct {
+	p: Vf2
+	s: Vf2
+	o: Vf2
 	r: fu
 }

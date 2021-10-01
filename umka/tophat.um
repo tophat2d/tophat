@@ -6,7 +6,7 @@
 
 import (
 	"rawdraw.um"
-	"rectangle.um"
+	"rect.um"
 	"input.um"
 	"audio.um"
 	"std/std.um"
@@ -28,13 +28,12 @@ var delta*: int
 
 var platform*: str = "linux"
 
-// Gets time since the game started **DEPRECATED**
-fn gettime*(): int
+fn getTime(): int
 
 // Set's up the engine and opens a window.
 fn setup*(title: str, w, h: int32) {
 	rawdraw.setup(title, w, h)
-	rawdraw.setbgcolor(0x000000ff)
+	rawdraw.setBgColor(0x000000ff)
 	rawdraw.clearframe()
 
 	if std.getenv("HOME") == "" {
@@ -42,9 +41,9 @@ fn setup*(title: str, w, h: int32) {
 		platform = "windows"
 	}
 
-	audio.sarr = []audio.sound{}
+	audio.sarr = []audio.Sound{}
 
-	t = gettime()
+	t = getTime()
 }
 
 // Sets window title on runtime
@@ -59,21 +58,21 @@ fn updatescaling(w, h, camw, camh: int32)
 // of the window and cam
 // is used for in engine
 // stuff.
-fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rectangle.rect) {
-	rawdraw.setcolor(0x000000ff)
-	rawdraw.drawrect(rectangle.rect{0, cam.h, w^, h^})
-	rawdraw.drawrect(rectangle.rect{cam.w, 0, w^, h^})
+fn cycle*(w, h: ^int32, bgcolor: uint32, cam: rect.Rect) {
+	rawdraw.setColor(0x000000ff)
+	rawdraw.drawRect(rect.Rect{0, cam.h, w^, h^})
+	rawdraw.drawRect(rect.Rect{cam.w, 0, w^, h^})
 	rawdraw.swapbuffers()
 
-	end = gettime()/1000
+	end = getTime()/1000
 	delta = (end - start)
 	for delta < 0 {
 		delta += 1000
 	}
-	start = gettime()/1000
+	start = getTime()/1000
 	t += delta
 
-	rawdraw.setbgcolor(0x000000ff)
+	rawdraw.setBgColor(0x000000ff)
 	rawdraw.clearframe()
 	rawdraw.handleinput()
 	rawdraw.getdimensions(w, h)

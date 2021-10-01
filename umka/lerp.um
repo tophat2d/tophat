@@ -9,7 +9,7 @@ type Any* = interface{}
 // Lerper queue item. It interpolates between start and end for the duration
 // of length in ms. Additionally you can enable swap, which instead of
 // dequeueing it spwaps start and end and resets the progress.
-type item* = struct {
+type Item* = struct {
 	start, end: th.fu
 	length: th.uu
 	progress: th.fu
@@ -20,27 +20,27 @@ type item* = struct {
 
 // Lerper is a queue of items. It will lerp the first one and if it ends
 // and it doesn't have swap enabled, it will dequeue it.
-type lerper* = []item
+type Lerper* = []Item
 
 // Removes the first lerper item.
-fn (l: ^lerper) dequeue*() {
+fn (l: ^Lerper) dequeue*() {
 	switch len(l^) {
 	case 0:
 		return
 	case 1:
-		l^ = lerper{}
+		l^ = Lerper{}
 	default:
 		l^ = slice(l^, 1)
 	}
 }
 
 // Adds an item to l's queue
-fn (l: ^lerper) enqueue*(i: item) {
+fn (l: ^Lerper) enqueue*(i: Item) {
 	l^ = append(l^, i)
 }
 
 // Interpolates the front by delta. And returns it's value.
-fn (l: ^lerper) bydelta*(delta: th.uu): th.fu {
+fn (l: ^Lerper) byDelta*(delta: th.uu): th.fu {
 	if len(l^) == 0 {
 		return 0
 	}

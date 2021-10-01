@@ -1,7 +1,6 @@
 
 import (
 	"th.um"
-	"entity.um"
 	"std.um"							
 )
 

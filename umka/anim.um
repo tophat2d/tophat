@@ -3,29 +3,29 @@
 import (
 	"th.um"
 	"image.um"
-	"rectangle.um"
+	"rect.um"
 )
 
 // Anim can turn an array of images into an animation. The difference between
 // anim and ent.animate is that anim has starting time, so it is useful for
 // one shot animations.
-type anim* = struct {
-	anim: []image.img
+type Anim* = struct {
+	anim: []image.Image
 	rot: th.fu
 	scale: th.fu
 	fps: th.uu
 	looping: bool
 
-	pos: th.vf2
+	pos: th.Vf2
 
-	zerotime: int
+	zeroTime: int
 
 	frame: int
 }
 
 // Anim's constructor.
-fn mk*(pos: th.vf2, anm: []image.img, fps: th.uu): anim {
-	a := anim{}
+fn mk*(pos: th.Vf2, anm: []image.Image, fps: th.uu): Anim {
+	a := Anim{}
 
 	a.anim = append(anm, anm[len(anm)-1])
 
@@ -41,19 +41,19 @@ fn mk*(pos: th.vf2, anm: []image.img, fps: th.uu): anim {
 }
 
 // Starts animation with start_time of t.
-fn (a: ^anim) start*(t: int) {
-	a.zerotime = t
+fn (a: ^Anim) start*(t: int) {
+	a.zeroTime = t
 }
 
 // This draws the animation. Returns true, if the animation ends.
-fn (a: ^anim) handle*(t: uint, cam: rectangle.rect): bool {
-	a.frame = (round(real(t-a.zerotime)/round((1000.0/a.fps))) % len(a.anim))
+fn (a: ^Anim) handle*(t: uint, cam: rect.Rect): bool {
+	a.frame = (round(real(t-a.zeroTime)/round((1000.0/a.fps))) % len(a.anim))
 
-	a.anim[a.frame].draw(th.vf2{round(a.pos.x) - cam.x + cam.w/2, round(a.pos.y) - cam.y + cam.h/2}, round(a.rot), th.vf2{a.scale, a.scale})
+	a.anim[a.frame].draw(th.Vf2{round(a.pos.x) - cam.x + cam.w/2, round(a.pos.y) - cam.y + cam.h/2}, round(a.rot), th.Vf2{a.scale, a.scale})
 
 	if a.frame == len(a.anim) - 1 {
 		if a.looping {
-			a.zerotime = t
+			a.zeroTime = t
 		} else {
 			return true
 		}

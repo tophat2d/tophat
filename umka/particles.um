@@ -3,53 +3,53 @@
 
 import (
 	"th.um"
-	"umka/rectangle.um"
+	"rect.um"
 )
 
 // Particle struct. You can tweak the start_time for godot-like explossivness.
-type particle* = struct {
+type Particle* = struct {
 	start_time: uint
 	seed: int32
 }
 
 // Emitter. This is where everything is configured.
-type emitter* = struct {
-	pos: th.vf2 // position
-	dm: th.vf2 // size of the emittion area
-	gravity: th.vf2 // gravity
+type Emitter* = struct {
+	pos: th.Vf2 // position
+	dm: th.Vf2 // size of the emittion area
+	gravity: th.Vf2 // gravity
 	repeat: bool // if false, particle won't be renewed
 	active: bool // false, if there aren't any active particles anymore
 	
-	angle: th.vf2 // angle in which particles are emitted
+	angle: th.Vf2 // angle in which particles are emitted
 
 	lifetime: th.uu // lifetime of particles
-	lifetime_randomness: th.fu // randomness in %/100
+	lifetimeRandomness: th.fu // randomness in %/100
 
 	velocity: th.fu // velocity
-	velocity_randomness: th.fu // randomness in %/100
+	velocityRandomness: th.fu // randomness in %/100
 
 	size: th.fu // size
-	size_randomness: th.fu // randomness in %/100
-	max_size: th.fu // size at the end of particles lifetime
+	sizeRandomness: th.fu // randomness in %/100
+	maxSize: th.fu // size at the end of particles lifetime
 
 	rotation: th.fu
-	rotation_randomness: th.fu
-	max_rotation: th.fu
+	rotationRandomness: th.fu
+	maxRotation: th.fu
 
 	colors: []uint32 // array of colors, which are interpolated between
 	
-	particles: []particle // list of particles
+	particles: []Particle // list of particles
 }
 
 // Emitter. This is where everything is configured.
 type c_emitter* = struct {
-	pos: th.vf2 // position
-	dm: th.vf2 // size of the emittion area
-	gravity: th.vf2 // gravity
+	pos: th.Vf2 // position
+	dm: th.Vf2 // size of the emittion area
+	gravity: th.Vf2 // gravity
 	repeat: bool // if false, particle won't be renewed
 	active: bool // false, if there aren't any active particles anymore
 	
-	angle: th.vf2 // angle in which particles are emitted
+	angle: th.Vf2 // angle in which particles are emitted
 
 	lifetime: th.uu // lifetime of particles
 	lifetime_randomness: th.fu // randomness in %/100
@@ -68,24 +68,24 @@ type c_emitter* = struct {
 	colors: ^uint32 // array of colors, which are interpolated between
 	colorc: th.uu
 	
-	particles: ^particle // list of particles
+	particles: ^Particle // list of particles
 	particlec: th.uu
 }
 
-fn c_particles_draw(p: ^c_emitter, cam: ^rectangle.rect, t: int32)
+fn c_particles_draw(p: ^c_emitter, cam: ^rect.Rect, t: int32)
 
 // Draws and updates the particles.
-fn (e: ^emitter) draw*(cam: rectangle.rect, t: int32) {
+fn (e: ^Emitter) draw*(cam: rect.Rect, t: int32) {
 	ce := c_emitter{
 		e.pos,
 		e.dm,
 		e.gravity,
 		e.repeat, e.active,
 		e.angle,
-		e.lifetime, e.lifetime_randomness,
-		e.velocity, e.velocity_randomness,
-		e.size, e.size_randomness, e.max_size,
-		e.rotation, e.max_rotation, e.rotation_randomness,
+		e.lifetime, e.lifetimeRandomness,
+		e.velocity, e.velocityRandomness,
+		e.size, e.sizeRandomness, e.maxSize,
+		e.rotation, e.maxRotation, e.rotationRandomness,
 		&e.colors[0], len(e.colors),
 		&e.particles[0], len(e.particles)}
 

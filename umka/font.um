@@ -9,32 +9,32 @@ import (
 type ptr = uint
 
 // a trutype font. Don't create by hand
-type ttf* = struct {
+type Font* = struct {
 	stbtt: ptr
 }
 
 fn ctexttoimg(
-	t: ^ttf, text: ^utf8.Rune,
-	runec: th.uu, size: th.fu, color: uint32, spacing: th.vf2): uint
+	t: ^Font, text: ^utf8.Rune,
+	runec: th.uu, size: th.fu, color: uint32, spacing: th.Vf2): uint
 
 // Creates an image.img from a text. ax and ay are character/line spacings.
-fn (t: ^ttf) strtoimg*(text: str, size: th.fu, color: uint32, spacing: th.vf2): image.img {
+fn (t: ^Font) strToImage*(text: str, size: th.fu, color: uint32, spacing: th.Vf2): image.Image {
 	runes := utf8.decode(text)
-	return image.img{ctexttoimg(t, &runes[0], len(runes), size, color, spacing)}
+	return image.Image{ctexttoimg(t, &runes[0], len(runes), size, color, spacing)}
 }
 
-fn cfontfree(t: ^ttf)
+fn cfontfree(t: ^Font)
 
 // Frees a font from memory.
-fn (t: ^ttf) delete*() {
+fn (t: ^Font) delete*() {
 	cfontfree(t)
 }
 
-fn cfontload(t: ^ttf, path: str)
+fn cfontload(t: ^Font, path: str)
 
 // Loads a font from file.
-fn load*(path: str): ttf {
-	t := ttf{}
+fn load*(path: str): Font {
+	t := Font{}
 	cfontload(&t, path)
 	return t
 }

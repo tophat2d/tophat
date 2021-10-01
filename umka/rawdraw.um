@@ -4,14 +4,14 @@
 import (
 	"th.um"
 	"std/std.um"
-	"rectangle.um"
+	"rect.um"
 )
 
 // Draws text. Fonts are comming eventually.
-fn drawtext*(text: str, pos: th.vf2, color: uint32, size: th.fu)
+fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
 
 // Precomputes a text dimensions.
-fn textsize*(text: str, scale: th.fu): th.vf2 {
+fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	var w, maxw, h: int
 	w = 0
 	maxw = 0
@@ -34,20 +34,20 @@ fn textsize*(text: str, scale: th.fu): th.vf2 {
 		maxw = w
 	}
 
-	return th.vf2{maxw * scale * 3 - scale, h * 6 * scale}
+	return th.Vf2{maxw * scale * 3 - scale, h * 6 * scale}
 }
 
 // Sets up a window (use tophat's functions instead).
 fn setup*(title: str, w, h: int)
 
 // Sets bg color of the window (already in tophat.cycle)
-fn setbgcolor*(color: int)
+fn setBgColor*(color: int)
 
 // Clears the screen (already in tophat.cycle)
 fn clearframe*()
 
 // Sets drawing color.
-fn setcolor*(color: int)
+fn setColor*(color: int)
 
 // Returns raw window dimension (already in tophat.cycle)
 fn getdimensions*(w, h: ^int32)
@@ -58,16 +58,16 @@ fn swapbuffers*()
 // Handles input (already in tophat.cycle)
 fn handleinput*()
 
-fn drawsegment(b, e: th.vf2, thickness: th.fu)
+fn drawSegment(b, e: th.Vf2, thickness: th.fu)
 
-// Draws a rectangle.
-fn drawrect*(r: rectangle.rect)
+// Draws a Rectangle.
+fn drawRect*(r: rect.Rect)
 
 // Draws a line.
-fn drawline*(b, e: th.vf2, thickness: th.fu, color: uint32) {
-	setcolor(color)
-	drawsegment(b, e, thickness)
+fn drawLine*(b, e: th.Vf2, thickness: th.fu, color: uint32) {
+	setColor(color)
+	drawSegment(b, e, thickness)
 }
 
 // Internal.
-fn cdrawimage*(img: int, rot: th.fu, scale: th.vf2, pos: th.vf2)
+fn cdrawimage*(img: int, rot: th.fu, scale: th.Vf2, pos: th.Vf2)

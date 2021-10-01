@@ -83,37 +83,37 @@ void _th_umka_bind(void *umka) {
 
 	// misc
 	umkaAddFunc(umka, "visualizecam", &umvisualizecam);
-	umkaAddFunc(umka, "gettime", &umgettime);
+	umkaAddFunc(umka, "getTime", &umgettime);
 
 	// rawdraw
-	umkaAddFunc(umka, "drawtext", &umdrawtext);
+	umkaAddFunc(umka, "drawText", &umdrawtext);
 	umkaAddFunc(umka, "setup", &umCNFGSetup);
-	umkaAddFunc(umka, "setbgcolor", &umCNFGSetBgColor);
-	umkaAddFunc(umka, "setcolor", &umCNFGSetColor);
+	umkaAddFunc(umka, "setBgColor", &umCNFGSetBgColor);
+	umkaAddFunc(umka, "setColor", &umCNFGSetColor);
 	umkaAddFunc(umka, "clearframe", &umCNFGClearFrame);
 	umkaAddFunc(umka, "getdimensions", &umCNFGGetDimensions);
 	umkaAddFunc(umka, "swapbuffers", &umCNFGSwapBuffers);
 	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
 	umkaAddFunc(umka, "updatescaling", &umgetscaling);
-	umkaAddFunc(umka, "drawrect", &umCNFGTackRectangle);
+	umkaAddFunc(umka, "drawRect", &umCNFGTackRectangle);
 	umkaAddFunc(umka, "setwindowtitle", &umCNFGChangeWindowTitle);
 	umkaAddFunc(umka, "iconset", &umCNFGSetWindowIconData);
 	umkaAddFunc(umka, "cdrawpoly", &umCNFGTackPoly);
-	umkaAddFunc(umka, "drawsegment", &umCNFGTackSegment);
+	umkaAddFunc(umka, "drawSegment", &umCNFGTackSegment);
 	umkaAddFunc(umka, "cdrawimage", &umCNFGBlitTex);
 
 #ifdef RELEASE_BUILD
 	int index = 0;
-	umkaAddModule(umka, "animation.um", libs[index++]);
+	umkaAddModule(umka, "anim.um", libs[index++]);
 	umkaAddModule(umka, "audio.um", libs[index++]);
 	umkaAddModule(umka, "csv.um", libs[index++]);
-	umkaAddModule(umka, "entity.um", libs[index++]);
+	umkaAddModule(umka, "ent.um", libs[index++]);
 	umkaAddModule(umka, "image.um", libs[index++]);
 	umkaAddModule(umka, "input.um", libs[index++]);
 	umkaAddModule(umka, "misc.um", libs[index++]);
 	umkaAddModule(umka, "rawdraw.um", libs[index++]);
-	umkaAddModule(umka, "raycast.um", libs[index++]);
-	umkaAddModule(umka, "rectangle.um", libs[index++]);
+	umkaAddModule(umka, "ray.um", libs[index++]);
+	umkaAddModule(umka, "rect.um", libs[index++]);
 	umkaAddModule(umka, "tilemap.um", libs[index++]);
 	umkaAddModule(umka, "tophat.um", libs[index++]);
 	umkaAddModule(umka, "ui.um", libs[index++]);

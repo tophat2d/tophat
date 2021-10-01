@@ -4,12 +4,12 @@ import (
 	"th.um"	
 )
 
-type rect* = struct {
+type Rect* = struct {
 	x, y, w, h: th.fu
 }
 
-fn mk*(x, y, w, h: th.fu): rect {
-	var r: rect
+fn mk*(x, y, w, h: th.fu): Rect {
+	var r: Rect
 
 	r.x = x
 	r.y = y
