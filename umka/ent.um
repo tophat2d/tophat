@@ -1,6 +1,5 @@
 
 import (
-	"tophat.um"
 	"rect.um"
 	"std/std.um"
 	"image.um"
@@ -56,8 +55,8 @@ fn (e: ^Ent) getColl*(s: []^Ent, ic: ^th.Vf2): int32 {
 
 // Animates the entity's image with one of the `anim` array. **Won't** begin on
 // the first frame. If you with that, use animation.anim.
-fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image) {
-	e.i = frames^[(round(real(tophat.t)/(1000/fps)) % len(frames^))]
+fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
+	e.i = frames^[(round(real(t)/(1000/fps)) % len(frames^))]
 }
 
 fn centysort(e: ^ent.Ent, count: int)

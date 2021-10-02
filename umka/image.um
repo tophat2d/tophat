@@ -1,7 +1,7 @@
 
 import (
 	"th.um"
-	"rawdraw.um"
+	"canvas.um"
 )
 
 // img is an opaque pointer to c. It needs to be free'd with it's delete()
@@ -57,7 +57,7 @@ fn (i: ^Image) fliph*() {
 
 // Draws the image **not** accounting for camera.
 fn (i: ^Image) draw*(pos: th.Vf2, rot: th.fu, scale: th.Vf2) {
-	rawdraw.cdrawimage(i.handle, rot, scale, pos)
+	canvas.cdrawimage(i.handle, rot, scale, pos)
 }
 
 // Returns true, if i is valid. This doesn't mean it isn't corrupted.

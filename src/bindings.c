@@ -111,11 +111,11 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "image.um", libs[index++]);
 	umkaAddModule(umka, "input.um", libs[index++]);
 	umkaAddModule(umka, "misc.um", libs[index++]);
-	umkaAddModule(umka, "rawdraw.um", libs[index++]);
+	umkaAddModule(umka, "canvas.um", libs[index++]);
 	umkaAddModule(umka, "ray.um", libs[index++]);
 	umkaAddModule(umka, "rect.um", libs[index++]);
 	umkaAddModule(umka, "tilemap.um", libs[index++]);
-	umkaAddModule(umka, "tophat.um", libs[index++]);
+	umkaAddModule(umka, "window.um", libs[index++]);
 	umkaAddModule(umka, "ui.um", libs[index++]);
 	umkaAddModule(umka, "vec.um", libs[index++]);
 	umkaAddModule(umka, "std.um", libs[index++]);

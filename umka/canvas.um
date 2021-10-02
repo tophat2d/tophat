@@ -1,4 +1,4 @@
-// Raw canvas library named after cnlohr's rawdraw library, the library
+// Raw canvas library named after cnlohr's canvas library, the library
 // tophat uses.
 
 import (

@@ -4,9 +4,8 @@
 import (
 	"th.um"
 	"rect.um"
-	"rawdraw.um"
+	"canvas.um"
 	"input.um"
-	"tophat.um"
 	"image.um"
 )
 
@@ -211,7 +210,7 @@ fn mklabel*(text: str, textsize: real, textcolor: uint32): Label {
 }
 
 fn (l: ^Label) calculate*() {
-	sx, sy := rawdraw.textSize(l.text, l.textSize)
+	sx, sy := canvas.textSize(l.text, l.textSize)
 
 	switch round(l.align.y) {
 	case MID:
@@ -229,14 +228,14 @@ fn (l: ^Label) calculate*() {
 }
 
 fn (l: ^Label) draw*() {
-	rawdraw.setColor(l.bgColor)
-	rawdraw.drawRect(rect.Rect{
+	canvas.setColor(l.bgColor)
+	canvas.drawRect(rect.Rect{
 		round(l.g.dimensions.x - l.off.x + l.g.padding.x),
 		round(l.g.dimensions.y - l.off.y + l.g.padding.y),
 		round(l.g.dimensions.w - l.g.padding.w),
 		round(l.g.dimensions.h - l.g.padding.h)})
 
-	rawdraw.drawText(
+	canvas.drawText(
 		l.text, th.Vf2{l.g.dimensions.x, l.g.dimensions.y}, l.textColor, l.textSize)
 }
 
@@ -341,10 +340,7 @@ fn update(w, h: int32) {
 
 // Call this every loop.
 fn handle*(w, h: int32) {
-	if tophat.t % 100 < 32 {
-		update(w, h)
-	}
-
+	update(w, h)
 	mainelement.handle()
 	mainelement.draw()
 }
