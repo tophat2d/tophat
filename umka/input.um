@@ -127,7 +127,7 @@ fn cispressed(keycode: int32): int32
 
 fn cisjustpressed(key: int32): int32
 
-// Returns if key is pressed. Either use
+// Returns true if key is pressed. Either use
 // codes defined in the file above, or
 // pass lower case char/number.
 fn isPressed*(code: int32): bool {

@@ -4,7 +4,7 @@ import (
 	"th.um"
 )
 
-// sound is an opaque pointer to c. Creating it manually will cause a crash.
+// Sound is an opaque pointer to c. Creating it manually will cause a crash.
 type Sound* = struct {
 	handle: int
 }
@@ -37,12 +37,12 @@ fn load*(path: str): Sound {
 	return s
 }
 
-// Sets the array of sounds that are handled in the background. **DEPRECATED**
+// Sets the array of Sounds that are handled in the background. **DEPRECATED**
 fn setSounds*(ss: []Sound) {
 	cauarr(&ss[0], len(ss))
 }
 
-// Sets the sound as looping. Off by default.
+// Sets the Sound as looping. Off by default.
 fn (s: ^Sound) looping*(l: bool) {
 	if l {
 		csoundloop(s.handle, 1)

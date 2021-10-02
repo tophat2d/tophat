@@ -4,7 +4,7 @@ import (
 	"canvas.um"
 )
 
-// img is an opaque pointer to c. It needs to be free'd with it's delete()
+// Image is an opaque pointer to c. It needs to be free'd with it's delete()
 // method, otherwise it will cause a memory leak. This is usually ok as
 // you only load images at the start of the game and need them until the
 // end, but function operating on images might need to keep the memory in

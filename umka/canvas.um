@@ -1,5 +1,4 @@
-// Raw canvas library named after cnlohr's canvas library, the library
-// tophat uses.
+// Canvas library allowing for drawing basic shapes.
 
 import (
 	"th.um"
@@ -7,10 +6,10 @@ import (
 	"rect.um"
 )
 
-// Draws text. Fonts are comming eventually.
+// Draws a basic line text usually good for debugging.
 fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
 
-// Precomputes a text dimensions.
+// Precomputes line text's dimensions.
 fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	var w, maxw, h: int
 	w = 0
@@ -37,32 +36,16 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	return th.Vf2{maxw * scale * 3 - scale, h * 6 * scale}
 }
 
-// Sets up a window (use tophat's functions instead).
-fn setup*(title: str, w, h: int)
-
-// Sets bg color of the window (already in tophat.cycle)
-fn setBgColor*(color: int)
-
-// Clears the screen (already in tophat.cycle)
-fn clearframe*()
-
-// Sets drawing color.
+// Sets color that is used for drawing.
 fn setColor*(color: int)
 
-// Returns raw window dimension (already in tophat.cycle)
-fn getdimensions*(w, h: ^int32)
-
-// Finishes the cycle (already in tophat.cycle)
-fn swapbuffers*()
-
-// Handles input (already in tophat.cycle)
-fn handleinput*()
-
-fn drawSegment(b, e: th.Vf2, thickness: th.fu)
+// Sets what color is used after a screen reset.
+fn setBgColor*(color: int)
 
 // Draws a Rectangle.
 fn drawRect*(r: rect.Rect)
 
+fn drawSegment(b, e: th.Vf2, thickness: th.fu)
 // Draws a line.
 fn drawLine*(b, e: th.Vf2, thickness: th.fu, color: uint32) {
 	setColor(color)

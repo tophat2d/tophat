@@ -40,6 +40,11 @@ fn setup*(title: str, w, h: int32) {
 fn setwindowtitle*(title: str)
 fn visualizecam(w, h: int32, color: uint32)
 fn updatescaling(w, h, camw, camh: int32)
+fn setup(title: str, w, h: int)
+fn clearframe()
+fn getdimensions(w, h: ^int32)
+fn swapbuffers()
+fn handleinput()
 
 // Function called each cycle.
 // W and H will return the
@@ -52,7 +57,7 @@ fn cycle*(cam: rect.Rect) {
 	canvas.setColor(0x000000ff)
 	canvas.drawRect(rect.Rect{0, cam.h, w, h})
 	canvas.drawRect(rect.Rect{cam.w, 0, w, h})
-	canvas.swapbuffers()
+	swapbuffers()
 
 	end = getTime()/1000
 	th.delta = (end - start)
@@ -63,9 +68,9 @@ fn cycle*(cam: rect.Rect) {
 	th.time += th.delta
 
 	canvas.setBgColor(0x000000ff)
-	canvas.clearframe()
-	canvas.handleinput()
-	canvas.getdimensions(&w, &h)
+	clearframe()
+	handleinput()
+	getdimensions(&w, &h)
 
 	updatescaling(w, h, round(cam.w), round(cam.h))
 }

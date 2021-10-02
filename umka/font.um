@@ -1,3 +1,4 @@
+// Package for font drawing.
 
 import (
 	"th.um"
@@ -8,7 +9,7 @@ import (
 
 type ptr = uint
 
-// a trutype font. Don't create by hand
+// Font type. It is a pointer to c.
 type Font* = struct {
 	stbtt: ptr
 }

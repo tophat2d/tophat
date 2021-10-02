@@ -6,11 +6,10 @@ import (
 	"th.um"
 )
 
-// Entity is the main object in most games. It allow for drawing and collisions.
-// Every entity has a polygon and optionally an image. If there is no image,
-// polygon is drawn. Polygon is used for collisions too. Entity has rot and
-// scale fields. You can set them manually (myent.rot = 20), but that won't
-// change the polygon. For changing the polygon itself, use setrot and setscale.
+// Entity is the main game object. It features drawing and collisions.
+// Every entity has an image used for drawing and a rectangle used
+// for collisions. It also has a transform used for transforming it's image
+// and rectangle.
 type Ent* = struct {
 	r: rect.Rect
 	i: image.Image
@@ -40,11 +39,9 @@ fn mk*(img: image.Image, t: th.Transform): Ent {
 	return e
 }
 
-// Checks whether e collides with any of the entities in s. If e has the same
-// is as any of the entities in s, they will be skipped. Collision returns
-// id of the colliding entity.
-// WARNING: This function will recieve a lot of changes. It will return an
-//   an array of indexes in s, where colliding entities lie.
+// Checks whether e collides with any entities in s and sets ic to the
+// intersection's position. If e is a part of s, it will be skipped.
+// WARNING: This function will recieve a lot of changes.
 fn (e: ^Ent) getColl*(s: []^Ent, ic: ^th.Vf2): int32 {
 	if len(s) == 0 {
 		return 0
@@ -54,7 +51,7 @@ fn (e: ^Ent) getColl*(s: []^Ent, ic: ^th.Vf2): int32 {
 }
 
 // Animates the entity's image with one of the `anim` array. **Won't** begin on
-// the first frame. If you with that, use animation.anim.
+// the first frame. If you want that, use anim.Anim.
 fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
 	e.i = frames^[(round(real(t)/(1000/fps)) % len(frames^))]
 }
