@@ -1,6 +1,7 @@
 #include "tophat.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <stb_truetype.h>
 
 struct {
@@ -79,6 +80,7 @@ void th_str_to_img(
 	h += 1.5 * rh;
 
 	uint32_t *data = malloc(sizeof(uint32_t) * w * h);
+	memset(data, 0, sizeof(uint32_t) * w * h);
 	int
 		x=0, y=0;
 	for (int i=0; i < runec; i++) {

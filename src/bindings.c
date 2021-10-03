@@ -87,7 +87,7 @@ void _th_umka_bind(void *umka) {
 
 	// rawdraw
 	umkaAddFunc(umka, "drawText", &umdrawtext);
-	umkaAddFunc(umka, "setup", &umCNFGSetup);
+	umkaAddFunc(umka, "wsetup", &umCNFGSetup);
 	umkaAddFunc(umka, "setBgColor", &umCNFGSetBgColor);
 	umkaAddFunc(umka, "setColor", &umCNFGSetColor);
 	umkaAddFunc(umka, "clearframe", &umCNFGClearFrame);
@@ -144,7 +144,7 @@ void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_font *f = (th_font *)p[5].ptrVal;
 	uint32_t *runes = (uint32_t *)p[4].ptrVal;
 	uu runec = p[3].intVal;
-	fu scale = p[2].realVal;
+	fu scale = p[2].real32Val;
 	uint32_t color = p[1].uintVal;
 	th_vf2 scaling = *(th_vf2 *)&p[0];
 
@@ -277,6 +277,9 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = (th_image *)p[0].ptrVal;
 	th_vf2 *out = (th_vf2 *)p[1].ptrVal;
 
+	if (!img)
+		return;
+
 	*out = img->dm;
 }
 
@@ -408,7 +411,7 @@ void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_sound *s = (th_sound *)p[1].ptrVal;
-	s->volume = (fu)p[0].realVal;
+	s->volume = p[0].real32Val;
 }
 
 // checks, if sound is valid
@@ -583,6 +586,11 @@ void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
 		&(th_ent){
 			.rect = (th_rect){.w = img->dm.w, .h = img->dm.h},
 			.t = *t});
+
+	for (uu i=0; i < 4; i++) {
+		q.v[i].x *= scaling;
+		q.v[i].y *= scaling;
+	}
 
 	th_blit_tex(img->gltexture, q);
 }

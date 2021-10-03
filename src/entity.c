@@ -25,18 +25,17 @@ th_quad th_ent_transform(th_ent *e) {
 }
 
 void th_ent_draw(th_ent *o, th_rect *camera) {
-	if (o->img == NULL)
-		return;
-
 	int camx, camy;
 	camx = camera->x - (camera->w / 2);
 	camy = camera->y - (camera->h / 2);
 	th_transform t = o->t;
 	t.pos.x -= camx;
 	t.pos.y -= camy;
-	th_quad q = th_ent_transform(
-		&(th_ent){
-			.rect = (th_rect){.w = o->img->dm.w, .h = o->img->dm.h}, .t = t});
+
+	th_rect r = o->rect;
+	if (o->img)
+		r = (th_rect){.w = o->img->dm.w, .h = o->img->dm.h};
+	th_quad q = th_ent_transform(&(th_ent){.rect = r, .t = t});
 	
 	// this logic is incorrect
 	if (q.br.x < 0 || q.br.y < 0)
@@ -48,6 +47,18 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	for (uu i=0; i < 4; i++) {
 		q.v[i].x *= scaling;
 		q.v[i].y *= scaling;
+	}
+
+	if (!o->img) {
+		RDPoint verts[4];
+		for (uu i=0; i < 4; i++) {
+			verts[i].x = q.v[i].x;
+			verts[i].y = q.v[i].y;
+		}
+
+		CNFGColor(o->color);
+		CNFGTackPoly(&verts[0], 4);
+		return;
 	}
 
 	th_blit_tex(o->img->gltexture, q);

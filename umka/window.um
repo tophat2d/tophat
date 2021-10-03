@@ -20,11 +20,16 @@ var (
 
 fn getTime(): int
 
+fn wsetup(title: str, w, h: int)
+fn clearframe()
+fn getdimensions(w, h: ^int32)
+fn swapbuffers()
+fn handleinput()
 // Set's up the engine and opens a window.
 fn setup*(title: str, w, h: int32) {
-	canvas.setup(title, w, h)
+	wsetup(title, w, h)
 	canvas.setBgColor(0x000000ff)
-	canvas.clearframe()
+	clearframe()
 
 	if std.getenv("HOME") == "" {
 		input.setwinmap()
@@ -40,11 +45,6 @@ fn setup*(title: str, w, h: int32) {
 fn setwindowtitle*(title: str)
 fn visualizecam(w, h: int32, color: uint32)
 fn updatescaling(w, h, camw, camh: int32)
-fn setup(title: str, w, h: int)
-fn clearframe()
-fn getdimensions(w, h: ^int32)
-fn swapbuffers()
-fn handleinput()
 
 // Function called each cycle.
 // W and H will return the

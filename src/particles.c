@@ -60,7 +60,9 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 		p->active = true;
 		srand(p->particles[i].seed);
 
-		fu direction = (rand()%(iu)(p->angle.y - p->angle.x) + p->angle.x) * M_PI / 180;
+		if ((p->angle.y - p->angle.x) + p->angle.x == 0)
+			p->angle.x++;
+		double direction = (rand() % (long)(p->angle.y - p->angle.x + 1) + p->angle.x) * M_PI / 180;
 
 		fu vx = p->velocity * cos(direction);
 		fu vy = p->velocity * sin(direction);
@@ -72,6 +74,8 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 		vx *= p->gravity.x;
 		vy *= p->gravity.y;
 
+		if (!p->dm.w) p->dm.w = 1;
+		if (!p->dm.h) p->dm.h = 1;
 		fu px = p->pos.x + rand()%(iu)p->dm.w + vx * (t - p->particles[i].start_time);
 		fu py = p->pos.y + rand()%(iu)p->dm.h + vy * (t - p->particles[i].start_time);
 

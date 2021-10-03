@@ -29,6 +29,8 @@ fn main() {
 
 	img := image.load("etc/test.png")
 	e := ent.mk(img, th.Transform{s: th.Vf2{2, 1}, p: th.Vf2{10, 10}, o: th.Vf2{}, r: 20.0})
+	e.c = th.red
+	e.i.handle = 0
 	//e.t.s = th.Vf2{1, 1}
 
 	tm := tilemap.mk(misc.readall("etc/tilemap-test.csv"), []image.Image{img})

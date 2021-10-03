@@ -171,7 +171,7 @@ fn (b: ^Box) calculate*() {
 fn (hb: ^Box) draw*() {
 
 	if hb.image.handle != 0 {
-		hb.image.draw(th.Vf2{hb.imgPos.x, hb.imgPos.y}, 0, th.Vf2{hb.imgs, hb.imgs})
+		hb.image.draw(th.Transform{th.Vf2{hb.imgPos.x, hb.imgPos.y}, th.Vf2{hb.imgs, hb.imgs}, th.Vf2{}, 0})
 	}
 
 	for i:=0; i < len(hb.children); i++ {
@@ -203,7 +203,7 @@ fn mklabel*(text: str, textsize: real, textcolor: uint32): Label {
 	h.text = text
 	h.textSize = textsize
 	h.textColor = textcolor
-	h.bgColor = 0x0
+	h.bgColor = 0
 	h.align = th.Vf2{MID, MID}
 
 	return h
@@ -214,29 +214,33 @@ fn (l: ^Label) calculate*() {
 
 	switch round(l.align.y) {
 	case MID:
-		l.off.y = (l.g.dimensions.h - sy - l.g.padding.h)/2
+		l.off.y = (l.g.dimensions.h - sy)/2// - l.g.padding.h)/2
 	case BOT:
-		l.off.y = l.g.dimensions.h - sy - l.g.padding.h
+		l.off.y = l.g.dimensions.h - sy
 	}
 
 	switch round(l.align.x) {
 	case MID:
-		l.off.x = (l.g.dimensions.w - sx - l.g.padding.w)/2
+		l.off.x = (l.g.dimensions.w - sx)/2
 	case BOT:
-		l.off.x = l.g.dimensions.w - sx - l.g.padding.w
+		l.off.x = l.g.dimensions.w - sx
 	}
 }
 
 fn (l: ^Label) draw*() {
 	canvas.setColor(l.bgColor)
 	canvas.drawRect(rect.Rect{
-		round(l.g.dimensions.x - l.off.x + l.g.padding.x),
-		round(l.g.dimensions.y - l.off.y + l.g.padding.y),
+		round(l.g.dimensions.x + l.g.padding.x),
+		round(l.g.dimensions.y + l.g.padding.y),
 		round(l.g.dimensions.w - l.g.padding.w),
 		round(l.g.dimensions.h - l.g.padding.h)})
 
 	canvas.drawText(
-		l.text, th.Vf2{l.g.dimensions.x, l.g.dimensions.y}, l.textColor, l.textSize)
+		l.text,
+		th.Vf2{
+			l.g.dimensions.x + l.g.padding.x + l.off.x,
+			l.g.dimensions.y + l.g.padding.y + l.off.y},
+		l.textColor, l.textSize)
 }
 
 fn (l: ^Label) get*(): ^Generic {
@@ -272,11 +276,6 @@ fn mkbutton*(l: Label): Button {
 fn (b: ^Button) calculate*() {
 	b.label.g.dimensions = b.g.dimensions
 	b.label.calculate()
-	b.label.g.dimensions.x += round(b.label.off.x) + b.label.g.padding.x
-	b.label.g.dimensions.w -= round(b.label.off.y) + b.label.g.padding.y
-
-	b.label.g.dimensions.y += b.label.g.padding.w
-	b.label.g.dimensions.h -= b.label.g.padding.h
 }
 
 fn (b: ^Button) draw*() {

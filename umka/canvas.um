@@ -53,4 +53,4 @@ fn drawLine*(b, e: th.Vf2, thickness: th.fu, color: uint32) {
 }
 
 // Internal.
-fn cdrawimage*(img: int, rot: th.fu, scale: th.Vf2, pos: th.Vf2)
+fn cdrawimage*(img: int, t: ^th.Transform)

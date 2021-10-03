@@ -16,6 +16,9 @@ extern GLuint gRDBlitProgUT;
 extern GLuint gRDBlitProgTex;
 extern GLuint gRDLastResizeW;
 extern GLuint gRDLastResizeH;
+#ifdef _WIN32
+#define glActiveTexture glActiveTextureCHEW
+#endif
 
 th_image *th_load_image(char *path) {
 	int w, h, c;

@@ -56,8 +56,8 @@ fn (i: ^Image) fliph*() {
 }
 
 // Draws the image **not** accounting for camera.
-fn (i: ^Image) draw*(pos: th.Vf2, rot: th.fu, scale: th.Vf2) {
-	canvas.cdrawimage(i.handle, rot, scale, pos)
+fn (i: ^Image) draw*(t: th.Transform) {
+	canvas.cdrawimage(i.handle, &t)
 }
 
 // Returns true, if i is valid. This doesn't mean it isn't corrupted.

@@ -76,6 +76,10 @@ fn c_particles_draw(p: ^c_emitter, cam: ^rect.Rect, t: int32)
 
 // Draws and updates the particles.
 fn (e: ^Emitter) draw*(cam: rect.Rect, t: int32) {
+	if len(e.colors) <= 0 || len(e.particles) <= 0 {
+		return
+	}
+
 	ce := c_emitter{
 		e.pos,
 		e.dm,
