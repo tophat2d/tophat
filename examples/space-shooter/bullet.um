@@ -1,48 +1,21 @@
 
 import (
-	"entity.um"
-	"image.um"
-	"polygon.um"
-	"tophat.um"
+	"th.um"
+	"ent.um"
+	"image.um"	
+)
 
-	"enemy.um"
-	"global.um"
+const (
+	speed = 0.1								
 )
 
 var (
-	prefab*: entity.ent
-	all*: []entity.ent
+	prefab: ent.Ent
+	bullets*: []ent.Ent
 )
 
 fn init*() {
-	// this is a prefab, that we will use as a bullet
-	prefab = entity.mk(polygon.mk(0, 0, []int32{0, 0, 0, 2, 1, 2, 1, 0}), 0xffff00ff, 1)
-
-	// array containing all bullets
-	all = []entity.ent{}
-}
-
-// handle function called in gamescn.um. takes list of pointers to enemies, that will be used with collisions
-fn handle*(scn: []^entity.ent) {
-
-	// goes through all bullets
-	for i:=0; i < len(all); i++ {
-		// checks, if they are above the screen, so we don't end up with a lot of them
-		if all[i].p.y < global.cam.y-global.cam.h {
-			all = delete(all, i)
-			continue
-		}
-
-		// checking collision
-		coll := all[i].getcoll(scn)
-		if coll != 0 {
-			enemy.die(coll) // calls die function on enemy
-			global.score += 10 // increments score
-			all = delete(all, i) // deletes the bullet
-			continue // continuing, sine we can't draw this anymore
-		}
-
-		all[i].p.y -= 0.1 * tophat.delta // decrementing y position. remember to use multiply by delta for framerate independant movement
-		all[i].draw(global.cam) // drawing bullet
-	}
+	prefab.t.s = th.Vf2{1, 1}
+	prefab.r.w = 1
+	prefab.r.h = 2
 }

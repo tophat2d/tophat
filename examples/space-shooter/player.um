@@ -1,82 +1,101 @@
 
 import (
-	"entity.um"
-	"image.um"
-	"polygon.um"
+	"th.um"
+	"hud.um"
+	"ent.um"
 	"input.um"
-	"tophat.um"
-//	"tophat/audio.um"
-
-	"bullet.um"
+	"sound.um"
+	"image.um"
+	"enemy.um"
 	"global.um"
-	"settings.um"
-	"sounds.um"
+	"effects.um"
+)
+
+const (
+	speed = 0.07
+	bulletSpeed = 0.1
 )
 
 var (
-	ship: entity.ent
-	shipanim: []image.img
-	pspeed: real 
-	hp*: int
+	e*: ent.Ent
+	bulletPrefab: ent.Ent
+	bullets*: []ent.Ent
+	frames: []image.Image
 )
 
 fn init*() {
-	ship = entity.mk(polygon.mk(40, 25, []int32{0, 0, 0, 8, 8, 8, 8, 0}), 0x000000ff, 1) // player entity
-	ship.setscale(0.1, 0.1)
-	shipanim = []image.img{image.load("graphics/ship1.png"), image.load("graphics/ship2.png")} // animation
-	pspeed = 0.1 // ship speed
+	frames = []image.Image{
+		image.load("gfx/ship1.png"),
+		image.load("gfx/ship2.png")}
+
+	e = ent.mk(
+		frames[0],
+		th.Transform{p: th.Vf2{y: global.cam.h/3}, s: th.Vf2{1, 1}})
+
+	bulletPrefab.t.s = th.Vf2{1, 1}
+	bulletPrefab.r.w = 1
+	bulletPrefab.r.h = 2
+	bulletPrefab.c = 0xAEAE0Cff
+
+	bullets = []ent.Ent{}
 }
 
 fn handle*() {
-	ship.animate(8, &shipanim) // animating player entity
-
-	// wasd movement
-	if input.ispressed(input.KEY_W) {
-		ship.p.y -= pspeed * tophat.delta
+	if input.isPressed(int32('a')) {
+		e.t.p.x -= speed * th.delta
+		if e.t.p.x < -global.cam.w/2 - e.r.w {
+			e.t.p.x = global.cam.w/2
+		}
 	}
-
-	if input.ispressed(input.KEY_S) {
-		if ship.p.y < 70 {
-			ship.p.y += pspeed * tophat.delta
+	if input.isPressed(int32('d')) {
+		e.t.p.x += speed * th.delta
+		if e.t.p.x > global.cam.w/2 {
+			e.t.p.x = -global.cam.w/2 - e.r.w
 		}
 	}
 
-	if input.ispressed(input.KEY_A) {
-		if !(ship.p.x < -48 && !settings.screenwrap) {
-			ship.p.x -= pspeed * tophat.delta
-		}
+	e.animate(4, &frames, th.time)
+
+	if input.isJustPressed(input.KEY_SPACE) {
+		sound.shoot.play()
+		b := bulletPrefab
+		b.t.p = th.Vf2{e.t.p.x + 1, e.t.p.y - bulletPrefab.r.h}
+
+		bullets = append(bullets, b)
+		b.t.p.x += 3
+		bullets = append(bullets, b)
 	}
 
-	if input.ispressed(input.KEY_D) {
-		if !(ship.p.x > 44 && !settings.screenwrap) {
-			ship.p.x += pspeed * tophat.delta
-		}
-	}
+	enemies := enemy.getEnts()
 
-	// shooting
-	if input.isjustpressed(input.KEY_ENTER) {
-		cb := len(bullet.all)
-		bullet.all = append(bullet.all, []entity.ent{bullet.prefab})
-		bullet.all = append(bullet.all, []entity.ent{bullet.prefab})
+	for i:=0; i >= 0 && i < len(bullets); i++ {
+		bullets[i].t.p.y -= bulletSpeed * th.delta
 
-		bullet.all[cb].p.x = ship.p.x + 2
-		bullet.all[cb].p.y = ship.p.y
-		bullet.all[cb+1].p.x = ship.p.x + 5
-		bullet.all[cb+1].p.y = ship.p.y
-
-		sounds.shoot.play()
-	}
-
-	// screenwrapping. can be enabled in settings
-	if settings.screenwrap {
-		if ship.p.x < -48 {
-			ship.p.x = 48
+		if bullets[i].t.p.y < -global.cam.h/2 {
+			bullets = delete(bullets, i)
+			i--
+			continue
 		}
 
-		if ship.p.x > 48 {
-			ship.p.x = -48
+		var ic: th.Vf2
+		if c := bullets[i].getColl(enemies, &ic); c != -1 {
+			bullets = delete(bullets, i)
+			effects.enemyDestroy(enemy.enemies[c].ent.t.p)
+			enemy.enemies = delete(enemy.enemies, c)
+			enemies = enemy.getEnts()
+			global.score++
+			hud.updateScore()
+			sound.explosion.play()
+			i--
+			continue
 		}
 	}
+}
 
-	ship.draw(global.cam) // drawing ship
+fn draw*() {
+	e.draw(global.cam)
+
+	for i:=0; i < len(bullets); i++ {
+		bullets[i].draw(global.cam)
+	}
 }

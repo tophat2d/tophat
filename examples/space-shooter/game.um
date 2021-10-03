@@ -1,0 +1,26 @@
+
+import (
+	"hud.um"
+	"player.um"
+	"enemy.um"
+	"effects.um"
+)
+
+fn init*() {
+	player.init()
+	enemy.init()
+	effects.init()
+	hud.init()
+}
+
+fn handle*() {
+	player.handle()
+	enemy.handle()
+	effects.handle()
+	hud.handle()
+
+	player.draw()
+	enemy.draw()
+	effects.draw()
+	hud.draw()
+}

@@ -1,77 +1,73 @@
 
 import (
-	"tophat.um"
-	"rawdraw.um"
-	"rectangle.um"
-	"animation.um"
-
+	"th.um"
 	"std.um"
+	"lerp.um"
+	"global.um"
+	"canvas.um"
+	"particles.um"
 )
-
-// type used for star
-type star* = struct {
-	x, y, w, h: real
-	speed: real
-}
 
 var (
-	hitend*: int // this is, when the hit effect will end
-
-	stars: []star // list of all stars
-
-	anims*: []animation.anim // list of all animations
-
-	cam: rectangle.rect // we need to store our own version of camera to avoid circular imports TODO
+	dmgEffect: lerp.Lerper
+	emitters: []particles.Emitter
 )
 
-fn init*(cami: rectangle.rect) {
-	stars = []star{}
-	anims = []animation.anim{}
-	cam = cami
+fn init*() {
+	dmgEffect = lerp.Lerper{}
+	emitters = []particles.Emitter{}
 }
 
-// function, that handles the star effect. it needs to be separate, since stars need to be drawn first
-fn handlestars*() {
-
-	// this is a block, that adds stars. it will add them every 200 ms
-	if tophat.t % 200 < tophat.delta + 1 {
-		for i:=0; i < 5; i++ {
-			stars = append(stars, star{std.rand()%96, std.rand()%20, 1, 2, real(std.rand()%2+2)/100}) // speed needs to be random for the "3d" effect
-		}
-	}
-
-	todel := []int{} // list of indexes to delete, so we don't do it while iterating over the array
-	for i:=0; i < len(stars); i++ {
-		if stars[i].y >= 144 { // checking, if star is bellow screen. note, that here we use coords in relation to screen, since we use the rawdraw module
-			todel = append(todel, i)
-			continue
-		}
-
-		stars[i].y += stars[i].speed * tophat.delta // moving star
-		rawdraw.setcolor(0xeeeeeeff) // setting color
-		rawdraw.drawrect(round(stars[i].x), round(stars[i].y), round(stars[i].w), round(stars[i].h)) // drawing
-	}
-
-	for i:=0; i < len(todel); i++ {
-		stars = delete(stars, todel[i] - i) // deleting stars
-	}
-}
-
-// main handle function. hit effect and animations
 fn handle*() {
-	if tophat.t < hitend { // checking, if hit effect should be drawn
-		rawdraw.setcolor(0xb91919aa)
-		rawdraw.drawrect(0, 0, 96, 144) // drawing hit effect
+	
+}
+
+fn damage*() {
+	dmgEffect.enqueue(
+		lerp.Item{0, 0xaa, 200, 0, false, null, fn(ctx: lerp.Any){}})
+	dmgEffect.enqueue(
+		lerp.Item{0xaa, 0, 200, 0, false, null, fn(ctx: lerp.Any){}})
+}
+
+fn enemyDestroy*(pos: th.Vf2) {
+	e := particles.Emitter{
+		pos, th.Vf2{0, 0},
+		th.Vf2{0.1, 0.1}, false, true,
+
+		th.Vf2{0, 360},
+		400, 0,
+		0.2, 0.2,
+		1, 0.6, 2,
+		0, 0, 0,
+		[]uint32{0xFFA500ff, 0xe9330caa},
+		make([]particles.Particle, 200)}
+	
+	for i:=0; i < len(e.particles); i++ {
+		e.particles[i] = particles.Particle{
+			th.time + std.rand() % 200,
+			std.rand()}
 	}
 
-	todel := []int{}
-	for i:=0; i < len(anims); i++ {
-		if anims[i].handle(tophat.t, cam) { // handling animations
-			todel = append(todel, i)
+	emitters = append(emitters, e)
+}
+
+fn draw*() {
+	if len(dmgEffect) != 0 {
+		val := round(dmgEffect.byDelta(th.delta))
+		if val < 0 { val = 0 }
+		canvas.setColor(0xaa0000000 | val)
+		canvas.drawRect(global.cam)
+	}
+
+	for i:=0; i>=0 && i < len(emitters) && len(emitters) != 0; i++ {
+		emitters[i].draw(global.cam, th.time)
+		if !emitters[i].active {
+			if len(emitters) == 1 {
+				emitters = []particles.Emitter{}
+				continue
+			}
+			emitters = delete(emitters, i)
+			i--
 		}
-	}
-
-	for i:=0; i < len(todel); i++ {
-		anims = delete(anims, todel[i] - i)
 	}
 }

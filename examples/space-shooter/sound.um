@@ -1,0 +1,17 @@
+
+import (
+	"audio.um"
+)
+
+var (
+	dmg*, explosion*, shoot*: audio.Sound
+)
+
+fn init*() {
+	dmg = audio.load("sfx/dmgsound.wav")
+	dmg.vol(0.7)
+	explosion = audio.load("sfx/explosion.wav")
+	explosion.vol(0.7)
+	shoot = audio.load("sfx/shoot.wav")
+	shoot.vol(0.7)
+}

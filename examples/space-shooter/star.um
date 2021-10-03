@@ -1,0 +1,51 @@
+
+import (
+	"th.um"
+	"std.um"
+	"rect.um"
+	"global.um"
+	"canvas.um"
+)
+
+const (
+	starNum = 200
+	speed = 0.04
+)
+
+var (
+	stars: []rect.Rect
+)
+
+fn init*() {
+	stars = make([]rect.Rect, starNum)
+
+	for i:=0; i < len(stars); i++ {
+		stars[i].y = -std.rand()%round(global.cam.h)
+		stars[i].x = std.rand()%round(global.cam.w)
+
+		stars[i].w = 1
+		stars[i].h = 2
+	}
+}
+
+fn handle*() {
+	for i:=0; i < len(stars); i++ {
+		s := speed
+		if round(stars[i].x) % 3 == 0 {
+			s *= 1.5
+		}
+		stars[i].y += s * th.delta
+
+		if stars[i].y > global.cam.h {
+			stars[i].y = -std.rand()%round(global.cam.h/8)
+			stars[i].x = std.rand()%round(global.cam.w)
+		}
+	}
+}
+
+fn draw*() {
+	for i:=0; i < len(stars); i++ {
+		canvas.setColor(0xeeeeeeff)
+		canvas.drawRect(stars[i])
+	}
+}

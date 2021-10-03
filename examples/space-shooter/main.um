@@ -1,65 +1,49 @@
-///////////////////////////////////////////////////////////////////////////
-// space shooter example                                                 //
-// file structure:                                                       //
-//   game.um      - main file with entry point                           //
-//   gamescn.um   - game loop                                            //
-//     player.um  - player handling                                      //
-//     enemy.um   - enemy handling                                       //
-//     bullet.um  - bullet handling                                      //
-//     effects.um - animations, hit effect and stars                     //
-//     sounds.um  - file with all sound variables                        //
-//   deathscn.um  - game over menu                                       //
-//   menu.um      - main menu                                            //
-//   global.um    - global variables                                     //
-//   settings.um  - game settings. you can disable/enable some features  //
-///////////////////////////////////////////////////////////////////////////
-
 
 import (
-	"rectangle.um"
-	"tophat.um"
-	"rawdraw.um"
-	"input.um"
-
-	"gamescn.um"
-	"deathscn.um"
-	"global.um"
+	"std.um"
+	"rect.um"
+	"window.um"
+	"canvas.um"
+	
+	"game.um"
 	"menu.um"
-	"sounds.um"
+	"star.um"
+	"sound.um"
+	"global.um"
 )
 
-// main entry point of our game
 fn main() {
-	// sets up the engine
-	tophat.setup("space shooter", 480, 720)
+	window.setup("title", 1280, 720)
 
-	var w, h: int32
-
-	// creating camera
-	global.cam = rectangle.mk(0, 0, 96, 144)
-
-	// calling init functions in our scenes. these load assets
-	gamescn.init()
-	menu.init()
-	deathscn.init()
-	sounds.init()
-
-	// setting scene variable to menu
+	global.cam = rect.mk(0, 0, 92, 168)
 	global.scene = global.MENU
 
-	// main cycle
-	for true {
-		tophat.cycle(&w, &h, 0x000022ff, global.cam)
+	game.init()
+	menu.init()
+	star.init()
+	sound.init()
+	global.hp = 10
 
-		// choosing, which function to call
+	f := std.fopen("score", "r")
+	if (f != null) {
+		fscanf(f, "%d", &global.hi)
+		std.fclose(f)
+	}
+
+	for true {
+		window.cycle(global.cam)
+		canvas.setColor(0x000022ff)
+		canvas.drawRect(global.cam)
+		
+		star.handle()
+		star.draw()
+
 		switch global.scene {
 		case global.MENU:
-			menu.run()
+			menu.handle()
 		case global.GAME:
-			gamescn.run()
-		case global.DEAD:
-			deathscn.run()
-		case global.QUIT:
+			game.handle()
+		case global.NONE:
 			break
 		}
 	}
