@@ -76,6 +76,9 @@ fn handle*() {
 					fprintf(f, "%d", global.hi)
 					std.fclose(f)
 				}
+
+				enemies = []Enemy{}
+				global.hp = 10
 				global.scene = global.MENU
 			}
 

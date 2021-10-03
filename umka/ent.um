@@ -44,7 +44,7 @@ fn mk*(img: image.Image, t: th.Transform): Ent {
 // WARNING: This function will recieve a lot of changes.
 fn (e: ^Ent) getColl*(s: []^Ent, ic: ^th.Vf2): int32 {
 	if len(s) == 0 {
-		return 0
+		return -1
 	}
 
 	return cgetcoll(ic, len(s), e, &s[0])

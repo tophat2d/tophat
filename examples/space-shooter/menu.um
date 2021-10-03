@@ -2,6 +2,7 @@
 import (
 	"th.um"
 	"ui.um"
+	"hud.um"
 	"rect.um"
 	"global.um"
 )
@@ -13,6 +14,8 @@ fn init*() {
 	playButton.g.padding = rect.mk(10, 5, 10, 5)
 	playButton.g.span = 2
 	playButton.onRelease = fn() {
+		global.score = 0
+		hud.updateScore()
 		global.scene = global.GAME
 	}
 
