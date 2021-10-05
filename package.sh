@@ -1,6 +1,7 @@
 #!/bin/sh -e
 
-version=v0.3-$(git rev-parse --short HEAD)
+version=v20-$(git rev-parse --short HEAD)
+echo ${version} > version
 
 ## linux package
 mkdir -p linux/bin

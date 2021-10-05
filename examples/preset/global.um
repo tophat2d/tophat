@@ -1,6 +1,7 @@
 
 import (
-	"tophat/rectangle.um"
+	"th.um"
+	"rect.um"
 )
 
 const (
@@ -8,7 +9,6 @@ const (
 )
 
 var (
-	scene*: int
-	w*, h*: int32
-	cam*: rectangle.rect
+	scene*: th.uu
+	cam*: rect.Rect
 )

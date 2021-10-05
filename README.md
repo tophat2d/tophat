@@ -1,8 +1,7 @@
 # tophat
 
-Tophat is a 2d game engine focused on minimalism using [Umka](https://github.com/vtereshkov/umka-lang), a statically typed scripting language for scripting. Games can however be extended with c.
-
-Tophat is currently going through a big rework. I don't advise to use it for a project as there will be a lot of breaking changes. See the progress [here](./rewrite.md).
+Tophat is a 2d game engine focused on minimalism. You can use [Umka](https://github.com/vtereshkov/umka-lang), a statically typed scripting language to make games, although they can be extended with c.
+Visit the [homepage](https://marekmaskarinec.github.io/tophat.html) for more info.
 
 ## features
 
@@ -11,6 +10,10 @@ Tophat is currently going through a big rework. I don't advise to use it for a p
 - minimalist ui framework
 - automatic scaling - your games look the same no matter the resolution
 - great cli tool for linux
+- particles
+- tilemaps
+- lighting system
+- collision detection
 
 ## getting started
 
@@ -36,6 +39,17 @@ Tip: run make with `-j$(nproc)` for parallel compiling.
 - `make cross` - build windows executable (located at `./tophat.exe`).
 - `make bulk` - same as `make` but (re)compile all sources at once
 
-## special thanks
+## install instructions
 
-TODO
+### linux
+
+1. Download the cli tool and tophat archive from releases.
+2. Put the cli tool in path. (recommended)
+3. `# tophat install tophat.zip`
+4. `$ tophat check` to check whether tophat installed correctly
+
+### windows
+
+1. Download the windows archive from releases
+2. Extract it wherever you like. Your projects will be stored there.
+3. Read the readme.

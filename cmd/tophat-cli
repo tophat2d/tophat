@@ -1,29 +1,13 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
 Path=/usr/share/tophat
 
-function get () {
-	echo "downloading tophat"
-	curl "https://github.com/marekmaskarinec/tophat-bin/blob/master/tophat.zip?raw=true" -o tophat.zip
-	if [ -f "tophat.zip" ]; then
-		echo "download completed"
-	else
-		echo "download failed"
-		exit 1
-	fi
-}
-
-function libcpy () {
-	cp -r $Path/umka ./
-}
-
-function clean () {
+clean () {
 	rm -rf $Path
 	rm -rf tophat.zip
-	rm -rf $(which tophat)
 }
 
-function setup () {
+setup () {
 	if [ ! $(whoami) = "root" ]; then
 		echo "not running as root"
 		exit 1
@@ -36,22 +20,18 @@ function setup () {
 	rm -r $Path/linux
 }
 
-function update() {
+check-update() {
 	echo "checking for new versions"
 	upversion=$(curl -s "https://raw.githubusercontent.com/marekmaskarinec/tophat/main/version")
 	if [ $upversion = $(cat $Path/version) ]; then
-		echo "tophat is already up to date"
+		echo "tophat is up to date"
 		exit 0
 	fi
 
-	echo "updating to $upversion"
-
-	get && setup ./tophat.zip
-
-	echo "done"
+	echo $(upversion) is available
 }
 
-function package() {
+package() {
 	if [ "$2" == "" ]; then
 		echo "specify os"
 		exit 1
@@ -111,7 +91,7 @@ function package() {
 	echo "done"
 }
 
-function check() {
+check() {
 	installed=FAILED
 	linux_bin=FAILED
 	windows_bin=FAILED
@@ -151,8 +131,7 @@ case $1 in
 		setup $2
 	;;
 	("update")
-		update
-		#rm tophat.zip
+		check-update
 	;;
 	("uninstall")
 		clean
@@ -174,17 +153,14 @@ case $1 in
 		check
 	;;
 	*)
-		echo "tophat v0.3 cli tool"
-		echo "made by Marek Maskarinec"
+		echo "tophat v20 cli tool"
 		echo "invalid arguments. usage:"
 		echo "    run: runs the game in current directory"
-		echo "    init: initializes current directory with hello world game"
-		echo "    libs: copies libraries to current directory. this is done automatically, if updating in tophat directory"
-		echo "    package [ platform ] [ game name ]: makes a package of the game in current directory"
+		echo "    init: initializes current directory with hello world preset"
+		echo "    package [ platform all/windows/linux ] [ game name ]: makes a package of the game in current directory"
 		echo "    install [ package path ]: installs tophat from archive specified by path"
-		echo "    update: checks for update. if new version is available, downloads it and installs it"
+		echo "    update: checks for update."
 		echo "    uninstall: removes tophat data."
-		echo "    get: gets tophat data"
 		echo "more info on discord server: https://discord.gg/PcT7cn59h9"
 	;;
 esac

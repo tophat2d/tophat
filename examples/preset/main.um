@@ -1,25 +1,28 @@
 
 import (
-	"tophat/tophat.um"
-	"tophat/rawdraw.um"
-	"tophat/rectangle.um"
+	"th.um"
+	"rect.um"
+	"canvas.um"
+	"window.um"
 
 	"global.um"
 )
 
 fn main() {
-	tophat.setup("title", 1280, 720)
+	window.setup("title", 1280, 720)
 
-	global.cam = rectangle.mk(0, 0, 192, 108)
+	global.cam = rect.mk(0, 0, 192, 108)
 
 	for true {
-		tophat.cycle(&global.w, &global.h, 0xffffffff, global.cam)
+		window.cycle(global.cam)
+		canvas.setColor(th.white)
+		canvas.drawRect(global.cam)
 
 		switch global.scene {
 		case global.NONE:
 			return
 		}
 
-		rawdraw.drawtext("hello world", 2, 2, 0x000000ff, 2)
+		canvas.drawText("hello world", th.Vf2{2, 2}, th.black, 2)
 	}
 }
