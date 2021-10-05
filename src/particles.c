@@ -54,10 +54,10 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 	p->active = false;
 
 	for (int i=0; i < p->particle_c; i++) {
+		p->active = true;
 		if (t < p->particles[i].start_time)
 			continue;
 
-		p->active = true;
 		srand(p->particles[i].seed);
 
 		if ((p->angle.y - p->angle.x) + p->angle.x == 0)
@@ -126,6 +126,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 				p->particles[i].seed = rand();
 			} else {
 				p->particles[i].start_time = -1;
+				p->active = false;
 			}
 		}
 	}

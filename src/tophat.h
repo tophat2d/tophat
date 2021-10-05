@@ -77,12 +77,12 @@ typedef struct {
 	uint32_t tint;
 } th_spotlight;
 
+#pragma pack(push, 1)
 typedef struct {
 	uint64_t start_time;
 	int seed;
 } _th_particle;
 
-#pragma pack(push, 1)
 typedef struct {
 	th_vf2 pos;
 	th_vf2 dm;
