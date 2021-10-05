@@ -48,7 +48,10 @@ fn (a: ^Anim) start*(t: int) {
 fn (a: ^Anim) handle*(t: uint, cam: rect.Rect): bool {
 	a.frame = (round(real(t-a.zeroTime)/round((1000.0/a.fps))) % len(a.anim))
 
-	a.anim[a.frame].draw(th.Vf2{round(a.pos.x) - cam.x + cam.w/2, round(a.pos.y) - cam.y + cam.h/2}, round(a.rot), th.Vf2{a.scale, a.scale})
+	a.anim[a.frame].draw(
+		th.Transform{
+			th.Vf2{round(a.pos.x) - cam.x + cam.w/2, round(a.pos.y) - cam.y + cam.h/2},
+			th.Vf2{a.scale, a.scale}, th.Vf2{}, a.rot})
 
 	if a.frame == len(a.anim) - 1 {
 		if a.looping {

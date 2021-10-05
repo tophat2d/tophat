@@ -36,6 +36,17 @@ const (
 	TOPLEFT* = 1
 )
 
+fn mk*(cells: []th.uu, w: th.uu, tiles: []image.Image, cellSize: th.fu): Tilemap {
+	t := Tilemap{}
+	t.cells = cells
+	t.w = w
+	t.tiles = tiles
+	t.cellSize = cellSize
+	t.collMask = make([]bool, len(tiles))
+	
+	return t
+}
+
 fn parseNum(inp: char): (int, bool) {
 	if inp >= '0' && inp <= '9' {
 		return int(inp) - int('0'), true
@@ -53,7 +64,7 @@ fn parseNum(inp: char): (int, bool) {
 }
 
 // Makes a tilemap from csv string
-fn mk*(inp: str, images: []image.Image): Tilemap {
+fn fromCSV*(inp: str, images: []image.Image): Tilemap {
 	res := csv.parse(inp)
 
 	if len(res) < 2 { return Tilemap{} }
