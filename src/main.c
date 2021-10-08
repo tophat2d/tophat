@@ -9,14 +9,18 @@
 
 th_global thg = {0};
 int destroyfunc;
+int died = 0;
 
 void die() {
+	if (died) return;
+	
 	th_audio_deinit();
 	if (destroyfunc) {
 		umkaCall(thg.umka, destroyfunc, 0, NULL, NULL);
 	}
 
 	umkaFree(thg.umka);
+	died = 1;
 }
 
 void HandleDestroy() {

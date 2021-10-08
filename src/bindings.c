@@ -66,7 +66,6 @@ void _th_umka_bind(void *umka) {
 
 	// audio
 	umkaAddFunc(umka, "cauload", &umauload);
-	umkaAddFunc(umka, "cauarr", &umauarr);
 	umkaAddFunc(umka, "csoundloop", &umsoundloop);
 	umkaAddFunc(umka, "csoundplay", &umsoundplay);
 	umkaAddFunc(umka, "csoundstop", &umsoundstop);
@@ -370,46 +369,45 @@ void umentysort(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // audio
 void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_sound *s = malloc(sizeof(th_sound));
-	th_sound_load(s, (char *)p->ptrVal);
+	th_sound_load((char *)p->ptrVal);
 
-	r->ptrVal = (intptr_t)s;
+	r->ptrVal = thg.sound_count;
 }
 
 // sets array of sounds to be played
-void umauarr(UmkaStackSlot *p, UmkaStackSlot *r) {
-	uu count = p[0].intVal;
-	th_sound **auarr = (th_sound **)p[1].ptrVal;
-
-	thg.sound_count = count;
-	thg.sounds = auarr;
-}
-
 void umsoundloop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_sound *s = (th_sound *)p[1].ptrVal;
+	if (!p[1].intVal) return;
+	if (p[1].intVal-1 >= thg.sound_count) return;
+	th_sound *s = thg.sounds[p[1].intVal - 1];
 	s->looping = p[0].intVal;
 }
 
 void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_sound *s = (th_sound *)p[0].ptrVal;
+	if (!p[0].intVal) return;
+	if (p[0].intVal-1 >= thg.sound_count) return;
+	th_sound *s = thg.sounds[p[0].intVal-1];
 	s->playing = 1;
 }
 
 void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_sound *s = (th_sound *)p[0].ptrVal;
+	if (!p[0].intVal) return;
+	if (p[0].intVal-1 >= thg.sound_count) return;
+	th_sound *s = thg.sounds[p[0].intVal-1];
 	s->playing = 0;
 }
 
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_sound *s = (th_sound *)p[1].ptrVal;
+	if (!p[1].intVal) return;
+	if (p[1].intVal-1 >= thg.sound_count) return;
+	th_sound *s = thg.sounds[p[1].intVal - 1];
 	s->volume = p[0].real32Val;
 }
 
 // checks, if sound is valid
 void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_sound *s = (th_sound *)p[0].ptrVal;
+	uu s = p->intVal;
 
-	if (s == NULL) {
+	if (!s || s-1 >= thg.sound_count) {
 		r[0].intVal = 0;
 		return;
 	}

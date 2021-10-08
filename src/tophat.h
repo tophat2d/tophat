@@ -7,6 +7,8 @@
 #include <stb_truetype.h>
 
 #define MAX_SOUNDS 512
+#define MAX_IMAGES 1024
+#define MAX_FONTS 128
 
 typedef float fu;
 typedef unsigned short uu;
@@ -148,14 +150,14 @@ typedef struct {
 	uu just_pressed[255];
 	th_vf2 mouse;
 
-	th_sound **sounds;
+	th_sound *sounds[MAX_SOUNDS];
 	uu sound_count;
 } th_global;
 
 // audio
 void th_audio_init();
 void th_audio_deinit();
-void th_sound_load(th_sound *s, char *path);
+void th_sound_load(char *path);
 
 // entity
 th_quad th_ent_transform(th_ent *e);

@@ -9,7 +9,6 @@ import (
 	"canvas.um"
 	"rect.um"
 	"input.um"
-	"audio.um"
 	"std/std.um"
 )
 
@@ -35,8 +34,6 @@ fn setup*(title: str, w, h: int32) {
 		input.setwinmap()
 		th.platform = "windows"
 	}
-
-	audio.sarr = []audio.Sound{}
 
 	th.time = getTime()
 }

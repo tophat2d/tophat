@@ -98,14 +98,14 @@ void th_audio_init(){
 void th_audio_deinit() {
 	ma_device_uninit(&audev);
 
-	for (int i=thg.sound_count - 1; i >= 0; i--) {
-		ma_decoder_uninit(&thg.sounds[i]->decoder);
+	while (--thg.sound_count) {
+		ma_decoder_uninit(&thg.sounds[thg.sound_count]->decoder);
 
-		free(thg.sounds[i]);
+		free(thg.sounds[thg.sound_count]);
 	}
 }
 
-void th_sound_load(th_sound *s, char *path) {
+void th_sound_load(char *path) {
 	ma_decoder_config decodercfg;
 	decodercfg = ma_decoder_config_init(SAMPLE_FORMAT, CHANNEL_COUNT, SAMPLE_RATE);
 
@@ -113,6 +113,8 @@ void th_sound_load(th_sound *s, char *path) {
 	char cpath[512];
 	strcpy(cpath, thg.respath);
 	strcat(cpath, path);
+
+	th_sound *s = thg.sounds[thg.sound_count++] = calloc(sizeof(th_sound), 1);
 	res = ma_decoder_init_file(cpath, &decodercfg, &s->decoder);
 	if (res != MA_SUCCESS)
 		th_error("couldn't load sound at path %s", path);

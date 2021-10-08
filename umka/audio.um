@@ -9,37 +9,18 @@ type Sound* = struct {
 	handle: int
 }
 
-var sarr*: []Sound
-
-fn setSounds*(ss: []Sound)
-
 fn cauload(path: str): int
-
-fn cauarr(s: ^Sound, count: th.uu)
-
 fn csoundloop(s: int, looping: th.uu)
-
 fn csoundplay(s: int) 
-
 fn csoundstop(s: int)
-
 fn csoundvol(s: int, vol: th.fu)
-
 fn csoundvalidate(s: int): th.uu
 
 // Loads sound at path relative to main.um
 fn load*(path: str): Sound {
 	s := Sound{cauload(path)}
 
-	sarr = append(sarr, s)
-	setSounds(sarr)
-
 	return s
-}
-
-// Sets the array of Sounds that are handled in the background. **DEPRECATED**
-fn setSounds*(ss: []Sound) {
-	cauarr(&ss[0], len(ss))
 }
 
 // Sets the Sound as looping. Off by default.
