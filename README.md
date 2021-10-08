@@ -53,3 +53,10 @@ Tip: run make with `-j$(nproc)` for parallel compiling.
 1. Download the windows archive from releases
 2. Extract it wherever you like. Your projects will be stored there.
 3. Read the readme.
+
+## acknowledgements
+
+- [vtereshkov](https://github.com/vtereshkov/) - umka
+- [cnlohr](https://github.com/cnlohr) - rawdraw
+- [nothings](https://github.com/nothings) - stb (image and ttf)
+- [mackron](https://github.com/mackron) - miniadio
