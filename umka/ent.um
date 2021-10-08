@@ -1,0 +1,66 @@
+
+import (
+	"rect.um"
+	"std/std.um"
+	"image.um"
+	"th.um"
+)
+
+// Entity is the main game object. It features drawing and collisions.
+// Every entity has an image used for drawing and a rectangle used
+// for collisions. It also has a transform used for transforming it's image
+// and rectangle.
+type Ent* = struct {
+	r: rect.Rect
+	i: image.Image
+	t: th.Transform
+	c: uint32
+}
+
+fn centdraw(e: ^Ent, c: ^rect.Rect)
+
+// Draws the entity onto the screen in relaction to camera c.
+fn (e: ^Ent) draw*(c: rect.Rect) {
+	centdraw(e, &c)
+}
+
+fn cgetcoll(ic: ^th.Vf2, count: int32, e: ^Ent, s: ^^Ent): int32
+
+// ent's constructor
+fn mk*(img: image.Image, t: th.Transform): Ent {
+	var e: Ent
+	e.i = img
+	e.t = t
+	dm := img.getDims()
+	e.r.w = dm.x
+	e.r.h = dm.y
+	e.c = 0xff
+
+	return e
+}
+
+// Checks whether e collides with any entities in s and sets ic to the
+// intersection's position. If e is a part of s, it will be skipped.
+// WARNING: This function will recieve a lot of changes.
+fn (e: ^Ent) getColl*(s: []^Ent, ic: ^th.Vf2): int32 {
+	if len(s) == 0 {
+		return -1
+	}
+
+	return cgetcoll(ic, len(s), e, &s[0])
+}
+
+// Animates the entity's image with one of the `anim` array. **Won't** begin on
+// the first frame. If you want that, use anim.Anim.
+fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
+	e.i = frames^[(round(real(t)/(1000/fps)) % len(frames^))]
+}
+
+fn centysort(e: ^ent.Ent, count: int)
+
+// Performs a y sort on entities.
+fn ysort*(ents: ^[]ent.Ent) {
+	if len(ents^) > 0 {
+		centysort(&ents[0], len(ents^))
+	}
+}

@@ -1,0 +1,41 @@
+// Package for font drawing.
+
+import (
+	"th.um"
+	"std/map.um"
+	"std/utf8.um"
+	"image.um"
+)
+
+type ptr = uint
+
+// Font type. It is a pointer to c.
+type Font* = struct {
+	stbtt: ptr
+}
+
+fn ctexttoimg(
+	t: ^Font, text: ^utf8.Rune,
+	runec: th.uu, size: th.fu, color: uint32, spacing: th.Vf2): uint
+
+// Creates an image.img from a text. ax and ay are character/line spacings.
+fn (t: ^Font) strToImage*(text: str, size: th.fu, color: uint32, spacing: th.Vf2): image.Image {
+	runes := utf8.decode(text)
+	return image.Image{ctexttoimg(t, &runes[0], len(runes), size, color, spacing)}
+}
+
+fn cfontfree(t: ^Font)
+
+// Frees a font from memory.
+fn (t: ^Font) delete*() {
+	cfontfree(t)
+}
+
+fn cfontload(t: ^Font, path: str)
+
+// Loads a font from file.
+fn load*(path: str): Font {
+	t := Font{}
+	cfontload(&t, path)
+	return t
+}

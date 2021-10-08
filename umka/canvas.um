@@ -1,0 +1,56 @@
+// Canvas library allowing for drawing basic shapes.
+
+import (
+	"th.um"
+	"std/std.um"
+	"rect.um"
+)
+
+// Draws a basic line text usually good for debugging.
+fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
+
+// Precomputes line text's dimensions.
+fn textSize*(text: str, scale: th.fu): th.Vf2 {
+	var w, maxw, h: int
+	w = 0
+	maxw = 0
+	h = 1
+
+	for s in text {
+		if s == "\n" {
+			h += 1
+			if w > maxw {
+				maxw = w
+			}
+
+			continue
+		}
+
+		w++
+	}
+
+	if w > maxw {
+		maxw = w
+	}
+
+	return th.Vf2{maxw * scale * 3 - scale, h * 6 * scale}
+}
+
+// Sets color that is used for drawing.
+fn setColor*(color: int)
+
+// Sets what color is used after a screen reset.
+fn setBgColor*(color: int)
+
+// Draws a Rectangle.
+fn drawRect*(r: rect.Rect)
+
+fn drawSegment(b, e: th.Vf2, thickness: th.fu)
+// Draws a line.
+fn drawLine*(b, e: th.Vf2, thickness: th.fu, color: uint32) {
+	setColor(color)
+	drawSegment(b, e, thickness)
+}
+
+// Internal.
+fn cdrawimage*(img: int, t: ^th.Transform)

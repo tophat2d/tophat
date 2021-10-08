@@ -1,106 +1,102 @@
 
 import (
-	"tophat/entity.um"
-	"tophat/rectangle.um"
-	"tophat/polygon.um"
-	"tophat/image.um"
-	"tophat/input.um"
-	"tophat/tophat.um"
-	"tophat/rawdraw.um"
-	"tophat/animation.um"
-	"tophat/tophat.um"
-	"tophat/audio.um"
-
-	"tophat/std/std.um"
-
+	"th.um"
+	"ent.um"
+	"std.um"
+	"image.um"
+	"sound.um"
 	"global.um"
-	"settings.um"
 	"effects.um"
-	"sounds.um"
 )
 
-// main enemy struct
-type enm* = struct {
-	ent: entity.ent
-	mx: int32
-	my: int32
+type Enemy* = struct {
+	motion: th.iu
+	ent: ent.Ent
 }
 
-var (
-	prefab*: entity.ent
-	all*: []enm
-	espeed*: real
+const (
+	speed = th.Vf2{0.015, 0.04}
+	maxEnemies = 4
+)
 
-	explosion: []image.img
+var (
+	enemies*: []Enemy
+	prefab: ent.Ent
 )
 
 fn init*() {
-	prefab = entity.mk(polygon.mk(0, 0, []int32{0, 0, 0, 80, 80, 80, 80, 0}), 0xffffffff, 0) // prefab used for new enemies
-	prefab.image = image.load("graphics/enemy.png")
-	prefab.setscale(0.1, 0.1)
-	all = []enm{} // list of all enemies
-	espeed = 0.04 // enemy speed
+	enemies = []Enemy{}
 
-	explosion = []image.img{image.load("graphics/explosion/1.png"), image.load("graphics/explosion/2.png"), image.load("graphics/explosion/3.png"), image.load("graphics/explosion/4.png")} // animation frames played, when enemy dies
+	prefab = ent.mk(
+		image.load("gfx/enemy.png"),
+		th.Transform{p: th.Vf2{y: -global.cam.h - 20}, s: th.Vf2{1, 1}})
 }
 
-// function called, when bullet collides with enemy
-fn die*(id: int32) {
-	for i:=0; i < len(all); i++ { // searching all array for enemy with correct id
-		if all[i].ent.id == id {
-			// creating new animation
-			ca := len(effects.anims)
-			effects.anims = append(effects.anims, animation.mk(round(all[i].ent.p.x), round(all[i].ent.p.y), explosion, 16))
-			effects.anims[ca].start(tophat.t)
-			sounds.explosion.play() // playing sound
-			all	= delete(all, i) // deleting enemy
-			return // exiting
-		}
+fn spawn*() {
+	e := prefab
+	e.t.p.x = std.rand()%round(global.cam.w - e.r.w * 2) - global.cam.w/2 + e.r.w
+	e.t.p.y -= std.rand()%round(global.cam.h/6)
+
+	m := std.rand()%2
+	if m == 0 {
+		m = -1
 	}
+	enemies = append(enemies, Enemy{m, e})
 }
 
-// enemy spawn function
-fn spawn(cam: rectangle.rect) {
-	ce := len(all)
-	all = append(all, enm{prefab, 0, std.rand()%3-1})
-	all[ce].ent.p.y = 4 - cam.y - cam.h/2
-	all[ce].ent.p.x = (std.rand()%cam.w-8) - cam.x - cam.w/2 + 4
-	all[ce].ent.id = std.rand()%2000+200
-}
-
-// this function returns list of enemies, that will then be used by bullets
-fn handle*(): []^entity.ent {
-	// deciding, if we should spawn new enemies
-	if len(all) < global.score/800 + 2 + std.rand()%2 {
-		spawn(global.cam)
+fn getEnts*(): []^ent.Ent {
+	e := make([]^ent.Ent, len(enemies))
+	for i:=0; i < len(enemies); i++ {
+		e[i] = &enemies[i].ent
 	}
 
-	scn := []^entity.ent{}
-	for i:=0; i < len(all); i++ {
-		scn = append(scn, &all[i].ent) // appending pointer to the enemy to scene
-	
-		// this isn't a good mechanic, but can be enabled in settings
-		if settings.enemyxmotion {
-			if std.rand()%50 < 1 || all[i].ent.p.x >= 40 || all[i].ent.p.x <= -40 { // checks, if enemy is on the edge, or random number is < 1 to change enemy motion
-				all[i].mx = std.rand()%3 - 1
-				all[i].my = std.rand()%3 - 1
+	return e
+}
+
+fn handle*() {
+	for len(enemies) < maxEnemies {
+		spawn()
+	}
+
+	for i:=0; i >= 0 && i < len(enemies) && len(enemies) != 0; i++ {
+		e := &enemies[i]
+
+		e.ent.t.p.y += speed.y * th.delta
+		if e.ent.t.p.y > global.cam.h/2 {
+			enemies = delete(enemies, i)
+			i--
+			effects.damage()
+			global.hp--
+			sound.dmg.play()
+
+			if global.hp == 0 {
+				if global.score > global.hi {
+					global.hi = global.score
+					f := std.fopen("score", "w")
+					fprintf(f, "%d", global.hi)
+					std.fclose(f)
+				}
+
+				enemies = []Enemy{}
+				global.hp = 10
+				global.scene = global.MENU
 			}
-		}
 
-		if all[i].ent.p.y >= 72 { // checking, if enemy is at the bottom of the screen
-			global.takedmg()
-			sounds.damage.play() // playing sound
-			all = delete(all, i) // deleting enemy
 			continue
 		}
 
-		// moving enemy
-		all[i].ent.p.x += espeed / 2 * tophat.delta * all[i].mx
-		all[i].ent.p.y += espeed * tophat.delta
-
-		// drawing enemy
-		all[i].ent.draw(global.cam)
+		e.ent.t.p.x += speed.x * th.delta * e.motion
+		if e.ent.t.p.x < -global.cam.w/2 ||
+			e.ent.t.p.x > global.cam.w/2 - e.ent.r.w {
+			e.motion *= -1
+			// prevent enemies from getting stuck in a loop
+			e.ent.t.p.x += e.motion
+		}
 	}
-	
-	return scn
+}
+
+fn draw*() {
+	for i:=0; i < len(enemies); i++ {
+		enemies[i].ent.draw(global.cam)
+	}
 }

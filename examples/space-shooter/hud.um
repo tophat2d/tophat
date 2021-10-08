@@ -1,0 +1,39 @@
+
+import (
+	"th.um"
+	"font.um"
+	"image.um"
+	"global.um"
+)
+
+var (
+	hearth: image.Image
+	mainFont: font.Font
+	scoreImg: image.Image
+)
+
+fn init*() {
+	hearth = image.load("gfx/hearth.png")
+
+	mainFont = font.load("gfx/marediv-regular.ttf")
+	scoreImg = mainFont.strToImage("0", 0.004, 0xeeeeee00, th.Vf2{1, 1})
+}
+
+fn updateScore*() {
+	scoreImg.delete()
+	scoreImg = mainFont.strToImage(repr(global.score), 0.004, 0xeeeeee00, th.Vf2{1, 1})
+}
+
+fn handle*() { }
+
+fn draw*() {
+	dm := hearth.getDims()
+	for i:=0; i < global.hp; i++ {
+		hearth.draw(
+			th.Transform{
+				p: th.Vf2{global.cam.w - ((dm.x + 1) * (i + 1) + 1), 1},
+				s: th.Vf2{1, 1}})
+	}
+
+	scoreImg.draw(th.Transform{p: th.Vf2{1, 1}, s: th.Vf2{1, 1}})
+}

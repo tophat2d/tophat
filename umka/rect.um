@@ -1,0 +1,20 @@
+// Rectangle is used mainly as camera.
+
+import (
+	"th.um"	
+)
+
+type Rect* = struct {
+	x, y, w, h: th.fu
+}
+
+fn mk*(x, y, w, h: th.fu): Rect {
+	var r: Rect
+
+	r.x = x
+	r.y = y
+	r.w = w
+	r.h = h
+
+	return r
+}

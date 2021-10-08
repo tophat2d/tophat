@@ -1,0 +1,147 @@
+
+import (
+	"th.um"
+	"rect.um"
+	"input.um"
+	"image.um"
+	"canvas.um"
+	"window.um"								
+	"tilemap.um"
+)
+
+fn getNbCount(arr: []th.uu, index: th.uu, arrW: th.uu): th.uu {
+	x := int(index % arrW)
+	y := int((index - x) / arrW)
+	nbc := 0
+
+	for x2:=x-1; x2 >= 0 && x2 <= x+1 && x2 < arrW; x2++ {
+		for y2:=y-1; y2 >= 0 && y2 <= y+1 && y2 < len(arr)/arrW; y2++ {
+			if x2 == x && y2 == y {
+				continue;
+			}
+
+			if (arr[arrW * y2 + x2] == 1) {
+				nbc++
+			}
+		}
+	}
+
+	return nbc
+}
+
+fn updateGrid(prev: []th.uu, w: th.uu): []th.uu {
+	out := make([]th.uu, len(prev))
+	for i, c in prev {
+		out[i] = c
+	}
+
+	for i:=0; i < len(prev); i++ {
+		nb := getNbCount(prev, i, w)
+
+		switch nb {
+		case 3:
+			if prev[i] == 0 {
+				out[i] = 1
+			}
+		case 2:
+		default:
+			out[i] = 0
+		}
+	}
+
+	return out
+}
+
+fn main() {
+	cam := rect.mk(0, 0, 150, 150)
+	window.setup("Conway's game of life", 1280, 720)
+	cellSize := 5
+
+	grid := tilemap.mk(
+		make([]th.uu, round((cam.w / cellSize) * (cam.h / cellSize))), round(cam.w / cellSize),
+		[]image.Image{image.mk([]uint32{th.white}, th.Vf2{1, 1})}, cellSize)
+	grid.pos.x = -cam.w/2
+	grid.pos.y = -cam.h/2
+
+	mode := 0
+
+	var backup: []th.uu
+	play := false
+
+	lastStep := th.time
+
+	for true {
+		window.cycle(cam)
+		canvas.setColor(th.black)
+		canvas.drawRect(cam)
+
+		grid.draw(cam)
+		switch mode {
+		case 0: // build
+			mouse := input.getMousePos()
+
+			if input.isJustPressed(input.KEY_ESCAPE) {
+				backup = grid.cells
+				mode = 1
+			}
+
+			canvas.drawText("-- EDIT --", th.Vf2{1, 1}, th.white, 1)
+
+			if trunc(mouse.y/cellSize) * grid.w +
+				trunc(mouse.x/cellSize) < len(grid.cells) {
+
+				if input.isPressed(input.LMB) || input.isPressed(int32('w')) {
+					grid.cells[trunc(mouse.y/cellSize) * grid.w + trunc(mouse.x/cellSize)] = 1
+				}
+				if input.isPressed(input.RMB) || input.isPressed(int32('e')) {
+					grid.cells[trunc(mouse.y/cellSize) * grid.w + trunc(mouse.x/cellSize)] = 0
+				}
+			}
+
+			if input.isPressed(int32('h')) {
+				canvas.drawText(
+					"edit mode:\n"+
+					"  w - plot\n"+
+					"  e - erase\n"+
+					"  escape - enter play mode\n"+
+					"play mode:\n"+
+					"  p - toggle play at fastest possible speed\n"+
+					"  l - step every 150 ms\n"+
+					"  escape - reset to board before play and enter edit\n"+
+					"  i - enter edit with current board\n", th.Vf2{1, 5}, th.white, 1)
+			} else {
+				canvas.drawText("hold h for help", th.Vf2{1, 5}, th.white, 1)
+			}
+		case 1:
+			if play || (input.isPressed(int32('l')) && th.time - lastStep > 150) {
+				grid.cells = updateGrid(grid.cells, grid.w)
+				lastStep = th.time
+			}
+
+			if input.isJustPressed(int32('p')) {
+				if play {
+					play = false
+				} else {
+					play = true
+				}
+			}
+
+			if input.isJustPressed(input.KEY_ESCAPE) {
+				grid.cells = backup
+				mode = 0
+				play = false
+			}
+
+			if input.isPressed(int32('i')) {
+				mode = 0
+				play = false
+			}
+		}
+
+		c := th.white
+		if th.delta > 19 {
+			c = th.red
+		}
+		canvas.drawText(repr(th.delta), th.Vf2{cam.w - 6, 1}, c, 1)
+	}
+}

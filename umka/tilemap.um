@@ -1,40 +1,34 @@
-// Tilemaps allow for easy level
-// construction. Similar to
-// godot or unity. They can
-// be loaded from csv or created
-// from raw data.
+// Tilemaps allow for easy level construction or fast collisions. You can even
+// use them for some games instead of entities (tetris comes to mind)
 
 import (
+	"th.um"
 	"csv.um"
 	"image.um"
 	"std.um"
-	"rectangle.um"
-	"entity.um"
-	"polygon.um"
+	"rect.um"
+	"ent.um"
 )
 
 // Tilemap struct
-type tmap* = struct {
-	tiles: []image.img // tiles that are used to draw (you can replace them mid game for animation)
-	x: int // position
-	y: int
-	w: int // width of tilemap
-	cells: []int32 // all cells (this will draw the tile in tiles with number in cells - 1)
-	collmask: []bool // if true, the tile collides
-	cellsize: int // cellsize
-	scaletype: int // how image scale is handled. 0: stretch, 1: top left
+type Tilemap* = struct {
+	tiles: []image.Image // tiles that are used to draw (you can replace them mid game for animation)
+	pos: th.Vf2
+	w: th.uu // width of tilemap
+	cells: []th.uu // all cells (this will draw the tile in tiles with number in cells - 1)
+	collMask: []bool // if true, the tile collides
+	cellSize: th.fu // cellsize
+	scaleType: th.uu // how image scale is handled. 0: stretch, 1: top left
 }
 
 type ctmap* = struct {
 	tiles: ^int
-	x: int32
-	y: int32
-	w: int32
-	h: int32
-	cells: ^int32
-	collmask: ^int32
-	cellsize: int32
-	scaletype: int32
+	pos: th.Vf2
+	w, h: th.uu
+	cells: ^th.uu
+	collmask: ^bool
+	cellsize: th.fu
+	scaletype: th.uu
 }
 
 const (
@@ -42,7 +36,18 @@ const (
 	TOPLEFT* = 1
 )
 
-fn parse_num(inp: char): (int, bool) {
+fn mk*(cells: []th.uu, w: th.uu, tiles: []image.Image, cellSize: th.fu): Tilemap {
+	t := Tilemap{}
+	t.cells = cells
+	t.w = w
+	t.tiles = tiles
+	t.cellSize = cellSize
+	t.collMask = make([]bool, len(tiles))
+	
+	return t
+}
+
+fn parseNum(inp: char): (int, bool) {
 	if inp >= '0' && inp <= '9' {
 		return int(inp) - int('0'), true
 	}
@@ -59,15 +64,15 @@ fn parse_num(inp: char): (int, bool) {
 }
 
 // Makes a tilemap from csv string
-fn mk*(inp: str, images: []image.img): tmap {
+fn fromCSV*(inp: str, images: []image.Image): Tilemap {
 	res := csv.parse(inp)
 
-	if len(res) < 2 { return tmap{} }
-	if len(res[0]) < 2 { return tmap{} }
-	if res[0][0] != "tophat tilemap" { return tmap{} }
+	if len(res) < 2 { return Tilemap{} }
+	if len(res[0]) < 2 { return Tilemap{} }
+	if res[0][0] != "tophat tilemap" { return Tilemap{} }
 
 	if len(res[1]) != len(images) {
-		error("incorrect collision mask in tilemap")
+		error("incorRect collision mask in tilemap")
 	}
 	collmask := make([]bool, len(res[1]))
 	for i:=0; i < len(res[1]); i++ {
@@ -75,14 +80,14 @@ fn mk*(inp: str, images: []image.img): tmap {
 		collmask[i] = false
 	}
 
-	cells := []int32{}
+	cells := []th.uu{}
 	for i:=2; i < len(res); i++ {
 		for j:=0; j < len(res[i]); j++ {
 			if res[i][j] == "" {
 				continue
 			}
 
-			val, check := parse_num(res[i][j][0])
+			val, check := parseNum(res[i][j][0])
 			if !check {
 				error("number in tilemap isn't valid")
 			}
@@ -95,49 +100,38 @@ fn mk*(inp: str, images: []image.img): tmap {
 		}
 	}
 
-	return tmap{images, std.atoi(res[0][1]), std.atoi(res[0][2]), len(res[2]), cells, collmask, std.atoi(res[0][3]), std.atoi(res[0][4])}
+	return Tilemap{
+		images, th.Vf2{std.atoi(res[0][1]), std.atoi(res[0][2])},
+		len(res[2]), cells, collmask, std.atoi(res[0][3]), std.atoi(res[0][4])}
 }
 
 // Sets tile at [x, y] to tile.
-fn (t: ^tmap) edit*(x, y, tile: int) {
+fn (t: ^Tilemap) edit*(x, y, tile: int) {
 	t.cells[y*t.w + x] = tile
 }
 
-fn cdrawtmap(ct: ^ctmap, cam: ^rectangle.rect)
+fn cdrawtmap(ct: ^ctmap, cam: ^rect.Rect)
 
 // Draws the tilemap.
-fn (t: ^tmap) draw*(cam: rectangle.rect) {
+fn (t: ^Tilemap) draw*(cam: rect.Rect) {
 	if len(t.cells) == 0 { return }
 
-	ccm := make([]int32, len(t.collmask))
-	for i:=0; i < len(t.collmask); i++ {
-		ccm[i] = int32(t.collmask[i])
-	}
-
-	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
+	cm := ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collMask[0], t.cellSize, t.scaleType}
 	cdrawtmap(&cm, &cam)
 }
 
-fn ctmapgetcoll(tx, ty, x, y: ^int32, t: ^ctmap, e: ^entity.cent): int32
+fn ctmapgetcoll(pos: ^th.Vf2, vert: ^th.uu, t: ^ctmap, e: ^ent.Ent): int32
 
 // Checks, if t collides with e.
-// [rx, ry] is where the collision
-// happened (usually one of the
-// vertices)
-// [tx, ty] is on which tile it
-// happened.
+// pos is the tile index where the collision happened
+// vert is which index collided
 // You need to pass a valid pointer (TODO)
-fn (t: ^tmap) getcoll*(e: entity.ent, rx, ry, tx, ty: ^int32): bool {
+fn (t: ^Tilemap) getColl*(e: ent.Ent, vert: ^th.uu, pos: ^th.Vf2): bool {
 	if len(t.cells) == 0 { return false }
 
-	ccm := make([]int32, len(t.collmask))
-	for i:=0; i < len(t.collmask); i++ {
-		ccm[i] = int32(t.collmask[i])
-	}
+	cm := ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collMask[0], t.cellSize, t.scaleType}
 
-	cm := ctmap{^int(&t.tiles[0]), t.x, t.y, t.w, len(t.cells)/t.w, &t.cells[0], &ccm[0], t.cellsize, t.scaletype}
-
-	c := ctmapgetcoll(tx, ty, rx, ry, &cm, &e.toc())
+	c := ctmapgetcoll(pos, vert, &cm, &e)
 
 	return bool(c)
 }

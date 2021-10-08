@@ -15,10 +15,8 @@
 
 ma_device_config auconf;
 ma_device audev;
-th_sound **sounds;
-int sound_count;
 
-extern char *respath;
+extern th_global thg;
 
 ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32, ma_uint32 frameCount, float volume) {
     float temp[4096];
@@ -55,11 +53,11 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
 }
 
 void _th_audio_data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
-	for (int i=sound_count-1; i >= 0; i--) {
-		if (sounds[0] == NULL)
+	for (int i=thg.sound_count-1; i >= 0; i--) {
+		if (thg.sounds[0] == NULL)
 			continue;
 
-		th_sound *csound = sounds[i];
+		th_sound *csound = thg.sounds[i];
 
 		if (csound == NULL)
 			continue;
@@ -100,10 +98,10 @@ void th_audio_init(){
 void th_audio_deinit() {
 	ma_device_uninit(&audev);
 
-	for (int i=sound_count - 1; i >= 0; i--) {
-		ma_decoder_uninit(&sounds[i]->decoder);
+	for (int i=thg.sound_count - 1; i >= 0; i--) {
+		ma_decoder_uninit(&thg.sounds[i]->decoder);
 
-		free(sounds[i]);
+		free(thg.sounds[i]);
 	}
 }
 
@@ -113,7 +111,7 @@ void th_sound_load(th_sound *s, char *path) {
 
 	ma_result res;
 	char cpath[512];
-	strcpy(cpath, respath);
+	strcpy(cpath, thg.respath);
 	strcat(cpath, path);
 	res = ma_decoder_init_file(cpath, &decodercfg, &s->decoder);
 	if (res != MA_SUCCESS)

@@ -1,0 +1,69 @@
+// Dead simple linear interpolation.
+
+import (
+	"th.um"								
+)
+
+type Any* = interface{}
+
+// Lerper queue item. It interpolates between start and end for the duration
+// of length in ms. Additionally you can enable swap, which instead of
+// dequeueing it spwaps start and end and resets the progress.
+type Item* = struct {
+	start, end: th.fu
+	length: th.uu
+	progress: th.fu
+	swap: bool
+	ctx: Any
+	callback: fn(ctx: Any)
+}
+
+// Lerper is a queue of items. It will lerp the first one and if it ends
+// and it doesn't have swap enabled, it will dequeue it.
+type Lerper* = []Item
+
+// Removes the first lerper item.
+fn (l: ^Lerper) dequeue*() {
+	switch len(l^) {
+	case 0:
+		return
+	case 1:
+		l^ = Lerper{}
+	default:
+		l^ = slice(l^, 1)
+	}
+}
+
+// Adds an item to l's queue
+fn (l: ^Lerper) enqueue*(i: Item) {
+	l^ = append(l^, i)
+}
+
+// Interpolates the front by delta. And returns it's value.
+fn (l: ^Lerper) byDelta*(delta: th.uu): th.fu {
+	if len(l^) == 0 {
+		return 0
+	}
+
+	for l[0].progress >= 1.0 {
+		l[0].callback(l[0].ctx)
+
+		if l[0].swap {
+			tmp := l[0].start
+			l[0].start = l[0].end
+			l[0].end = tmp
+
+			l[0].progress = 0
+			break
+		}
+
+		l.dequeue()
+		if len(l^) == 0 {
+			return 0
+		}
+	}
+
+	l[0].progress += th.fu(delta)/l[0].length
+
+	return l[0].progress * (l[0].end-l[0].start) + l[0].start
+}

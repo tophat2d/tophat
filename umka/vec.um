@@ -1,43 +1,49 @@
 // small 2d vector library
 // ask for features in issues
 
-import "std/std.um"
+import (
+	"th.um"
+	"std/std.um"
+)
 
 // rotates point [x, y] around [cx, cy] with
 // rot in degrees
-fn rotatepoint*(x, y, cx, cy, rot: real): (real, real) {
+fn rotatePoint*(pos, origin: th.Vf2, rot: th.fu): th.Vf2 {
 	angle := (rot * std.pi) / 180
 
-	x1 := x - cx
-	y1 := y - cy
+	pos.x -= origin.x
+	pos.y -= origin.y
 
-	x2 := x1 * cos(angle) - y1 * sin(angle)
-	y2 := x1 * sin(angle) + y1 * cos(angle)
+	pos.x = pos.x * cos(angle) - pos.y * sin(angle)
+	pos.y = pos.x * sin(angle) + pos.y * cos(angle)
 
-	return x2 + cx, y2 + cy
+	pos.x += origin.x
+	pos.y += origin.y
+
+	return pos
 }
 
 // Distance of [x1, y1] to [x2, [y2]].
 // It won't be negative.
-fn distanceto*(x1, y1, x2, y2: real): real {
-	return std.sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2))
+fn distanceTo*(p1, p2: th.Vf2): th.fu {
+	return std.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 }
 
 // Angle between [x1, y1] and [x2, y2]
-fn angleto*(x1, y1, x2, y2: real): real {
-	return atan2(y2 - y1, x2 - x1) * 180 / std.pi + 180
+fn angleTo*(p1, p2: th.Vf2): real {
+	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std.pi + 180
 }
 
-fn abs*(x, y: real): (real, real) { return fabs(x), fabs(y) }
+fn abs*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{fabs(p.x), fabs(p.y)} }
 
-fn rnd*(x, y: real): (int32, int32) { return round(x), round(y) }
+fn rnd*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{round(p.x), round(p.y)} }
 
-fn flr*(x, y: real): (int32, int32) { return trunc(x), trunc(y) }
-
-fn sub*(x1, y1, x2, y2: real): (real, real) { return x1 - x2, y1 - y2 }
-
-fn add*(x1, y1, x2, y2: real): (real, real) { return x1 + x2, y1 + y2 }
-
-fn div*(x1, y1, x2, y2: real): (real, real) { return x1 / x2, y1 / y2 }
-
-fn mul*(x1, y1, x2, y2: real): (real, real) { return x1 * x2, y1 * y2 }
+fn flr*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{trunc(p.x), trunc(p.y)} }
+             
+fn sub*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{p.x - p2.x, p.y - p2.y} }
+                                                        
+fn add*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{p.x + p2.x, p.y + p2.y} }
+                                                            
+fn div*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{p.x / p2.x, p.y / p2.y} }
+                          
+fn mul*(p, p2: th.Vf2): th.Vf2 { return th.Vf2{p.x * p2.x, p.y * p2.y} }

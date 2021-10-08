@@ -2,53 +2,6 @@ import (
 	"../lib/umka/import/std.um"								
 )
 
-fn sslice*(inp: str, start, end: int): str {
-	if start >= len(inp) { return "" }
-	e := end+1
-	if end+1 >= len(inp) { e = len(inp) }
-	return slice(inp, start, e)
-}
-
-fn join*(inp: []str, joiner: str): str {
-	tr := ""
-	for i:=0; i < len(inp); i++ {
-		tr += inp[i]
-		if i != len(inp) - 1 {
-			tr += joiner
-		}
-	}
-	return tr
-}
-
-fn _replace(inp, pattern, repl: str): []str {
-	lsplit := -1
-	tr := []str{}
-
-	for i:=0; i < len(inp); i++ {
-		s := inp[i]
-		if s == pattern[0] {
-			for j:=0; pattern[j] == inp[i]; j++ {
-				if j == len(pattern) - 1 {
-					tr = append(tr, sslice(inp, lsplit + 1 , i - len(pattern)))
-					if repl != "" {
-						tr = append(tr, repl)
-					}
-					lsplit = i
-					break		
-				}
-				i++
-			}
-		}
-	}
-	tr = append(tr, sslice(inp, lsplit + 1, len(inp)-1))
-
-	return tr
-}
-
-fn replace*(inp, pattern, replacer: str): str { return join(_replace(inp, pattern, replacer), "") }
-
-fn split*(inp: str, splitter: str): []str { return _replace(inp, splitter, "") }
-
 fn readall(f: std.File): str {
     const blockSize = 16
     res := ""
@@ -62,23 +15,49 @@ fn readall(f: std.File): str {
     return res
 }
 
-fn strtoc(inp: str): str {
-	out := ""
-	splt := split(inp, "\n")
-
-	for i:=0; i < len(splt); i++ {
-		tmp := replace(splt[i], "\\", "\\\\")
-		out += "\"" + replace(tmp, "\"", "\\\"") + "\\n\"\n"
+fn chcnt(chars: str, c: str): bool {
+	for c2 in chars {
+		if c == c2 {
+			return true
+		}
 	}
 
+	return false
+}
+
+fn strtoc(inp: str): str {
+	out := ""
+	out += "\""
+
+	for c in inp {
+		if chcnt("\"\n\t'\\", str(c)) {
+			out += "\\"
+		}
+
+		if c == '\t' {
+			out += "t"
+		} else if c == '\n' {
+			out += "n"
+			out += "\"\n\""
+		} else if c == '\r' {
+		} else {
+			out += str(c)
+		}
+	}
+
+	out += "\""
 	return out
 }
 
 fn main() {
+	printf("const char *libs[] = {\n")
+
 	for i:=1; i < std.argc(); i++ {
 		f := std.fopen(std.argv(i), "r")
 		data := readall(f)
 		printf("%s\n", strtoc(data)+",")
 		std.fclose(f)
 	}
+
+	printf("};\n")
 }

@@ -1,70 +1,50 @@
 import (
-	"umka/rawdraw.um"
-	"umka/vec.um"
-	"umka/tophat.um"
-	"umka/input.um"
-	"umka/rectangle.um"
-	"umka/entity.um"
-	"umka/raycast.um"
-	"umka/polygon.um"
-	"umka/ui.um"
-	"umka/image.um"
+	"umka/anim.um"
+	"umka/audio.um"
 	"umka/csv.um"
-	"umka/tilemap.um"
-	"umka/tween.um"
+	"umka/ent.um"
+	"umka/font.um"
+	"umka/image.um"
+	"umka/input.um"
+	"umka/lerp.um"
 	"umka/light.um"
+	"umka/misc.um"
 	"umka/particles.um"
+	"umka/canvas.um"
+	"umka/ray.um"
+	"umka/rect.um"
+	"umka/th.um"
+	"umka/tilemap.um"
+	"umka/window.um"
+	"umka/ui.um"
+	"umka/vec.um"
 
 	"umka/std/std.um"
 )
 
 fn main() { 
-	cam := rectangle.mk(0, 0, 250, 250)
-	tophat.setup("test game", 100, 100)
+	cam := rect.mk(0, 0, 250, 250)
+	window.setup("test game", 100, 100)
 	var w, h: int32
 
-	t := 0
-
-	m := light.mk(0xff, 0.1, cam)
-
-	spot := light.spotlight{0, 0, 20, 0xff000000}
-	spot2 := light.spotlight{0, 0, 40, 0xffff0000}
-
 	img := image.load("etc/test.png")
+	e := ent.mk(img, th.Transform{s: th.Vf2{2, 1}, p: th.Vf2{10, 10}, o: th.Vf2{}, r: 20.0})
+	e.c = th.red
+	e.i.handle = 0
+	//e.t.s = th.Vf2{1, 1}
 
 	for true {
-		tophat.cycle(&w, &h, 0xffffffff, cam)
-		t += tophat.delta
+		window.cycle(cam)
+		canvas.setColor(th.white)
+		canvas.drawRect(cam)
 
-		m.clear()
+		e.t.p = input.getGlobalMousePos(cam)
+		e.draw(cam)
 
-		img.draw(0, 0, 0, 10)
-
-		spot.x, spot.y = input.getglobalmousepos(cam)
-
-		spot.stamp(&m, cam)
-		spot2.stamp(&m, cam)
-		m.draw(cam)
-
-		if input.ispressed(int32('a')) {
-			cam.x += round(0.1 * tophat.delta)
+		if th.delta == 0 {
+			th.delta = 16
 		}
-
-		if input.ispressed(int32('d')) {
-			cam.x -= round(0.1 * tophat.delta)
-		}
-
-		if input.ispressed(int32('w')) {
-			cam.y += round(0.1 * tophat.delta)
-		}
-
-		if input.ispressed(int32('s')) {
-			cam.y -= round(0.1 * tophat.delta)
-		}
-
-		if tophat.delta != 0 {
-			rawdraw.drawtext(repr(1000/tophat.delta), 0, 0, tophat.white, 2)
-		}
+		canvas.drawText(repr(1000/th.delta), th.Vf2{0, 0}, th.black, 1)
 	}
 }
 

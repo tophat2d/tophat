@@ -1,44 +1,45 @@
 
 import (
-	"tophat/ui.um"
-	"tophat/rectangle.um"
-
-	"gamescn.um"
+	"th.um"
+	"ui.um"
+	"hud.um"
+	"rect.um"
 	"global.um"
 )
 
-var (
-	mainbox: ui.box
-	playbutton: ui.button
-	settingsbutton: ui.button
-)
-
-// creating ui
 fn init*() {
-	playbutton = ui.mkbutton(ui.mklabel("PLAY", 1, 0x22ff))
-	playbutton.label.bgcolor = 0xeeeeeeff
-	playbutton.padding = rectangle.mk(10, 10, 10, 10)
-
-	settingsbutton = ui.mkbutton(ui.mklabel("QUIT", 1, 0x22ff))
-	settingsbutton.label.bgcolor = 0xeeeeeeff
-	settingsbutton.padding = rectangle.mk(10, 10, 10, 10)
-
-	mainbox = ui.mkbox([]ui.element{ui.mklabel("SPACE GAME", 2, 0xeeeeeeff), &playbutton, &settingsbutton}, false)
-	mainbox.padding = rectangle.mk(10, 20, 10, 20)
-
-	ui.mainelement = mainbox
-}
-
-fn run*() {
-	ui.mainelement = mainbox // setting main element
-	ui.handle(global.cam.w, global.cam.h)
-
-	if playbutton.justreleased {
-		gamescn.retry()
+	playButton := ui.mkbutton(ui.mklabel("PLAY", 1, 0x000022ff))
+	playButton.label.bgColor = 0xeeeeeeaa
+	playButton.label.align = th.Vf2{ui.MID, ui.MID}
+	playButton.g.padding = rect.mk(10, 5, 10, 5)
+	playButton.g.span = 2
+	playButton.onRelease = fn() {
+		global.score = 0
+		hud.updateScore()
 		global.scene = global.GAME
 	}
 
-	if settingsbutton.justreleased {
-		global.scene = global.QUIT
+	exitButton := ui.mkbutton(ui.mklabel("EXIT", 1, 0x000022ff))
+	exitButton.label.bgColor = 0xeeeeeeaa
+	exitButton.g.padding = rect.mk(10, 5, 10, 5)
+	exitButton.g.span = 2
+	exitButton.onRelease = fn() {
+		global.scene = global.NONE
 	}
+
+	ui.mainelement = ui.mkbox(
+		[]ui.Element{
+			ui.mklabel("SPACE SHOOTER", 2, 0xeeeeeeff),
+			ui.mklabel(
+				"SCORE: " + repr(global.score) + "TOP: " + repr(global.hi),
+				1, 0xeeeeeeff),
+			playButton, exitButton}, false)
+	^ui.Box(ui.mainelement).children[0].get().span = 2
+}
+
+fn handle*() {
+	^ui.Label(^ui.Box(ui.mainelement).children[1]).text = 
+		"SCORE: " + repr(global.score) + "TOP: " + repr(global.hi)
+
+	ui.handle(round(global.cam.w), round(global.cam.h))
 }

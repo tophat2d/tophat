@@ -11,6 +11,9 @@ src/umkalibs.h
 tophat
 tophat-win.zip
 tophat.exe
-tophat.zip
+src/umkalibs.h
+lib/stb_image.h
+lib/miniaudio.h
+tophat-linux.zip
 tophat-win.zip
 **/gmon.out

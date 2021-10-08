@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include <CNFG.h>
 
@@ -9,7 +10,7 @@
 
 #define FRAND (double)rand()/0x7FFFFFFF
 
-extern float scaling;
+extern th_global thg;
 
 int interp(int start, int start_val, int end, int end_val, int t) {
 	return (start_val + (t - start) * ((end_val - start_val)/(end-start)));
@@ -50,57 +51,83 @@ int get_particle_rotation(th_particles *p, _th_particle pa, int t) {
 
 void th_particles_draw(th_particles *p, th_rect cam, int t) {
 	int camx = cam.x - cam.w/2, camy = cam.y - cam.h/2;
+	p->active = false;
 
 	for (int i=0; i < p->particle_c; i++) {
+		p->active = true;
+		if (t < p->particles[i].start_time)
+			continue;
+
 		srand(p->particles[i].seed);
 
-		double direction = (rand()%(p->angle_max - p->angle_min) + p->angle_min) * M_PI / 180;
+		if ((p->angle.y - p->angle.x) + p->angle.x == 0)
+			p->angle.x++;
+		double direction = (rand() % (long)(p->angle.y - p->angle.x + 1) + p->angle.x) * M_PI / 180;
 
-		double vx = p->velocity * cos(direction);
-		double vy = p->velocity * sin(direction);
+		fu vx = p->velocity * cos(direction);
+		fu vy = p->velocity * sin(direction);
 		if (p->velocity_randomness != 0) {
 				vx += FRAND*(p->velocity*p->velocity_randomness);
 				vy += FRAND*(p->velocity*p->velocity_randomness);
 		}
 
-		vx *= p->gravity_x;
-		vy *= p->gravity_y;
+		vx *= p->gravity.x;
+		vy *= p->gravity.y;
 
-		int px = p->px + rand()%p->w + vx * (t - p->particles[i].start_time);
-		int py = p->py + rand()%p->h + vy * (t - p->particles[i].start_time);
+		if (!p->dm.w) p->dm.w = 1;
+		if (!p->dm.h) p->dm.h = 1;
+		fu px = p->pos.x + rand()%(iu)p->dm.w + vx * (t - p->particles[i].start_time);
+		fu py = p->pos.y + rand()%(iu)p->dm.h + vy * (t - p->particles[i].start_time);
 
-		double size = p->size;
+		fu size = p->size;
 		if (p->size != p->max_size)
 			size = get_particle_size(p, p->particles[i], t);
 
 		size += FRAND * (p->size * p->size_randomness);
 
-		uint32_t col = 0;
+		uint32_t col = 0xff;
 		if (p->color_c > 0)
 			col = get_particle_color(p, p->particles[i], t);
-
-		int rot = p->rotation;
-		if (p->rotation != p->max_rotation)
-			rot = get_particle_rotation(p, p->particles[i], t);
-
-		rot += FRAND * (p->size * p->rotation_randomness);
-
-		RDPoint points[4] = {{px, py}, {px + size, py}, {px + size, py + size}, {px, py + size}};
-		for (int i=0; i < 4; i++) {
-			float x = points[i].x;
-			float y = points[i].y;
-			th_rotate_point(&x, &y, px + size/2, py+size/2, rot);
-			points[i].x = (x - camx) * scaling;
-			points[i].y = (y - camy) * scaling;
-		}
-
 		CNFGColor(col);
-		CNFGTackPoly(points, 4); // TODO camera
+
+		if (p->max_rotation) {
+			int rot = p->rotation;
+			if (p->rotation != p->max_rotation)
+				rot = get_particle_rotation(p, p->particles[i], t);
+      
+			rot += FRAND * (p->size * p->rotation_randomness);
+      
+			RDPoint points[4] = {{px, py}, {px + size, py}, {px + size, py + size}, {px, py + size}};
+			for (int i=0; i < 4; i++) {
+				th_vf2 p = {{points[i].x, points[i].y}};
+				th_rotate_point(&p, (th_vf2){{px + size/2, py+size/2}}, rot);
+				points[i].x = (p.x - camx) * thg.scaling;
+				points[i].y = (p.y - camy) * thg.scaling;
+			}
+      
+			CNFGTackPoly(points, 4);
+		} else { // optimize drawing without rotations
+			fu x = px;
+			fu y = py;
+			fu w = px + size;
+			fu h = py + size;
+
+			CNFGTackRectangle(
+				(x - camx) * thg.scaling,
+				(y - camy) * thg.scaling,
+				(w - camx) * thg.scaling,
+				(h - camy) * thg.scaling);
+		}
 
 		int lt = p->lifetime + FRAND*(p->lifetime * p->lifetime_randomness);
 		if (t - p->particles[i].start_time >= lt) {
-			p->particles[i].start_time = t - rand()%(p->lifetime / 4);
-			p->particles[i].seed = rand();
+			if (p->repeat) {
+				p->particles[i].start_time = t - rand()%(p->lifetime / 4);
+				p->particles[i].seed = rand();
+			} else {
+				p->particles[i].start_time = -1;
+				p->active = false;
+			}
 		}
 	}
 }

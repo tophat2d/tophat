@@ -3,6 +3,9 @@
 
 void _th_umka_bind(void *umka);
 void umfopen(UmkaStackSlot *p, UmkaStackSlot *r);
+void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r);
+void umfontfree(UmkaStackSlot *p, UmkaStackSlot *r);
+void umfontload(UmkaStackSlot *p, UmkaStackSlot *r);
 void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r);
 void umlightmaskdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 void umspotlightstamp(UmkaStackSlot *p, UmkaStackSlot *r);
@@ -19,6 +22,7 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r);
+void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r);
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r);
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r);
 void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r);
@@ -48,7 +52,6 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r);
-void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r);
 

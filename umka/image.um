@@ -1,14 +1,15 @@
-// Module for loading and operating
-// with images.
 
 import (
-	"rawdraw.um"
+	"th.um"
+	"canvas.um"
 )
 
-// Img is an opaque pointer
-// to c same as sound. It needs
-// to be freed by img.delete()
-type img* = struct {
+// Image is an opaque pointer to c. It needs to be free'd with it's delete()
+// method, otherwise it will cause a memory leak. This is usually ok as
+// you only load images at the start of the game and need them until the
+// end, but function operating on images might need to keep the memory in
+// mind. 
+type Image* = struct {
 	handle: int
 }
 
@@ -24,72 +25,74 @@ fn fliphimg(i: int)
 
 fn imgvalid(i: int): int32
 
-fn imggetdims(w, h: ^int32, i: int)
+fn imggetdims(dm: ^th.Vf2, i: int)
 
-fn imgcrop(img: int, x1, x2, y1, y2: int32)
+fn imgcrop(img: int, tl, br: th.Vf2)
 
-fn imgfromdata(data: ^uint32, w: int32, h: int32): int
+fn imgfromdata(data: ^uint32, dm: th.Vf2): int
 
 fn imgcopy(data: int): int
 
+fn imgsetfilter(data, filter: int)
+
 // Loads an image at path.
-fn load*(path: str): img {
-	return img{loadimg(&path[0])}
+fn load*(path: str): Image {
+	return Image{loadimg(&path[0])}
 }
 
 // Frees i from memory.
-fn (i: ^img) delete*() {
+fn (i: ^Image) delete*() {
 	deleteimg(i.handle)
 }
 
-// Set's i as window icon.
-// Works only on linux.
-// **DEPRECATED**
-fn (i: ^img) setasicon*() {
-	iconset(i.handle)
-}
-
 // Flips i on it's vertical axis.
-fn (i: ^img) flipv*() {
+fn (i: ^Image) flipv*() {
 	flipvimg(i.handle)
 }
 
 // Flips i on it's horizontal axis.
-fn (i: ^img) fliph*() {
+fn (i: ^Image) fliph*() {
 	fliphimg(i.handle)
 }
 
 // Draws the image **not** accounting for camera.
-fn (i: ^img) draw*(x, y, rot: int32, scale: real)  {
-	rawdraw.cdrawimage(i.handle, rot, scale, x, y)
+fn (i: ^Image) draw*(t: th.Transform) {
+	canvas.cdrawimage(i.handle, &t)
 }
 
-// Returns true, if i is valid.
-fn (i: ^img) validate*(): bool {
+// Returns true, if i is valid. This doesn't mean it isn't corrupted.
+fn (i: ^Image) validate*(): bool {
 	return bool(imgvalid(i.handle))
 }
 
-// Returns the dimensions in pixels of i.
-fn (i: ^img) getdims*(): (int32, int32) {
-	var w, h: int32
-	imggetdims(&w, &h, i.handle)
+// Returns width and heigth.
+fn (i: ^Image) getDims*(): th.Vf2 {
+	out := th.Vf2{}
+	imggetdims(&out, i.handle)
 
-	return w, h
+	return out
 }
 
-// Crops out the rectangle from image.
-fn (i: ^img) crop*(x1, y1, x2, y2: int32) {
-	imgcrop(i.handle, x1, x2, y1, y2)
+// Crops out the Rectangle from image. (destructive)
+fn (i: ^Image) crop*(tl, br: th.Vf2) {
+	imgcrop(i.handle, tl, br)
 }
 
 // Creates an image from raw data.
 // **BUGGY**
-fn fromdata*(data: []uint32, w: int): img {
-	return img{imgfromdata(&data[0], w, len(data)/w)}
+fn mk*(data: []uint32, dm: th.Vf2): Image {
+	return Image{imgfromdata(&data[0], dm)}
 }
 
 // Copies image into a new one.
-fn (i: ^img) copy*(): img {
-	return img{imgcopy(i.handle)}
+fn (i: ^Image) copy*(): Image {
+	return Image{imgcopy(i.handle)}
 }
 
+// Sets a mag/min filter. 0 is linear, others are nearest.
+// This function will regenerate the texture, so it's slow.
+// https://learnopengl.com/img/getting-started/texture_filtering.png
+// left is nearest, right is linear.
+fn (i: ^Image) setfilter(filter: int) {
+	imgsetfilter(i.handle, filter)
+}

@@ -1,6 +1,0 @@
-
-var (
-	screenwrap*: bool = false // sts screen wrapping
-	enemyxmotion*: bool = false // sets, if enemies should move on the x axis
-	stars*: bool = true // enable stars
-)

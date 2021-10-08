@@ -1,5 +1,34 @@
 // Umka standard library
 
+// Memory
+
+fn rtlmemcpy(dest, src: ^void, count: int)
+
+fn tobytes*(buf: interface{}): []uint8 {
+    if buf.__self == null {
+        error("Buffer is null")
+    }
+    if selfhasptr(buf) {
+        error("Cannot access reference types")
+    }
+    bytes := make([]uint8, sizeofself(buf))
+    rtlmemcpy(&bytes[0], buf.__self, sizeofself(buf))
+    return bytes
+}
+
+fn frombytes*(buf: interface{}, bytes: []uint8) {
+    if buf.__self == null {
+        error("Buffer is null")
+    }    
+    if selfhasptr(buf) {
+        error("Cannot access reference types")
+    }
+    if sizeofself(buf) != len(bytes) {
+        error("Illegal buffer size")
+    }
+    rtlmemcpy(buf.__self, &bytes[0], sizeofself(buf))    
+}
+
 // File I/O
 
 type File* = ^struct {}
@@ -11,33 +40,67 @@ const (
 )    
 
 fn rtlfopen  (name: str, mode: str): File;  
-fn cfopen    (name: str, mode: str): File;
-fn fopen*    (name: str, mode: str): File {return cfopen(name, mode)}
+fn fopen*    (name: str, mode: str): File {return rtlfopen(name, mode)}
 
 fn rtlfclose (f: File): int
 fn fclose*   (f: File): int {return rtlfclose(f)}
 
 fn rtlfread(buf: ^void, size, cnt: int, f: File): int
+
 fn fread*(f: File, buf: interface{}): int {
+    if f == null {
+        error("File is null")
+    }
+    if bytes := ^[]uint8(buf); bytes != null {
+        return rtlfread(&bytes[0], len(bytes^), 1, f)
+    }
     if selfhasptr(buf) {
-        error("Cannot read reference types")
+        error("Cannot read reference types except ^[]uint8")
     }
     return rtlfread(buf.__self, sizeofself(buf), 1, f)
 }
 
 fn rtlfwrite(buf: ^void, size, cnt: int, f: File): int
+
 fn fwrite*(f: File, buf: interface{}): int {
+    if f == null {
+        error("File is null")
+    }
+    if bytes := ^[]uint8(buf); bytes != null {
+        return rtlfwrite(&bytes[0], len(bytes^), 1, f)
+    }    
     if selfhasptr(buf) {
-        error("Cannot write reference types")
+        error("Cannot write reference types except ^[]uint8")
     }
     return rtlfwrite(buf.__self, sizeofself(buf), 1, f)
 }
 
 fn rtlfseek  (f: File, offset, origin: int): int
-fn fseek*    (f: File, offset, origin: int): int {return rtlfseek(f, offset, origin)}
+fn fseek*    (f: File, offset, origin: int): int {
+    if f == null {
+        error("File is null")
+    }
+    return rtlfseek(f, offset, origin)
+}
+
+fn rtlftell (f: File): int
+fn ftell*   (f: File): int {
+    if f == null {
+        error("File is null")
+    }
+    return rtlftell(f)
+}
 
 fn rtlremove (name: str): int
 fn remove*   (name: str): int {return rtlremove(name)}
+
+fn rtlfeof  (f: File): int
+fn feof*    (f: File): bool {
+    if f == null {
+        error("File is null")
+    }                
+    return bool(rtlfeof(f))
+}
 
 // I/O utilities
 
@@ -48,6 +111,38 @@ fn getchar*(): char {
     var c: char
     scanf("%c", &c)
     return c
+}
+
+// Strings
+
+fn ltrim*(s: str): str {
+    start := -1
+    slen := len(s)
+    for i := 0; i < slen; i++ {
+        if s[i] != ' ' && s[i] != '\t' {
+            start = i
+            break
+        } 
+    }
+    if start == -1 {return ""}
+    return slice(s, start)
+}
+
+fn rtrim*(s: str): str {
+    stop := -1
+    slen := len(s)
+    for i := slen - 1; i >= 0; i-- {
+        if s[i] != ' ' && s[i] != '\t' {
+            stop = i
+            break
+        } 
+    }
+    if stop == -1 {return ""}
+    return slice(s, 0, stop + 1)
+}
+
+fn trim*(s: str): str {
+    return ltrim(rtrim(s))
 }
 
 // Conversions
@@ -65,7 +160,7 @@ fn atof*(s: str): real {
 }
 
 fn itoa*(x: int): str {
-		s := str(make([]char, 256))
+    s := str(make([]char, 256))
     sprintf(s, "%lld", x)
     return s
 }
@@ -106,16 +201,17 @@ fn clock*(): real {return rtlclock()}
 
 // Command line and environment
 
-/*fn argc*(): int {return rtlargc}
+fn argc*(): int {return rtlargc}
 
 fn argv*(i: int): str {
     if i < 0 || i >= rtlargc {
         error("Command line parameter not found")
     }
     return rtlargv[i]
-}*/
+}
 
 fn rtlgetenv(name: str): str
 fn getenv*(name: str): str {
     return "" + rtlgetenv(name)
 }
+

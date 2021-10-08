@@ -4,6 +4,32 @@
 #include <stdbool.h>
 #include <miniaudio.h>
 #include <CNFG.h>
+#include <stb_truetype.h>
+
+#define MAX_SOUNDS 512
+
+typedef float fu;
+typedef unsigned short uu;
+typedef short iu;
+
+typedef union {
+	struct {fu w, h;};
+	struct {fu x, y;};
+} th_vf2;
+
+typedef struct {
+	fu x, y, w, h;
+} th_rect;
+
+typedef union {
+	struct {th_vf2 tl, tr, br, bl;};
+	th_vf2 v[4];
+} th_quad;
+
+typedef struct {
+	th_vf2 pos, scale, origin;
+	fu rot;
+} th_transform;
 
 typedef struct {
     ma_decoder decoder;
@@ -13,11 +39,11 @@ typedef struct {
 } th_sound;
 
 typedef struct {
-	int w;
-	int h;
-	int c;
-	uint32_t *rdimg;
-	unsigned int tex;
+	th_vf2 dm;
+	uu channels;
+	uint32_t *data;
+	unsigned int gltexture;
+	uu filter;
 } th_image;
 
 #pragma pack(push, 1)
@@ -33,90 +59,98 @@ typedef struct {
 
 #pragma pack(push, 1)
 typedef struct {
-	th_poly p;
+	th_rect rect;
 	th_image *img;
-	double sx;
-	double sy;
-	int rot;
+	th_transform t;
 	uint32_t color;
-	int id;
 } th_ent;
 #pragma pack(pop)
 
 typedef struct {
 	uint32_t *dots;
-	int w, h;
-	double rect_size;
+	uu w, h;
+	fu rect_size;
 	uint32_t color;
 } th_lightmask;
 
 typedef struct {
-	int x, y;
-	int radius;
+	th_vf2 pos;
+	uu radius;
 	uint32_t tint;
 } th_spotlight;
 
+#pragma pack(push, 1)
 typedef struct {
-	int start_time;
+	uint64_t start_time;
 	int seed;
 } _th_particle;
 
-#pragma pack(push, 1)
 typedef struct {
-	int px, py;
-	int w, h;
-	double gravity_x, gravity_y;
-	int seed;
+	th_vf2 pos;
+	th_vf2 dm;
+	th_vf2 gravity;
+	bool repeat;
+	bool active;
 
-	int angle_min, angle_max;
+	th_vf2 angle;
 
-	int lifetime;
-	double lifetime_randomness;
+	uu lifetime;
+	fu lifetime_randomness;
 
-	double velocity;
-	double velocity_randomness;
+	fu velocity;
+	fu velocity_randomness;
 
-	double size;
-	double size_randomness;
-	double max_size;
+	fu size;
+	fu size_randomness;
+	fu max_size;
 
-	int rotation;
-	int max_rotation;
-	double rotation_randomness;
+	fu rotation;
+	fu max_rotation;
+	fu rotation_randomness;
 
 	uint32_t *colors;
-	int color_c;
+	uu color_c;
 
 	_th_particle *particles;
-	int particle_c;
+	uu particle_c;
 } th_particles;
 #pragma pack(pop)
 
 typedef struct {
-	int x;
-	int y;
-	int l;
-	int r;
+	th_vf2 pos;
+	fu l;
+	fu r;
 } th_ray;
 
-typedef struct {
-	int x;
-	int y;
-	int w;
-	int h;
-} th_rect;
-
+#pragma pack(push, 1)
 typedef struct {
 	th_image **tiles;
-	int x;
-	int y;
-	int w;
-	int h;
-	int *cells;
-	int *collmask;
-	int cellsize;
-	int scaletype;
+	th_vf2 pos;
+	uu w, h;
+	uu *cells;
+	char *collmask;
+	fu cellsize;
+	uu scaletype;
 } th_tmap;
+#pragma pack(pop)
+
+typedef struct {
+	stbtt_fontinfo *info;
+} th_font;
+
+// struct holding all tophat's global variables.
+typedef struct {
+	char respath[1024];
+	fu scaling;
+	void *umka;
+
+	uu pressed[255];
+	uu just_pressed[255];
+	th_vf2 mouse;
+
+	th_sound **sounds;
+	uu sound_count;
+} th_global;
 
 // audio
 void th_audio_init();
@@ -124,17 +158,20 @@ void th_audio_deinit();
 void th_sound_load(th_sound *s, char *path);
 
 // entity
+th_quad th_ent_transform(th_ent *e);
 void th_ent_draw(th_ent *o, th_rect *camera);
-int th_ent_getcoll(th_ent *e, th_ent *scene, int count, int *ix, int *iy);
+iu th_ent_getcoll(th_ent *e, th_ent **scene, uu count, th_vf2 *ic);
 
 // image
 th_image *th_load_image(char *path);
 void th_free_image(th_image *img);
-void th_image_from_data(th_image *img, uint32_t *data, int w, int h);
-void th_blit_tex(unsigned int tex, int x, int y, int w, int h, float rot);
+void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
+void th_image_set_filter(th_image *img, int filter);
+unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
+void th_blit_tex(unsigned int tex, th_quad q);
 void th_image_flipv(th_image *img);
 void th_image_fliph(th_image *img);
-void th_image_crop(th_image *img, int x1, int y1, int x2, int y2);
+void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
 
 // light
 void th_lightmask_clear(th_lightmask *d);
@@ -144,17 +181,27 @@ void th_spotlight_stamp(th_spotlight *l, th_lightmask *d);
 // misc
 float th_get_scaling(int w, int h, int camw, int camh);
 void th_error(char *text, ...);
-void th_rotate_point(float *x, float *y, float cx, float cy, float rot);
-void th_vector_normalize(float x1, float y1, float x2, float y2, float *rx, float *ry);
+void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
+void th_vector_normalize(float *x, float *y);
 
 // particles
 void th_particles_draw(th_particles *p, th_rect cam, int t);
 
 // raycast
-int th_ray_getcoll(th_ray *ra, th_ent *scene, int count, int *ix, int *iy);
+int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, th_vf2 *ic);
 
 // tilemap
 void th_tmap_draw(th_tmap *t, th_rect *cam);
+
+// font
+void th_font_load(th_font *out, char *path);
+void th_str_to_img(
+	th_image *out, th_font *font,
+	uint32_t *runes, uu runec,
+	fu scale, uint32_t color,
+	th_vf2 spacing);
+
+th_vf2 th_quad_min(th_quad q);
 
 //// "unexported" functions
 
@@ -162,23 +209,17 @@ void th_tmap_draw(th_tmap *t, th_rect *cam);
 void _th_audio_data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
 // collisions
-int _th_poly_to_poly(th_poly *p1, th_poly *p2, int *ix, int *iy);
-int _th_poly_to_line(th_poly *a, int sx, int sy, int ex, int ey, int *ix, int *iy);
-int _th_line_to_line(int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4, int *ix, int *iy);
-int _th_poly_to_point(th_poly *a, int px, int py, int *ix, int *iy);
-bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, int *ix, int *iy);
-bool _th_coll_on_tilemap(th_poly *p, th_tmap *t, int *rx, int *ry, int *rtx, int *rty);
+int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
+uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
+uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
+uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
+uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
+bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
 
 // image
 void _th_rdimg(th_image *img, unsigned char *data);
 
-// input
-void _th_input_init();
-
 // light
 void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color);
-
-// polygon
-RDPoint *_th_poly_to_rdpoint(th_poly *p, int camx, int camy);
 
 #endif

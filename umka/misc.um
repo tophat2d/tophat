@@ -1,34 +1,28 @@
 
 import (
-	"entity.um"								
+	"th.um"
+	"std.um"							
 )
 
+fn readall*(path: str): str {
+	f := std.fopen(path, "r")
+	const blockSize = 16
+	res := ""
+
+	for ok := true; ok {
+	  var buff: [blockSize + 1]char
+	  ok = std.fread(f, ^[blockSize]char(&buff)) == 1
+	  res += str([]char(buff))
+	}
+
+	std.fclose(f)
+	return res
+}
+
 // Snaps a value to step.
-fn stepify*(val, step: real): real {
+fn stepify*(val, step: th.fu): th.fu {
 	if step != 0 {
 		val = trunc(val / step + 0.5) * step
 	}
 	return val
 }
-
-// **DEPRECATED**. Replaces by entity.ysort
-fn ysort*(ents: []entity.ent): []entity.ent {
-	swapped := true
-
-	for swapped {
-		swapped = false
-
-		for i:=1; i < len(ents); i++ {
-			if ents[i-1].p.y > ents[i].p.y {
-				tmp := ents[i]
-				ents[i] = ents[i-1]
-				ents[i-1] = tmp
-
-				swapped = true
-			}
-		}
-	}
-
-	return ents
-}
-
