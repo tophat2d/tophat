@@ -8,7 +8,7 @@
 
 #define INTERP(x0, y0, x1, y1, x) (y0 + (x - x0) * ((y1 - y0) / (x1 - x0)))
 
-extern float scaling;
+extern th_global thg;
 
 void th_lightmask_clear(th_lightmask *d) {
 	for (int i=0; i < d->w * d->h; i++)
@@ -18,8 +18,8 @@ void th_lightmask_clear(th_lightmask *d) {
 void th_lightmask_draw(th_lightmask *d, th_rect *cam) {
 	unsigned tex = CNFGTexImage(d->dots, d->w, d->h);
 	CNFGBlitTex(tex, 0, 0,
-	            cam->w * scaling,
-							cam->h * scaling);
+	            cam->w * thg.scaling,
+							cam->h * thg.scaling);
 	CNFGDeleteTex(tex);
 }
 

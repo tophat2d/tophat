@@ -4,7 +4,7 @@
 
 #include "tophat.h"
 
-extern float scaling;
+extern th_global thg;
 
 th_quad th_ent_transform(th_ent *e) {
 	th_quad q = {0};
@@ -45,8 +45,8 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 		return;
 
 	for (uu i=0; i < 4; i++) {
-		q.v[i].x *= scaling;
-		q.v[i].y *= scaling;
+		q.v[i].x *= thg.scaling;
+		q.v[i].y *= thg.scaling;
 	}
 
 	if (!o->img) {

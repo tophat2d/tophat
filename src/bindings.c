@@ -18,15 +18,7 @@
 #include "umkalibs.h"
 #endif
 
-extern float scaling;
-extern int pressed[255];
-extern int just_pressed[255];
-extern int mousex;
-extern int mousey;
-
-extern char *respath;
-extern th_sound **sounds;
-extern int sound_count;
+extern th_global thg;
 
 void _th_umka_bind(void *umka) {
 	// etc
@@ -98,7 +90,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "drawRect", &umCNFGTackRectangle);
 	umkaAddFunc(umka, "setwindowtitle", &umCNFGChangeWindowTitle);
 	umkaAddFunc(umka, "iconset", &umCNFGSetWindowIconData);
-	umkaAddFunc(umka, "cdrawpoly", &umCNFGTackPoly);
 	umkaAddFunc(umka, "drawSegment", &umCNFGTackSegment);
 	umkaAddFunc(umka, "cdrawimage", &umCNFGBlitTex);
 
@@ -134,7 +125,7 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	const char *mode = (const char *)p[0].ptrVal;
 
 	char path[512];
-	strcpy(path, respath);
+	strcpy(path, thg.respath);
 
 	FILE *f = fopen(strcat(path, name), mode);
 	r->ptrVal = (intptr_t)f;
@@ -146,10 +137,10 @@ void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
 	uu runec = p[3].intVal;
 	fu scale = p[2].real32Val;
 	uint32_t color = p[1].uintVal;
-	th_vf2 scaling = *(th_vf2 *)&p[0];
+	th_vf2 spacing = *(th_vf2 *)&p[0];
 
 	th_image *img = malloc(sizeof(th_image));
-	th_str_to_img(img, f, runes, runec, scale, color, scaling);
+	th_str_to_img(img, f, runes, runec, scale, color, spacing);
 	r->intVal = (intptr_t)img;
 }
 
@@ -159,7 +150,7 @@ void umfontfree(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char buf[512];
-	strcpy(buf, respath);
+	strcpy(buf, thg.respath);
 	strcat(buf, (char *)p[0].ptrVal);
 
 	th_font_load((th_font *)p[1].ptrVal, buf);
@@ -234,7 +225,7 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_image *img;
 	char pathcpy[512];
-	strcpy(pathcpy, respath);
+	strcpy(pathcpy, thg.respath);
 	img = th_load_image(strcat(pathcpy, path));
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 
@@ -330,21 +321,21 @@ void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
 // gets position of mouse cursor
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 *out = (th_vf2 *)p[0].ptrVal;
-	out->x = mousex / scaling;
-	out->y = mousey / scaling;
+	out->x = thg.mouse.x / thg.scaling;
+	out->y = thg.mouse.y / thg.scaling;
 }
 
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
-	r[0].intVal = pressed[keycode];
+	r[0].intVal = thg.pressed[keycode];
 }
 
 void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
-	r[0].intVal = just_pressed[keycode];
-	just_pressed[keycode] = 0;
+	r[0].intVal = thg.just_pressed[keycode];
+	thg.just_pressed[keycode] = 0;
 }
 
 ///////////////////////
@@ -390,8 +381,8 @@ void umauarr(UmkaStackSlot *p, UmkaStackSlot *r) {
 	uu count = p[0].intVal;
 	th_sound **auarr = (th_sound **)p[1].ptrVal;
 
-	sound_count = count;
-	sounds = auarr;
+	thg.sound_count = count;
+	thg.sounds = auarr;
 }
 
 void umsoundloop(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -454,7 +445,7 @@ void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int color = p[0].uintVal;
 
 	CNFGColor((uint32_t)color);
-	CNFGTackRectangle(0, 0, w * scaling, h * scaling);
+	CNFGTackRectangle(0, 0, w * thg.scaling, h * thg.scaling);
 }
 
 // gets current time in ms
@@ -474,11 +465,11 @@ void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 pos = *(th_vf2 *)&p[2];
 	char *text = (char *)p[3].ptrVal;
 
-	CNFGPenX = pos.x * scaling;
-	CNFGPenY = pos.y * scaling;
+	CNFGPenX = pos.x * thg.scaling;
+	CNFGPenY = pos.y * thg.scaling;
 	CNFGColor(color);
-	CNFGSetLineWidth(0.6 * scaling * size);
-	CNFGDrawText(text, size * scaling);
+	CNFGSetLineWidth(0.6 * thg.scaling * size);
+	CNFGDrawText(text, size * thg.scaling);
 }
 
 void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -537,16 +528,16 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int w = p[3].intVal;
 
 	if ((float)w/camw < (float)h/camh) {
-		scaling = ((float)w/camw);
+		thg.scaling = ((float)w/camw);
 	} else {
-		scaling = ((float)h/camh);
+		thg.scaling = ((float)h/camh);
 	}
 }
 
 void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_rect re = *(th_rect *)&p[0];
 
-	CNFGTackRectangle(re.x * scaling, re.y * scaling, (re.x + re.w) * scaling, (re.y + re.h) * scaling);
+	CNFGTackRectangle(re.x * thg.scaling, re.y * thg.scaling, (re.x + re.w) * thg.scaling, (re.y + re.h) * thg.scaling);
 }
 
 void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -557,25 +548,14 @@ void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_error("setasicon is deprecated.");
 }
 
-void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_poly *pl = (th_poly *)p[0].ptrVal;
-	uint32_t color = (uint32_t)p[1].uintVal;
-
-	RDPoint *pr;
-	pr = _th_poly_to_rdpoint(pl, 0, 0);
-	CNFGColor(color);
-	CNFGTackPoly(pr, pl->vc);
-	free(pr);
-}
-
 void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
 	float thickness = p[0].real32Val;
 	th_vf2 e = *(th_vf2 *)&p[1];
 	th_vf2 b = *(th_vf2 *)&p[2];
 
 
-	CNFGSetLineWidth(thickness * scaling);
-	CNFGTackSegment(b.x * scaling, b.y * scaling, e.x * scaling, e.y * scaling);
+	CNFGSetLineWidth(thickness * thg.scaling);
+	CNFGTackSegment(b.x * thg.scaling, b.y * thg.scaling, e.x * thg.scaling, e.y * thg.scaling);
 }
 
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -588,8 +568,8 @@ void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
 			.t = *t});
 
 	for (uu i=0; i < 4; i++) {
-		q.v[i].x *= scaling;
-		q.v[i].y *= scaling;
+		q.v[i].x *= thg.scaling;
+		q.v[i].y *= thg.scaling;
 	}
 
 	th_blit_tex(img->gltexture, q);

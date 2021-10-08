@@ -10,7 +10,7 @@
 
 #define FRAND (double)rand()/0x7FFFFFFF
 
-extern float scaling;
+extern th_global thg;
 
 int interp(int start, int start_val, int end, int end_val, int t) {
 	return (start_val + (t - start) * ((end_val - start_val)/(end-start)));
@@ -101,8 +101,8 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 			for (int i=0; i < 4; i++) {
 				th_vf2 p = {{points[i].x, points[i].y}};
 				th_rotate_point(&p, (th_vf2){{px + size/2, py+size/2}}, rot);
-				points[i].x = (p.x - camx) * scaling;
-				points[i].y = (p.y - camy) * scaling;
+				points[i].x = (p.x - camx) * thg.scaling;
+				points[i].y = (p.y - camy) * thg.scaling;
 			}
       
 			CNFGTackPoly(points, 4);
@@ -113,10 +113,10 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 			fu h = py + size;
 
 			CNFGTackRectangle(
-				(x - camx) * scaling,
-				(y - camy) * scaling,
-				(w - camx) * scaling,
-				(h - camy) * scaling);
+				(x - camx) * thg.scaling,
+				(y - camy) * thg.scaling,
+				(w - camx) * thg.scaling,
+				(h - camy) * thg.scaling);
 		}
 
 		int lt = p->lifetime + FRAND*(p->lifetime * p->lifetime_randomness);

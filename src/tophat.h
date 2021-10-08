@@ -6,6 +6,8 @@
 #include <CNFG.h>
 #include <stb_truetype.h>
 
+#define MAX_SOUNDS 512
+
 typedef float fu;
 typedef unsigned short uu;
 typedef short iu;
@@ -136,6 +138,20 @@ typedef struct {
 	stbtt_fontinfo *info;
 } th_font;
 
+// struct holding all tophat's global variables.
+typedef struct {
+	char respath[1024];
+	fu scaling;
+	void *umka;
+
+	uu pressed[255];
+	uu just_pressed[255];
+	th_vf2 mouse;
+
+	th_sound **sounds;
+	uu sound_count;
+} th_global;
+
 // audio
 void th_audio_init();
 void th_audio_deinit();
@@ -203,13 +219,7 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
 // image
 void _th_rdimg(th_image *img, unsigned char *data);
 
-// input
-void _th_input_init();
-
 // light
 void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color);
-
-// polygon
-RDPoint *_th_poly_to_rdpoint(th_poly *p, int camx, int camy);
 
 #endif

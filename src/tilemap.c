@@ -7,7 +7,7 @@
 
 #include "tophat.h"
 
-extern float scaling;
+extern th_global thg;
 
 enum {
 	STRETCH,
@@ -45,17 +45,17 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 
 		switch (t->scaletype) {
 		case STRETCH:
-			tr.scale.x = t->cellsize * scaling;
-			tr.scale.y = t->cellsize * scaling;
+			tr.scale.x = t->cellsize * thg.scaling;
+			tr.scale.y = t->cellsize * thg.scaling;
 			break;
 		case TOPLEFT:
-			tr.scale.x = t->tiles[t->cells[j*t->w+i]-1]->dm.w * scaling;
-			tr.scale.y = t->tiles[t->cells[j*t->w+i]-1]->dm.h * scaling;
+			tr.scale.x = t->tiles[t->cells[j*t->w+i]-1]->dm.w * thg.scaling;
+			tr.scale.y = t->tiles[t->cells[j*t->w+i]-1]->dm.h * thg.scaling;
 			break;
 		}
 
-		tr.pos.x = (t->pos.x+i*t->cellsize-camx)*scaling;
-		tr.pos.y = (t->pos.y+j*t->cellsize-camy)*scaling;
+		tr.pos.x = (t->pos.x+i*t->cellsize-camx)*thg.scaling;
+		tr.pos.y = (t->pos.y+j*t->cellsize-camy)*thg.scaling;
 		const th_quad q = th_ent_transform(
 			&(th_ent){ .rect = (th_rect){ .w = 1, .h = 1}, .t = tr});
 		th_blit_tex(t->tiles[t->cells[j*t->w+i]-1]->gltexture, q);

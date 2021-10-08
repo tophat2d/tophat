@@ -52,7 +52,6 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r);
-void umCNFGTackPoly(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r);
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r);
 

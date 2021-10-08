@@ -7,19 +7,16 @@
 #include "bindings.h"
 #include "tophat.h"
 
-float scaling;
-char *respath;
-
+th_global thg = {0};
 int destroyfunc;
-void *umka;
 
 void die() {
 	th_audio_deinit();
 	if (destroyfunc) {
-		umkaCall(umka, destroyfunc, 0, NULL, NULL);
+		umkaCall(thg.umka, destroyfunc, 0, NULL, NULL);
 	}
 
-	umkaFree(umka);
+	umkaFree(thg.umka);
 }
 
 void HandleDestroy() {
@@ -27,36 +24,25 @@ void HandleDestroy() {
 }
 
 int main(int argc, char *argv[]) {
-	umka = umkaAlloc();
+	thg.umka = umkaAlloc();
 	int umkaOK;
 
-	char rp[255];
-	respath = &rp[0];
-
 	FILE *f;
-	char scriptpath[20];
+	char scriptpath[512];
 	if ((f = fopen("main.um", "r"))) {
-		strcpy(respath, "./");
+		strcpy(thg.respath, "./");
 		strcpy(scriptpath, "main.um");
 		fclose(f);
-	} else if ((f = fopen("game.um", "r"))) {
-		strcpy(respath, "./");
-		strcpy(scriptpath, "game.um");
-		fclose(f);
 	} else if ((f = fopen("tophat.dat/main.um", "r"))) {
-		strcpy(respath, "tophat.dat/");
+		strcpy(thg.respath, "tophat.dat/");
 		strcpy(scriptpath, "tophat.dat/main.um");
-		fclose(f);
-	} else if ((f = fopen("tophat.dat/game.um", "r"))) {
-		strcpy(respath, "tophat.dat/");
-		strcpy(scriptpath, "tophat.dat/game.um");
 		fclose(f);
 	} else {
 		th_error("Could not find game.um or main.um. Make sure you are in a proper directory.");
 
 		return 1;
 	}
-	umkaOK = umkaInit(umka, scriptpath, NULL, 1024 * 1024, 1024 * 1024, NULL, 0, NULL);
+	umkaOK = umkaInit(thg.umka, scriptpath, NULL, 1024 * 1024, 1024 * 1024, NULL, 0, NULL);
 
 	th_audio_init();
 
@@ -65,24 +51,23 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	_th_umka_bind(umka);
-	umkaOK = umkaCompile(umka);
+	_th_umka_bind(thg.umka);
+	umkaOK = umkaCompile(thg.umka);
 
 	if (!umkaOK) {
 		UmkaError error;
-		umkaGetError(umka, &error);
+		umkaGetError(thg.umka, &error);
 		th_error("%s (%d, %d): %s\n", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}
 
-	destroyfunc = umkaGetFunc(umka, NULL, "windowdestroy");
-	scaling = 1;
-	_th_input_init();
+	destroyfunc = umkaGetFunc(thg.umka, NULL, "windowdestroy");
+	thg.scaling = 1;
 
-	umkaOK = umkaRun(umka);
+	umkaOK = umkaRun(thg.umka);
 	if (!umkaOK) {
 		UmkaError error;
-		umkaGetError(umka, &error);
+		umkaGetError(thg.umka, &error);
 		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
 		fprintf(stderr, "\tStack trace:\n");
 
@@ -90,7 +75,7 @@ int main(int argc, char *argv[]) {
 			char fnName[UMKA_MSG_LEN + 1];
 			int fnOffset;
 
-			if (!umkaGetCallStack(umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1)) {
+			if (!umkaGetCallStack(thg.umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1)) {
 				break;
 				fprintf(stderr, "\t\t...\n");
 			}

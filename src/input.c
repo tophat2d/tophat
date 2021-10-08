@@ -1,10 +1,7 @@
 #include <string.h>
+#include "tophat.h"
 
-int mousex;
-int mousey;
-
-int pressed[255];
-int just_pressed[255];
+extern th_global thg;
 
 void HandleKey(int keycode, int bDown) {
 	if (keycode > 255) {
@@ -36,29 +33,23 @@ void HandleKey(int keycode, int bDown) {
 	}
 
 	if (!bDown) {
-		pressed[keycode] = 0;
-		just_pressed[keycode] = 0;
+		thg.pressed[keycode] = 0;
+		thg.just_pressed[keycode] = 0;
 		return;
 	}
 
-	if (!pressed[keycode]) {
-		pressed[keycode] = 1;
-		just_pressed[keycode] = 1;
+	if (!thg.pressed[keycode]) {
+		thg.pressed[keycode] = 1;
+		thg.just_pressed[keycode] = 1;
 		return;
 	}
 
-	just_pressed[keycode] = 0;
+	thg.just_pressed[keycode] = 0;
 }
 void HandleButton( int x, int y, int button, int bDown ) {
 	HandleKey(button+6, bDown);
 }
 
 void HandleMotion( int x, int y, int mask ) {
-	mousex = x;
-	mousey = y;
-}
-
-void _th_input_init() {
-	memset(&pressed[0], 0, 255 * sizeof(int));
-	memset(&just_pressed[0], 0, 255 * sizeof(int));
+	thg.mouse = (th_vf2){{x, y}};
 }
