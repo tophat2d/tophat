@@ -152,6 +152,9 @@ typedef struct {
 
 	th_sound *sounds[MAX_SOUNDS];
 	uu sound_count;
+
+	th_font *fonts[MAX_FONTS];
+	uu font_count;
 } th_global;
 
 // audio
@@ -202,6 +205,7 @@ void th_str_to_img(
 	uint32_t *runes, uu runec,
 	fu scale, uint32_t color,
 	th_vf2 spacing);
+void th_font_deinit();
 
 th_vf2 th_quad_min(th_quad q);
 

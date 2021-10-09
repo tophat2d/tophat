@@ -4,6 +4,8 @@
 #include <string.h>
 #include <stb_truetype.h>
 
+extern th_global thg;
+
 struct {
 	uint32_t rune;
 	uint8_t *data;
@@ -105,4 +107,11 @@ void th_str_to_img(
 
 	th_image_from_data(out, data, (th_vf2){.w=w, .h=h});
 	free(data);
+}
+
+void th_font_deinit() {
+	while (thg.font_count--) {
+		free(thg.fonts[thg.font_count]->info);
+		free(thg.fonts[thg.font_count]);
+	}
 }

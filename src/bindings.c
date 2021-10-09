@@ -25,7 +25,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cfopen", &umfopen);
 
 	umkaAddFunc(umka, "ctexttoimg", &umfonttexttoimg);
-	umkaAddFunc(umka, "cfontfree", &umfontfree);
 	umkaAddFunc(umka, "cfontload", &umfontload);
 
 	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
@@ -131,7 +130,7 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_font *f = (th_font *)p[5].ptrVal;
+	th_font *f = thg.fonts[p[5].intVal-1];
 	uint32_t *runes = (uint32_t *)p[4].ptrVal;
 	uu runec = p[3].intVal;
 	fu scale = p[2].real32Val;
@@ -143,16 +142,14 @@ void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = (intptr_t)img;
 }
 
-void umfontfree(UmkaStackSlot *p, UmkaStackSlot *r) {
-	free((void *)p[0].ptrVal);
-}
-
 void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char buf[512];
 	strcpy(buf, thg.respath);
 	strcat(buf, (char *)p[0].ptrVal);
 
-	th_font_load((th_font *)p[1].ptrVal, buf);
+	th_font *f = thg.fonts[thg.font_count++] = calloc(sizeof(th_font), 1);
+	th_font_load(f, buf);
+	r->intVal = thg.font_count;
 }
 
 // sets values of all dots to lightmask's color
