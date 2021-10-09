@@ -98,7 +98,7 @@ void th_audio_init(){
 void th_audio_deinit() {
 	ma_device_uninit(&audev);
 
-	while (--thg.sound_count) {
+	while (thg.sound_count--) {
 		ma_decoder_uninit(&thg.sounds[thg.sound_count]->decoder);
 
 		free(thg.sounds[thg.sound_count]);
