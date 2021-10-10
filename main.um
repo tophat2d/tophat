@@ -44,6 +44,7 @@ fn main() {
 		if th.delta == 0 {
 			th.delta = 16
 		}
+
 		canvas.drawText(repr(1000/th.delta), th.Vf2{0, 0}, th.black, 1)
 	}
 }

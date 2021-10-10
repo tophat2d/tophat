@@ -130,7 +130,11 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_font *f = thg.fonts[p[5].intVal-1];
+	if (p[5].uintVal-1 >= thg.font_count) {
+		th_error("Invalid font\n");
+		return;
+	}
+	th_font *f = thg.fonts[p[5].uintVal-1];
 	uint32_t *runes = (uint32_t *)p[4].ptrVal;
 	uu runec = p[3].intVal;
 	fu scale = p[2].real32Val;
@@ -373,29 +377,37 @@ void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // sets array of sounds to be played
 void umsoundloop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[1].intVal) return;
-	if (p[1].intVal-1 >= thg.sound_count) return;
+	if (!p[1].intVal || p[1].intVal-1 >= thg.sound_count) {
+		th_error("Invalid sound\n");
+		return;
+	}
 	th_sound *s = thg.sounds[p[1].intVal - 1];
 	s->looping = p[0].intVal;
 }
 
 void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[0].intVal) return;
-	if (p[0].intVal-1 >= thg.sound_count) return;
+	if (!p[0].intVal || p[0].intVal-1 >= thg.sound_count) {
+		th_error("Invalid sound\n");
+		return;
+	}
 	th_sound *s = thg.sounds[p[0].intVal-1];
 	s->playing = 1;
 }
 
 void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[0].intVal) return;
-	if (p[0].intVal-1 >= thg.sound_count) return;
+	if (!p[0].intVal || p[0].intVal-1 >= thg.sound_count) {
+		th_error("Invalid sound\n");
+		return;
+	}
 	th_sound *s = thg.sounds[p[0].intVal-1];
 	s->playing = 0;
 }
 
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[1].intVal) return;
-	if (p[1].intVal-1 >= thg.sound_count) return;
+	if (!p[1].intVal || p[1].intVal-1 >= thg.sound_count) {
+		th_error("Invalid sound\n");
+		return;
+	}
 	th_sound *s = thg.sounds[p[1].intVal - 1];
 	s->volume = p[0].real32Val;
 }
