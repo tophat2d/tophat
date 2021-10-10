@@ -524,7 +524,7 @@ void umCNFGSwapBuffers(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGHandleInput(UmkaStackSlot *p, UmkaStackSlot *r) {
-	CNFGHandleInput();
+	r->intVal = CNFGHandleInput();
 }
 
 // calculates scaling

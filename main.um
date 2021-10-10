@@ -33,8 +33,7 @@ fn main() {
 	e.i.handle = 0
 	//e.t.s = th.Vf2{1, 1}
 
-	for true {
-		window.cycle(cam)
+	for window.cycle(cam) {
 		canvas.setColor(th.white)
 		canvas.drawRect(cam)
 

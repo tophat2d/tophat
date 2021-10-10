@@ -70,8 +70,7 @@ fn main() {
 
 	lastStep := th.time
 
-	for true {
-		window.cycle(cam)
+	for window.cycle(cam) {
 		canvas.setColor(th.black)
 		canvas.drawRect(cam)
 

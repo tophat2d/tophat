@@ -30,8 +30,7 @@ fn main() {
 		std.fclose(f)
 	}
 
-	for true {
-		window.cycle(global.cam)
+	for window.cycle(global.cam) {
 		canvas.setColor(0x000022ff)
 		canvas.drawRect(global.cam)
 		

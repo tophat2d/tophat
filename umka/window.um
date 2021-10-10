@@ -23,7 +23,7 @@ fn wsetup(title: str, w, h: int)
 fn clearframe()
 fn getdimensions(w, h: ^int32)
 fn swapbuffers()
-fn handleinput()
+fn handleinput(): bool
 // Set's up the engine and opens a window.
 fn setup*(title: str, w, h: int32) {
 	wsetup(title, w, h)
@@ -43,14 +43,10 @@ fn setwindowtitle*(title: str)
 fn visualizecam(w, h: int32, color: uint32)
 fn updatescaling(w, h, camw, camh: int32)
 
-// Function called each cycle.
-// W and H will return the
-// window size, bgcolor will
-// be the background color
-// of the window and cam
-// is used for in engine
-// stuff.
-fn cycle*(cam: rect.Rect) {
+// Cycle needs to be called every cycle. Pass the currently used camera, which
+// i used to calculate tophat's scaling. It returns true, if the window is
+// still running.
+fn cycle*(cam: rect.Rect): bool {
 	canvas.setColor(0x000000ff)
 	canvas.drawRect(rect.Rect{0, cam.h, w, h})
 	canvas.drawRect(rect.Rect{cam.w, 0, w, h})
@@ -66,9 +62,10 @@ fn cycle*(cam: rect.Rect) {
 
 	canvas.setBgColor(0x000000ff)
 	clearframe()
-	handleinput()
+	running := handleinput()
 	getdimensions(&w, &h)
 
 	updatescaling(w, h, round(cam.w), round(cam.h))
+	return running
 }
 
