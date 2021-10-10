@@ -14,6 +14,7 @@ import (
 const (
 	speed = 0.07
 	bulletSpeed = 0.1
+	shootTimeout = 300
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 	bulletPrefab: ent.Ent
 	bullets*: []ent.Ent
 	frames: []image.Image
+	lastShot: int = -shootTimeout
 )
 
 fn init*() {
@@ -56,7 +58,7 @@ fn handle*() {
 
 	e.animate(4, &frames, th.time)
 
-	if input.isJustPressed(input.KEY_SPACE) {
+	if input.isJustPressed(input.KEY_SPACE) && th.time - lastShot >= shootTimeout {
 		sound.shoot.play()
 		b := bulletPrefab
 		b.t.p = th.Vf2{e.t.p.x + 1, e.t.p.y - bulletPrefab.r.h}
@@ -64,6 +66,8 @@ fn handle*() {
 		bullets = append(bullets, b)
 		b.t.p.x += 3
 		bullets = append(bullets, b)
+
+		lastShot = th.time
 	}
 
 	enemies := enemy.getEnts()
