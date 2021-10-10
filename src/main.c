@@ -24,9 +24,7 @@ void die() {
 	died = 1;
 }
 
-void HandleDestroy() {
-	die();
-}
+void HandleDestroy() { }
 
 int main(int argc, char *argv[]) {
 	thg.umka = umkaAlloc();
