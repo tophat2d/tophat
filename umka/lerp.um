@@ -18,6 +18,12 @@ type Item* = struct {
 	callback: fn(ctx: Any)
 }
 
+// Item's constructor
+fn mk*(start, end: th.fu, length: th.uu, swap: bool): Item {
+	return Item{
+		start, end, length, 0, swap, null, fn(ctx: Any) {}}
+}
+
 // Lerper is a queue of items. It will lerp the first one and if it ends
 // and it doesn't have swap enabled, it will dequeue it.
 type Lerper* = []Item
