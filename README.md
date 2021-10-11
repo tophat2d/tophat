@@ -59,4 +59,4 @@ Tip: run make with `-j$(nproc)` for parallel compiling.
 - [vtereshkov](https://github.com/vtereshkov/) - umka
 - [cnlohr](https://github.com/cnlohr) - rawdraw
 - [nothings](https://github.com/nothings) - stb (image and ttf)
-- [mackron](https://github.com/mackron) - miniadio
+- [mackron](https://github.com/mackron) - miniaudio
