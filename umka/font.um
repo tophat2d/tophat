@@ -12,6 +12,13 @@ type Font* = struct {
 	index: th.uu
 }
 
+type Cached* = struct {
+	runes: map.Map
+	color: uint32
+	size: th.fu
+	font: Font
+}
+
 fn ctexttoimg(
 	t: th.uu, text: ^utf8.Rune,
 	runec: th.uu, size: th.fu, color: uint32, spacing: th.Vf2): uint
@@ -28,3 +35,88 @@ fn cfontload(path: str): th.uu
 fn load*(path: str): Font {
 	return Font{cfontload(path)}
 }
+
+fn getYOff(f: th.uu, r: utf8.Rune): int
+
+fn mkCached*(f: Font, c: uint32, s: th.fu): Cached {
+	return Cached {
+		runes: map.Map{},
+		color: c,
+		size: s,
+		font: f}
+}
+
+fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
+	if &c.runes == null {
+		c.runes = map.Map{}
+	}
+
+	c.runes.set(rune,
+		c.font.strToImage(rune.encode(), c.size, c.color, th.Vf2{0, 0}))
+}
+
+fn (c: ^Cached) preCacheStr*(s: str) {
+	runes := utf8.decode(s)
+	
+	for r in runes {
+		if r == uint32(' ') {
+			continue
+		}
+
+		if ^image.Image(c.runes.get(r)) == null {
+			c.preCacheRune(r)
+		}
+	}
+}
+
+fn (c: ^Cached) draw*(text: str, t: th.Transform) {
+	lx := t.p.x
+	runes := utf8.decode(text)
+
+	maxH := -1.0
+	for r in runes {
+		if r == uint32(' ') {
+			continue
+		}
+
+		if ^image.Image(c.runes.get(r)) == null {
+			c.preCacheRune(r)
+		}
+
+		if h := ^image.Image(c.runes.get(r)).getDims().y; maxH < 0 || maxH < h {
+			maxH = h
+		}
+	}
+
+	maxH /= 1.5
+	for r in runes {
+		// line and space handling is bad.
+		if r == uint32(' ') {
+			dm := ^image.Image(c.runes.get(runes[0])).getDims()
+			t.p.x += dm.x * t.s.x
+			continue
+		}
+
+		if r == uint32('\n') {
+			dm := ^image.Image(c.runes.get(runes[0])).getDims()
+			t.p.y += maxH*1.1 * t.s.y
+			t.p.x = lx
+		}
+
+		if ^image.Image(c.runes.get(r)) == null {
+			c.preCacheRune(r)
+		}
+
+		img := ^image.Image(c.runes.get(r))^
+		dm := img.getDims()
+		off := (maxH - dm.y) + (dm.y + getYOff(c.font.index, r) * c.size)
+		off *= t.s.y	
+
+		t.p.y += off
+		img.draw(t)
+		t.p.y -= off
+
+		t.p.x += dm.x * t.s.x
+	}
+}
+

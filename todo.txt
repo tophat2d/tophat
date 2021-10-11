@@ -1,0 +1,45 @@
+Lines starting with ? aren't definite. List isn't sorted in any way.
+Items are kind of grouped.
+
+store images better
+
+fix memory leaks
+
+cached fonts spacing
+fix 14 and 17 with fonts
+
+light color blending
+light pixel plot function in umka
+more light shapes
+?light occlussion
+
+reconstruct ui.um
+	grid in box
+	box has button functions
+	rich text label using cached fonts
+	additional elements
+		checkbox
+		progress bar
+		?input box
+
+?gui editor
+	entity constructor
+	tilemap editor and entity placer
+	??ui builder
+
+redo tophat distribution
+	just distribute binary
+	games will be packaged with external program
+		file embedding
+
+simplify particle's code
+particles constructor
+
+th.Transform constructors
+
+make tutorials
+	fonts
+	ui
+	game structure
+	tilemaps
+	basics

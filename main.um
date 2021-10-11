@@ -20,6 +20,7 @@ import (
 	"umka/vec.um"
 
 	"umka/std/std.um"
+	"umka/std/map.um"
 )
 
 fn main() { 
@@ -32,6 +33,10 @@ fn main() {
 	e.c = th.red
 	e.i.handle = 0
 	//e.t.s = th.Vf2{1, 1}
+	c := font.Cached{
+		map.Map{}, 0, 0.1,
+		font.load("examples/space-shooter/gfx/marediv-regular.ttf")}
+printf("%d\n", c.font.index)
 
 	for window.cycle(cam) {
 		canvas.setColor(th.white)
@@ -44,6 +49,8 @@ fn main() {
 			th.delta = 16
 		}
 
+		c.draw("a B q\na B q", th.Transform{p: th.Vf2{20, 20}, s: th.Vf2{0.03, 0.03}})		
+		canvas.drawLine(th.Vf2{20, 20}, th.Vf2{21, 20}, 1, th.cyan)
 		canvas.drawText(repr(1000/th.delta), th.Vf2{0, 0}, th.black, 1)
 	}
 }

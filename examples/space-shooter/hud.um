@@ -8,21 +8,19 @@ import (
 
 var (
 	hearth: image.Image
-	mainFont: font.Font
-	scoreImg: image.Image
+	mainFont: font.Cached
 )
 
 fn init*() {
 	hearth = image.load("gfx/hearth.png")
 
-	mainFont = font.load("gfx/marediv-regular.ttf")
-	scoreImg = mainFont.strToImage("0", 0.004, 0xeeeeee00, th.Vf2{1, 1})
+	mainFont = font.mkCached(
+		font.load("gfx/marediv-regular.ttf"),
+		0xeeeeee00, 0.04)
+	mainFont.preCacheStr("0123456789")
 }
 
-fn updateScore*() {
-	scoreImg.delete()
-	scoreImg = mainFont.strToImage(repr(global.score), 0.004, 0xeeeeee00, th.Vf2{1, 1})
-}
+fn updateScore*() { }
 
 fn handle*() { }
 
@@ -35,5 +33,7 @@ fn draw*() {
 				s: th.Vf2{1, 1}})
 	}
 
-	scoreImg.draw(th.Transform{p: th.Vf2{1, 1}, s: th.Vf2{1, 1}})
+	mainFont.draw(
+		repr(global.score), th.Transform{
+			p: th.Vf2{1, 1}, s: th.Vf2{0.06, 0.06}})
 }

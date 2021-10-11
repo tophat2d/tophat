@@ -5,6 +5,7 @@ void _th_umka_bind(void *umka);
 void umfopen(UmkaStackSlot *p, UmkaStackSlot *r);
 void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r);
 void umfontload(UmkaStackSlot *p, UmkaStackSlot *r);
+void umfontgetyoff(UmkaStackSlot *p, UmkaStackSlot *r);
 void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r);
 void umlightmaskdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 void umspotlightstamp(UmkaStackSlot *p, UmkaStackSlot *r);

@@ -26,6 +26,7 @@ void _th_umka_bind(void *umka) {
 
 	umkaAddFunc(umka, "ctexttoimg", &umfonttexttoimg);
 	umkaAddFunc(umka, "cfontload", &umfontload);
+	umkaAddFunc(umka, "getYOff", &umfontgetyoff);
 
 	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
 	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
@@ -154,6 +155,19 @@ void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_font *f = thg.fonts[thg.font_count++] = calloc(sizeof(th_font), 1);
 	th_font_load(f, buf);
 	r->intVal = thg.font_count;
+}
+
+void umfontgetyoff(UmkaStackSlot *p, UmkaStackSlot *r) {
+	if (p[1].uintVal-1 >= thg.font_count) {
+		th_error("Invalid font %d\n", p[1].intVal);
+		return;
+	}
+	th_font *f = thg.fonts[p[1].uintVal-1];
+	uint32_t rune = p[0].uintVal;
+
+	int out, t;
+	stbtt_GetCodepointBitmapBox(f->info, rune, 1, 1, &t, &out, &t, &t);
+	r->intVal = out;
 }
 
 // sets values of all dots to lightmask's color
