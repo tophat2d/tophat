@@ -1,345 +1,115 @@
-// Small and modular ui module useful for stuff like menus.
-// Set ui.mainelement to your main element.
 
 import (
 	"th.um"
+	"vec.um"	
 	"rect.um"
 	"canvas.um"
-	"input.um"
-	"image.um"
 )
 
-const (
-	// text aligns
-	MID* = 0
-	TOP*
-	BOT*
-
-	// image modes
-	CENTER* = 0
-	STRETCH*
-	SCALE*
-)
-
-// These are properties every element should have.
 type Generic* = struct {
-	padding: rect.Rect // amount of space removed from the space available
-	
-	// position and dimensions. You can set them manually, or use box for automatic
-	// placement.
-	dimensions: rect.Rect
-	span: int // how many elements in a box it spans
+	t: th.Transform
+	onEvent: fn(evenType: th.uu, ctx: interface{})
+	gridPos: th.Vf2
+	gridSpan: th.Vf2
 }
 
-// Elements is the interface for all ui elements. You can make your own elements.
 type Element* = interface {
-	draw() // draws the element
-	calculate() // calculates it's dimensions
-	handle() // handle cycle
-	get(): ^Generic // returns a pointer to it's generic
+	handle()
+	draw()
+	get(): ^Generic
 }
 
-// Box can be used to oranize
-// elements in a v/hbox style or
-// to draw image (or both).
-// It has children, which are organized
-// on it's calculate call.
-type Box* = struct {
+type Grid* = struct {
 	g: Generic
-	children: []Element
-	vertical: bool // false: hbox
-
-	image: image.Image
-	imageMode: th.uu // CENTER, STRETCH, SCALE
-	imgs: th.fu // ignore
-	imgPos: th.Vf2 // ignore
+	w, h: th.uu
+	elements: []Element
 }
 
-// Label can be used to draw text.
-type Label* = struct {
+type SimpleLabel* = struct {
 	g: Generic
 	text: str
-	textSize: real
-	textColor: uint32
-	align: th.Vf2
+	textSize: th.fu
+	color: uint32
 	bgColor: uint32
-
-	off: th.Vf2
 }
 
-// Button checks for clicks on it's
-// handle function. Clicks can be recieved
-// the input way, or as callbacks.
-type Button* = struct {
-	label: Label // Label (this is what is actually drawn)
-	toggled: bool // is toggled
-	pressed: bool // is pressed
-	justPressed: bool // is just pressed
-	justReleased: bool // is just release
-
-	g: Generic
-
-	onPress, onJustPress, onRelease: fn() // callbacks
-	onToggle: fn(toggled: bool)
+fn (g: ^Generic) grid*(x, y: th.uu): ^Generic {
+	g.gridPos.x = x
+	g.gridPos.y = y
+	return g
 }
 
-////////////////////////////////
-// box
-
-fn mkbox*(c: []Element, vertical: bool): Box {
-	h := Box {}
-
-	h.g = Generic{
-		padding: rect.Rect{},
-		dimensions: rect.Rect{},
-		span: 1}
-	h.children = c
-	h.vertical = vertical
-	h.imageMode = CENTER
-
-	return h
+fn (g: ^Generic) span*(x, y: th.uu): ^Generic {
+	g.gridSpan.x = x
+	g.gridSpan.y = y
+	return g
 }
 
-fn (b: ^Box) calculate*() {
-	generics := make([]^Generic, len(b.children))
-	for i:=0; i < len(b.children); i++ {
-		generics[i] = b.children[i].get()
-	}
+fn mkGrid*(w, h: th.uu): Grid {
+	return Grid {
+		g: Generic{},
+		w: w, h: h,
+		elements: []Element{}}
+}
 
-	totalspan := 0.0
-	off := 0
+fn (g: ^Grid) get*(): ^Generic {
+	return &g.g
+}
 
-	for i:=0; i < len(b.children); i++ {
-		totalspan += generics[i].span
-	}
+fn (g: ^Grid) handle*() {
+	cellSize := th.Vf2{g.g.t.s.x/g.w, g.g.t.s.y/g.h}
 
-	for i:=0; i < len(b.children); i++ {
-		dims := &generics[i].dimensions
-		padd := &generics[i].padding
+	for i:=0; i < len(g.elements); i++ {
+		e := &g.elements[i]
+		ge := e.get()
 
-		if b.vertical {
-			dims.x = b.g.dimensions.x + off + padd.x
-			dims.w = trunc(real(b.g.dimensions.w)/totalspan) * generics[i].span - padd.w
-
-			dims.y = b.g.dimensions.y + padd.y
-			dims.h = b.g.dimensions.h - padd.h
-      
-			b.children[i].calculate()
-      
-			off += trunc(real(b.g.dimensions.w)/totalspan) * generics[i].span
-		} else {
-			dims.x = b.g.dimensions.x + padd.x
-			dims.w = b.g.dimensions.w - padd.w - padd.x
-      
-			dims.y = b.g.dimensions.y + off + padd.y
-			dims.h = trunc(real(b.g.dimensions.h)/totalspan * generics[i].span) -
-				padd.h - padd.y
-      
-			b.children[i].calculate()
-      
-			off += trunc(real(b.g.dimensions.h)/totalspan) * generics[i].span
-		}
-	}
-
-	if b.image.handle == 0 {
-		return
-	}
-
-	dm := b.image.getDims()
-	switch b.imageMode {
-	case CENTER:
-		b.imgs = 1
-
-
-		b.imgPos.x = round(b.g.dimensions.x + (b.g.dimensions.w-dm.x)/2)
-		b.imgPos.y = round(b.g.dimensions.y + (b.g.dimensions.h-dm.y)/2)
-	case SCALE:
-		sx := round(b.g.dimensions.w / dm.x)
-		sy := round(b.g.dimensions.h / dm.y)
-
-		b.imgs = sy
-
-		if sx < sy {
-			b.imgs = sx
+		if ge.gridPos.x > g.w || ge.gridPos.y > g.h {
+			error("ui.Grid: out of bounds.")
 		}
 
-		b.imgPos.x = round(b.g.dimensions.x + (b.g.dimensions.w - dm.x*b.imgs)/2)
-		b.imgPos.y = round(b.g.dimensions.y + (b.g.dimensions.h - dm.y*b.imgs)/2)
+		ge.t.p = vec.mul(ge.gridPos, cellSize)
+
+		if ge.gridPos.x + ge.gridSpan.x > g.w ||
+			ge.gridPos.y + ge.gridSpan.y > g.h {
+			error("ui.Grid: out of bounds.")
+		}
+
+		if ge.gridSpan.x == 0 {
+			ge.gridSpan.x = 1
+		}
+
+		if ge.gridSpan.y == 0 {
+			ge.gridSpan.y = 1
+		}
+
+		ge.t.s = vec.mul(ge.gridSpan, cellSize)
+
+		e.handle()
 	}
 }
 
-fn (hb: ^Box) draw*() {
-
-	if hb.image.handle != 0 {
-		hb.image.draw(th.Transform{th.Vf2{hb.imgPos.x, hb.imgPos.y}, th.Vf2{hb.imgs, hb.imgs}, th.Vf2{}, 0})
-	}
-
-	for i:=0; i < len(hb.children); i++ {
-		hb.children[i].draw()
+fn (g: ^Grid) draw*() {
+	for e in g.elements {
+		e.draw()
 	}
 }
 
-fn (b: ^Box) get*(): ^Generic {
-	return &b.g
+fn mkSimpleLabel*(text: str, color: uint32, size: th.fu): SimpleLabel {
+	return SimpleLabel {
+		g: Generic{},
+		text: text,
+		textSize: size,
+		color: color}
 }
 
-fn (hb: ^Box) handle*() {
-	for i:=0; i < len(hb.children); i++ {
-		hb.children[i].handle()
-	}
-}
-
-////////////////////////////////
-// label
-
-fn mklabel*(text: str, textsize: real, textcolor: uint32): Label {
-	h := Label{}
-
-	h.g = Generic{
-		padding: rect.Rect{},
-		dimensions: rect.Rect{},
-		span: 1}
-
-	h.text = text
-	h.textSize = textsize
-	h.textColor = textcolor
-	h.bgColor = 0
-	h.align = th.Vf2{MID, MID}
-
-	return h
-}
-
-fn (l: ^Label) calculate*() {
-	sx, sy := canvas.textSize(l.text, l.textSize)
-
-	switch round(l.align.y) {
-	case MID:
-		l.off.y = (l.g.dimensions.h - sy)/2// - l.g.padding.h)/2
-	case BOT:
-		l.off.y = l.g.dimensions.h - sy
-	}
-
-	switch round(l.align.x) {
-	case MID:
-		l.off.x = (l.g.dimensions.w - sx)/2
-	case BOT:
-		l.off.x = l.g.dimensions.w - sx
-	}
-}
-
-fn (l: ^Label) draw*() {
-	canvas.setColor(l.bgColor)
-	canvas.drawRect(rect.Rect{
-		round(l.g.dimensions.x + l.g.padding.x),
-		round(l.g.dimensions.y + l.g.padding.y),
-		round(l.g.dimensions.w - l.g.padding.w),
-		round(l.g.dimensions.h - l.g.padding.h)})
-
-	canvas.drawText(
-		l.text,
-		th.Vf2{
-			l.g.dimensions.x + l.g.padding.x + l.off.x,
-			l.g.dimensions.y + l.g.padding.y + l.off.y},
-		l.textColor, l.textSize)
-}
-
-fn (l: ^Label) get*(): ^Generic {
+fn (l: ^SimpleLabel) get*(): ^Generic {
 	return &l.g
 }
 
-fn (l: ^Label) handle*() {}
+fn (l: ^SimpleLabel) handle*() { }
 
-////////////////////////////////
-// button
-
-fn mkbutton*(l: Label): Button {
-	b := Button{}
-
-	b.g = Generic{
-		padding: l.g.padding,
-		dimensions: rect.Rect{},
-		span: 1}
-
-	b.label = l
-	b.pressed = false
-	b.justPressed = false
-	b.toggled = false
-
-	b.onPress = fn() {}
-	b.onJustPress = fn() {}
-	b.onRelease = fn() {}
-	b.onToggle = fn(toggled: bool) {}
-
-	return b
-}
-
-fn (b: ^Button) calculate*() {
-	b.label.g.dimensions = b.g.dimensions
-	b.label.calculate()
-}
-
-fn (b: ^Button) draw*() {
-	b.label.draw()
-}
-
-fn (b: ^Button) get*(): ^Generic {
-	return &b.g
-}
-
-fn (b: ^Button) handle*() {
-	mx, my := input.getMousePos()
-	mp := input.isPressed(input.LMB)
-
-	ms := (
-		b.g.dimensions.x <= mx &&
-		b.g.dimensions.y <= my &&
-		mx <= b.g.dimensions.x + b.g.dimensions.w &&
-		my <= b.g.dimensions.y + b.g.dimensions.h)
-
-	b.justPressed = false
-	b.justReleased = false 
-
-	if ms && mp {
-		if !b.pressed {
-			b.justPressed = true
-			b.onJustPress()
-		}
-		b.pressed = true
-		b.onPress()
-	} else {
-		if b.pressed {
-			b.justReleased = true
-			b.onRelease()
-		}
-		b.pressed = false
-	}
-
-	if b.justPressed {
-		b.toggled = !b.toggled
-		b.onToggle(b.toggled)
-	}
-}
-
-////////////////////////////////
-// main handler
-// doing it like this is stupid.
-
-var mainelement*: Element
-
-// no need to call this
-fn update(w, h: int32) {
-	dims := &mainelement.get().dimensions
-	padd := &mainelement.get().padding
-	dims.x = padd.x
-	dims.y = padd.y
-	dims.w = w - padd.w - padd.x
-	dims.h = h - padd.h - padd.y
-	mainelement.calculate()
-}
-
-// Call this every loop.
-fn handle*(w, h: int32) {
-	update(w, h)
-	mainelement.handle()
-	mainelement.draw()
+fn (l: ^SimpleLabel) draw*() {
+	canvas.setColor(l.bgColor)
+	canvas.drawRect(rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
+	canvas.drawText(l.text, l.g.t.p, l.color, l.textSize)
 }

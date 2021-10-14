@@ -20,8 +20,6 @@ fn init*() {
 	mainFont.preCacheStr("0123456789")
 }
 
-fn updateScore*() { }
-
 fn handle*() { }
 
 fn draw*() {

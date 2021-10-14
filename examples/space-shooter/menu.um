@@ -15,7 +15,6 @@ fn init*() {
 	playButton.g.span = 2
 	playButton.onRelease = fn() {
 		global.score = 0
-		hud.updateScore()
 		global.scene = global.GAME
 	}
 

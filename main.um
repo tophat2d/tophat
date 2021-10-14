@@ -26,32 +26,26 @@ import (
 fn main() { 
 	cam := rect.mk(0, 0, 250, 250)
 	window.setup("test game", 100, 100)
-	var w, h: int32
 
-	img := image.load("etc/test.png")
-	e := ent.mk(img, th.Transform{s: th.Vf2{2, 1}, p: th.Vf2{10, 10}, o: th.Vf2{}, r: 20.0})
-	e.c = th.red
-	e.i.handle = 0
-	//e.t.s = th.Vf2{1, 1}
-	c := font.Cached{
-		map.Map{}, 0, 0.1,
-		font.load("examples/space-shooter/gfx/marediv-regular.ttf")}
-printf("%d\n", c.font.index)
+	g := ui.mkGrid(3, 3)
+	g.g.t.s = th.Vf2{cam.w, cam.h}
+	l := ui.mkSimpleLabel("Hello world", th.black, 2)
+	l.get().grid(1, 1).span(2, 1)
+	l.bgColor = th.red
+	g.elements = []ui.Element{ui.Element(l)}
+	
 
 	for window.cycle(cam) {
 		canvas.setColor(th.white)
 		canvas.drawRect(cam)
 
-		e.t.p = input.getGlobalMousePos(cam)
-		e.draw(cam)
-
 		if th.delta == 0 {
 			th.delta = 16
 		}
-
-		c.draw("a B q\na B q", th.Transform{p: th.Vf2{20, 20}, s: th.Vf2{0.03, 0.03}})		
-		canvas.drawLine(th.Vf2{20, 20}, th.Vf2{21, 20}, 1, th.cyan)
 		canvas.drawText(repr(1000/th.delta), th.Vf2{0, 0}, th.black, 1)
+
+		g.handle()
+		g.draw()
 	}
 }
 
