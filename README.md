@@ -20,6 +20,10 @@ Visit the [homepage](https://marekmaskarinec.github.io/tophat.html) for more inf
 If you just want to see, how a game made using tophat looks like, you can find some in the `examples` folder.
 Standard library documentation can be found [here](https://marekmaskarinec.github.io/thdocs/index.html).
 
+## todo
+
+See the [todo list](./todo.txt).
+
 ## build instructions
 
 ### deps:
