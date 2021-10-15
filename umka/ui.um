@@ -246,6 +246,9 @@ fn (l: ^Label) draw*() {
 		return
 	}
 
+	canvas.setColor(l.bgColor)
+	canvas.drawRect(rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
+
 	l.font.preCacheStr(l.text) 
 	text := utf8.decode(l.text)
 
@@ -282,9 +285,36 @@ fn (l: ^Label) draw*() {
 		}
 	}
 
-	stext := "" 
-	for r in text {
-		stext += r.encode()
+	stext := ""
+	w := 0.0
+	lineH := -1.0
+	origY := l.g.t.p.y
+	for i:=0; i < len(text); i++ {
+		if text[i] == uint32('\n') || i == len(text)-1 {
+			if l.center {
+				l.g.t.p.x = (l.g.t.s.x - w) / 2
+			}
+			l.font.draw(stext, th.Transform{p: l.g.t.p, s: th.Vf2{l.scale, l.scale}})
+
+			stext = ""
+			l.g.t.p.y += lineH * l.scale * 1.6
+			if l.g.t.p.y + lineH*l.scale*1.8 > origY + l.g.t.s.y {
+				return
+			}
+			w = 0
+			continue
+		}
+
+		if text[i] == uint32(' ') {
+			w += ^image.Image(l.font.runes.get(text[0])).getDims().x * l.scale * 1.1
+		} else {
+			dm := ^image.Image(l.font.runes.get(text[i])).getDims().x
+			w += dm * l.scale * 1.1
+			if h := dm; lineH == -1 || h > lineH {
+				lineH = h
+			}
+		}
+
+		stext += text[i].encode()
 	}
-	l.font.draw(stext, th.Transform{p: l.g.t.p, s: th.Vf2{l.scale, l.scale}})
 }
