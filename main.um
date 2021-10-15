@@ -27,12 +27,28 @@ fn main() {
 	cam := rect.mk(0, 0, 250, 250)
 	window.setup("test game", 100, 100)
 
+	l := ui.mkSimpleLabel("Hello world", th.black, 2)
+	l.get().grid(0, 0).span(3, 1)
+	l.bgColor = th.red
+	l.g.ctx = &l
+	l.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
+		l := ^ui.SimpleLabel(ctx)
+		if eventType == ui.eventPress {
+			l.bgColor = th.cyan
+		} else if eventType == ui.eventRelease {
+			l.bgColor = th.red
+		}
+	}
+	l.center = true
+
+	iBox := ui.mkImage(image.load("etc/test.png"))
+	iBox.get().grid(0, 1).span(3, 2)
+	iBox.g.onEvent = fn(eventType: th.uu, ctx: interface{}) { }
+
 	g := ui.mkGrid(3, 3)
 	g.g.t.s = th.Vf2{cam.w, cam.h}
-	l := ui.mkSimpleLabel("Hello world", th.black, 2)
-	l.get().grid(1, 1).span(2, 1)
-	l.bgColor = th.red
-	g.elements = []ui.Element{ui.Element(l)}
+	g.elements = []ui.Element{&l, &iBox}
+	g.border = 10
 	
 
 	for window.cycle(cam) {
