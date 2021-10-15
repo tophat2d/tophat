@@ -133,8 +133,8 @@ fn (g: ^Grid) handle*() {
 
 		ge.t.p = vec.mul(ge.gridPos, cellSize)
 		// divide by to as there are two borders
-		ge.t.p.x += g.border/2
-		ge.t.p.y += g.border/2
+		ge.t.p.x += g.border/2 + g.g.t.p.x
+		ge.t.p.y += g.border/2 + g.g.t.p.y
 
 		if ge.gridPos.x + ge.gridSpan.x > g.w ||
 			ge.gridPos.y + ge.gridSpan.y > g.h {
@@ -239,7 +239,9 @@ fn (l: ^Label) get*(): ^Generic {
 	return &l.g
 }
 
-fn (l: ^Label) handle*() {  }
+fn (l: ^Label) handle*() {
+	l.g.handle()
+}
 
 fn (l: ^Label) draw*() {
 	if len(l.text) == 0 {
@@ -289,8 +291,8 @@ fn (l: ^Label) draw*() {
 	w := 0.0
 	lineH := -1.0
 	origY := l.g.t.p.y
-	for i:=0; i < len(text); i++ {
-		if text[i] == uint32('\n') || i == len(text)-1 {
+	for i:=0; true; i++ {
+		if i >= len(text) || text[i] == uint32('\n') {
 			if l.center {
 				l.g.t.p.x = (l.g.t.s.x - w) / 2
 			}
@@ -302,6 +304,7 @@ fn (l: ^Label) draw*() {
 				return
 			}
 			w = 0
+			if i >= len(text) { break }
 			continue
 		}
 

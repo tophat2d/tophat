@@ -8,7 +8,7 @@ import (
 
 var (
 	hearth: image.Image
-	mainFont: font.Cached
+	mainFont*: font.Cached
 )
 
 fn init*() {

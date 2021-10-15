@@ -7,38 +7,50 @@ import (
 	"global.um"
 )
 
+var (
+	grid: ui.Grid
+)
+
 fn init*() {
-	playButton := ui.mkbutton(ui.mklabel("PLAY", 1, 0x000022ff))
-	playButton.label.bgColor = 0xeeeeeeaa
-	playButton.label.align = th.Vf2{ui.MID, ui.MID}
-	playButton.g.padding = rect.mk(10, 5, 10, 5)
-	playButton.g.span = 2
-	playButton.onRelease = fn() {
+	title := ui.mkLabel(hud.mainFont, "SPACE SHOOTER", 0.12)
+	title.center = true
+	title.get().span(1, 2)
+
+	score := ui.mkLabel(hud.mainFont, "", 0.04)
+	score.center = true
+	score.get().grid(0, 2)
+
+	playButton := ui.mkLabel(hud.mainFont, "PLAY", 0.06)
+	playButton.center = true
+	playButton.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
+		if eventType != ui.eventRelease {
+			return
+		}
 		global.score = 0
 		global.scene = global.GAME
 	}
+	playButton.get().grid(0, 3)
 
-	exitButton := ui.mkbutton(ui.mklabel("EXIT", 1, 0x000022ff))
-	exitButton.label.bgColor = 0xeeeeeeaa
-	exitButton.g.padding = rect.mk(10, 5, 10, 5)
-	exitButton.g.span = 2
-	exitButton.onRelease = fn() {
+	exitButton := ui.mkLabel(hud.mainFont, "EXIT", 0.06)
+	exitButton.center = true
+	exitButton.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
+		if eventType != ui.eventRelease {
+			return
+		}
 		global.scene = global.NONE
 	}
+	exitButton.get().grid(0, 4)
 
-	ui.mainelement = ui.mkbox(
-		[]ui.Element{
-			ui.mklabel("SPACE SHOOTER", 2, 0xeeeeeeff),
-			ui.mklabel(
-				"SCORE: " + repr(global.score) + "TOP: " + repr(global.hi),
-				1, 0xeeeeeeff),
-			playButton, exitButton}, false)
-	^ui.Box(ui.mainelement).children[0].get().span = 2
+	grid = ui.mkGrid(1, 5)
+	grid.g.t.s = th.Vf2{global.cam.w, global.cam.h-20}
+	grid.g.t.p.y += 20
+	grid.elements = []ui.Element{title, score, playButton, exitButton}
 }
 
 fn handle*() {
-	^ui.Label(^ui.Box(ui.mainelement).children[1]).text = 
-		"SCORE: " + repr(global.score) + "TOP: " + repr(global.hi)
+	^ui.Label(grid.elements[1]).text =
+		"TOP " + repr(global.hi) + " SCORE " + repr(global.score)
 
-	ui.handle(round(global.cam.w), round(global.cam.h))
+	grid.handle()
+	grid.draw()
 }
