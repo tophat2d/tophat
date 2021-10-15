@@ -2,6 +2,7 @@
 import (
 	"th.um"
 	"vec.um"	
+	"utf8.um"
 	"rect.um"
 	"font.um"
 	"input.um"
@@ -56,10 +57,12 @@ type Image* = struct {
 
 type Label* = struct {
 	g: Generic
+	text: str
 	font: font.Cached
 	center: bool
 	wrapping: bool
 	bgColor: uint32
+	scale: th.fu
 }
 
 fn mkGeneric(): Generic {
@@ -215,7 +218,7 @@ fn (i: ^Image) draw*() {
 		if i.g.t.s.x < i.g.t.s.y {
 			s.x = i.g.t.s.x/dm.x
 			s.y = s.x
-			i.g.t.p.y = (i.g.t.s.y - s.y*dm.y)/2
+			i.g.t.p.y += (i.g.t.s.y - s.y*dm.y)/2
 		} else {
 			s.y = i.g.t.s.y/dm.y
 			s.x = s.y
@@ -226,10 +229,10 @@ fn (i: ^Image) draw*() {
 	i.image.draw(th.Transform{p: i.g.t.p, s: s})
 }
 
-fn mkLabel*(f: font.Cached, text: str): Label {
+fn mkLabel*(f: font.Cached, text: str, scale: th.fu): Label {
 	return Label {
-		mkGeneric(),
-		f, false, true, 0}
+		mkGeneric(), text,
+		f, false, true, 0, scale}
 }
 
 fn (l: ^Label) get*(): ^Generic {
@@ -248,15 +251,30 @@ fn (l: ^Label) draw*() {
 
 	if l.wrapping {
 		maxW := l.g.t.s.x
-		w := 0
+		w := 0.0
+		wordW := 0.0
 		lastSpace := 0
 		for i:=0; i < len(text); i++ {
-			if r == uint32(' ') {
+			if text[i] == uint32(' ') {
 				lastSpace = i
+				step := ^image.Image(l.font.runes.get(text[0])).getDims().x * l.scale * 1.1
+				w += step
+				if wordW > maxW {
+					text[i] = uint32('\n')
+					w = 0
+				}
+				wordW = 0
+			} else {
+				step := ^image.Image(l.font.runes.get(text[i])).getDims().x * l.scale * 1.1
+				w += step
+				wordW += step
+			}
+
+			if text[i] == uint32('\n') {
+				w = 0
 			}
  
-			w += image.Image(l.font.runes.get(r)).getDims()
-			if w > maxW {
+			if w > maxW && wordW < maxW {
 				i = lastSpace
 				text[i] = uint32('\n')
 				w = 0
@@ -265,8 +283,8 @@ fn (l: ^Label) draw*() {
 	}
 
 	stext := "" 
-	for r in runes {
+	for r in text {
 		stext += r.encode()
 	}
-	l.font.draw(stext, th.Transform{p: l.g.t.p})
+	l.font.draw(stext, th.Transform{p: l.g.t.p, s: th.Vf2{l.scale, l.scale}})
 }

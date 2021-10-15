@@ -116,7 +116,7 @@ fn (c: ^Cached) draw*(text: str, t: th.Transform) {
 		img.draw(t)
 		t.p.y -= off
 
-		t.p.x += dm.x * t.s.x
+		t.p.x += dm.x * t.s.x * 1.1
 	}
 }
 

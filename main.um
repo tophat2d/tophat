@@ -42,14 +42,16 @@ fn main() {
 	l.center = true
 
 	iBox := ui.mkImage(image.load("etc/test.png"))
-	iBox.get().grid(0, 1).span(3, 2)
+	iBox.get().grid(2, 1).span(1, 1)
 	iBox.g.onEvent = fn(eventType: th.uu, ctx: interface{}) { }
 
+	rl := ui.mkLabel(font.mkCached(font.load("examples/space-shooter/gfx/marediv-regular.ttf"), 0xff00, 0.1), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", 0.04)
+	rl.get().grid(0, 1).span(2, 2)
+	
 	g := ui.mkGrid(3, 3)
 	g.g.t.s = th.Vf2{cam.w, cam.h}
-	g.elements = []ui.Element{&l, &iBox}
-	g.border = 10
-	
+	g.elements = []ui.Element{&l, &iBox, &rl}
+	g.border = 10	
 
 	for window.cycle(cam) {
 		canvas.setColor(th.white)
