@@ -3,12 +3,13 @@ import (
 	"th.um"
 	"vec.um"	
 	"rect.um"
+	"font.um"
 	"canvas.um"
 )
 
 type Generic* = struct {
 	t: th.Transform
-	onEvent: fn(evenType: th.uu, ctx: interface{})
+	onEvent: fn(eventType: th.uu, ctx: interface{})
 	gridPos: th.Vf2
 	gridSpan: th.Vf2
 }
@@ -33,6 +34,20 @@ type SimpleLabel* = struct {
 	bgColor: uint32
 }
 
+type Label* = struct {
+	g: Generic
+	font: font.Cached
+	center: bool
+	wrapping: bool
+	bgColor: uint32
+}
+
+fn mkGeneric(): Generic {
+	g := Generic{}
+	g.onEvent = fn(eventType: th.uu, ctx: interface{}) { }
+	return g
+}
+
 fn (g: ^Generic) grid*(x, y: th.uu): ^Generic {
 	g.gridPos.x = x
 	g.gridPos.y = y
@@ -47,7 +62,7 @@ fn (g: ^Generic) span*(x, y: th.uu): ^Generic {
 
 fn mkGrid*(w, h: th.uu): Grid {
 	return Grid {
-		g: Generic{},
+		g: mkGeneric(),
 		w: w, h: h,
 		elements: []Element{}}
 }
@@ -96,7 +111,7 @@ fn (g: ^Grid) draw*() {
 
 fn mkSimpleLabel*(text: str, color: uint32, size: th.fu): SimpleLabel {
 	return SimpleLabel {
-		g: Generic{},
+		g: mkGeneric(),
 		text: text,
 		textSize: size,
 		color: color}
@@ -112,4 +127,49 @@ fn (l: ^SimpleLabel) draw*() {
 	canvas.setColor(l.bgColor)
 	canvas.drawRect(rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
 	canvas.drawText(l.text, l.g.t.p, l.color, l.textSize)
+}
+
+fn mkLabel*(f: font.Cached, text: str): Label {
+	return Label {
+		mkGeneric(),
+		f, false, true, 0}
+}
+
+fn (l: ^Label) get*(): ^Generic {
+	return &l.g
+}
+
+fn (l: ^Label) handle*() {  }
+
+fn (l: ^Label) draw*() {
+	if len(l.text) == 0 {
+		return
+	}
+
+	l.font.preCacheStr(l.text) 
+	text := utf8.decode(l.text)
+
+	if l.wrapping {
+		maxW := l.g.t.s.x
+		w := 0
+		lastSpace := 0
+		for i:=0; i < len(text); i++ {
+			if r == uint32(' ') {
+				lastSpace = i
+			}
+ 
+			w += image.Image(l.font.runes.get(r)).getDims()
+			if w > maxW {
+				i = lastSpace
+				text[i] = uint32('\n')
+				w = 0
+			}
+		}
+	}
+
+	stext := "" 
+	for r in runes {
+		stext += r.encode()
+	}
+	l.font.draw(stext, th.Transform{p: l.g.t.p})
 }
