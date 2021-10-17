@@ -17,26 +17,8 @@ int interp(int start, int start_val, int end, int end_val, int t) {
 }
 
 uint32_t get_particle_color(th_particles *p, _th_particle pa, int t) {
-	uint32_t col = 0;
-
 	int n = (t - pa.start_time) / (p->lifetime / p->color_c);
-
-	int x0 = pa.start_time + p->lifetime / p->color_c * n;
-	int y0 = p->colors[n];
-	int x1 = pa.start_time + p->lifetime / p->color_c * (n + 1);
-	int y1 = p->colors[n];
-	if (n < p->color_c - 1)
-		y1 = p->colors[n+1];
-
-	for (int i=0; i < 4; i++) {
-		int t0 = y0 & 0xff;
-		int t1 = y1 & 0xff;
-		col += (int)round(interp(x0, t0, x1, t1, 1)) << (i * 8);
-		y0 >>= 8;
-		y1 >>= 8;
-	}
-
-	return col;
+	return p->colors[n];
 }
 
 double get_particle_size(th_particles *p, _th_particle pa, int t) {

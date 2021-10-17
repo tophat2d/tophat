@@ -13,15 +13,6 @@ light pixel plot function in umka
 more light shapes
 ?light occlussion
 
-reconstruct ui.um
-	grid in box
-	box has button functions
-	rich text label using cached fonts
-	additional elements
-		checkbox
-		progress bar
-		?input box
-
 ?gui editor
 	entity constructor
 	tilemap editor and entity placer
@@ -43,3 +34,4 @@ make tutorials
 	game structure
 	tilemaps
 	basics
+	entities
