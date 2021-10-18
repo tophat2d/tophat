@@ -66,6 +66,11 @@ typedef struct {
 	th_transform t;
 	uint32_t color;
 } th_ent;
+
+typedef struct {
+	uu index;
+	th_vf2 pos;
+} th_coll;
 #pragma pack(pop)
 
 typedef struct {
@@ -165,7 +170,8 @@ void th_sound_load(char *path);
 // entity
 th_quad th_ent_transform(th_ent *e);
 void th_ent_draw(th_ent *o, th_rect *camera);
-iu th_ent_getcoll(th_ent *e, th_ent **scene, uu count, th_vf2 *ic);
+void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
+	uu maxColls, th_coll *colls);
 
 // image
 th_image *th_load_image(char *path);

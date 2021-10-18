@@ -365,9 +365,11 @@ void umentgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_ent **scene = (th_ent **)p[0].ptrVal;
 	th_ent *e = (th_ent *)p[1].ptrVal;
 	int count = p[2].intVal;
-	th_vf2 *ic = (th_vf2 *)p[3].ptrVal;
+	uu maxColls = p[3].ptrVal;
+	uu *collC = (uu *)p[4].ptrVal;
+	th_coll *colls = (th_coll *)p[5].ptrVal;
 
-	r->intVal = th_ent_getcoll(e, scene, count, ic);
+	th_ent_getcoll(e, scene, count, collC, maxColls, colls);
 }
 
 int _th_ysort_test(const void *a, const void *b) {

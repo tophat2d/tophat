@@ -17,6 +17,11 @@ type Ent* = struct {
 	c: uint32
 }
 
+type Coll* = struct {
+	index: th.uu
+	pos: th.Vf2
+}
+
 fn centdraw(e: ^Ent, c: ^rect.Rect)
 
 // Draws the entity onto the screen in relaction to camera c.
@@ -24,7 +29,7 @@ fn (e: ^Ent) draw*(c: rect.Rect) {
 	centdraw(e, &c)
 }
 
-fn cgetcoll(ic: ^th.Vf2, count: int32, e: ^Ent, s: ^^Ent): int32
+fn cgetcoll(coll: ^Coll, collC: ^int, maxCount: th.uu, count: int32, e: ^Ent, s: ^^Ent)
 
 // ent's constructor
 fn mk*(img: image.Image, t: th.Transform): Ent {
@@ -39,15 +44,25 @@ fn mk*(img: image.Image, t: th.Transform): Ent {
 	return e
 }
 
-// Checks whether e collides with any entities in s and sets ic to the
-// intersection's position. If e is a part of s, it will be skipped.
-// WARNING: This function will recieve a lot of changes.
-fn (e: ^Ent) getColl*(s: []^Ent, ic: ^th.Vf2): int32 {
+// Checks collisions of e with entities in s. Checks at max maxColl collisions.
+fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
 	if len(s) == 0 {
-		return -1
+		return []Coll{}
 	}
 
-	return cgetcoll(ic, len(s), e, &s[0])
+	if maxColls > len(s) {
+		maxColls = len(s)
+	}
+
+	if maxColls == 0 {
+		maxColls = 1
+	}
+
+	colls := make([]Coll, maxColls)
+	count := 0
+	cgetcoll(&colls[0], &count, maxColls, len(s), e, &s[0])
+
+	return slice(colls, 0, count)
 }
 
 // Animates the entity's image with one of the `anim` array. **Won't** begin on

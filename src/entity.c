@@ -64,12 +64,14 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	th_blit_tex(o->img->gltexture, q);
 }
 
-iu th_ent_getcoll(th_ent *e, th_ent **scene, uu count, th_vf2 *ic) {
-	for (int i=0; i < count; i++) {
+void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
+	uu maxColls, th_coll *colls) {
+
+	for (int i=0; i < count && *collC < maxColls; i++) {
 		if (e == scene[i]) continue;
 
-		if (th_ent_to_ent(scene[i], e, ic))
-			return i;
+		if (th_ent_to_ent(scene[i], e, &colls[*collC].pos)) {
+			colls[(*collC)++].index = i;
+		}
 	}
-	return -1;
 }

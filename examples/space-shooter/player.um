@@ -82,10 +82,10 @@ fn handle*() {
 		}
 
 		var ic: th.Vf2
-		if c := bullets[i].getColl(enemies, &ic); c != -1 {
+		if colls := bullets[i].getColl(enemies, 1); len(colls) != 0 {
 			bullets = delete(bullets, i)
-			effects.enemyDestroy(enemy.enemies[c].ent.t.p)
-			enemy.enemies = delete(enemy.enemies, c)
+			effects.enemyDestroy(enemy.enemies[colls[0].index].ent.t.p)
+			enemy.enemies = delete(enemy.enemies, colls[0].index)
 			enemies = enemy.getEnts()
 			global.score++
 			sound.explosion.play()
