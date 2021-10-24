@@ -14,7 +14,6 @@ void umdrawcone(UmkaStackSlot *p, UmkaStackSlot *r);
 void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r);
 void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r);
-void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r);

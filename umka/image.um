@@ -9,25 +9,14 @@ type Image* = struct {
 }
 
 fn loadimg(path: ^char): int
-
-fn deleteimg(i: int)
-
 fn iconset(i: int)
-
 fn flipvimg(i: int)
-
 fn fliphimg(i: int)
-
 fn imgvalid(i: int): int32
-
 fn imggetdims(dm: ^th.Vf2, i: int)
-
 fn imgcrop(img: int, tl, br: th.Vf2)
-
 fn imgfromdata(data: ^uint32, dm: th.Vf2): int
-
 fn imgcopy(data: int): int
-
 fn imgsetfilter(data, filter: int)
 
 // Loads an image at path.

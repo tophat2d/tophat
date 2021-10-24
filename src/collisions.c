@@ -1,6 +1,4 @@
-//
-// largely inspired by (copied from :]) this guide: http://jeffreythompson.org/collision-detection/table_of_contents.php
-//
+// line to line is stolen from: http://jeffreythompson.org/collision-detection/table_of_contents.php
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>

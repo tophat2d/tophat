@@ -20,10 +20,6 @@
 
 extern th_global thg;
 
-#define GET_IMAGE(ivar, index) { \
-	if (index-1 > thg.image_count || index == 0) {th_error("invalid image %ld", index); return;} \
-	ivar = thg.images[index-1];}
-
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
@@ -44,7 +40,6 @@ void _th_umka_bind(void *umka) {
 
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
-	umkaAddFunc(umka, "deleteimg", &umimgfree);
 	umkaAddFunc(umka, "flipvimg", &umimgflipv);
 	umkaAddFunc(umka, "fliphimg", &umimgfliph);
 	umkaAddFunc(umka, "imgvalid", &umimgvalid);
@@ -259,14 +254,6 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 
 	r[0].ptrVal = thg.image_count;
-}
-
-// frees an image
-void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img;
-	GET_IMAGE(img, p[0].intVal);
-
-	th_free_image(img);
 }
 
 // checks, if image is correctly loaded
