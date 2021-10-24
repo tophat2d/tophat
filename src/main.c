@@ -16,6 +16,7 @@ void die() {
 	
 	th_audio_deinit();
 	th_font_deinit();
+	th_image_deinit();
 	if (destroyfunc) {
 		umkaCall(thg.umka, destroyfunc, 0, NULL, NULL);
 	}

@@ -20,6 +20,10 @@
 
 extern th_global thg;
 
+#define GET_IMAGE(ivar, index) { \
+	if (index-1 > thg.image_count || index == 0) {th_error("invalid image %ld", index); return;} \
+	ivar = thg.images[index-1];}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
@@ -142,9 +146,13 @@ void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
 	uint32_t color = p[1].uintVal;
 	th_vf2 spacing = *(th_vf2 *)&p[0];
 
-	th_image *img = malloc(sizeof(th_image));
+	if (thg.image_count >= MAX_IMAGES - 1) {
+		th_error("Too many images. Create an issue.");
+		return;
+	}
+	th_image *img = thg.images[thg.image_count++] = calloc(sizeof(th_image), 1);
 	th_str_to_img(img, f, runes, runec, scale, color, spacing);
-	r->intVal = (intptr_t)img;
+	r->intVal = thg.image_count;
 }
 
 void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -152,6 +160,10 @@ void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	strcpy(buf, thg.respath);
 	strcat(buf, (char *)p[0].ptrVal);
 
+	if (thg.font_count >= MAX_FONTS - 1) {
+		th_error("Too many fonts. Create an issue.");
+		return;
+	}
 	th_font *f = thg.fonts[thg.font_count++] = calloc(sizeof(th_font), 1);
 	th_font_load(f, buf);
 	r->intVal = thg.font_count;
@@ -237,25 +249,30 @@ void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *path = (char *)p[0].ptrVal;
 
-	th_image *img;
+	if (thg.image_count >= MAX_IMAGES - 1) {
+		th_error("Too many images. Create an issue.");
+		return;
+	}
 	char pathcpy[512];
 	strcpy(pathcpy, thg.respath);
-	img = th_load_image(strcat(pathcpy, path));
+	th_image *img = thg.images[thg.image_count++] = th_load_image(strcat(pathcpy, path));
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 
-	r[0].ptrVal = (intptr_t)img;
+	r[0].ptrVal = thg.image_count;
 }
 
 // frees an image
 void umimgfree(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[0].ptrVal;
+	th_image *img;
+	GET_IMAGE(img, p[0].intVal);
 
 	th_free_image(img);
 }
 
 // checks, if image is correctly loaded
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[0].ptrVal;
+	th_image *img;
+	GET_IMAGE(img, p[0].intVal);
 	if (img->data != NULL) {
 		r->intVal = 1;
 		return;
@@ -266,20 +283,23 @@ void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // flips image
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[0].ptrVal;
+	th_image *img;
+	GET_IMAGE(img, p[0].intVal);
 
 	th_image_flipv(img);
 }
 
 // flips image
 void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[0].ptrVal;
+	th_image *img;
+	GET_IMAGE(img, p[0].intVal);
 
 	th_image_fliph(img);
 }
 
 void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[0].ptrVal;
+	th_image *img;
+	GET_IMAGE(img, p[0].intVal);
 	th_vf2 *out = (th_vf2 *)p[1].ptrVal;
 
 	if (!img)
@@ -289,7 +309,8 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[4].ptrVal;
+	th_image *img;
+	GET_IMAGE(img, p[4].intVal);
 	th_vf2 tl = *(th_vf2 *)&p[1];
 	th_vf2 br = *(th_vf2 *)&p[0];
 
@@ -301,31 +322,36 @@ void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 dm = *(th_vf2 *)&p[0];
 	uint32_t *data = (uint32_t *)p[1].ptrVal;
 
-	th_image *img = malloc(sizeof(th_image));
+	if (thg.image_count >= MAX_IMAGES - 1) {
+		th_error("Too many images. Create an issue.");
+		return;
+	}
+	th_image *img = thg.images[thg.image_count++] = calloc(sizeof(th_image), 1);
 	th_image_from_data(img, data, dm);
 
-	r->ptrVal = (intptr_t)img;
+	r->ptrVal = thg.image_count;
 }
 
 void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *inp = (th_image *)p[0].ptrVal;
+	th_image *inp;
+	GET_IMAGE(inp, p[0].intVal);
 
-	th_image *out = calloc(sizeof(th_image), 1);
+	if (thg.image_count >= MAX_IMAGES - 1) {
+		th_error("Too many images. Create an issue.");
+		return;
+	}
+	th_image *out = thg.images[thg.image_count++] = calloc(sizeof(th_image), 1);
 	out->dm = inp->dm;
 	out->data = calloc(sizeof(uint32_t), out->dm.w * out->dm.h);
 	memcpy(out->data, inp->data, sizeof(uint32_t) * out->dm.w * out->dm.h);
 
-	r->ptrVal = (intptr_t)out;
+	r->ptrVal = thg.image_count;
 }
 
 void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[1].ptrVal;
+	th_image *img;
+	GET_IMAGE(img, p[1].intVal);
 	int filter = p[0].intVal;
-
-	if (!img) {
-		th_error("setfilter: null image");
-		return;
-	}
 
 	th_image_set_filter(img, filter);
 }
@@ -582,7 +608,8 @@ void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = (th_image *)p[1].ptrVal;
+	th_image *img;
+	GET_IMAGE(img, p[1].ptrVal);
 	th_transform *t = (th_transform *)p[0].ptrVal;
 
 	th_quad q = th_ent_transform(

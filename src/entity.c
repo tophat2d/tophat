@@ -33,8 +33,11 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	t.pos.y -= camy;
 
 	th_rect r = o->rect;
-	if (o->img)
-		r = (th_rect){.w = o->img->dm.w, .h = o->img->dm.h};
+	th_image *img = NULL;
+	if (o->img) {
+		GET_IMAGE(img, o->img);
+		r = (th_rect){.w = img->dm.w, .h = img->dm.h};
+	}
 	th_quad q = th_ent_transform(&(th_ent){.rect = r, .t = t});
 	
 	// this logic is incorrect
@@ -61,7 +64,7 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 		return;
 	}
 
-	th_blit_tex(o->img->gltexture, q);
+	th_blit_tex(img->gltexture, q);
 }
 
 void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,

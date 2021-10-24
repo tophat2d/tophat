@@ -4,11 +4,6 @@ import (
 	"canvas.um"
 )
 
-// Image is an opaque pointer to c. It needs to be free'd with it's delete()
-// method, otherwise it will cause a memory leak. This is usually ok as
-// you only load images at the start of the game and need them until the
-// end, but function operating on images might need to keep the memory in
-// mind. 
 type Image* = struct {
 	handle: int
 }
@@ -37,12 +32,8 @@ fn imgsetfilter(data, filter: int)
 
 // Loads an image at path.
 fn load*(path: str): Image {
-	return Image{loadimg(&path[0])}
-}
-
-// Frees i from memory.
-fn (i: ^Image) delete*() {
-	deleteimg(i.handle)
+	i := loadimg(&path[0])
+	return Image{i}
 }
 
 // Flips i on it's vertical axis.

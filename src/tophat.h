@@ -7,12 +7,16 @@
 #include <stb_truetype.h>
 
 #define MAX_SOUNDS 512
-#define MAX_IMAGES 1024
+#define MAX_IMAGES 2048
 #define MAX_FONTS 128
 
 typedef float fu;
 typedef unsigned short uu;
 typedef short iu;
+
+#define GET_IMAGE(ivar, index) { \
+	if (index-1 > thg.image_count || index == 0) {th_error("invalid image %ld", index); return;} \
+	ivar = thg.images[index-1];}
 
 typedef union {
 	struct {fu w, h;};
@@ -62,7 +66,7 @@ typedef struct {
 #pragma pack(push, 1)
 typedef struct {
 	th_rect rect;
-	th_image *img;
+	uint64_t img;
 	th_transform t;
 	uint32_t color;
 } th_ent;
@@ -160,6 +164,9 @@ typedef struct {
 
 	th_font *fonts[MAX_FONTS];
 	uu font_count;
+
+	th_image *images[MAX_IMAGES];
+	uu image_count;
 } th_global;
 
 // audio
@@ -183,6 +190,7 @@ void th_blit_tex(unsigned int tex, th_quad q);
 void th_image_flipv(th_image *img);
 void th_image_fliph(th_image *img);
 void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
+void th_image_deinit();
 
 // light
 void th_lightmask_clear(th_lightmask *d);

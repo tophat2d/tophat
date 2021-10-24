@@ -114,6 +114,10 @@ void th_sound_load(char *path) {
 	strcpy(cpath, thg.respath);
 	strcat(cpath, path);
 
+	if (thg.sound_count >= MAX_SOUNDS - 1) {
+		th_error("Too many sounds. Create an issue.");
+		return;
+	}
 	th_sound *s = thg.sounds[thg.sound_count++] = calloc(sizeof(th_sound), 1);
 	res = ma_decoder_init_file(cpath, &decodercfg, &s->decoder);
 	if (res != MA_SUCCESS)

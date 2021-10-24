@@ -20,6 +20,8 @@ extern GLuint gRDLastResizeH;
 #define glActiveTexture glActiveTextureCHEW
 #endif
 
+extern th_global thg;
+
 th_image *th_load_image(char *path) {
 	int w, h, c;
 
@@ -218,4 +220,13 @@ void _th_rdimg(th_image *img, unsigned char *data) {
 	}
 
 	img->data = rd;
+}
+
+void th_image_deinit() {
+	while (thg.image_count--) {
+		th_image *img = thg.images[thg.image_count];
+		CNFGDeleteTex(img->gltexture);
+		free(img->data);
+		free(img);
+	}
 }
