@@ -37,6 +37,7 @@ typedef struct {
 	fu rot;
 } th_transform;
 
+#pragma pack(push, 1)
 typedef struct {
     ma_decoder decoder;
     int playing;
@@ -52,7 +53,6 @@ typedef struct {
 	uu filter;
 } th_image;
 
-#pragma pack(push, 1)
 typedef struct {
 	int x;
 	int y;
@@ -61,9 +61,7 @@ typedef struct {
 	int h;
 	int vc;
 } th_poly;
-#pragma pack(pop)
 
-#pragma pack(push, 1)
 typedef struct {
 	th_rect rect;
 	uint64_t img;
@@ -75,7 +73,6 @@ typedef struct {
 	uu index;
 	th_vf2 pos;
 } th_coll;
-#pragma pack(pop)
 
 typedef struct {
 	uint32_t *dots;
@@ -90,7 +87,6 @@ typedef struct {
 	uint32_t tint;
 } th_spotlight;
 
-#pragma pack(push, 1)
 typedef struct {
 	uint64_t start_time;
 	int seed;
@@ -125,7 +121,6 @@ typedef struct {
 	_th_particle *particles;
 	uu particle_c;
 } th_particles;
-#pragma pack(pop)
 
 typedef struct {
 	th_vf2 pos;
@@ -133,7 +128,6 @@ typedef struct {
 	fu r;
 } th_ray;
 
-#pragma pack(push, 1)
 typedef struct {
 	th_image **tiles;
 	th_vf2 pos;
@@ -143,11 +137,11 @@ typedef struct {
 	fu cellsize;
 	uu scaletype;
 } th_tmap;
-#pragma pack(pop)
 
 typedef struct {
 	stbtt_fontinfo *info;
 } th_font;
+#pragma pack(pop)
 
 // struct holding all tophat's global variables.
 typedef struct {

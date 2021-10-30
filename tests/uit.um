@@ -1,0 +1,74 @@
+import (
+	"umka/anim.um"
+	"umka/audio.um"
+	"umka/csv.um"
+	"umka/ent.um"
+	"umka/font.um"
+	"umka/image.um"
+	"umka/input.um"
+	"umka/lerp.um"
+	"umka/light.um"
+	"umka/misc.um"
+	"umka/particles.um"
+	"umka/canvas.um"
+	"umka/ray.um"
+	"umka/rect.um"
+	"umka/th.um"
+	"umka/tilemap.um"
+	"umka/window.um"
+	"umka/ui.um"
+	"umka/vec.um"
+
+	"umka/std/std.um"
+	"umka/std/map.um"
+)
+
+fn main() { 
+	cam := rect.mk(0, 0, 250, 250)
+	window.setup("test game", 100, 100)
+
+	l := ui.mkSimpleLabel("Hello world", th.black, 2)
+	l.get().grid(0, 0).span(3, 1)
+	l.bgColor = th.red
+	l.g.ctx = &l
+	l.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
+		l := ^ui.SimpleLabel(ctx)
+		if eventType == ui.eventPress {
+			l.bgColor = th.cyan
+		} else if eventType == ui.eventRelease {
+			l.bgColor = th.red
+		}
+	}
+	l.center = true
+
+	iBox := ui.mkImage(image.load("etc/test.png"))
+	iBox.get().grid(2, 1).span(1, 1)
+	iBox.g.onEvent = fn(eventType: th.uu, ctx: interface{}) { }
+
+	rl := ui.mkLabel(font.mkCached(font.load("examples/space-shooter/gfx/marediv-regular.ttf"), 0xff00, 0.1), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", 0.04)
+	rl.get().grid(0, 1).span(2, 2)
+	rl.bgColor = th.green
+	rl.center = true
+	
+	g := ui.mkGrid(3, 3)
+	g.g.t.s = th.Vf2{cam.w, cam.h}
+	g.elements = []ui.Element{&l, &iBox, &rl}
+	g.border = 10	
+
+	for window.cycle(cam) {
+		canvas.setColor(th.white)
+		canvas.drawRect(cam)
+
+		if th.delta == 0 {
+			th.delta = 16
+		}
+		canvas.drawText(repr(1000/th.delta), th.Vf2{0, 0}, th.black, 1)
+
+		g.handle()
+		g.draw()
+	}
+}
+
+fn windowdestroy() {
+	printf("destroying window\n")
+}
