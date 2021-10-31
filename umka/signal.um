@@ -1,0 +1,33 @@
+
+import (
+	"map.um"
+)
+
+type Any* = interface{}
+type Callback* = fn(ctx: Any) 
+type Signal* = []Callback
+
+var signals: map.Map
+
+fn register*(name: str, callback: Callback) {
+	ptr := signals.get(name)
+
+	arr := ^Signal(ptr)
+	if arr == null {
+		signals.set(name, []Callback{})
+		arr = ^Signal(signals.get(name))
+	}
+
+	arr^ = append(arr^, callback)
+}
+
+fn emit*(name: str, ctx: Any) {
+	arr := ^Signal(signals.get(name))
+	if arr == null {
+		return
+	}
+
+	for c in arr^ {
+		c(ctx)
+	}
+}

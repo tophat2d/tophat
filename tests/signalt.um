@@ -1,0 +1,27 @@
+
+import (
+	"th.um"
+	"rect.um"
+	"input.um"
+	"signal.um"
+	"canvas.um"
+	"window.um"
+)
+
+fn main() {
+	window.setup("title", 1280, 720)
+	cam := rect.mk(0, 0, 192, 108)
+
+	signal.register("spacePress", signal.Callback{
+		printf("%s\n", repr(ctx))
+	})
+
+	for window.cycle(cam) {
+		canvas.setColor(th.white)
+		canvas.drawRect(cam)
+
+		if input.isPressed(input.KEY_SPACE) {
+			signal.emit("spacePress", th.time)
+		}
+	}
+}
