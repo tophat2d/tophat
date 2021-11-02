@@ -56,8 +56,6 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 
 		tr.pos.x = (t->pos.x+i*t->cellsize-camx)*thg.scaling;
 		tr.pos.y = (t->pos.y+j*t->cellsize-camy)*thg.scaling;
-		const th_quad q = th_ent_transform(
-			&(th_ent){ .rect = (th_rect){ .w = 1, .h = 1}, .t = tr});
-		th_blit_tex(t->tiles[t->cells[j*t->w+i]-1]->gltexture, q);
+		th_blit_tex(t->tiles[t->cells[j*t->w+i]-1], tr);
 	}
 }

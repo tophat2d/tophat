@@ -298,11 +298,11 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img;
-	GET_IMAGE(img, p[4].intVal);
+	GET_IMAGE(img, p[2].intVal);
 	th_vf2 tl = *(th_vf2 *)&p[1];
 	th_vf2 br = *(th_vf2 *)&p[0];
 
-	th_image_crop(img, tl, br);
+	img->crop = (th_rect){tl.x, tl.y, br.x, br.y};
 }
 
 // returns a pointer to an image from data
@@ -600,15 +600,5 @@ void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
 	GET_IMAGE(img, p[1].ptrVal);
 	th_transform *t = (th_transform *)p[0].ptrVal;
 
-	th_quad q = th_ent_transform(
-		&(th_ent){
-			.rect = (th_rect){.w = img->dm.w, .h = img->dm.h},
-			.t = *t});
-
-	for (uu i=0; i < 4; i++) {
-		q.v[i].x *= thg.scaling;
-		q.v[i].y *= thg.scaling;
-	}
-
-	th_blit_tex(img->gltexture, q);
+	th_blit_tex(img, *t);
 }

@@ -53,7 +53,8 @@ fn (i: ^Image) getDims*(): th.Vf2 {
 	return out
 }
 
-// Crops out the Rectangle from image. (destructive)
+// Crops an image. Coordinates are between 0, 0 (top left) and
+// 1, 1 (bottom right)
 fn (i: ^Image) crop*(tl, br: th.Vf2) {
 	imgcrop(i.handle, tl, br)
 }

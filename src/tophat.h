@@ -51,6 +51,7 @@ typedef struct {
 	uint32_t *data;
 	unsigned int gltexture;
 	uu filter;
+	th_rect crop;
 } th_image;
 
 typedef struct {
@@ -180,10 +181,9 @@ void th_free_image(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 void th_image_set_filter(th_image *img, int filter);
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
-void th_blit_tex(unsigned int tex, th_quad q);
+void th_blit_tex(th_image *img, th_transform t);
 void th_image_flipv(th_image *img);
 void th_image_fliph(th_image *img);
-void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
 void th_image_deinit();
 
 // light

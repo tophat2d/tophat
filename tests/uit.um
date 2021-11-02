@@ -44,6 +44,7 @@ fn main() {
 	iBox := ui.mkImage(image.load("etc/test.png"))
 	iBox.get().grid(2, 1).span(1, 1)
 	iBox.g.onEvent = fn(eventType: th.uu, ctx: interface{}) { }
+	iBox.image.crop(th.Vf2{0.5, 1.0/12}, th.Vf2{1, 1})
 
 	rl := ui.mkLabel(font.mkCached(font.load("examples/space-shooter/gfx/marediv-regular.ttf"), 0xff00, 0.1), "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", 0.04)
 	rl.get().grid(0, 1).span(2, 2)

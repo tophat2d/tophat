@@ -33,6 +33,7 @@ th_image *th_load_image(char *path) {
 	img->dm.h = h;
 	img->channels = c;
 	img->filter = 1;
+	img->crop = (th_rect){0, 0, 1, 1};
 
 	if (data == NULL) {
 		th_error("could not find image at path %s", path);
@@ -64,6 +65,7 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 	img->data = malloc(sizeof(uint32_t) * dm.w * dm.h);
 	memcpy(img->data, data, sizeof(uint32_t) * dm.w * dm.h);
 	img->dm = dm;
+	img->crop = (th_rect){0, 0, 1, 1};
 	img->channels = 4;
 	img->filter = 1;
 
@@ -103,8 +105,20 @@ unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
 }
 
 // stolen from rawdraw
-void th_blit_tex(unsigned int tex, th_quad q) {
+void th_blit_tex(th_image *img, th_transform t) {
 	CNFGFlushRender();
+
+	th_quad q = th_ent_transform(
+		&(th_ent){
+			.rect = (th_rect){
+				.w = (img->crop.w - img->crop.x) * img->dm.x,
+				.h = (img->crop.h - img->crop.y) * img->dm.y},
+			.t = t});
+
+	for (uu i=0; i < 4; i++) {
+		q.v[i].x *= thg.scaling;
+		q.v[i].y *= thg.scaling;
+	}
 
 	th_vf2 p = th_quad_min(q);
 
@@ -114,17 +128,24 @@ void th_blit_tex(unsigned int tex, th_quad q) {
 		-0.5f+p.x/(float)gRDLastResizeW, 0.5f-p.y/(float)gRDLastResizeH);
 	glUniform1i(gRDBlitProgUT, 0);
 
-	glBindTexture(GL_TEXTURE_2D, tex);
+	glBindTexture(GL_TEXTURE_2D, img->gltexture);
 
 	const float verts[] = {
 		q.tl.x - p.x, q.tl.y - p.y, q.tr.x - p.x, q.tr.y - p.y, q.br.x - p.x, q.br.y - p.y,
 		q.tl.x - p.x, q.tl.y - p.y, q.br.x - p.x, q.br.y - p.y, q.bl.x - p.x, q.bl.y - p.y};
-	static const uint8_t colors[] = {
-		0,0,   255,0,  255,255,
-		0,0,  255,255, 0,255 };
+
+	th_rect bounds = img->crop;
+	bounds.x *= 255;
+	bounds.y *= 255;
+	bounds.w *= 255;
+	bounds.h *= 255;
+	uint8_t tex_verts[] = {
+		bounds.x, bounds.y, bounds.w, bounds.y, bounds.w, bounds.h,
+		bounds.x, bounds.y, bounds.w, bounds.h, bounds.x, bounds.h };
+
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
-	glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, colors);
+	glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, tex_verts);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 }
@@ -159,44 +180,6 @@ void th_image_fliph(th_image *img) {
 
 	free(img->data);
 	img->data = f;
-	CNFGDeleteTex(img->gltexture);
-	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
-}
-
-void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br) {
-	if (img->data == NULL) {
-		th_error("crop: image is not valid");
-		return;
-	}
-
-	if (tl.x < 0 || tl.y < 0 || br.x > img->dm.w || br.y > img->dm.h) {
-		th_error("crop: invalid dimensions");
-		return;
-	}
-
-	if (tl.x > br.x) {
-		int tmp = tl.x;
-		tl.x = br.x;
-		br.x = tmp;
-	}
-
-	if (tl.y > br.y) {
-		int tmp = tl.y;
-		tl.y = br.y;
-		br.y = tmp;
-	}
-
- 	uint32_t *n = calloc(sizeof(uint32_t), (br.x-tl.x) * (br.y-tl.y));
-
-	for (int x=0; x < br.x-tl.x; x++) {
-		for (int y=0; y < br.y-tl.y; y++) {
-			n[(uu)(y*(br.x-tl.x)+x)] = img->data[(uu)((y+tl.y)*img->dm.w+x+tl.x)];
-		}
-	}
-	free(img->data);
-	img->dm.w = br.x-tl.x;
-	img->dm.h = br.y-tl.y;
-	img->data = n;
 	CNFGDeleteTex(img->gltexture);
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 }
