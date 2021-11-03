@@ -17,6 +17,7 @@ typedef short iu;
 #define GET_IMAGE(ivar, index) { \
 	if (index-1 > thg.image_count || index == 0) {th_error("invalid image %ld", index); return;} \
 	ivar = thg.images[index-1];}
+#define SWAP_VARS(v1, v2, type) { type tmp = v1; v1 = v2; v2 = tmp; }
 
 typedef union {
 	struct {fu w, h;};
@@ -52,6 +53,8 @@ typedef struct {
 	unsigned int gltexture;
 	uu filter;
 	th_rect crop;
+	char flipv;
+	char fliph;
 } th_image;
 
 typedef struct {
@@ -182,8 +185,6 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 void th_image_set_filter(th_image *img, int filter);
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(th_image *img, th_transform t);
-void th_image_flipv(th_image *img);
-void th_image_fliph(th_image *img);
 void th_image_deinit();
 
 // light

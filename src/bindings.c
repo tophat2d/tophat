@@ -274,7 +274,7 @@ void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img;
 	GET_IMAGE(img, p[0].intVal);
 
-	th_image_flipv(img);
+	img->flipv = !img->flipv;
 }
 
 // flips image
@@ -282,7 +282,7 @@ void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img;
 	GET_IMAGE(img, p[0].intVal);
 
-	th_image_fliph(img);
+	img->fliph = !img->fliph;
 }
 
 void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {

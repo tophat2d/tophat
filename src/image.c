@@ -34,6 +34,8 @@ th_image *th_load_image(char *path) {
 	img->channels = c;
 	img->filter = 1;
 	img->crop = (th_rect){0, 0, 1, 1};
+	img->flipv = 0;
+	img->fliph = 0;
 
 	if (data == NULL) {
 		th_error("could not find image at path %s", path);
@@ -65,6 +67,8 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 	img->data = malloc(sizeof(uint32_t) * dm.w * dm.h);
 	memcpy(img->data, data, sizeof(uint32_t) * dm.w * dm.h);
 	img->dm = dm;
+	img->flipv = 0;
+	img->fliph = 0;
 	img->crop = (th_rect){0, 0, 1, 1};
 	img->channels = 4;
 	img->filter = 1;
@@ -139,49 +143,18 @@ void th_blit_tex(th_image *img, th_transform t) {
 	bounds.y *= 255;
 	bounds.w *= 255;
 	bounds.h *= 255;
+	if (img->flipv)
+		SWAP_VARS(bounds.y, bounds.h, fu);
+	if (img->fliph)
+		SWAP_VARS(bounds.x, bounds.w, fu);
 	uint8_t tex_verts[] = {
 		bounds.x, bounds.y, bounds.w, bounds.y, bounds.w, bounds.h,
 		bounds.x, bounds.y, bounds.w, bounds.h, bounds.x, bounds.h };
-
 
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
 	glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, tex_verts);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-}
-
-// TODO do this inplace
-void th_image_flipv(th_image *img) {
-	if (img->data == NULL) {
-		th_error("flipv: image is not valid");
-		return;
-	}
-
-	uint32_t *f = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-
-	for (int i=0; i < img->dm.w; i++) for (int j=0; j < img->dm.h; j++)
-			f[(j + 1) * (uu)img->dm.w - i - 1] = img->data[j * (uu)img->dm.w + i];
-
-	free(img->data);
-	img->data = f;
-	CNFGDeleteTex(img->gltexture);
-	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
-}
-
-void th_image_fliph(th_image *img) {
-	if (img->data == NULL) {
-		th_error("fliph: image is not valid");
-		return;
-	}
-
-	uint32_t *f = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-	for (int i=0; i < img->dm.w; i++) for (int j=0; j < img->dm.h; j++)
-			f[(uu)((img->dm.h - j - 1) * img->dm.w + i)] = img->data[(uu)(j * img->dm.w + i)];
-
-	free(img->data);
-	img->data = f;
-	CNFGDeleteTex(img->gltexture);
-	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 }
 
 void _th_rdimg(th_image *img, unsigned char *data) {
