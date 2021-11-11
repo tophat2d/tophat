@@ -1,7 +1,6 @@
 
 import (
 	"th.um"
-	"vec.um"	
 	"utf8.um"
 	"rect.um"
 	"font.um"
@@ -131,7 +130,7 @@ fn (g: ^Grid) handle*() {
 			error("ui.Grid: out of bounds.")
 		}
 
-		ge.t.p = vec.mul(ge.gridPos, cellSize)
+		ge.t.p = ge.gridPos.mul(cellSize)
 		// divide by to as there are two borders
 		ge.t.p.x += g.border/2 + g.g.t.p.x
 		ge.t.p.y += g.border/2 + g.g.t.p.y
@@ -149,7 +148,7 @@ fn (g: ^Grid) handle*() {
 			ge.gridSpan.y = 1
 		}
 
-		ge.t.s = vec.mul(ge.gridSpan, cellSize)
+		ge.t.s = ge.gridSpan.mul(cellSize)
 		// don't divide by two as size is relative to position
 		ge.t.s.x -= g.border
 		ge.t.s.y -= g.border

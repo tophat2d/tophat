@@ -1,8 +1,0 @@
-
-type fu* = real32
-type iu* = int16
-type uu* = uint16
-
-type vf2* = struct {
-	x, y: fu
-}

@@ -17,7 +17,6 @@ import (
 	"umka/tilemap.um"
 	"umka/window.um"
 	"umka/ui.um"
-	"umka/vec.um"
 
 	"umka/std/std.um"
 	"umka/std/map.um"

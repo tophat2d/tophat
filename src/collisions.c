@@ -27,8 +27,15 @@ int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic) {
 }
 
 uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic) {
-	// TODO
-	return 0;
+	uu coll = 0;
+	for (uu i=0; i < 4; i++) {
+		th_vf2 v = q->v[i];
+		th_vf2 n = q->v[(i + 1) % 4];
+		if (((v.y >= p.y && n.y < p.y) || (v.y < p.y && n.y >= p.y)) && 
+			p.x < (n.x-v.x)*(p.y - v.y) / (n.y - v.y) + v.x)
+			coll = !coll;
+	}
+	return coll;
 }
 
 uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic) {

@@ -106,7 +106,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "tilemap.um", libs[index++]);
 	umkaAddModule(umka, "window.um", libs[index++]);
 	umkaAddModule(umka, "ui.um", libs[index++]);
-	umkaAddModule(umka, "vec.um", libs[index++]);
 	umkaAddModule(umka, "std.um", libs[index++]);
 	umkaAddModule(umka, "particles.um", libs[index++]);
 	umkaAddModule(umka, "light.um", libs[index++]);

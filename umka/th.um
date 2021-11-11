@@ -2,6 +2,10 @@
 // Variables: time, delta, platform
 // Constants: black, white, red, green, blue, yellow, magenta, cyan.
 
+import (
+	"std.um"
+)
+
 // standard type for real values
 type fu* = real32
 // standard type for integer values
@@ -13,6 +17,43 @@ type uu* = uint16
 type Vf2* = struct {
 	x, y: fu
 }
+
+// rotates point [x, y] around [cx, cy] with
+// rot in degrees
+fn (p: ^th.Vf2) rotated*(origin: th.Vf2, rot: th.fu): th.Vf2 {
+	angle := (rot * std.pi) / 180
+
+	pos := p^
+	pos.x -= origin.x
+	pos.y -= origin.y
+
+	pos.x = pos.x * cos(angle) - pos.y * sin(angle)
+	pos.y = pos.x * sin(angle) + pos.y * cos(angle)
+
+	pos.x += origin.x
+	pos.y += origin.y
+
+	return pos
+}
+
+// Distance of [x1, y1] to [x2, [y2]].
+// It won't be negative.
+fn (p1: ^th.Vf2) distanceTo*(p2: th.Vf2): th.fu {
+	return std.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
+}
+
+// Angle between [x1, y1] and [x2, y2]
+fn (p1: ^th.Vf2) angleTo*(p2: th.Vf2): real {
+	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std.pi + 180
+}
+
+fn (p: ^th.Vf2) abs*(): th.Vf2 { return th.Vf2{fabs(p.x), fabs(p.y)} }
+fn (p: ^th.Vf2) rnd*(): th.Vf2 { return th.Vf2{round(p.x), round(p.y)} }
+fn (p: ^th.Vf2) flr*(): th.Vf2 { return th.Vf2{trunc(p.x), trunc(p.y)} }
+fn (p: ^th.Vf2) sub*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x - p2.x, p.y - p2.y} }
+fn (p: ^th.Vf2) add*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x + p2.x, p.y + p2.y} }
+fn (p: ^th.Vf2) div*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x / p2.x, p.y / p2.y} }
+fn (p: ^th.Vf2) mul*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x * p2.x, p.y * p2.y} }
 
 // Struct defining transformation. Used for example by entities.
 type Transform* = struct {
