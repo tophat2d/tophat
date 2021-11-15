@@ -1,0 +1,38 @@
+
+import (
+	"th.um"
+	"image.um"
+)
+
+// Atlas is an image containing tiles. Mostly used by tilemaps.
+type Atlas* = struct {
+	i: image.Image // source image
+	cs: th.Vf2 // size of a cell in pixels
+	dm: th.Vf2 // amount of cells in image
+}
+
+// i: source image
+// dm: amount of cells
+fn mk*(i: image.Image, dm: th.Vf2): Atlas {
+	a := atlas.Atlas{}
+
+	a.i = i
+	a.dm = dm
+	a.cs = i.getDims().div(dm)
+
+	return a
+}
+
+// Draws the tile at `at`
+fn (a: ^Atlas) draw(at: th.Vf2, t: th.Transform) {
+	if (at.x > a.dm.x || at.y > a.dm.y || at.x * at.y < 0) {
+		return
+	}
+
+	a.i.crop(
+		th.Vf2{at.x / a.dm.x, at.y / a.dm.y},
+		th.Vf2{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})
+
+	a.i.draw(t)
+	a.i.crop(th.Vf2{}, th.Vf2{1, 1})
+}

@@ -115,6 +115,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "font.um", libs[index++]);
 	umkaAddModule(umka, "th.um", libs[index++]);
 	umkaAddModule(umka, "signal.um", libs[index++]);
+	umkaAddModule(umka, "atlas.um", libs[index++]);
 #endif
 }
 

@@ -133,13 +133,18 @@ typedef struct {
 } th_ray;
 
 typedef struct {
-	th_image **tiles;
+	uint64_t i;
+	th_vf2 cs;
+	th_vf2 dm;
+} th_atlas;
+
+typedef struct {
+	th_atlas a;
 	th_vf2 pos;
 	uu w, h;
 	uu *cells;
 	char *collmask;
-	fu cellsize;
-	uu scaletype;
+	fu scale;
 } th_tmap;
 
 typedef struct {
@@ -166,6 +171,10 @@ typedef struct {
 	th_image *images[MAX_IMAGES];
 	uu image_count;
 } th_global;
+
+// atlas
+th_vf2 th_atlas_nth_coords(th_atlas *a, uu n);
+th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell);
 
 // audio
 void th_audio_init();

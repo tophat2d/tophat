@@ -8,41 +8,35 @@ import (
 	"std.um"
 	"rect.um"
 	"ent.um"
+	"atlas.um"
 )
 
 // Tilemap struct
 type Tilemap* = struct {
-	tiles: []image.Image // tiles that are used to draw (you can replace them mid game for animation)
+	atlas: atlas.Atlas
 	pos: th.Vf2
 	w: th.uu // width of tilemap
 	cells: []th.uu // all cells (this will draw the tile in tiles with number in cells - 1)
 	collMask: []bool // if true, the tile collides
-	cellSize: th.fu // cellsize
-	scaleType: th.uu // how image scale is handled. 0: stretch, 1: top left
+	scale: th.fu
 }
 
 type ctmap* = struct {
-	tiles: ^int
+	atlas: atlas.Atlas
 	pos: th.Vf2
 	w, h: th.uu
 	cells: ^th.uu
 	collmask: ^bool
-	cellsize: th.fu
-	scaletype: th.uu
+	scale: th.fu
 }
 
-const (
-	STRETCH* = 0
-	TOPLEFT* = 1
-)
-
-fn mk*(cells: []th.uu, w: th.uu, tiles: []image.Image, cellSize: th.fu): Tilemap {
+fn mk*(cells: []th.uu, w: th.uu, at: atlas.Atlas, scale: th.fu): Tilemap {
 	t := Tilemap{}
 	t.cells = cells
 	t.w = w
-	t.tiles = tiles
-	t.cellSize = cellSize
-	t.collMask = make([]bool, len(tiles))
+	t.atlas = at
+	t.collMask = make([]bool, 10) //  TODO
+	t.scale = scale
 	
 	return t
 }
@@ -65,7 +59,7 @@ fn parseNum(inp: char): (int, bool) {
 
 // Makes a tilemap from csv string
 fn fromCSV*(inp: str, images: []image.Image): Tilemap {
-	res := csv.parse(inp)
+/*	res := csv.parse(inp)
 
 	if len(res) < 2 { return Tilemap{} }
 	if len(res[0]) < 2 { return Tilemap{} }
@@ -102,7 +96,8 @@ fn fromCSV*(inp: str, images: []image.Image): Tilemap {
 
 	return Tilemap{
 		images, th.Vf2{std.atoi(res[0][1]), std.atoi(res[0][2])},
-		len(res[2]), cells, collmask, std.atoi(res[0][3]), std.atoi(res[0][4])}
+		len(res[2]), cells, collmask, std.atoi(res[0][3])}*/
+	return Tilemap{}
 }
 
 // Sets tile at [x, y] to tile.
@@ -112,11 +107,16 @@ fn (t: ^Tilemap) edit*(x, y, tile: int) {
 
 fn cdrawtmap(ct: ^ctmap, cam: ^rect.Rect)
 
+// Returns a c represenation of t
+fn (t: ^Tilemap) toc*(): ctmap {
+	return ctmap{t.atlas, t.pos, t.w, len(t.cells) / t.w, &t.cells[0], &t.collMask[0], t.scale}
+}
+
 // Draws the tilemap.
 fn (t: ^Tilemap) draw*(cam: rect.Rect) {
 	if len(t.cells) == 0 { return }
 
-	cm := ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collMask[0], t.cellSize, t.scaleType}
+	cm := t.toc()
 	cdrawtmap(&cm, &cam)
 }
 
@@ -129,8 +129,7 @@ fn ctmapgetcoll(pos: ^th.Vf2, vert: ^th.uu, t: ^ctmap, e: ^ent.Ent): int32
 fn (t: ^Tilemap) getColl*(e: ent.Ent, vert: ^th.uu, pos: ^th.Vf2): bool {
 	if len(t.cells) == 0 { return false }
 
-	cm := ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collMask[0], t.cellSize, t.scaleType}
-
+	cm := t.toc()
 	c := ctmapgetcoll(pos, vert, &cm, &e)
 
 	return bool(c)

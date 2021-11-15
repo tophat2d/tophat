@@ -85,8 +85,8 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic) {
 	bool coll = false;
 	float len = 0;
 	while (len < ra->l) {
-		int tx = (x - t->pos.x) / t->cellsize;
-		int ty = (y - t->pos.y) / t->cellsize;
+		int tx = (x - t->pos.x) / (t->scale * t->a.cs.x);
+		int ty = (y - t->pos.y) / (t->scale * t->a.cs.y);
 
 		int tile = t->cells[(int)(ty * t->w + tx)] - 1;
 		if (x >= t->pos.x && y >= t->pos.y && tx < t->w && ty < t->h &&
@@ -113,8 +113,8 @@ uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc) {
 	th_quad q = th_ent_transform(e);
 
 	for (uu i=0; i < 4; i++) {
-		const iu tx = (q.v[i].x - t->pos.x) / t->cellsize;
-		const iu ty = (q.v[i].y - t->pos.y) / t->cellsize;
+		const iu tx = (q.v[i].x - t->pos.x) / (t->scale * t->a.cs.x);
+		const iu ty = (q.v[i].y - t->pos.y) / (t->scale * t->a.cs.y);
 
 		if (q.v[i].x < t->pos.x || q.v[i].y < t->pos.x) continue;
 		if (tx < 0 || ty < 0) continue;

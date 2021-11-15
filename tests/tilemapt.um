@@ -1,0 +1,30 @@
+
+import (
+	"th.um"
+	"rect.um"
+	"atlas.um"
+	"image.um"
+	"canvas.um"
+	"window.um"
+	"tilemap.um"
+)
+
+fn main() {
+	window.setup("title", 1280, 720)
+	cam := rect.mk(0, 0, 192, 108)
+
+	t := tilemap.mk(
+		[]th.uu{
+			0, 1, 1, 0,
+			2, 2, 2, 2,
+			2, 2, 2, 2,
+			0, 1, 1, 0},
+		4, atlas.mk(image.load("etc/atlas.png"), th.Vf2{2, 1}), 1)
+
+	for window.cycle(cam) {
+		canvas.setColor(th.white)
+		canvas.drawRect(cam)
+
+		t.draw(cam)	
+	}
+}
