@@ -75,13 +75,13 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 		};
 	
 		th_rect r = th_atlas_get_cell(&t->a, th_atlas_nth_coords(&t->a, cell - 1));
-		const uint8_t tex_verts[] = {
-			r.x * 255, r.y * 255,  (r.x + r.w) * 255, r.y * 255,          (r.x + r.w) * 255, (r.y + r.h) * 255,
-			r.x * 255, r.y * 255,  (r.x + r.w) * 255, (r.y + r.h) * 255,  r.x * 255, (r.y + r.h) * 255
+		const float tex_verts[] = {
+			r.x, r.y,  (r.x + r.w), r.y,          (r.x + r.w), (r.y + r.h),
+			r.x, r.y,  (r.x + r.w), (r.y + r.h),  r.x, (r.y + r.h)
 		};
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
-		glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, tex_verts);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, 0, tex_verts);
 
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
