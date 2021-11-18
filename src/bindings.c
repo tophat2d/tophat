@@ -69,6 +69,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "csoundloop", &umsoundloop);
 	umkaAddFunc(umka, "csoundplay", &umsoundplay);
 	umkaAddFunc(umka, "csoundstop", &umsoundstop);
+	umkaAddFunc(umka, "csoundpause", &umsoundpause);
 	umkaAddFunc(umka, "csoundvol", &umsoundvol);
 	umkaAddFunc(umka, "csoundvalidate", &umsoundvalidate);
 
@@ -436,7 +437,7 @@ void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
 	s->playing = 1;
 }
 
-void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umsoundpause(UmkaStackSlot *p, UmkaStackSlot *r) {
 	if (!p[0].intVal || p[0].intVal-1 >= thg.sound_count) {
 		th_error("Invalid sound\n");
 		return;
@@ -464,6 +465,16 @@ void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r) {
 	}
 
 	r[0].intVal = 1;
+}
+
+void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
+	if (!p[1].intVal || p[1].intVal-1 >= thg.sound_count) {
+		th_error("Invalid sound\n");
+		return;
+	}
+	th_sound *s = thg.sounds[p[1].intVal - 1];
+	ma_decoder_seek_to_pcm_frame(&s->decoder, 0);
+	s->playing = 0;
 }
 
 ///////////////////////

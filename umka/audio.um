@@ -13,6 +13,7 @@ fn cauload(path: str): int
 fn csoundloop(s: int, looping: th.uu)
 fn csoundplay(s: int) 
 fn csoundstop(s: int)
+fn csoundpause(s: int)
 fn csoundvol(s: int, vol: th.fu)
 fn csoundvalidate(s: int): th.uu
 
@@ -42,6 +43,10 @@ fn (s: ^Sound) play*() {
 // Stops the sound and resets the progress.
 fn (s: ^Sound) stop*() {
 	csoundstop(s.handle)
+}
+
+fn (s: ^Sound) pause() {
+	csoundpause(s.handle)
 }
 
 // Set's the volume of the sound as a multiplier of it's default volume.
