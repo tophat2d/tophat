@@ -37,6 +37,7 @@ void _th_umka_bind(void *umka) {
 	// tilemaps
 	umkaAddFunc(umka, "cdrawtmap", &umdrawtmap);
 	umkaAddFunc(umka, "ctmapgetcoll", &umtmapgetcoll);
+	umkaAddFunc(umka, "cautotile", &umtmapautotile);
 
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
@@ -237,6 +238,17 @@ void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 *tc = (th_vf2 *)p[3].ptrVal;
 
 	r->intVal = _th_coll_on_tilemap(ent, t, vert, tc);
+}
+
+void umtmapautotile(UmkaStackSlot *p, UmkaStackSlot *r) {
+	uu tile = p[0].intVal;
+	uu *cfg = (uu *)p[1].ptrVal;
+	uu *src = (uu *)p[2].ptrVal;
+	uu h = p[3].intVal;
+	uu w = p[4].intVal;
+	uu *tgt = (uu *)p[5].ptrVal;
+
+	th_tmap_autotile(tgt, src, w, h, cfg, tile);
 }
 
 ///////////////////////

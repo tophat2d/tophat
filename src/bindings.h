@@ -13,6 +13,7 @@ void umparticlesdraw(UmkaStackSlot *p, UmkaStackSlot *r);
 void umdrawcone(UmkaStackSlot *p, UmkaStackSlot *r);
 void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r);
 void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r);
+void umtmapautotile(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r);
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r);

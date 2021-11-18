@@ -215,6 +215,7 @@ int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, th_vf2 *ic);
 
 // tilemap
 void th_tmap_draw(th_tmap *t, th_rect *cam);
+void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 
 // font
 void th_font_load(th_font *out, char *path);

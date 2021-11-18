@@ -86,3 +86,30 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 		glDrawArrays(GL_TRIANGLES, 0, 6);
 	}
 }
+
+static uu safe_get(uu *src, uu w, uu h, uu x, uu y) {
+	if (x > w || y > h)
+		return 0;
+
+	return src[w * y + x]; 
+}
+
+enum {
+	top = 1,
+	right = 2,
+	bot = 4,
+	left = 8
+};
+
+void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter) {
+	for (int x=0; x < w; x++) for (int y=0; y < h; y++) {
+		if (src[x + y * w] != limiter) continue;
+		int sum = 0;
+		sum += top * !!safe_get(src, w, h, x, y-1);
+		sum += bot * !!safe_get(src, w, h, x, y+1);
+		sum += right * !!safe_get(src, w, h, x+1, y);
+		sum += left * !!safe_get(src, w, h, x-1, y);
+		tgt[x + y * w] = tiles[sum];
+	}
+}
+

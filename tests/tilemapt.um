@@ -13,13 +13,37 @@ fn main() {
 	window.setup("title", 1280, 720)
 	cam := rect.mk(0, 0, 192, 108)
 
-	t := tilemap.mk(
-		[]th.uu{
-			0, 1, 1, 0,
-			2, 2, 2, 2,
-			2, 2, 2, 2,
-			0, 1, 1, 0},
-		4, atlas.mk(image.load("etc/atlas.png"), th.Vf2{2, 1}), 1)
+	atl := atlas.mk(image.load("etc/atlas.png"), th.Vf2{4, 4})
+	src := []th.uu{
+		1, 1, 1, 0, 0, 1, 1, 1,
+		0, 0, 1, 0, 0, 1, 0, 1,
+		0, 1, 1, 1, 1, 1, 1, 1,
+		0, 0, 0, 0, 1, 0, 1, 0}
+	w := 8
+	h := len(src) / w
+
+	t := tilemap.mk(make([]th.uu, w * h), w,
+		atlas.mk(image.load("etc/atlas.png"), th.Vf2{4, 4}), 2)
+
+	cfg := make([]th.uu, 16)	
+	cfg[tilemap.top | tilemap.bot] = 1
+	cfg[tilemap.left | tilemap.right] = 2
+	cfg[tilemap.left | tilemap.top] = 3
+	cfg[tilemap.right | tilemap.top] = 4
+	cfg[tilemap.left | tilemap.bot] = 5
+	cfg[tilemap.bot | tilemap.right] = 6
+	cfg[tilemap.left | tilemap.top | tilemap.right] = 7
+	cfg[tilemap.left | tilemap.bot | tilemap.right] = 8
+	cfg[tilemap.top | tilemap.right | tilemap.bot] = 9
+	cfg[tilemap.top | tilemap.left | tilemap.bot] = 10
+	cfg[tilemap.right] = 11
+	cfg[tilemap.left] = 12
+	cfg[tilemap.top] = 13
+	cfg[tilemap.bot] = 14
+	cfg[tilemap.top | tilemap.right | tilemap.bot | tilemap.left] = 15
+	cfg[0] = 16
+
+	t.autotile(src, cfg, 1)
 
 	for window.cycle(cam) {
 		canvas.setColor(th.white)
