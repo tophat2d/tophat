@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	start, end: uint
+	start, end: real
 	w*, h*: int32
 )
 
@@ -52,13 +52,10 @@ fn cycle*(cam: rect.Rect): bool {
 	canvas.drawRect(rect.Rect{cam.w, 0, w, h})
 	swapbuffers()
 
-	end = getTime()/1000
-	th.delta = (end - start)
-	for th.delta < 0 {
-		th.delta += 1000
-	}
-	start = getTime()/1000
-	th.time += th.delta
+	end = std.clock()*1000
+	th.delta = round(end - start)
+	start = std.clock()*1000
+	th.time = round(start)
 
 	canvas.setBgColor(0x000000ff)
 	clearframe()
