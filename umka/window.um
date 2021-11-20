@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	start, end: real
+	start, end, clockOffset: real
 	w*, h*: int32
 )
 
@@ -35,7 +35,7 @@ fn setup*(title: str, w, h: int32) {
 		th.platform = "windows"
 	}
 
-	th.time = getTime()
+	clockOffset = std.clock() * 1000
 }
 
 // Sets window title on runtime
@@ -55,7 +55,7 @@ fn cycle*(cam: rect.Rect): bool {
 	end = std.clock()*1000
 	th.delta = round(end - start)
 	start = std.clock()*1000
-	th.time = round(start)
+	th.time = round(start - clockOffset)
 
 	canvas.setBgColor(0x000000ff)
 	clearframe()

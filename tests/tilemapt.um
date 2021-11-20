@@ -50,6 +50,6 @@ fn main() {
 		canvas.drawRect(cam)
 
 		t.draw(cam)	
-		canvas.drawText(repr(th.delta), th.Vf2{0, 0}, th.black, 1)
+		canvas.drawText(repr(th.delta) + " " + repr(th.time), th.Vf2{0, 0}, th.black, 1)
 	}
 }
