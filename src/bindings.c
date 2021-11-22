@@ -285,17 +285,17 @@ void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
 // flips image
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img;
-	GET_IMAGE(img, p[0].intVal);
+	GET_IMAGE(img, p[1].intVal);
 
-	img->flipv = !img->flipv;
+	img->flipv = p[0].intVal;
 }
 
 // flips image
 void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img;
-	GET_IMAGE(img, p[0].intVal);
+	GET_IMAGE(img, p[1].intVal);
 
-	img->fliph = !img->fliph;
+	img->fliph = p[0].intVal;
 }
 
 void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {

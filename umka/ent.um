@@ -36,9 +36,11 @@ fn mk*(img: image.Image, t: th.Transform): Ent {
 	var e: Ent
 	e.i = img
 	e.t = t
-	dm := img.getDims()
-	e.r.w = dm.x
-	e.r.h = dm.y
+	if img.handle != 0 {
+		dm := img.getDims()
+		e.r.w = dm.x
+		e.r.h = dm.y
+	}
 	e.c = 0xff
 
 	return e

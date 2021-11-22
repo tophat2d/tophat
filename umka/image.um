@@ -10,8 +10,8 @@ type Image* = struct {
 
 fn loadimg(path: ^char): int
 fn iconset(i: int)
-fn flipvimg(i: int)
-fn fliphimg(i: int)
+fn flipvimg(i: int, f: bool)
+fn fliphimg(i: int, f: bool)
 fn imgvalid(i: int): int32
 fn imggetdims(dm: ^th.Vf2, i: int)
 fn imgcrop(img: int, tl, br: th.Vf2)
@@ -26,13 +26,13 @@ fn load*(path: str): Image {
 }
 
 // Flips i on it's vertical axis.
-fn (i: ^Image) flipv*() {
-	flipvimg(i.handle)
+fn (i: ^Image) flipv*(flip: bool) {
+	flipvimg(i.handle, flip)
 }
 
 // Flips i on it's horizontal axis.
-fn (i: ^Image) fliph*() {
-	fliphimg(i.handle)
+fn (i: ^Image) fliph*(flip: bool) {
+	fliphimg(i.handle, flip)
 }
 
 // Draws the image **not** accounting for camera.
