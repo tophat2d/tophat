@@ -129,7 +129,7 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	strcpy(path, thg.respath);
 
 	FILE *f = fopen(strcat(path, name), mode);
-	r->ptrVal = (intptr_t)f;
+	r->ptrVal = f;
 }
 
 void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -267,7 +267,7 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = thg.images[thg.image_count++] = th_load_image(strcat(pathcpy, path));
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 
-	r[0].ptrVal = thg.image_count;
+	r[0].intVal = thg.image_count;
 }
 
 // checks, if image is correctly loaded
@@ -330,7 +330,7 @@ void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = thg.images[thg.image_count++] = calloc(sizeof(th_image), 1);
 	th_image_from_data(img, data, dm);
 
-	r->ptrVal = thg.image_count;
+	r->intVal = thg.image_count;
 }
 
 void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -346,7 +346,7 @@ void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
 	out->data = calloc(sizeof(uint32_t), out->dm.w * out->dm.h);
 	memcpy(out->data, inp->data, sizeof(uint32_t) * out->dm.w * out->dm.h);
 
-	r->ptrVal = thg.image_count;
+	r->intVal = thg.image_count;
 }
 
 void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -392,7 +392,7 @@ void umentgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_ent **scene = (th_ent **)p[0].ptrVal;
 	th_ent *e = (th_ent *)p[1].ptrVal;
 	int count = p[2].intVal;
-	uu maxColls = p[3].ptrVal;
+	uu maxColls = p[3].intVal;
 	uu *collC = (uu *)p[4].ptrVal;
 	th_coll *colls = (th_coll *)p[5].ptrVal;
 
@@ -415,7 +415,7 @@ void umentysort(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_sound_load((char *)p->ptrVal);
 
-	r->ptrVal = thg.sound_count;
+	r->intVal = thg.sound_count;
 }
 
 // sets array of sounds to be played
@@ -620,7 +620,7 @@ void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img;
-	GET_IMAGE(img, p[1].ptrVal);
+	GET_IMAGE(img, p[1].intVal);
 	th_transform *t = (th_transform *)p[0].ptrVal;
 
 	th_blit_tex(img, *t);
