@@ -1,6 +1,6 @@
 # tophat
 
-Tophat is a 2d game engine focused on minimalism. You can use [Umka](https://github.com/vtereshkov/umka-lang), a statically typed scripting language to make games, although they can be extended with c.
+Tophat is a friendly 2d game engine for the [Umka](https://github.com/vtereshkov/umka-lang) programming language.
 Visit the [homepage](https://marekmaskarinec.github.io/tophat.html) for more info.
 
 ## features
@@ -14,6 +14,7 @@ Visit the [homepage](https://marekmaskarinec.github.io/tophat.html) for more inf
 - tilemaps
 - lighting system
 - collision detection
+- font support
 
 ## getting started
 
