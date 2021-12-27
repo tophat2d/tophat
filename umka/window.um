@@ -31,7 +31,6 @@ fn setup*(title: str, w, h: int32) {
 	clearframe()
 
 	if std.getenv("HOME") == "" {
-		input.setwinmap()
 		th.platform = "windows"
 	}
 

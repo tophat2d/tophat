@@ -43,13 +43,13 @@ fn init*() {
 }
 
 fn handle*() {
-	if input.isPressed(int32('a')) {
+	if input.isPressed('a') {
 		e.t.p.x -= speed * th.delta
 		if e.t.p.x < -global.cam.w/2 - e.r.w {
 			e.t.p.x = global.cam.w/2
 		}
 	}
-	if input.isPressed(int32('d')) {
+	if input.isPressed('d') {
 		e.t.p.x += speed * th.delta
 		if e.t.p.x > global.cam.w/2 {
 			e.t.p.x = -global.cam.w/2 - e.r.w
@@ -58,7 +58,7 @@ fn handle*() {
 
 	e.animate(4, &frames, th.time)
 
-	if input.isJustPressed(input.KEY_SPACE) && th.time - lastShot >= shootTimeout {
+	if input.isJustPressed(' ') && th.time - lastShot >= shootTimeout {
 		sound.shoot.play()
 		b := bulletPrefab
 		b.t.p = th.Vf2{e.t.p.x + 1, e.t.p.y - bulletPrefab.r.h}
