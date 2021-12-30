@@ -50,14 +50,27 @@ fn strtoc(inp: str): str {
 }
 
 fn main() {
-	printf("const char *libs[] = {\n")
+	mode := std.argv(1)
 
-	for i:=1; i < std.argc(); i++ {
-		f := std.fopen(std.argv(i), "r")
-		data := readall(f)
-		printf("%s\n", strtoc(data)+",")
-		std.fclose(f)
+	// embeds contents of a file as a string. TODO just as bytes
+	if mode == "em" {
+		printf("const char *%s[] = {\n", std.argv(2))
+  
+		for i:=3; i < std.argc(); i++ {
+			f := std.fopen(std.argv(i), "r")
+			data := readall(f)
+			printf("%s\n", strtoc(data)+",")
+			std.fclose(f)
+		}
+  
+		printf("};\n")
+	// creates a string array with args as values
+	} else if mode == "argarr" {
+		printf("const char *%s[] = { ", std.argv(2))
+		for i:=3; i < std.argc(); i++ {
+			printf("\"%s\", ", std.argv(i))
+		}
+
+		printf(" };\n")
 	}
-
-	printf("};\n")
 }

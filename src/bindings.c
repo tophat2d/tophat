@@ -14,11 +14,9 @@
 
 #include "tophat.h"
 
-#ifdef RELEASE_BUILD
-#include "umkalibs.h"
-#endif
-
 extern th_global thg;
+
+extern char *th_em_modulesrc[];
 
 void _th_umka_bind(void *umka) {
 	// etc
@@ -93,32 +91,30 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "drawSegment", &umCNFGTackSegment);
 	umkaAddFunc(umka, "cdrawimage", &umCNFGBlitTex);
 
-#ifdef RELEASE_BUILD
 	int index = 0;
-	umkaAddModule(umka, "anim.um", libs[index++]);
-	umkaAddModule(umka, "audio.um", libs[index++]);
-	umkaAddModule(umka, "csv.um", libs[index++]);
-	umkaAddModule(umka, "ent.um", libs[index++]);
-	umkaAddModule(umka, "image.um", libs[index++]);
-	umkaAddModule(umka, "input.um", libs[index++]);
-	umkaAddModule(umka, "misc.um", libs[index++]);
-	umkaAddModule(umka, "canvas.um", libs[index++]);
-	umkaAddModule(umka, "ray.um", libs[index++]);
-	umkaAddModule(umka, "rect.um", libs[index++]);
-	umkaAddModule(umka, "tilemap.um", libs[index++]);
-	umkaAddModule(umka, "window.um", libs[index++]);
-	umkaAddModule(umka, "ui.um", libs[index++]);
-	umkaAddModule(umka, "std.um", libs[index++]);
-	umkaAddModule(umka, "particles.um", libs[index++]);
-	umkaAddModule(umka, "light.um", libs[index++]);
-	umkaAddModule(umka, "lerp.um", libs[index++]);
-	umkaAddModule(umka, "map.um", libs[index++]);
-	umkaAddModule(umka, "utf8.um", libs[index++]);
-	umkaAddModule(umka, "font.um", libs[index++]);
-	umkaAddModule(umka, "th.um", libs[index++]);
-	umkaAddModule(umka, "signal.um", libs[index++]);
-	umkaAddModule(umka, "atlas.um", libs[index++]);
-#endif
+	umkaAddModule(umka, "anim.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "audio.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "csv.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ent.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "image.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "input.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "misc.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "canvas.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ray.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "rect.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "tilemap.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "window.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ui.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "std.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "particles.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "light.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "lerp.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "map.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "utf8.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "font.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "th.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "signal.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "atlas.um", th_em_modulesrc[index++]);
 }
 
 void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {

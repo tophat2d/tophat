@@ -18,11 +18,9 @@ type Vf2* = struct {
 	x, y: fu
 }
 
-// rotates point [x, y] around [cx, cy] with
-// rot in degrees
+// rotates `p` around `origin` with `rot` in degrees
 fn (p: ^th.Vf2) rotated*(origin: th.Vf2, rot: th.fu): th.Vf2 {
 	angle := (rot * std.pi) / 180
-	printf("%f\n", angle)
 
 	pos := p^
 	pos.x -= origin.x
@@ -37,8 +35,7 @@ fn (p: ^th.Vf2) rotated*(origin: th.Vf2, rot: th.fu): th.Vf2 {
 	return pos
 }
 
-// Distance of [x1, y1] to [x2, [y2]].
-// It won't be negative.
+// distance between `p1` and `p2`
 fn (p1: ^th.Vf2) distanceTo*(p2: th.Vf2): th.fu {
 	return std.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 }
