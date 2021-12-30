@@ -22,16 +22,17 @@ type Vf2* = struct {
 // rot in degrees
 fn (p: ^th.Vf2) rotated*(origin: th.Vf2, rot: th.fu): th.Vf2 {
 	angle := (rot * std.pi) / 180
+	printf("%f\n", angle)
 
 	pos := p^
 	pos.x -= origin.x
 	pos.y -= origin.y
 
-	pos.x = pos.x * cos(angle) - pos.y * sin(angle)
-	pos.y = pos.x * sin(angle) + pos.y * cos(angle)
+	x := pos.x * cos(angle) - pos.y * sin(angle)
+	y := pos.x * sin(angle) + pos.y * cos(angle)
 
-	pos.x += origin.x
-	pos.y += origin.y
+	pos.x = x + origin.x
+	pos.y = y + origin.y
 
 	return pos
 }
@@ -54,6 +55,27 @@ fn (p: ^th.Vf2) sub*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x - p2.x, p.y - p2.y}
 fn (p: ^th.Vf2) add*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x + p2.x, p.y + p2.y} }
 fn (p: ^th.Vf2) div*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x / p2.x, p.y / p2.y} }
 fn (p: ^th.Vf2) mul*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x * p2.x, p.y * p2.y} }
+fn (p: ^th.Vf2) mag*(): th.fu {
+	return sqrt(p.x * p.x + p.y * p.y)
+}
+
+fn (p: ^th.Vf2) norm*(): th.Vf2 {
+	if p.x == 0 && p.y == 0 {
+		return p^
+	}
+
+	a := p.abs()
+	o := p^
+	if a.x > a.y {
+		o.x /= a.x
+		o.y /= a.x
+	} else {
+		o.y /= a.y
+		o.x /= a.y
+	}
+
+	return o
+}
 
 // Struct defining transformation. Used for example by entities.
 type Transform* = struct {

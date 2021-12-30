@@ -38,7 +38,6 @@ typedef struct {
 	fu rot;
 } th_transform;
 
-#pragma pack(push, 1)
 typedef struct {
     ma_decoder decoder;
     int playing;
@@ -150,7 +149,6 @@ typedef struct {
 typedef struct {
 	stbtt_fontinfo *info;
 } th_font;
-#pragma pack(pop)
 
 // struct holding all tophat's global variables.
 typedef struct {

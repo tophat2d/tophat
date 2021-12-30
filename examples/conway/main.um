@@ -4,6 +4,7 @@ import (
 	"rect.um"
 	"input.um"
 	"image.um"
+	"atlas.um"
 	"canvas.um"
 	"window.um"								
 	"tilemap.um"
@@ -59,7 +60,7 @@ fn main() {
 
 	grid := tilemap.mk(
 		make([]th.uu, round((cam.w / cellSize) * (cam.h / cellSize))), round(cam.w / cellSize),
-		[]image.Image{image.mk([]uint32{th.white}, th.Vf2{1, 1})}, cellSize)
+		atlas.mk(image.mk([]uint32{th.white}, th.Vf2{1, 1}), th.Vf2{1, 1}), cellSize)
 	grid.pos.x = -cam.w/2
 	grid.pos.y = -cam.h/2
 
@@ -79,7 +80,7 @@ fn main() {
 		case 0: // build
 			mouse := input.getMousePos()
 
-			if input.isJustPressed(input.KEY_ESCAPE) {
+			if input.isJustPressed(input.key_escape) {
 				backup = grid.cells
 				mode = 1
 			}
@@ -89,15 +90,15 @@ fn main() {
 			if trunc(mouse.y/cellSize) * grid.w +
 				trunc(mouse.x/cellSize) < len(grid.cells) {
 
-				if input.isPressed(input.LMB) || input.isPressed(int32('w')) {
+				if input.isPressed(input.mouse1) || input.isPressed('w') {
 					grid.cells[trunc(mouse.y/cellSize) * grid.w + trunc(mouse.x/cellSize)] = 1
 				}
-				if input.isPressed(input.RMB) || input.isPressed(int32('e')) {
+				if input.isPressed(input.mouse3) || input.isPressed('e') {
 					grid.cells[trunc(mouse.y/cellSize) * grid.w + trunc(mouse.x/cellSize)] = 0
 				}
 			}
 
-			if input.isPressed(int32('h')) {
+			if input.isPressed('h') {
 				canvas.drawText(
 					"edit mode:\n"+
 					"  w - plot\n"+
@@ -112,12 +113,12 @@ fn main() {
 				canvas.drawText("hold h for help", th.Vf2{1, 5}, th.white, 1)
 			}
 		case 1:
-			if play || (input.isPressed(int32('l')) && th.time - lastStep > 150) {
+			if play || (input.isPressed('l') && th.time - lastStep > 150) {
 				grid.cells = updateGrid(grid.cells, grid.w)
 				lastStep = th.time
 			}
 
-			if input.isJustPressed(int32('p')) {
+			if input.isJustPressed('p') {
 				if play {
 					play = false
 				} else {
@@ -125,13 +126,13 @@ fn main() {
 				}
 			}
 
-			if input.isJustPressed(input.KEY_ESCAPE) {
+			if input.isJustPressed(input.key_escape) {
 				grid.cells = backup
 				mode = 0
 				play = false
 			}
 
-			if input.isPressed(int32('i')) {
+			if input.isPressed('i') {
 				mode = 0
 				play = false
 			}
