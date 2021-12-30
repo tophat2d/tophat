@@ -72,5 +72,6 @@ fn main() {
 		}
 
 		printf(" };\n")
+		printf("int %s_count = %d;\n", std.argv(2), std.argc() - 3)
 	}
 }

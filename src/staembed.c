@@ -2108,4 +2108,5 @@ const char *th_em_modulesrc[] = {
 "}\n"
 "",
 };
-const char *th_em_modulenames[] = { "umka/anim.um", "umka/audio.um", "umka/csv.um", "umka/ent.um", "umka/image.um", "umka/input.um", "umka/misc.um", "umka/canvas.um", "umka/ray.um", "umka/rect.um", "umka/tilemap.um", "umka/window.um", "umka/ui.um", "umka/std/std.um", "umka/particles.um", "umka/light.um", "umka/lerp.um", "umka/std/map.um", "umka/std/utf8.um", "umka/font.um", "umka/th.um", "umka/signal.um", "umka/atlas.um",  };
+const char *th_em_modulenames[] = { "anim.um", "audio.um", "csv.um", "ent.um", "image.um", "input.um", "misc.um", "canvas.um", "ray.um", "rect.um", "tilemap.um", "window.um", "ui.um", "std.um", "particles.um", "light.um", "lerp.um", "map.um", "utf8.um", "font.um", "th.um", "signal.um", "atlas.um",  };
+int th_em_modulenames_count = 23;

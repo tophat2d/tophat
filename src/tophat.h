@@ -18,6 +18,7 @@ typedef short iu;
 	if (index-1 > thg.image_count || index == 0) {th_error("invalid image %ld", index); return;} \
 	ivar = thg.images[index-1];}
 #define SWAP_VARS(v1, v2, type) { type tmp = v1; v1 = v2; v2 = tmp; }
+#define LEN(a) (sizeof(a) / sizeof(a[0]))
 
 typedef union {
 	struct {fu w, h;};

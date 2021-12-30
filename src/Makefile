@@ -13,7 +13,7 @@ UMKA_MODULES = umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um 
 $(EM_TARGET): $(UMKA_MODULES)
 	@echo EM $@
 	@./lib/umka/build/umka cmd/buildhelper.um em th_em_modulesrc $(UMKA_MODULES) > $(EM_TARGET)
-	@./lib/umka/build/umka cmd/buildhelper.um argarr th_em_modulenames $(UMKA_MODULES) >> $(EM_TARGET)
+	@./lib/umka/build/umka cmd/buildhelper.um argarr th_em_modulenames $(notdir $(UMKA_MODULES)) >> $(EM_TARGET)
 	rm -f src/bindings.o
 
 %.o: %.c

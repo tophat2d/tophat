@@ -11,6 +11,10 @@ th_global thg = {0};
 int destroyfunc;
 int died = 0;
 
+extern char *th_em_modulenames[];
+extern char *th_em_modulesrc[];
+extern int th_em_modulenames_count;
+
 void die() {
 	if (died) return;
 	
@@ -30,6 +34,33 @@ void HandleDestroy() { }
 int main(int argc, char *argv[]) {
 	thg.umka = umkaAlloc();
 	int umkaOK;
+
+	if (argc != 1) {
+		if (strcmp(argv[1], "-modsrc") == 0) {
+			if (argc != 3) {
+				printf("modsrc takes one argument\n");
+				return 1;
+			}
+			
+			for (int i=0; i < th_em_modulenames_count; i++) {
+				if (strcmp(argv[2], th_em_modulenames[i]) == 0) {
+					printf(th_em_modulesrc[i]);
+					return 0;
+				}
+			}
+
+			printf("No module named %s\n", argv[2]);
+		} else {
+			printf(
+				"tophat - a minimalist game engine for making games in umka.\n"
+				"Just launching tophat without flags will run main.um or tophat.dat/main.um\n"
+				"Available flags:\n"
+				"  -modsrc <module name>: print source of a builtin module\n");
+			return 0;
+		}
+
+		return 0;
+	}
 
 	FILE *f;
 	char scriptpath[512];
