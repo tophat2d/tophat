@@ -1,4 +1,5 @@
 // Raycasts allow for vroom fast collisions.
+// Changes will happen.
 
 import (
 	"th.um"
@@ -21,7 +22,7 @@ fn mk*(pos: th.Vf2, l, r: th.fu): Ray {
 }
 
 fn craygetcoll(ic: ^th.Vf2, count: int32, r: ^Ray, s: ^^ent.Ent): int32
-fn craygettmapcoll(r: ^Ray, t: ^tilemap.ctmap, ic: ^th.Vf2): bool
+fn craygettmapcoll(r: ^Ray, t: ^tilemap.Tilemap, ic: ^th.Vf2): bool
 
 // Same as ent.getcoll. Same changes will apply.
 fn (r: ^Ray) getcoll*(s: []^ent.Ent, ic: ^th.Vf2): int32 {
@@ -29,12 +30,5 @@ fn (r: ^Ray) getcoll*(s: []^ent.Ent, ic: ^th.Vf2): int32 {
 }
 
 fn (r: ^Ray) gettmapcoll*(t: tilemap.Tilemap, ic: ^th.Vf2): bool {
-	ccm := make([]int32, len(t.collMask))
-	for i:=0; i < len(t.collMask); i++ {
-		ccm[i] = int32(t.collMask[i])
-	}
-
-	cm := tilemap.ctmap{^int(&t.tiles[0]), t.pos, t.w, len(t.cells)/t.w, &t.cells[0], &t.collMask[0], t.cellSize, t.scaleType}
-
-	return craygettmapcoll(r, &cm, ic)
+	return craygettmapcoll(r, &t, ic)
 }

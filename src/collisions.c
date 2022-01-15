@@ -73,6 +73,10 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic) {
 
 	th_rotate_point(&e, ra->pos, ra->r);
 
+	int
+		tw = t->w,
+		th = t->cells.len / t->w;
+
 	float
 		mx = e.x - b.x,
 		my = e.y - b.y;
@@ -88,9 +92,9 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic) {
 		int tx = (x - t->pos.x) / (t->scale * t->a.cs.x);
 		int ty = (y - t->pos.y) / (t->scale * t->a.cs.y);
 
-		int tile = t->cells[(int)(ty * t->w + tx)] - 1;
-		if (x >= t->pos.x && y >= t->pos.y && tx < t->w && ty < t->h &&
-			tile >= 0 && t->collmask[tile]) {
+		int tile = t->cells.data[(int)(ty * t->w + tx)] - 1;
+		if (x >= t->pos.x && y >= t->pos.y && tx < tw && ty < th &&
+			tile >= 0 && t->collmask.data[tile]) {
 			coll = true;
 			if (minlen == -1 || len < minlen)
 				minlen = len;
@@ -112,19 +116,23 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic) {
 uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc) {
 	th_quad q = th_ent_transform(e);
 
+	int
+		tw = t->w,
+		th = t->cells.len / t->w;
+
 	for (uu i=0; i < 4; i++) {
 		const iu tx = (q.v[i].x - t->pos.x) / (t->scale * t->a.cs.x);
 		const iu ty = (q.v[i].y - t->pos.y) / (t->scale * t->a.cs.y);
 
 		if (q.v[i].x < t->pos.x || q.v[i].y < t->pos.x) continue;
 		if (tx < 0 || ty < 0) continue;
-		if (tx >= t->w || ty >= t->h) continue;
+		if (tx >= tw || ty >= th) continue;
 
-		const int tile = t->cells[(t->w * ty) + tx];
+		const int tile = t->cells.data[(tw * ty) + tx];
 		if (!tile)
 			continue;
 
-		if (t->collmask[tile - 1]) {
+		if (t->collmask.data[tile - 1]) {
 			*vert = i;
 			tc->x = tx;
 			tc->y = ty;

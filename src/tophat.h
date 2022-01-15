@@ -5,6 +5,7 @@
 #include <miniaudio.h>
 #include <CNFG.h>
 #include <stb_truetype.h>
+#include <umka_api.h>
 
 #define MAX_SOUNDS 512
 #define MAX_IMAGES 2048
@@ -40,10 +41,10 @@ typedef struct {
 } th_transform;
 
 typedef struct {
-    ma_decoder decoder;
-    int playing;
-    float volume;
-    int looping;
+	ma_decoder decoder;
+	int playing;
+	float volume;
+	int looping;
 } th_sound;
 
 typedef struct {
@@ -119,11 +120,9 @@ typedef struct {
 	fu max_rotation;
 	fu rotation_randomness;
 
-	uint32_t *colors;
-	uu color_c;
+	UmkaDynArray(uint32_t) colors;
 
-	_th_particle *particles;
-	uu particle_c;
+	UmkaDynArray(_th_particle) particles;
 } th_particles;
 
 typedef struct {
@@ -141,9 +140,9 @@ typedef struct {
 typedef struct {
 	th_atlas a;
 	th_vf2 pos;
-	uu w, h;
-	uu *cells;
-	char *collmask;
+	uu w;
+	UmkaDynArray(uu) cells;
+	UmkaDynArray(bool) collmask;
 	fu scale;
 } th_tmap;
 

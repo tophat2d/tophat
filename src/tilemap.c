@@ -30,9 +30,13 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	int camx = cam->x - (cam->w / 2);
 	int camy = cam->y - (cam->h / 2);
 
-	if (camx > t->pos.x + t->w*t->scale * t->a.cs.x)
+	int
+		tw = t->w,
+		th = t->cells.len / t->w; 
+
+	if (camx > t->pos.x + tw*t->scale * t->a.cs.x)
 		return;
-	if (camy > t->pos.y + t->h*t->scale * t->a.cs.y)
+	if (camy > t->pos.y + th*t->scale * t->a.cs.y)
 		return;
 
 	int sx = fabs((fabs(t->pos.x)-abs(camx))) / (t->scale * t->a.cs.x);
@@ -45,10 +49,10 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	if (t->pos.y>=camy)
 		sy = 0;
 
-	if (sw > t->w)
-		sw = t->w - sx;
-	if (sh > t->h)
-		sh = t->h - sy;
+	if (sw > tw)
+		sw = tw - sx;
+	if (sh > th)
+		sh = th - sy;
 
 	CNFGFlushRender();
 
@@ -61,8 +65,8 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	glBindTexture(GL_TEXTURE_2D, a->gltexture);
 
 	for (int i=sx; i < sx+sw; i++) for (int j=sy; j < sy+sh; j++) {
-		if (t->cells[j*t->w+i] == 0) continue;
-		int cell = t->cells[j * t->w + i];
+		if (t->cells.data[j*t->w+i] == 0) continue;
+		int cell = t->cells.data[j * t->w + i];
 
 		const float
 			w = t->a.cs.x * thg.scaling * t->scale,
@@ -77,7 +81,7 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 		th_rect r = th_atlas_get_cell(&t->a, th_atlas_nth_coords(&t->a, cell - 1));
 		const float tex_verts[] = {
 			r.x, r.y,  (r.x + r.w), r.y,          (r.x + r.w), (r.y + r.h),
-			r.x, r.y,  (r.x + r.w), (r.y + r.h),  r.x, (r.y + r.h)
+			r.x, r.y,  (r.x + r.w), (r.y + r.h),  r.x,         (r.y + r.h)
 		};
 
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
