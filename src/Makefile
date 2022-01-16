@@ -20,7 +20,7 @@ $(EM_TARGET): $(UMKA_MODULES)
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MD -o $@ -c $<
 
-$(TARGET): $(EM_TARGET) $(OBJS) $(UMKA_LIBRARY)
+$(TARGET): $(UMKA_LIBRARY) $(EM_TARGET) $(OBJS)
 	@echo LD $@
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
 
