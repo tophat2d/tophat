@@ -18,3 +18,13 @@ fn mk*(x, y, w, h: th.fu): Rect {
 
 	return r
 }
+
+// translates screen coordinates to world coordinates with cam r
+fn (r: ^rect.Rect) toWorld(p: th.Vf2): th.Vf2 {
+	return th.Vf2{ p.x + r.x - r.w/2, p.y + r.y - r.h/2 }
+}
+
+// translates world coordinates to screen coordinates with cam r
+fn (r: ^rect.Rect) toScreen(p: th.Vf2): th.Vf2 {
+	return th.Vf2{ p.x - r.x + r.w/2, p.y - r.y + r.h/2 }
+}

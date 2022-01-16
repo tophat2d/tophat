@@ -42,6 +42,7 @@ fn (p1: ^th.Vf2) distanceTo*(p2: th.Vf2): th.fu {
 
 // Angle between [x1, y1] and [x2, y2]
 fn (p1: ^th.Vf2) angleTo*(p2: th.Vf2): real {
+	if p1.x == p2.x && p1.y == p2.y { return 0 }
 	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std.pi + 180
 }
 

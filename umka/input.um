@@ -45,10 +45,7 @@ fn getMousePos*(): th.Vf2 {
 
 // Returns the position of mouse cursor in relation to cam.
 fn getGlobalMousePos*(cam: rect.Rect): th.Vf2 {
-	v := getMousePos()
-	v.x += cam.x - cam.w/2
-	v.y += cam.y - cam.h/2
-	return v
+	return cam.toWorld(getMousePos())
 }
 
 fn cispressed(keycode: char): int32
