@@ -56,6 +56,9 @@ void HandleKey(int keycode, int bDown) {
 	}
 #endif
 
+	if (keycode > 255)
+		return;
+
 	if (!bDown) {
 		thg.pressed[keycode] = 0;
 		thg.just_pressed[keycode] = 0;
