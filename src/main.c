@@ -13,6 +13,7 @@ int died = 0;
 
 extern char *th_em_modulenames[];
 extern char *th_em_modulesrc[];
+extern char *th_em_misc[];
 extern int th_em_modulenames_count;
 
 void die() {
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
 	int umkaOK;
 
 	if (argc != 1) {
-		if (strcmp(argv[1], "-modsrc") == 0) {
+		if (strcmp(argv[1], "modsrc") == 0) {
 			if (argc != 3) {
 				printf("modsrc takes one argument\n");
 				return 1;
@@ -50,12 +51,20 @@ int main(int argc, char *argv[]) {
 			}
 
 			printf("No module named %s\n", argv[2]);
+		} else if (strcmp(argv[1], "license") == 0) {
+			printf("%s\n", th_em_misc[0]);
+			return 0;
+		} else if (strcmp(argv[1], "version") == 0) {
+			printf("%s\n", th_em_misc[1]);
 		} else {
 			printf(
 				"tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um or tophat.dat/main.um\n"
-				"Available flags:\n"
-				"  -modsrc <module name>: print source of a builtin module\n");
+				"Available modes:\n"
+				"  modsrc <module name> - print source of a builtin module\n"
+				"  license - print the license\n"
+				"  version - print the version\n"
+				"Visit mrms.cz/tophat.html for more info.");
 			return 0;
 		}
 

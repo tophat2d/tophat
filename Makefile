@@ -8,11 +8,13 @@ ifeq ($(PLATFORM), Linux)
   CROSS_CC=x86_64-w64-mingw32-gcc
   CROSS_FLAGS = -lm -Ldl -Ilib/rawdraw -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread $(WARNS) $(DEFS) -DNO_OPENGL_HEADERS
   TARGET=tophat
+  UMKA_BIN = ./lib/umka/build/umka
 else
 ifeq ($(SHORT_PLATFORM), MINGW64_NT)
   LDLIBS += -lm -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread lib/rawdraw/chew.c
   TARGET=tophat.exe
   DEFS += -DNO_OPENGL_HEADERS
+  UMKA_BIN = ./lib/umka/build/umka.exe
 endif
 endif
 
@@ -37,12 +39,6 @@ include Makeumka
 include src/Makefile
 
 deepclean:: clean
-
-install: $(TARGET) cross
-	./package.sh
-	cp cmd/tophat-cli /usr/bin
-	./cmd/tophat-cli install tophat-linux.zip
-	rm tophat-linux.zip tophat-win.zip
 
 clean::
 	$(RM) $(TARGET)
