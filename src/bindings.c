@@ -117,14 +117,23 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "atlas.um", th_em_modulesrc[index++]);
 }
 
+static
+char *conv_path(char *out, char *path) {
+	if (path[0] != '/') {
+		strcpy(out, thg.respath);
+		strcat(out, path);
+	} else {
+		strcpy(out, path);
+	}
+	return out;
+}
+
 void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
-	const char *name = (const char *)p[1].ptrVal;
+	char *name = (char *)p[1].ptrVal;
 	const char *mode = (const char *)p[0].ptrVal;
 
 	char path[512];
-	strcpy(path, thg.respath);
-
-	FILE *f = fopen(strcat(path, name), mode);
+	FILE *f = fopen(conv_path(path, name), mode);
 	r->ptrVal = f;
 }
 
@@ -151,15 +160,13 @@ void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char buf[512];
-	strcpy(buf, thg.respath);
-	strcat(buf, (char *)p[0].ptrVal);
 
 	if (thg.font_count >= MAX_FONTS - 1) {
 		th_error("Too many fonts. Create an issue.");
 		return;
 	}
 	th_font *f = thg.fonts[thg.font_count++] = calloc(sizeof(th_font), 1);
-	th_font_load(f, buf);
+	th_font_load(f, conv_path(buf, p[0].ptrVal));
 	r->intVal = thg.font_count;
 }
 
@@ -259,8 +266,7 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 		return;
 	}
 	char pathcpy[512];
-	strcpy(pathcpy, thg.respath);
-	th_image *img = thg.images[thg.image_count++] = th_load_image(strcat(pathcpy, path));
+	th_image *img = thg.images[thg.image_count++] = th_load_image(conv_path(pathcpy, path));
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 
 	r[0].intVal = thg.image_count;
