@@ -544,6 +544,7 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 #ifdef _WIN32
 	chewInit();
 #endif
+	th_image_init();
 
 	if (res) {
 		printf("could not initialize rawdraw\n");
@@ -622,8 +623,9 @@ void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img;
-	GET_IMAGE(img, p[1].intVal);
-	th_transform *t = (th_transform *)p[0].ptrVal;
+	GET_IMAGE(img, p[2].intVal);
+	th_transform *t = (th_transform *)p[1].ptrVal;
+	uint32_t c = p[0].uintVal;
 
-	th_blit_tex(img, *t);
+	th_blit_tex(img, *t, c);
 }

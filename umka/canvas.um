@@ -51,6 +51,3 @@ fn drawLine*(b, e: th.Vf2, thickness: th.fu, color: uint32) {
 	setColor(color)
 	drawSegment(b, e, thickness)
 }
-
-// Internal.
-fn cdrawimage*(img: int, t: ^th.Transform)

@@ -64,7 +64,7 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 		return;
 	}
 
-	th_blit_tex(img, t);
+	th_blit_tex(img, t, o->color);
 }
 
 void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,

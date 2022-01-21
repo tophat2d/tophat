@@ -35,9 +35,11 @@ fn (i: ^Image) fliph*(flip: bool) {
 	fliphimg(i.handle, flip)
 }
 
-// Draws the image **not** accounting for camera.
-fn (i: ^Image) draw*(t: th.Transform) {
-	canvas.cdrawimage(i.handle, &t)
+fn cdrawimage(img: int, t: ^th.Transform, color: uint32)
+// Draws the image **not** accounting for camera. It transforms it with t and
+// applies color as a color filter.
+fn (i: ^Image) draw*(t: th.Transform, color: uint32) {
+	cdrawimage(i.handle, &t, color)
 }
 
 // Returns true, if i is valid. This doesn't mean it isn't corrupted.

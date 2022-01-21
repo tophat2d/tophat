@@ -52,7 +52,7 @@ fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
 	}
 
 	c.runes.set(rune,
-		c.font.strToImage(rune.encode(), c.size, c.color, th.Vf2{0, 0}))
+		c.font.strToImage(rune.encode(), c.size, 0xffffff00, th.Vf2{0, 0}))
 }
 
 fn (c: ^Cached) preCacheStr*(s: str) {
@@ -113,7 +113,7 @@ fn (c: ^Cached) draw*(text: str, t: th.Transform) {
 		off *= t.s.y	
 
 		t.p.y += off
-		img.draw(t)
+		img.draw(t, c.color)
 		t.p.y -= off
 
 		t.p.x += dm.x * t.s.x * 1.1

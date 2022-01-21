@@ -8,6 +8,7 @@
 
 #include "tophat.h"
 
+// declaration needed to leech off of rawdraw
 extern GLuint gRDShaderProg;
 extern GLuint gRDBlitProg;
 extern GLuint gRDShaderProgUX;
@@ -16,9 +17,13 @@ extern GLuint gRDBlitProgUT;
 extern GLuint gRDBlitProgTex;
 extern GLuint gRDLastResizeW;
 extern GLuint gRDLastResizeH;
+GLuint CNFGGLInternalLoadShader( const char * vertex_shader, const char * fragment_shader );
 #ifdef _WIN32
 #define glActiveTexture glActiveTextureCHEW
 #endif
+
+GLuint th_blit_prog = -1;
+GLuint th_blit_prog_color = -1;
 
 extern th_global thg;
 
@@ -109,7 +114,7 @@ unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
 }
 
 // stolen from rawdraw
-void th_blit_tex(th_image *img, th_transform t) {
+void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
 	CNFGFlushRender();
 
 	th_quad q = th_ent_transform(
@@ -126,11 +131,16 @@ void th_blit_tex(th_image *img, th_transform t) {
 
 	th_vf2 p = th_quad_min(q);
 
-	glUseProgram(gRDBlitProg);
+	glUseProgram(th_blit_prog);
 	glUniform4f(gRDBlitProgUX,
 		1.f/gRDLastResizeW, -1.f/gRDLastResizeH,
 		-0.5f+p.x/(float)gRDLastResizeW, 0.5f-p.y/(float)gRDLastResizeH);
 	glUniform1i(gRDBlitProgUT, 0);
+
+	float colors[4];
+	for (int i=0; i < 4; ++i)
+		colors[i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
+	glUniform4f(th_blit_prog_color, colors[3], colors[2], colors[1], colors[0]);
 
 	glBindTexture(GL_TEXTURE_2D, img->gltexture);
 
@@ -176,6 +186,22 @@ void _th_rdimg(th_image *img, unsigned char *data) {
 	}
 
 	img->data = rd;
+}
+
+void th_image_init() {
+	th_blit_prog = CNFGGLInternalLoadShader(
+		"uniform vec4 xfrm;"
+		"attribute vec3 a0;"
+		"attribute vec4 a1;"
+		"varying vec2 tc;"
+		"void main() { gl_Position = vec4( a0.xy*xfrm.xy+xfrm.zw, a0.z, 0.5 ); tc = a1.xy; }",
+		
+		"varying vec2 tc;"
+		"uniform sampler2D tex;"
+		"uniform vec4 modColor;"
+		"void main() { gl_FragColor = texture2D(tex,tc).wzyx * modColor;}");
+
+	th_blit_prog_color = glGetUniformLocation(th_blit_prog, "modColor");
 }
 
 void th_image_deinit() {

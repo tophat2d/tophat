@@ -11,9 +11,13 @@ import (
 // for collisions. It also has a transform used for transforming it's image
 // and rectangle.
 type Ent* = struct {
+	// used as a collider, used as backup when invalid image is supplied
 	r: rect.Rect
+	// used in drawing
 	i: image.Image
+	// used to transform and translate the image and rect
 	t: th.Transform
+	// used as a color of the rect and a color filter for the image
 	c: uint32
 }
 
@@ -41,7 +45,11 @@ fn mk*(img: image.Image, t: th.Transform): Ent {
 		e.r.w = dm.x
 		e.r.h = dm.y
 	}
-	e.c = 0xff
+	e.c = th.white
+
+	if t.s.x == 0 && t.s.y == 0 {
+		t.s = th.Vf2{ 1, 1 }
+	}
 
 	return e
 }

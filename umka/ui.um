@@ -225,7 +225,7 @@ fn (i: ^Image) draw*() {
 		}
 	}
 
-	i.image.draw(th.Transform{p: i.g.t.p, s: s})
+	i.image.draw(th.Transform{p: i.g.t.p, s: s}, th.white)
 }
 
 fn mkLabel*(f: font.Cached, text: str, scale: th.fu): Label {

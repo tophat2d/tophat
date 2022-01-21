@@ -191,7 +191,8 @@ void th_free_image(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 void th_image_set_filter(th_image *img, int filter);
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
-void th_blit_tex(th_image *img, th_transform t);
+void th_blit_tex(th_image *img, th_transform t, uint32_t color);
+void th_image_init();
 void th_image_deinit();
 
 // light

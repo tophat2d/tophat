@@ -16,7 +16,7 @@ fn init*() {
 
 	mainFont = font.mkCached(
 		font.load("gfx/marediv-regular.ttf"),
-		0xeeeeee00, 0.04)
+		0xeeeeeeff, 0.04)
 	mainFont.preCacheStr("0123456789")
 }
 
@@ -28,7 +28,7 @@ fn draw*() {
 		hearth.draw(
 			th.Transform{
 				p: th.Vf2{global.cam.w - ((dm.x + 1) * (i + 1) + 1), 1},
-				s: th.Vf2{1, 1}})
+				s: th.Vf2{1, 1}}, th.white)
 	}
 
 	mainFont.draw(
