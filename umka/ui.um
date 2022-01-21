@@ -57,7 +57,7 @@ type Image* = struct {
 type Label* = struct {
 	g: Generic
 	text: str
-	font: font.Cached
+	font: ^font.Cached
 	center: bool
 	wrapping: bool
 	bgColor: uint32
@@ -228,7 +228,7 @@ fn (i: ^Image) draw*() {
 	i.image.draw(th.Transform{p: i.g.t.p, s: s}, th.white)
 }
 
-fn mkLabel*(f: font.Cached, text: str, scale: th.fu): Label {
+fn mkLabel*(f: ^font.Cached, text: str, scale: th.fu): Label {
 	return Label {
 		mkGeneric(), text,
 		f, false, true, 0, scale}
