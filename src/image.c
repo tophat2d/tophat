@@ -139,9 +139,14 @@ void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
 
 	glBindTexture(GL_TEXTURE_2D, img->gltexture);
 
+	sh *= -1;
 	const float verts[] = {
-		q.tl.x - p.x, q.tl.y - p.y, q.tr.x - p.x, q.tr.y - p.y, q.br.x - p.x, q.br.y - p.y,
-		q.tl.x - p.x, q.tl.y - p.y, q.br.x - p.x, q.br.y - p.y, q.bl.x - p.x, q.bl.y - p.y};
+		(q.tl.x - p.x)/sw, (q.tl.y - p.y)/sh,
+		(q.tr.x - p.x)/sw, (q.tr.y - p.y)/sh,
+		(q.br.x - p.x)/sw, (q.br.y - p.y)/sh,
+		(q.tl.x - p.x)/sw, (q.tl.y - p.y)/sh,
+		(q.br.x - p.x)/sw, (q.br.y - p.y)/sh,
+		(q.bl.x - p.x)/sw, (q.bl.y - p.y)/sh};
 
 	th_rect bounds = img->crop;
 	bounds.x *= 255;
@@ -156,7 +161,7 @@ void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
 		bounds.x, bounds.y, bounds.w, bounds.y, bounds.w, bounds.h,
 		bounds.x, bounds.y, bounds.w, bounds.h, bounds.x, bounds.h };
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_TRUE, 0, verts);
 	glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, tex_verts);
 
 	glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -193,7 +198,7 @@ void th_image_init() {
 		"attribute vec3 vert;\n"
 		"attribute vec4 tex_vert;\n"
 		"varying vec2 tc;\n"
-		"void main() { gl_Position = vec4( vert.xy*pr+pos, vert.z, 0.5 ); tc = tex_vert.xy; }\n",
+		"void main() { gl_Position = vec4( vert.xy+pos, vert.z, 0.5 ); tc = tex_vert.xy; }\n",
 		
 		"varying vec2 tc;"
 		"uniform sampler2D tex;"
