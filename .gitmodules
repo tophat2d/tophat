@@ -10,3 +10,6 @@
 [submodule "lib/miniaudio"]
 	path = lib/miniaudio
 	url = https://github.com/mackron/miniaudio.git
+[submodule "lib/sokol"]
+	path = lib/sokol
+	url = https://github.com/floooh/sokol.git

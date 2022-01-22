@@ -3,7 +3,7 @@
 _:
 	@echo run make from repository root && false
 
-SRCS = $(shell find src/ -name \*.c -print)
+SRCS = $(shell find src/ -name \*.c -print) # lib/rawdraw/chew.c
 OBJS = $(sort $(SRCS:.c=.o))
 DEPS = $(OBJS:.o=.d)
 

@@ -33,6 +33,6 @@ fn (a: ^Atlas) draw(at: th.Vf2, t: th.Transform) {
 		th.Vf2{at.x / a.dm.x, at.y / a.dm.y},
 		th.Vf2{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})
 
-	a.i.draw(t)
+	a.i.draw(t, th.white)
 	a.i.crop(th.Vf2{}, th.Vf2{1, 1})
 }

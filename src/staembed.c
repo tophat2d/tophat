@@ -2052,7 +2052,7 @@ const char *th_em_modulesrc[] = {
 "\t\tth.Vf2{at.x / a.dm.x, at.y / a.dm.y},\n"
 "\t\tth.Vf2{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})\n"
 "\n"
-"\ta.i.draw(t)\n"
+"\ta.i.draw(t, th.white)\n"
 "\ta.i.crop(th.Vf2{}, th.Vf2{1, 1})\n"
 "}\n"
 "",

@@ -541,9 +541,7 @@ void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	int res = CNFGSetup(title, w, h);
 
-#ifdef _WIN32
-	chewInit();
-#endif
+	th_gl_init();
 	th_image_init();
 
 	if (res) {

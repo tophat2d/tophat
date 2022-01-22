@@ -11,7 +11,7 @@ ifeq ($(PLATFORM), Linux)
   UMKA_BIN = ./lib/umka/build/umka
 else
 ifeq ($(SHORT_PLATFORM), MINGW64_NT)
-  LDLIBS += -lm -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread lib/rawdraw/chew.c
+  LDLIBS += -lm -lopengl32 -lgdi32 -Wl,-Bstatic -lpthread
   TARGET=tophat.exe
   DEFS += -DNO_OPENGL_HEADERS
   UMKA_BIN = ./lib/umka/build/umka.exe

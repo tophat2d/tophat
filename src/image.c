@@ -9,21 +9,15 @@
 #include "tophat.h"
 
 // declaration needed to leech off of rawdraw
-extern GLuint gRDShaderProg;
-extern GLuint gRDBlitProg;
-extern GLuint gRDShaderProgUX;
-extern GLuint gRDBlitProgUX;
-extern GLuint gRDBlitProgUT;
-extern GLuint gRDBlitProgTex;
-extern GLuint gRDLastResizeW;
-extern GLuint gRDLastResizeH;
-GLuint CNFGGLInternalLoadShader( const char * vertex_shader, const char * fragment_shader );
 #ifdef _WIN32
 #define glActiveTexture glActiveTextureCHEW
 #endif
 
 GLuint th_blit_prog = -1;
 GLuint th_blit_prog_color = -1;
+GLuint th_blit_prog_pr = -1;
+GLuint th_blit_prog_pos = -1;
+GLuint th_blit_prog_tex = -1;
 
 extern th_global thg;
 
@@ -131,11 +125,12 @@ void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
 
 	th_vf2 p = th_quad_min(q);
 
+	short sw, sh;
+	CNFGGetDimensions(&sw, &sh);
 	glUseProgram(th_blit_prog);
-	glUniform4f(gRDBlitProgUX,
-		1.f/gRDLastResizeW, -1.f/gRDLastResizeH,
-		-0.5f+p.x/(float)gRDLastResizeW, 0.5f-p.y/(float)gRDLastResizeH);
-	glUniform1i(gRDBlitProgUT, 0);
+	glUniform2f(th_blit_prog_pr, 1.f/sw, -1.f/sh);
+	glUniform2f(th_blit_prog_pos, -0.5f+p.x/(float)sw, 0.5f-p.y/(float)sh);
+	glUniform1i(th_blit_prog_tex, 0);
 
 	float colors[4];
 	for (int i=0; i < 4; ++i)
@@ -189,19 +184,27 @@ void _th_rdimg(th_image *img, unsigned char *data) {
 }
 
 void th_image_init() {
-	th_blit_prog = CNFGGLInternalLoadShader(
-		"uniform vec4 xfrm;"
-		"attribute vec3 a0;"
-		"attribute vec4 a1;"
-		"varying vec2 tc;"
-		"void main() { gl_Position = vec4( a0.xy*xfrm.xy+xfrm.zw, a0.z, 0.5 ); tc = a1.xy; }",
+	const char *attribs[] = {
+		"vert", "tex_vert"
+	};
+	th_blit_prog = th_gl_create_prog(
+		"uniform vec2 pr; /* pixel ratio */\n"
+		"uniform vec2 pos;\n"
+		"attribute vec3 vert;\n"
+		"attribute vec4 tex_vert;\n"
+		"varying vec2 tc;\n"
+		"void main() { gl_Position = vec4( vert.xy*pr+pos, vert.z, 0.5 ); tc = tex_vert.xy; }\n",
 		
 		"varying vec2 tc;"
 		"uniform sampler2D tex;"
 		"uniform vec4 modColor;"
-		"void main() { gl_FragColor = texture2D(tex,tc).wzyx * modColor;}");
+		"void main() { gl_FragColor = texture2D(tex,tc).wzyx * modColor;}",
+		attribs, 2);
 
 	th_blit_prog_color = glGetUniformLocation(th_blit_prog, "modColor");
+	th_blit_prog_pr = glGetUniformLocation(th_blit_prog, "pr");
+	th_blit_prog_pos = glGetUniformLocation(th_blit_prog, "pos");
+	th_blit_prog_tex = glGetUniformLocation(th_blit_prog, "tex");
 }
 
 void th_image_deinit() {

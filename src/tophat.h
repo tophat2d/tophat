@@ -6,6 +6,7 @@
 #include <CNFG.h>
 #include <stb_truetype.h>
 #include <umka_api.h>
+#include <GL/gl.h>
 
 #define MAX_SOUNDS 512
 #define MAX_IMAGES 2048
@@ -246,4 +247,8 @@ void _th_rdimg(th_image *img, unsigned char *data);
 // light
 void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color);
 
+void th_gl_init();
+GLuint th_gl_compile_shader(const char **src, GLenum type);
+GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char **attribs, int nattribs);
+void th_gl_free_prog(GLuint prog);
 #endif
