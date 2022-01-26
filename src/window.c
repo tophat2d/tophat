@@ -39,8 +39,6 @@ void th_window_setup(char *name, int w, int h) {
 	if (!vi) {
 		th_error("No visual found.");
 		return;
-	} else {
-		printf("\n\tvisual %p selected\n", (void *)vi->visualid);
 	}
 
 	XSetWindowAttributes attribs;

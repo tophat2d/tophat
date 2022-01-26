@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
 	FILE *f;
 	char scriptpath[512];
 	if ((f = fopen("main.um", "r"))) {
-		strcpy(thg.respath, "./");
+		thg.respath[0] = 0;
 		strcpy(scriptpath, "main.um");
 		fclose(f);
 	} else if ((f = fopen("tophat.dat/main.um", "r"))) {

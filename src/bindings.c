@@ -17,11 +17,11 @@ extern char *th_em_modulesrc[];
 
 static
 char *conv_path(char *out, char *path) {
-	if (path[0] != '/') {
+	if (strstr(path, "raw://") == path) {
+		strcpy(out, path + strlen("raw://"));
+	} else {
 		strcpy(out, thg.respath);
 		strcat(out, path);
-	} else {
-		strcpy(out, path);
 	}
 	return out;
 }
