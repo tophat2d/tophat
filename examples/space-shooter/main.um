@@ -31,8 +31,7 @@ fn main() {
 	}
 
 	for window.cycle(global.cam) {
-		canvas.setColor(0x000022ff)
-		canvas.drawRect(global.cam)
+		canvas.drawRect(0x000022ff, global.cam)
 		
 		star.handle()
 		star.draw()

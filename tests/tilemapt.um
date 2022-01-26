@@ -46,8 +46,7 @@ fn main() {
 	t.autotile(src, cfg, 1)
 
 	for window.cycle(cam) {
-		canvas.setColor(th.white)
-		canvas.drawRect(cam)
+		canvas.drawRect(th.white, cam)
 
 		t.draw(cam)	
 		canvas.drawText(repr(th.delta) + " " + repr(th.time), th.Vf2{0, 0}, th.black, 1)

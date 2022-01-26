@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <CNFG.h>
 
 #include "tophat.h"
 
@@ -53,14 +52,8 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	}
 
 	if (!o->img) {
-		RDPoint verts[4];
-		for (uu i=0; i < 4; i++) {
-			verts[i].x = q.v[i].x;
-			verts[i].y = q.v[i].y;
-		}
-
-		CNFGColor(o->color);
-		CNFGTackPoly(&verts[0], 4);
+		th_canvas_triangle(o->color, q.v[0], q.v[1], q.v[2]);
+		th_canvas_triangle(o->color, q.v[0], q.v[2], q.v[3]);
 		return;
 	}
 

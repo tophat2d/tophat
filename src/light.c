@@ -1,8 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 #include <math.h>
-
-#include <CNFG.h>
+#include <GL/gl.h>
 
 #include "tophat.h"
 
@@ -16,11 +15,9 @@ void th_lightmask_clear(th_lightmask *d) {
 }
 
 void th_lightmask_draw(th_lightmask *d, th_rect *cam) {
-	unsigned tex = CNFGTexImage(d->dots, d->w, d->h);
-	CNFGBlitTex(tex, 0, 0,
-	            cam->w * thg.scaling,
-							cam->h * thg.scaling);
-	CNFGDeleteTex(tex);
+	/*unsigned tex = th_gen_texture(d->dots, (th_vf2){{ d->w, d->h }}, 0);
+	th_blit_tex(tex, (th_transform){ .scale = (th_vf2){{ 1, 1 }}}, 0xffffffff);
+	glDeleteTextures(1, &tex);*/
 }
 
 void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color) {

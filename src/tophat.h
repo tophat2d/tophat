@@ -3,7 +3,6 @@
 
 #include <stdbool.h>
 #include <miniaudio.h>
-#include <CNFG.h>
 #include <stb_truetype.h>
 #include <umka_api.h>
 #include <GL/gl.h>
@@ -37,7 +36,9 @@ typedef union {
 } th_quad;
 
 typedef struct {
-	th_vf2 pos, scale, origin;
+	th_vf2 pos;
+	th_vf2 scale;
+	th_vf2 origin;
 	fu rot;
 } th_transform;
 
@@ -251,4 +252,22 @@ void th_gl_init();
 GLuint th_gl_compile_shader(const char **src, GLenum type);
 GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char **attribs, int nattribs);
 void th_gl_free_prog(GLuint prog);
+
+void th_input_key(int keycode, int bDown);
+
+void th_window_setup(char *name, int w, int h);
+void th_window_get_dimensions(int *w, int *h);
+int th_window_handle();
+void th_window_swap_buffers();
+void th_window_clear_frame();
+
+void _th_umka_bind(void *umka);
+
+void th_canvas_rect(uint32_t color, th_rect r);
+void th_canvas_init();
+void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
+void th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size);
+void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);
+void th_canvas_flush();
+
 #endif

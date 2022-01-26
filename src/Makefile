@@ -28,7 +28,7 @@ $(TARGET): $(UMKA_LIBRARY) $(EM_TARGET) $(OBJS)
 
 UMKA_SRC=lib/umka/src/umka_common.c lib/umka/src/umka_const.c lib/umka/src/umka_expr.c lib/umka/src/umka_ident.c lib/umka/src/umka_runtime.c lib/umka/src/umka_types.c lib/umka/src/umka_api.c lib/umka/src/umka_compiler.c lib/umka/src/umka_decl.c lib/umka/src/umka_gen.c lib/umka/src/umka_lexer.c lib/umka/src/umka_stmt.c lib/umka/src/umka_vm.c
 cross: $(UMKA_LIB)
-	$(CROSS_CC) $(CFLAGS) -o tophat.exe $(SRCS) $(UMKA_SRC) $(CROSS_FLAGS) lib/rawdraw/chew.c -s -Os
+	$(CROSS_CC) $(CFLAGS) -o tophat.exe $(SRCS) $(UMKA_SRC) $(CROSS_FLAGS) lib/rawdraw/chew.c
 
 bulk: $(UMKA_LIB) $(UMKA_LIBRARY)
 	$(CC) -o $(TARGET) $(CFLAGS) $(SRCS) $(LDFLAGS) $(LDLIBS)

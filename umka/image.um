@@ -9,7 +9,6 @@ type Image* = struct {
 }
 
 fn loadimg(path: ^char): int
-fn iconset(i: int)
 fn flipvimg(i: int, f: bool)
 fn fliphimg(i: int, f: bool)
 fn imgvalid(i: int): int32

@@ -45,7 +45,6 @@ fn handle*() {
 
 fn draw*() {
 	for i:=0; i < len(stars); i++ {
-		canvas.setColor(0xeeeeeeff)
-		canvas.drawRect(stars[i])
+		canvas.drawRect(0xeeeeeeff, stars[i])
 	}
 }

@@ -1,8 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#define CNFG_IMPLEMENTATION
-#include <CNFG.h>
 #include <umka_api.h>
 #include "bindings.h"
 #include "tophat.h"
@@ -29,8 +27,6 @@ void die() {
 	umkaFree(thg.umka);
 	died = 1;
 }
-
-void HandleDestroy() { }
 
 int main(int argc, char *argv[]) {
 	thg.umka = umkaAlloc();

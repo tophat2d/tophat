@@ -5,8 +5,7 @@ import (
 	"std/std.um"
 	"rect.um"
 )
-
-// Draws a basic line text usually good for debugging.
+// Draws a basic pixel text usually good for debugging.
 fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
 
 // Precomputes line text's dimensions.
@@ -33,21 +32,10 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 		maxw = w
 	}
 
-	return th.Vf2{maxw * scale * 3 - scale, h * 6 * scale}
+	return th.Vf2{maxw * scale * 6 - scale, h * 6 * scale}
 }
-
-// Sets color that is used for drawing.
-fn setColor*(color: int)
-
-// Sets what color is used after a screen reset.
-fn setBgColor*(color: int)
 
 // Draws a Rectangle.
-fn drawRect*(r: rect.Rect)
+fn drawRect*(color: uint32, r: rect.Rect)
 
-fn drawSegment(b, e: th.Vf2, thickness: th.fu)
-// Draws a line.
-fn drawLine*(b, e: th.Vf2, thickness: th.fu, color: uint32) {
-	setColor(color)
-	drawSegment(b, e, thickness)
-}
+fn drawLine*(color: uint32, b, e: th.Vf2, thickness: th.fu)

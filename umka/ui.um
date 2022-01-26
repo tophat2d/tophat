@@ -180,7 +180,6 @@ fn (l: ^SimpleLabel) handle*() {
 }
 
 fn (l: ^SimpleLabel) draw*() {
-	canvas.setColor(l.bgColor)
 
 	pos := l.g.t.p
 	if l.center {
@@ -189,7 +188,7 @@ fn (l: ^SimpleLabel) draw*() {
 		pos.y += (l.g.t.s.y - dm.y)/2
 	}
 
-	canvas.drawRect(rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
+	canvas.drawRect(l.bgColor, rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
 	canvas.drawText(l.text, pos, l.color, l.textSize)
 }
 
@@ -247,8 +246,7 @@ fn (l: ^Label) draw*() {
 		return
 	}
 
-	canvas.setColor(l.bgColor)
-	canvas.drawRect(rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
+	canvas.drawRect(l.bgColor, rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
 
 	l.font.preCacheStr(l.text) 
 	text := utf8.decode(l.text)

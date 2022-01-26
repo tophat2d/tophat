@@ -3,7 +3,6 @@
 
 #include <GL/gl.h>
 #include <stb_image.h>
-#include <CNFG.h>
 #include <chew.h>
 
 #include "tophat.h"
@@ -18,6 +17,8 @@ GLuint th_blit_prog_color = -1;
 GLuint th_blit_prog_pr = -1;
 GLuint th_blit_prog_pos = -1;
 GLuint th_blit_prog_tex = -1;
+static GLuint vao;
+static GLuint vbo;
 
 extern th_global thg;
 
@@ -56,7 +57,7 @@ th_image *th_load_image(char *path) {
 }
 
 void th_free_image(th_image *img) {
-	CNFGDeleteTex(img->gltexture);
+	glDeleteTextures(1, &img->gltexture);
 
 	free(img->data);
 	free(img);
@@ -77,7 +78,7 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 
 void th_image_set_filter(th_image *img, int filter) {
 	img->filter = filter;
-	CNFGDeleteTex(img->gltexture);
+	glDeleteTextures(1, &img->gltexture);
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 }
 
@@ -109,7 +110,7 @@ unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
 
 // stolen from rawdraw
 void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
-	CNFGFlushRender();
+	th_canvas_flush();
 
 	th_quad q = th_ent_transform(
 		&(th_ent){
@@ -123,13 +124,12 @@ void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
 		q.v[i].y *= thg.scaling;
 	}
 
-	th_vf2 p = th_quad_min(q);
+	int sw, sh;
+	th_window_get_dimensions(&sw, &sh);
+	sh *= -0.5;
+	sw *= 0.5;
 
-	short sw, sh;
-	CNFGGetDimensions(&sw, &sh);
 	glUseProgram(th_blit_prog);
-	glUniform2f(th_blit_prog_pr, 1.f/sw, -1.f/sh);
-	glUniform2f(th_blit_prog_pos, -0.5f+p.x/(float)sw, 0.5f-p.y/(float)sh);
 	glUniform1i(th_blit_prog_tex, 0);
 
 	float colors[4];
@@ -139,32 +139,27 @@ void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
 
 	glBindTexture(GL_TEXTURE_2D, img->gltexture);
 
-	sh *= -1;
-	const float verts[] = {
-		(q.tl.x - p.x)/sw, (q.tl.y - p.y)/sh,
-		(q.tr.x - p.x)/sw, (q.tr.y - p.y)/sh,
-		(q.br.x - p.x)/sw, (q.br.y - p.y)/sh,
-		(q.tl.x - p.x)/sw, (q.tl.y - p.y)/sh,
-		(q.br.x - p.x)/sw, (q.br.y - p.y)/sh,
-		(q.bl.x - p.x)/sw, (q.bl.y - p.y)/sh};
-
 	th_rect bounds = img->crop;
-	bounds.x *= 255;
-	bounds.y *= 255;
-	bounds.w *= 255;
-	bounds.h *= 255;
 	if (img->flipv)
 		SWAP_VARS(bounds.y, bounds.h, fu);
 	if (img->fliph)
 		SWAP_VARS(bounds.x, bounds.w, fu);
-	uint8_t tex_verts[] = {
-		bounds.x, bounds.y, bounds.w, bounds.y, bounds.w, bounds.h,
-		bounds.x, bounds.y, bounds.w, bounds.h, bounds.x, bounds.h };
+	const float verts[] = {
+		q.tl.x / sw - 1.0, q.tl.y / sh + 1.0, bounds.x, bounds.y,
+		q.tr.x / sw - 1.0, q.tr.y / sh + 1.0, bounds.w, bounds.y,
+		q.br.x / sw - 1.0, q.br.y / sh + 1.0, bounds.w, bounds.h,
+		q.tl.x / sw - 1.0, q.tl.y / sh + 1.0, bounds.x, bounds.y,
+		q.br.x / sw - 1.0, q.br.y / sh + 1.0, bounds.w, bounds.h,
+		q.bl.x / sw - 1.0, q.bl.y / sh + 1.0, bounds.x, bounds.h};
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_TRUE, 0, verts);
-	glVertexAttribPointer(1, 2, GL_UNSIGNED_BYTE, GL_TRUE, 0, tex_verts);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float) * 4 * 6, verts);
 
+	glUseProgram(th_blit_prog);
+	glBindVertexArray(vao);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindVertexArray(0);
 }
 
 void _th_rdimg(th_image *img, unsigned char *data) {
@@ -193,29 +188,41 @@ void th_image_init() {
 		"vert", "tex_vert"
 	};
 	th_blit_prog = th_gl_create_prog(
-		"uniform vec2 pr; /* pixel ratio */\n"
-		"uniform vec2 pos;\n"
-		"attribute vec3 vert;\n"
-		"attribute vec4 tex_vert;\n"
+		"attribute vec2 vert;\n"
+		"attribute vec2 tex_vert;\n"
 		"varying vec2 tc;\n"
-		"void main() { gl_Position = vec4( vert.xy+pos, vert.z, 0.5 ); tc = tex_vert.xy; }\n",
+		"void main() {\n"
+		"  gl_Position = vec4( vert.xy, 0, 1 );\n"
+		"  tc = tex_vert;\n"
+		"}\n",
 		
-		"varying vec2 tc;"
-		"uniform sampler2D tex;"
-		"uniform vec4 modColor;"
-		"void main() { gl_FragColor = texture2D(tex,tc).wzyx * modColor;}",
+		"uniform sampler2D tex;\n"
+		"uniform vec4 color;\n"
+		"varying vec2 tc;\n"
+		"void main() { gl_FragColor = texture2D(tex,tc).abgr * color;}",
 		attribs, 2);
 
-	th_blit_prog_color = glGetUniformLocation(th_blit_prog, "modColor");
-	th_blit_prog_pr = glGetUniformLocation(th_blit_prog, "pr");
-	th_blit_prog_pos = glGetUniformLocation(th_blit_prog, "pos");
+	th_blit_prog_color = glGetUniformLocation(th_blit_prog, "color");
 	th_blit_prog_tex = glGetUniformLocation(th_blit_prog, "tex");
+
+	glGenVertexArrays(1, &vao);
+	glGenBuffers(1, &vbo);
+
+	glBindVertexArray(vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	const float verts[6 * 4];
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 4 * 6, verts, GL_DYNAMIC_DRAW);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), NULL);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void *)(2 * sizeof(float)));
+	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
 }
 
 void th_image_deinit() {
 	while (thg.image_count--) {
 		th_image *img = thg.images[thg.image_count];
-		CNFGDeleteTex(img->gltexture);
+		glDeleteTextures(1, &img->gltexture);
 		free(img->data);
 		free(img);
 	}

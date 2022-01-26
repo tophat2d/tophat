@@ -23,7 +23,12 @@ extern th_global thg;
 #define WIN_KEY_ESCAPE 27
 #define WIN_KEY_ENTER 13
 
-void HandleKey(int keycode, int bDown) {
+void HandleKey( int keycode, int bDown ) { }
+void HandleButton( int x, int y, int button, int bDown ) { }
+void HandleMotion( int x, int y, int mask ) { }
+void HandleDestroy() { }
+
+void th_input_key(int keycode, int bDown) {
 #ifdef __linux__
 	switch (keycode) {
 	case LINUX_KEY_SHIFT:
@@ -72,11 +77,4 @@ void HandleKey(int keycode, int bDown) {
 	}
 
 	thg.just_pressed[keycode] = 0;
-}
-void HandleButton( int x, int y, int button, int bDown ) {
-	HandleKey(button, bDown);
-}
-
-void HandleMotion( int x, int y, int mask ) {
-	thg.mouse = (th_vf2){{x, y}};
 }

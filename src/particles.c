@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 
-#include <CNFG.h>
-
 #include "tophat.h"
 
 #define FRAND (double)rand()/0x7FFFFFFF
@@ -74,7 +72,6 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 		uint32_t col = 0xff;
 		if (p->colors.len > 0)
 			col = get_particle_color(p, p->particles.data[i], t);
-		CNFGColor(col);
 
 		if (p->max_rotation) {
 			int rot = p->rotation;
@@ -83,26 +80,26 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
       
 			rot += FRAND * (p->size * p->rotation_randomness);
       
-			RDPoint points[4] = {{px, py}, {px + size, py}, {px + size, py + size}, {px, py + size}};
+			th_vf2 p[4] = {
+				{ .x = px, .y = py},
+				{ .x = px + size, .y = py},
+				{ .x = px + size, .y = py + size},
+				{ .x = px, .y = py + size}};
 			for (int i=0; i < 4; i++) {
-				th_vf2 p = {{points[i].x, points[i].y}};
-				th_rotate_point(&p, (th_vf2){{px + size/2, py+size/2}}, rot);
-				points[i].x = (p.x - camx) * thg.scaling;
-				points[i].y = (p.y - camy) * thg.scaling;
+				th_rotate_point(&p[i], (th_vf2){{px + size/2, py+size/2}}, rot);
+				p[i].x = (p[i].x - camx) * thg.scaling;
+				p[i].y = (p[i].y - camy) * thg.scaling;
 			}
       
-			CNFGTackPoly(points, 4);
+			th_canvas_triangle(col, p[0], p[1], p[2]);
+			th_canvas_triangle(col, p[0], p[2], p[3]);
 		} else { // optimize drawing without rotations
 			fu x = px;
 			fu y = py;
-			fu w = px + size;
-			fu h = py + size;
+			fu w = size;
+			fu h = size;
 
-			CNFGTackRectangle(
-				(x - camx) * thg.scaling,
-				(y - camy) * thg.scaling,
-				(w - camx) * thg.scaling,
-				(h - camy) * thg.scaling);
+			th_canvas_rect(col, (th_rect){ x - camx, y - camy, w, h });
 		}
 
 		int lt = p->lifetime + FRAND*(p->lifetime * p->lifetime_randomness);

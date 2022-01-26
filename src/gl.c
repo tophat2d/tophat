@@ -85,6 +85,7 @@ GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char 
 		goto fail;
 	}
 
+	glUseProgram(prog);
 	return prog;
 
 fail:

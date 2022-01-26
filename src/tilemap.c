@@ -3,8 +3,6 @@
 #include <math.h>
 #include <stdio.h>
 
-#include <CNFG.h>
-
 #include "tophat.h"
 #include <GL/gl.h>
 #include <chew.h>
@@ -54,40 +52,25 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	if (sh > th)
 		sh = th - sy;
 
-	CNFGFlushRender();
-
-	glUseProgram(gRDBlitProg);
-	glUniform4f(gRDBlitProgUX,
-		1.f/gRDLastResizeW, -1.f/gRDLastResizeH,
-		-0.5f+t->pos.x/(float)gRDLastResizeW, 0.5f-t->pos.y/(float)gRDLastResizeH);
-	glUniform1i(gRDBlitProgUT, 0);
-
-	glBindTexture(GL_TEXTURE_2D, a->gltexture);
-
 	for (int i=sx; i < sx+sw; i++) for (int j=sy; j < sy+sh; j++) {
 		if (t->cells.data[j*t->w+i] == 0) continue;
 		int cell = t->cells.data[j * t->w + i];
 
 		const float
-			w = t->a.cs.x * thg.scaling * t->scale,
-			h = t->a.cs.y * thg.scaling * t->scale,
-			x = (t->pos.x - camx) * thg.scaling + w * i,
-			y = (t->pos.y - camy) * thg.scaling + h * j;
-		const float verts[] = {
-			x, y,  x + w, y,      x + w, y + h,
-			x, y,  x + w, y + h,  x, y + h	
-		};
+			w = t->a.cs.x * t->scale,
+			h = t->a.cs.y * t->scale,
+			x = t->pos.x - camx + w * i,
+			y = t->pos.y - camy + h * j;
 	
-		th_rect r = th_atlas_get_cell(&t->a, th_atlas_nth_coords(&t->a, cell - 1));
-		const float tex_verts[] = {
-			r.x, r.y,  (r.x + r.w), r.y,          (r.x + r.w), (r.y + r.h),
-			r.x, r.y,  (r.x + r.w), (r.y + r.h),  r.x,         (r.y + r.h)
-		};
 
-		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, verts);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_TRUE, 0, tex_verts);
-
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		th_transform tt = {0};
+		tt.pos = (th_vf2){{ x, y }};
+		tt.scale = (th_vf2){{ t->scale, t->scale}};
+		th_vf2 p = th_atlas_nth_coords(&t->a, cell - 1);
+		a->crop = th_atlas_get_cell(&t->a, p);
+		a->crop.w += a->crop.x;
+		a->crop.h += a->crop.y;
+		th_blit_tex(a, tt, 0xffffffff);
 	}
 }
 

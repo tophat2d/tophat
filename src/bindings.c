@@ -5,117 +5,15 @@
 #include <sys/time.h>
 #include <GL/gl.h>
 
-#include <CNFG.h>
 #include <chew.h>
 #include <umka_api.h>
 #include <stb_image.h>
-
-#include "bindings.h"
 
 #include "tophat.h"
 
 extern th_global thg;
 
 extern char *th_em_modulesrc[];
-
-void _th_umka_bind(void *umka) {
-	// etc
-	umkaAddFunc(umka, "cfopen", &umfopen);
-
-	umkaAddFunc(umka, "ctexttoimg", &umfonttexttoimg);
-	umkaAddFunc(umka, "cfontload", &umfontload);
-	umkaAddFunc(umka, "getYOff", &umfontgetyoff);
-
-	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
-	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
-	umkaAddFunc(umka, "cspotlightstamp", &umspotlightstamp);
-
-	umkaAddFunc(umka, "c_particles_draw", &umparticlesdraw);
-
-	// tilemaps
-	umkaAddFunc(umka, "cdrawtmap", &umdrawtmap);
-	umkaAddFunc(umka, "ctmapgetcoll", &umtmapgetcoll);
-	umkaAddFunc(umka, "cautotile", &umtmapautotile);
-
-	// images
-	umkaAddFunc(umka, "loadimg", &umimgload);
-	umkaAddFunc(umka, "flipvimg", &umimgflipv);
-	umkaAddFunc(umka, "fliphimg", &umimgfliph);
-	umkaAddFunc(umka, "imgvalid", &umimgvalid);
-	umkaAddFunc(umka, "imggetdims", &umimggetdims);
-	umkaAddFunc(umka, "imgcrop", &umimgcrop);
-	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
-	umkaAddFunc(umka, "imgcopy", &umimgcopy);
-	umkaAddFunc(umka, "imgsetfilter", &umimgsetfilter);
-
-	// input
-	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
-	umkaAddFunc(umka, "cispressed", &umispressed);
-	umkaAddFunc(umka, "cisjustpressed", &umisjustpressed);
-
-	// entities
-	umkaAddFunc(umka, "centdraw", &umentdraw);
-	umkaAddFunc(umka, "cgetcoll", &umentgetcoll);
-	umkaAddFunc(umka, "centysort", &umentysort);
-
-	// rays
-	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
-	umkaAddFunc(umka, "craygettmapcoll", &umraygettmapcoll);
-
-	// audio
-	umkaAddFunc(umka, "cauload", &umauload);
-	umkaAddFunc(umka, "csoundloop", &umsoundloop);
-	umkaAddFunc(umka, "csoundplay", &umsoundplay);
-	umkaAddFunc(umka, "csoundstop", &umsoundstop);
-	umkaAddFunc(umka, "csoundpause", &umsoundpause);
-	umkaAddFunc(umka, "csoundvol", &umsoundvol);
-	umkaAddFunc(umka, "csoundvalidate", &umsoundvalidate);
-
-	// misc
-	umkaAddFunc(umka, "visualizecam", &umvisualizecam);
-	umkaAddFunc(umka, "getTime", &umgettime);
-
-	// rawdraw
-	umkaAddFunc(umka, "drawText", &umdrawtext);
-	umkaAddFunc(umka, "wsetup", &umCNFGSetup);
-	umkaAddFunc(umka, "setBgColor", &umCNFGSetBgColor);
-	umkaAddFunc(umka, "setColor", &umCNFGSetColor);
-	umkaAddFunc(umka, "clearframe", &umCNFGClearFrame);
-	umkaAddFunc(umka, "getdimensions", &umCNFGGetDimensions);
-	umkaAddFunc(umka, "swapbuffers", &umCNFGSwapBuffers);
-	umkaAddFunc(umka, "handleinput", &umCNFGHandleInput);
-	umkaAddFunc(umka, "updatescaling", &umgetscaling);
-	umkaAddFunc(umka, "drawRect", &umCNFGTackRectangle);
-	umkaAddFunc(umka, "setwindowtitle", &umCNFGChangeWindowTitle);
-	umkaAddFunc(umka, "iconset", &umCNFGSetWindowIconData);
-	umkaAddFunc(umka, "drawSegment", &umCNFGTackSegment);
-	umkaAddFunc(umka, "cdrawimage", &umCNFGBlitTex);
-
-	int index = 0;
-	umkaAddModule(umka, "anim.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "audio.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "csv.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ent.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "image.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "input.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "misc.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "canvas.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ray.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "rect.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "tilemap.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "window.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ui.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "std.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "particles.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "light.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "lerp.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "map.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "utf8.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "font.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "th.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "signal.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "atlas.um", th_em_modulesrc[index++]);
-}
 
 static
 char *conv_path(char *out, char *path) {
@@ -500,15 +398,6 @@ void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 ///////////////////////
 // misc
-// draws a rectangle showing, where the camera is
-void umvisualizecam(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int w = p[2].intVal;
-	int h = p[1].intVal;
-	int color = p[0].uintVal;
-
-	CNFGColor((uint32_t)color);
-	CNFGTackRectangle(0, 0, w * thg.scaling, h * thg.scaling);
-}
 
 // gets current time in ms
 void umgettime(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -527,58 +416,39 @@ void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 pos = *(th_vf2 *)&p[2];
 	char *text = (char *)p[3].ptrVal;
 
-	CNFGPenX = pos.x * thg.scaling;
-	CNFGPenY = pos.y * thg.scaling;
-	CNFGColor(color);
-	CNFGSetLineWidth(0.6 * thg.scaling * size);
-	CNFGDrawText(text, size * thg.scaling);
+	th_canvas_text(text, color, pos, size);
 }
 
-void umCNFGSetup(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umwindowsetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *title = (char *)p[2].ptrVal;
 	int w = p[1].intVal;
 	int h = p[0].intVal;
 
-	int res = CNFGSetup(title, w, h);
+	th_window_setup(title, w, h);
 
 	th_gl_init();
 	th_image_init();
-
-	if (res) {
-		printf("could not initialize rawdraw\n");
-		return;
-	}
+	th_canvas_init();
 }
 
-void umCNFGSetBgColor(UmkaStackSlot *p, UmkaStackSlot *r) {
-	CNFGBGColor = (uint32_t)p[0].uintVal;
+
+void umwindowclearframe(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_window_clear_frame();
 }
 
-void umCNFGSetColor(UmkaStackSlot *p, UmkaStackSlot *r) {
-	CNFGColor((uint32_t)p[0].uintVal);
-}
-
-void umCNFGClearFrame(UmkaStackSlot *p, UmkaStackSlot *r) {
-	CNFGClearFrame();
-}
-
-void umCNFGGetDimensions(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umwindowgetdimensions(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int *w = (int *)p[1].ptrVal;
 	int *h = (int *)p[0].ptrVal;
-	short ws, hs;
 
-	CNFGGetDimensions(&ws, &hs);
-
-	*w = ws;
-	*h = hs;
+	th_window_get_dimensions(w, h);
 }
 
-void umCNFGSwapBuffers(UmkaStackSlot *p, UmkaStackSlot *r) {
-	CNFGSwapBuffers();
+void umwindowswapbuffers(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_window_swap_buffers();
 }
 
-void umCNFGHandleInput(UmkaStackSlot *p, UmkaStackSlot *r) {
-	r->intVal = CNFGHandleInput();
+void umwindowhandle(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->intVal = th_window_handle();
 }
 
 // calculates scaling
@@ -595,35 +465,120 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 	}
 }
 
-void umCNFGTackRectangle(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umcanvasrect(UmkaStackSlot *p, UmkaStackSlot *r) {
+	uint32_t color = p[2].uintVal;
 	th_rect re = *(th_rect *)&p[0];
-
-	CNFGTackRectangle(re.x * thg.scaling, re.y * thg.scaling, (re.x + re.w) * thg.scaling, (re.y + re.h) * thg.scaling);
+	th_canvas_rect(color, re);
 }
 
-void umCNFGChangeWindowTitle(UmkaStackSlot *p, UmkaStackSlot *r) {
-	CNFGChangeWindowTitle((char *)p->ptrVal);
-}
-
-void umCNFGSetWindowIconData(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_error("setasicon is deprecated.");
-}
-
-void umCNFGTackSegment(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umcanvasline(UmkaStackSlot *p, UmkaStackSlot *r) {
 	float thickness = p[0].real32Val;
 	th_vf2 e = *(th_vf2 *)&p[1];
 	th_vf2 b = *(th_vf2 *)&p[2];
+	uint32_t color = p[3].uintVal;
 
-
-	CNFGSetLineWidth(thickness * thg.scaling);
-	CNFGTackSegment(b.x * thg.scaling, b.y * thg.scaling, e.x * thg.scaling, e.y * thg.scaling);
+	th_canvas_line(color, b, e, thickness);
 }
 
-void umCNFGBlitTex(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umimagedraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img;
 	GET_IMAGE(img, p[2].intVal);
 	th_transform *t = (th_transform *)p[1].ptrVal;
 	uint32_t c = p[0].uintVal;
 
 	th_blit_tex(img, *t, c);
+}
+
+void _th_umka_bind(void *umka) {
+	// etc
+	umkaAddFunc(umka, "cfopen", &umfopen);
+
+	umkaAddFunc(umka, "ctexttoimg", &umfonttexttoimg);
+	umkaAddFunc(umka, "cfontload", &umfontload);
+	umkaAddFunc(umka, "getYOff", &umfontgetyoff);
+
+	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
+	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
+	umkaAddFunc(umka, "cspotlightstamp", &umspotlightstamp);
+
+	umkaAddFunc(umka, "c_particles_draw", &umparticlesdraw);
+
+	// tilemaps
+	umkaAddFunc(umka, "cdrawtmap", &umdrawtmap);
+	umkaAddFunc(umka, "ctmapgetcoll", &umtmapgetcoll);
+	umkaAddFunc(umka, "cautotile", &umtmapautotile);
+
+	// images
+	umkaAddFunc(umka, "loadimg", &umimgload);
+	umkaAddFunc(umka, "flipvimg", &umimgflipv);
+	umkaAddFunc(umka, "fliphimg", &umimgfliph);
+	umkaAddFunc(umka, "imgvalid", &umimgvalid);
+	umkaAddFunc(umka, "imggetdims", &umimggetdims);
+	umkaAddFunc(umka, "imgcrop", &umimgcrop);
+	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
+	umkaAddFunc(umka, "imgcopy", &umimgcopy);
+	umkaAddFunc(umka, "imgsetfilter", &umimgsetfilter);
+
+	// input
+	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
+	umkaAddFunc(umka, "cispressed", &umispressed);
+	umkaAddFunc(umka, "cisjustpressed", &umisjustpressed);
+
+	// entities
+	umkaAddFunc(umka, "centdraw", &umentdraw);
+	umkaAddFunc(umka, "cgetcoll", &umentgetcoll);
+	umkaAddFunc(umka, "centysort", &umentysort);
+
+	// rays
+	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
+	umkaAddFunc(umka, "craygettmapcoll", &umraygettmapcoll);
+
+	// audio
+	umkaAddFunc(umka, "cauload", &umauload);
+	umkaAddFunc(umka, "csoundloop", &umsoundloop);
+	umkaAddFunc(umka, "csoundplay", &umsoundplay);
+	umkaAddFunc(umka, "csoundstop", &umsoundstop);
+	umkaAddFunc(umka, "csoundpause", &umsoundpause);
+	umkaAddFunc(umka, "csoundvol", &umsoundvol);
+	umkaAddFunc(umka, "csoundvalidate", &umsoundvalidate);
+
+	// misc
+	umkaAddFunc(umka, "getTime", &umgettime);
+
+	// canvas
+	umkaAddFunc(umka, "drawText", &umdrawtext);
+	umkaAddFunc(umka, "wsetup", &umwindowsetup);
+	umkaAddFunc(umka, "clearframe", &umwindowclearframe);
+	umkaAddFunc(umka, "getdimensions", &umwindowgetdimensions);
+	umkaAddFunc(umka, "swapbuffers", &umwindowswapbuffers);
+	umkaAddFunc(umka, "handleinput", &umwindowhandle);
+	umkaAddFunc(umka, "updatescaling", &umgetscaling);
+	umkaAddFunc(umka, "drawRect", &umcanvasrect);
+	umkaAddFunc(umka, "drawLine", &umcanvasline);
+	umkaAddFunc(umka, "cdrawimage", &umimagedraw);
+
+	int index = 0;
+	umkaAddModule(umka, "anim.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "audio.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "csv.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ent.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "image.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "input.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "misc.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "canvas.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ray.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "rect.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "tilemap.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "window.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ui.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "std.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "particles.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "light.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "lerp.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "map.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "utf8.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "font.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "th.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "signal.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "atlas.um", th_em_modulesrc[index++]);
 }

@@ -55,8 +55,7 @@ fn draw*() {
 	if len(dmgEffect) != 0 {
 		val := round(dmgEffect.byDelta(th.delta))
 		if val < 0 { val = 0 }
-		canvas.setColor(0xaa0000000 | val)
-		canvas.drawRect(global.cam)
+		canvas.drawRect(0xaa000000 | val, global.cam)
 	}
 
 	for i:=0; i>=0 && i < len(emitters) && len(emitters) != 0; i++ {
