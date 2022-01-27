@@ -108,7 +108,7 @@ void th_canvas_rect(uint32_t color, th_rect r) {
 		(th_vf2){{r.x, r.y + r.h}});
 }
 
-// stolen from rawdraw
+// stolen from here: stackoverflow.com/questions/1936934/turn-a-line-into-a-rectangle
 void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness) {
 	f.x *= thg.scaling;
 	f.y *= thg.scaling;
@@ -116,16 +116,11 @@ void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness) {
 	t.y *= thg.scaling;
 	thickness *= thg.scaling;
 
-	th_vf2 d = { .x = f.x - t.x, .y = f.y - t.y};
-	fu mag = 1.f/sqrt(d.x*d.x + d.x*d.y);
-	d.x *= mag;
-	d.y *= mag;
-	th_vf2 ortho = { .x = d.x * thickness, .y = -d.y * thickness };
-
-	t.x += d.x/2 + 0.5;
-	t.y += d.y/2 + 0.5;
-	f.x += d.x/2 - 0.5;
-	f.y += d.y/2 - 0.5;
+	th_vf2 d = { .x = t.x - f.x, .y = t.y - f.y};
+	fu mag = sqrt(d.x*d.x + d.y*d.y);
+	d.x /= mag;
+	d.y /= mag;
+	th_vf2 ortho = { .x = -d.y * thickness * 0.5, .y = d.x * thickness * 0.5 };
 
 	th_canvas_triangle(color,
 		(th_vf2){{f.x - ortho.x, f.y - ortho.y}},

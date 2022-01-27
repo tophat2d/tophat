@@ -23,7 +23,7 @@ CFLAGS += -Ilib/stb/ \
 		  -Ilib/rawdraw/ \
 		  -Ilib/miniaudio/
 
-DEFS += -DCNFGOGL -DUMKA_STATIC
+DEFS += -DUMKA_STATIC -UMKA_EXT_LIBS
 WARNS = \
 		-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
 		-Wno-old-style-declaration -Wno-implicit-fallthrough
