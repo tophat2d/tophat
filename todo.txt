@@ -1,37 +1,10 @@
-Lines starting with ? aren't definite. List isn't sorted in any way.
-Items are kind of grouped.
 
-store images better
+image batching
 
-fix memory leaks
+input overhaul
+	- use keycodes instead of keysyms
+	- add a function that handles text input
 
-cached fonts spacing
-fix 14 and 17 with fonts
+c side docs
 
-light color blending
-light pixel plot function in umka
-more light shapes
-?light occlussion
-
-?gui editor
-	entity constructor
-	tilemap editor and entity placer
-	??ui builder
-
-redo tophat distribution
-	just distribute binary
-	games will be packaged with external program
-		file embedding
-
-simplify particle's code
-particles constructor
-
-th.Transform constructors
-
-make tutorials
-	fonts
-	ui
-	game structure
-	tilemaps
-	basics
-	entities
+shader based lighting

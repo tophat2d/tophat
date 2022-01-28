@@ -18,12 +18,12 @@ ifeq ($(SHORT_PLATFORM), MINGW64_NT)
 endif
 endif
 
-#CFLAGS ?= -s -Os -pipe
+CFLAGS ?= -s -Os -pipe
 CFLAGS += -Ilib/stb/ \
 		  -Ilib/rawdraw/ \
 		  -Ilib/miniaudio/
 
-DEFS += -DUMKA_STATIC -UMKA_EXT_LIBS
+DEFS += -DUMKA_STATIC -DUMKA_EXT_LIBS
 WARNS = \
 		-Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
 		-Wno-old-style-declaration -Wno-implicit-fallthrough
