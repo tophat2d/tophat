@@ -13,5 +13,5 @@ int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, th_vf2 *ic) {
 		if (th_point_to_quad(ra->pos, &q, ic))
 			return i;
 	}
-	return 0;
+	return -1;
 }

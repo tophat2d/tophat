@@ -54,11 +54,8 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
 }
 
 void _th_audio_data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
-	for (int i=thg.sound_count-1; i >= 0; i--) {
-		if (thg.sounds[0] == NULL)
-			continue;
-
-		th_sound *csound = thg.sounds[i];
+	for (int i=thg.sound_count; i > 0; i--) {
+		th_sound *csound = th_get_sound(i);
 
 		if (csound == NULL)
 			continue;
@@ -99,32 +96,28 @@ void th_audio_init(){
 void th_audio_deinit() {
 	ma_device_uninit(&audev);
 
-	while (thg.sound_count--) {
-		ma_decoder_uninit(&thg.sounds[thg.sound_count]->decoder);
-
-		free(thg.sounds[thg.sound_count]);
-	}
+	while (thg.sound_count--)
+		ma_decoder_uninit(&thg.sounds[thg.sound_count].decoder);
+	free(thg.sounds);
 }
 
-void th_sound_load(char *path) {
+th_sound *th_sound_load(char *path) {
 	ma_decoder_config decodercfg;
 	decodercfg = ma_decoder_config_init(SAMPLE_FORMAT, CHANNEL_COUNT, SAMPLE_RATE);
 
-	ma_result res;
-	char cpath[512];
-	strcpy(cpath, thg.respath);
-	strcat(cpath, path);
-
-	if (thg.sound_count >= MAX_SOUNDS - 1) {
-		th_error("Too many sounds. Create an issue.");
-		return;
+	th_sound *s = th_alloc_sound();
+	if (!s) {
+		th_error("Could not allocate space for a sound.");
+		return NULL;
 	}
-	th_sound *s = thg.sounds[thg.sound_count++] = calloc(sizeof(th_sound), 1);
-	res = ma_decoder_init_file(cpath, &decodercfg, &s->decoder);
-	if (res != MA_SUCCESS)
-		th_error("couldn't load sound at path %s", path);
 
-	s->playing = 0;
-	s->volume = 100;
-	s->looping = 0;
+	ma_result res;
+	res = ma_decoder_init_file(path, &decodercfg, &s->decoder);
+	if (res != MA_SUCCESS)
+		th_error("Couldn't load sound at path %s", path);
+
+	s->seek_to = -1;
+	s->volume = 1;
+
+	return s;
 }

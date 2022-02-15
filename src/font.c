@@ -13,12 +13,11 @@ struct {
 	int yoff;
 } typedef __th_font_char;
 
-void th_font_load(th_font *out, char *path) {
-	FILE *f = fopen(path, "r");
+th_font *th_font_load(char *path) {
+	FILE *f = fopen(path, "rb");
 	if (f == NULL) {
 		th_error("Could not find font at %s.", path);
-		out = NULL;
-		return;
+		return NULL;
 	}
 
 	fseek(f, 0, SEEK_END);
@@ -26,11 +25,28 @@ void th_font_load(th_font *out, char *path) {
 	fseek(f, 0, SEEK_SET);
 
 	unsigned char *buf = malloc(size);
+	if (!buf) {
+		th_error("Could not allocate buffer of size %d for font data.", size);
+		return NULL;
+	}
 	fread(buf, size, 1, f);
 	fclose(f);
 
+	th_font *out = th_alloc_font();
+	if (!out) {
+		th_error("Could not allocate font");
+		free(buf);
+	}
+
+	out->buf = buf;
 	out->info = malloc(sizeof(stbtt_fontinfo));
+	if (!out->info) {
+		th_error("Could not allocate font info.");
+		return NULL;
+	}
 	stbtt_InitFont(out->info, buf, 0);
+
+	return out;
 }
 
 void th_str_to_img(
@@ -111,7 +127,8 @@ void th_str_to_img(
 
 void th_font_deinit() {
 	while (thg.font_count--) {
-		free(thg.fonts[thg.font_count]->info);
-		free(thg.fonts[thg.font_count]);
+		free(thg.fonts[thg.font_count].info);
+		free(thg.fonts[thg.font_count].buf);
 	}
+	free(thg.fonts);
 }

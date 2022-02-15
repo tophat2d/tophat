@@ -36,11 +36,10 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (p[5].uintVal-1 >= thg.font_count) {
-		th_error("Invalid font\n");
+	th_font *f = th_get_font_err(p[5].uintVal);
+	if (!f)
 		return;
-	}
-	th_font *f = thg.fonts[p[5].uintVal-1];
+
 	uint32_t *runes = (uint32_t *)p[4].ptrVal;
 	uu runec = p[3].intVal;
 	fu scale = p[2].real32Val;
@@ -51,29 +50,24 @@ void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
 		th_error("Too many images. Create an issue.");
 		return;
 	}
-	th_image *img = thg.images[thg.image_count++] = calloc(sizeof(th_image), 1);
+	th_image *img = th_alloc_image();
+	if (!img)
+		return;
 	th_str_to_img(img, f, runes, runec, scale, color, spacing);
 	r->intVal = thg.image_count;
 }
 
 void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
-	char buf[512];
-
-	if (thg.font_count >= MAX_FONTS - 1) {
-		th_error("Too many fonts. Create an issue.");
-		return;
-	}
-	th_font *f = thg.fonts[thg.font_count++] = calloc(sizeof(th_font), 1);
-	th_font_load(f, conv_path(buf, p[0].ptrVal));
+	char buf[1024];
+	th_font *f = th_font_load(conv_path(buf, p[0].ptrVal));
+	if (!f)
+		r->intVal = 0;
 	r->intVal = thg.font_count;
 }
 
 void umfontgetyoff(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (p[1].uintVal-1 >= thg.font_count) {
-		th_error("Invalid font %d\n", p[1].intVal);
-		return;
-	}
-	th_font *f = thg.fonts[p[1].uintVal-1];
+	th_font *f = th_get_font_err(p[1].uintVal);
+	if (!f) return;
 	uint32_t rune = p[0].uintVal;
 
 	int out, t;
@@ -159,12 +153,10 @@ void umtmapautotile(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *path = (char *)p[0].ptrVal;
 
-	if (thg.image_count >= MAX_IMAGES - 1) {
-		th_error("Too many images. Create an issue.");
-		return;
-	}
-	char pathcpy[512];
-	th_image *img = thg.images[thg.image_count++] = th_load_image(conv_path(pathcpy, path));
+	char pathcpy[1024];
+	th_image *img = th_alloc_image();
+	if (!img) return;
+	img = th_load_image(conv_path(pathcpy, path));
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 
 	r[0].intVal = thg.image_count;
@@ -172,8 +164,8 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // checks, if image is correctly loaded
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img;
-	GET_IMAGE(img, p[0].intVal);
+	th_image *img = th_get_image_err(p[0].uintVal);
+	if (!img) return;
 	if (img->data != NULL) {
 		r->intVal = 1;
 		return;
@@ -184,23 +176,23 @@ void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // flips image
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img;
-	GET_IMAGE(img, p[1].intVal);
+	th_image *img = th_get_image_err(p[1].uintVal);
+	if (!img) return;
 
 	img->flipv = p[0].intVal;
 }
 
 // flips image
 void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img;
-	GET_IMAGE(img, p[1].intVal);
+	th_image *img = th_get_image_err(p[1].uintVal);
+	if (!img) return;
 
 	img->fliph = p[0].intVal;
 }
 
 void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img;
-	GET_IMAGE(img, p[0].intVal);
+	th_image *img = th_get_image_err(p[0].uintVal);
+	if (!img) return;
 	th_vf2 *out = (th_vf2 *)p[1].ptrVal;
 
 	if (!img)
@@ -210,8 +202,8 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img;
-	GET_IMAGE(img, p[2].intVal);
+	th_image *img = th_get_image_err(p[2].uintVal);
+	if (!img) return;
 	th_vf2 tl = *(th_vf2 *)&p[1];
 	th_vf2 br = *(th_vf2 *)&p[0];
 
@@ -223,35 +215,29 @@ void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 dm = *(th_vf2 *)&p[0];
 	uint32_t *data = (uint32_t *)p[1].ptrVal;
 
-	if (thg.image_count >= MAX_IMAGES - 1) {
-		th_error("Too many images. Create an issue.");
-		return;
-	}
-	th_image *img = thg.images[thg.image_count++] = calloc(sizeof(th_image), 1);
+	th_image *img = th_get_image_err(p[2].uintVal);
+	if (!img) return;
 	th_image_from_data(img, data, dm);
 
 	r->intVal = thg.image_count;
 }
 
 void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *inp;
-	GET_IMAGE(inp, p[0].intVal);
+	th_image *img1 = th_get_image_err(p[0].intVal);
+	if (!img1) return;
 
-	if (thg.image_count >= MAX_IMAGES - 1) {
-		th_error("Too many images. Create an issue.");
-		return;
-	}
-	th_image *out = thg.images[thg.image_count++] = calloc(sizeof(th_image), 1);
-	out->dm = inp->dm;
-	out->data = calloc(sizeof(uint32_t), out->dm.w * out->dm.h);
-	memcpy(out->data, inp->data, sizeof(uint32_t) * out->dm.w * out->dm.h);
+	th_image *img2 = th_alloc_image();
+	if (!img2) return;
+	*img2 = *img1;
+	img2->data = calloc(sizeof(uint32_t), img2->dm.w * img2->dm.h);
+	memcpy(img2->data, img1->data, sizeof(uint32_t) * img2->dm.w * img2->dm.h);
 
 	r->intVal = thg.image_count;
 }
 
 void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img;
-	GET_IMAGE(img, p[1].intVal);
+	th_image *img = th_get_image_err(p[1].intVal);
+	if (!img) return;
 	int filter = p[0].intVal;
 
 	th_image_set_filter(img, filter);
@@ -313,67 +299,50 @@ void umentysort(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // audio
 void umauload(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_sound_load((char *)p->ptrVal);
+	char path[1024];
+	th_sound *s = th_sound_load(conv_path(path, (char *)p->ptrVal));
+	if (!s) return;
 
 	r->intVal = thg.sound_count;
 }
 
 // sets array of sounds to be played
 void umsoundloop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[1].intVal || p[1].intVal-1 >= thg.sound_count) {
-		th_error("Invalid sound\n");
-		return;
-	}
-	th_sound *s = thg.sounds[p[1].intVal - 1];
+	th_sound *s = th_get_sound_err(p[1].uintVal);
+	if (!s) return;
 	s->looping = p[0].intVal;
 }
 
 void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[0].intVal || p[0].intVal-1 >= thg.sound_count) {
-		th_error("Invalid sound\n");
-		return;
-	}
-	th_sound *s = thg.sounds[p[0].intVal-1];
+	th_sound *s = th_get_sound_err(p[0].uintVal);
+	if (!s) return;
 	s->playing = 1;
 }
 
 void umsoundpause(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[0].intVal || p[0].intVal-1 >= thg.sound_count) {
-		th_error("Invalid sound\n");
-		return;
-	}
-	th_sound *s = thg.sounds[p[0].intVal-1];
+	th_sound *s = th_get_sound_err(p[0].uintVal);
+	if (!s) return;
 	s->playing = 0;
 }
 
 void umsoundvol(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[1].intVal || p[1].intVal-1 >= thg.sound_count) {
-		th_error("Invalid sound\n");
-		return;
-	}
-	th_sound *s = thg.sounds[p[1].intVal - 1];
+	th_sound *s = th_get_sound_err(p[1].uintVal);
+	if (!s) return;
 	s->volume = p[0].real32Val;
 }
 
 // checks, if sound is valid
 void umsoundvalidate(UmkaStackSlot *p, UmkaStackSlot *r) {
-	uu s = p->intVal;
-
-	if (!s || s-1 >= thg.sound_count) {
-		r[0].intVal = 0;
-		return;
-	}
+	th_sound *s = th_get_sound(p[0].uintVal);
+	if (!s) return;
 
 	r[0].intVal = 1;
 }
 
 void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	if (!p[1].intVal || p[1].intVal-1 >= thg.sound_count) {
-		th_error("Invalid sound\n");
-		return;
-	}
-	th_sound *s = thg.sounds[p[1].intVal - 1];
-	ma_decoder_seek_to_pcm_frame(&s->decoder, 0);
+	th_sound *s = th_get_sound_err(p[0].uintVal);
+	if (!s) return;
+	s->seek_to = 0;
 	s->playing = 0;
 }
 
@@ -481,8 +450,8 @@ void umcanvasline(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimagedraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img;
-	GET_IMAGE(img, p[2].intVal);
+	th_image *img = th_get_image_err(p[2].uintVal);
+	if (!img) return;
 	th_transform *t = (th_transform *)p[1].ptrVal;
 	uint32_t c = p[0].uintVal;
 

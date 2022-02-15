@@ -26,9 +26,12 @@ th_image *th_load_image(char *path) {
 	int w, h, c;
 
 	unsigned char *data = stbi_load(path, &w, &h, &c, 0);
+	if (!data) {
+		th_error("Could not load an image at path %s.", path);
+		return NULL;
+	}
 
-	th_image *img;
-	img = malloc(sizeof(th_image));
+	th_image *img = th_alloc_image();
 	img->dm.w = w;
 	img->dm.h = h;
 	img->channels = c;
@@ -36,19 +39,6 @@ th_image *th_load_image(char *path) {
 	img->crop = (th_rect){0, 0, 1, 1};
 	img->flipv = 0;
 	img->fliph = 0;
-
-	if (data == NULL) {
-		th_error("could not find image at path %s", path);
-		img->data = NULL;
-		return img;
-	}
-
-	// Faster way, but it doesn't seem to work. TODO FIXME
-	/*if (c == 4) {
-		img->rdimg = (unsigned int *)data;
-
-		return img;
-	}*/
 
 	_th_rdimg(img, data);
 	stbi_image_free(data);
@@ -221,9 +211,9 @@ void th_image_init() {
 
 void th_image_deinit() {
 	while (thg.image_count--) {
-		th_image *img = thg.images[thg.image_count];
-		glDeleteTextures(1, &img->gltexture);
-		free(img->data);
-		free(img);
+		th_image img = thg.images[thg.image_count];
+		glDeleteTextures(1, &img.gltexture);
+		free(img.data);
 	}
+	free(thg.images);
 }

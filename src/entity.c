@@ -32,11 +32,9 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	t.pos.y -= camy;
 
 	th_rect r = o->rect;
-	th_image *img = NULL;
-	if (o->img) {
-		GET_IMAGE(img, o->img);
+	th_image *img = th_get_image(o->img);
+	if (img)
 		r = (th_rect){.w = img->dm.w, .h = img->dm.h};
-	}
 	th_quad q = th_ent_transform(&(th_ent){.rect = r, .t = t});
 	
 	// this logic is incorrect

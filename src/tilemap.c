@@ -22,8 +22,8 @@ extern GLuint gRDLastResizeH;
 #endif
 
 void th_tmap_draw(th_tmap *t, th_rect *cam) {
-	th_image *a;
-	GET_IMAGE(a, t->a.i);
+	th_image *a = th_get_image(t->a.i);
+	if (!a) return;
 
 	int camx = cam->x - (cam->w / 2);
 	int camy = cam->y - (cam->h / 2);

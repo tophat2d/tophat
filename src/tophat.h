@@ -15,9 +15,6 @@ typedef float fu;
 typedef unsigned short uu;
 typedef short iu;
 
-#define GET_IMAGE(ivar, index) { \
-	if (index-1 > thg.image_count || index == 0) {th_error("invalid image %ld", index); return;} \
-	ivar = thg.images[index-1];}
 #define SWAP_VARS(v1, v2, type) { type tmp = v1; v1 = v2; v2 = tmp; }
 #define LEN(a) (sizeof(a) / sizeof(a[0]))
 
@@ -43,10 +40,9 @@ typedef struct {
 } th_transform;
 
 typedef struct {
+	int playing, looping, seek_to;
+	fu volume;
 	ma_decoder decoder;
-	int playing;
-	float volume;
-	int looping;
 } th_sound;
 
 typedef struct {
@@ -150,6 +146,7 @@ typedef struct {
 
 typedef struct {
 	stbtt_fontinfo *info;
+	unsigned char *buf;
 } th_font;
 
 // struct holding all tophat's global variables.
@@ -162,13 +159,13 @@ typedef struct {
 	uu just_pressed[255];
 	th_vf2 mouse;
 
-	th_sound *sounds[MAX_SOUNDS];
+	th_sound *sounds;
 	uu sound_count;
 
-	th_font *fonts[MAX_FONTS];
+	th_font *fonts;
 	uu font_count;
 
-	th_image *images[MAX_IMAGES];
+	th_image *images;
 	uu image_count;
 } th_global;
 
@@ -179,7 +176,7 @@ th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell);
 // audio
 void th_audio_init();
 void th_audio_deinit();
-void th_sound_load(char *path);
+th_sound *th_sound_load(char *path);
 
 // entity
 th_quad th_ent_transform(th_ent *e);
@@ -218,8 +215,21 @@ int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, th_vf2 *ic);
 void th_tmap_draw(th_tmap *t, th_rect *cam);
 void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 
+// tophat
+th_image *th_get_image(uu index);
+th_font *th_get_font(uu index);
+th_sound *th_get_sound(uu index);
+
+th_image *th_get_image_err(uu index);
+th_font *th_get_font_err(uu index);
+th_sound *th_get_sound_err(uu index);
+
+th_image *th_alloc_image();
+th_font *th_alloc_font();
+th_sound *th_alloc_sound();
+
 // font
-void th_font_load(th_font *out, char *path);
+th_font *th_font_load(char *path);
 void th_str_to_img(
 	th_image *out, th_font *font,
 	uint32_t *runes, uu runec,
