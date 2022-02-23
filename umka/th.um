@@ -35,28 +35,58 @@ fn (p: ^th.Vf2) rotated*(origin: th.Vf2, rot: th.fu): th.Vf2 {
 	return pos
 }
 
-// distance between `p1` and `p2`
+// distance between p1 and p2
 fn (p1: ^th.Vf2) distanceTo*(p2: th.Vf2): th.fu {
 	return std.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 }
 
-// Angle between [x1, y1] and [x2, y2]
+// Angle between p1 and p2
 fn (p1: ^th.Vf2) angleTo*(p2: th.Vf2): real {
 	if p1.x == p2.x && p1.y == p2.y { return 0 }
 	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std.pi + 180
 }
 
-fn (p: ^th.Vf2) abs*(): th.Vf2 { return th.Vf2{fabs(p.x), fabs(p.y)} }
-fn (p: ^th.Vf2) rnd*(): th.Vf2 { return th.Vf2{round(p.x), round(p.y)} }
-fn (p: ^th.Vf2) flr*(): th.Vf2 { return th.Vf2{trunc(p.x), trunc(p.y)} }
-fn (p: ^th.Vf2) sub*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x - p2.x, p.y - p2.y} }
-fn (p: ^th.Vf2) add*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x + p2.x, p.y + p2.y} }
-fn (p: ^th.Vf2) div*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x / p2.x, p.y / p2.y} }
-fn (p: ^th.Vf2) mul*(p2: th.Vf2): th.Vf2 { return th.Vf2{p.x * p2.x, p.y * p2.y} }
+// Absolute value of a vector.
+fn (p: ^th.Vf2) abs*(): th.Vf2 {
+	return th.Vf2{fabs(p.x), fabs(p.y)}
+}
+
+// Rounds a vector.
+fn (p: ^th.Vf2) rnd*(): th.Vf2 {
+	return th.Vf2{round(p.x), round(p.y)}
+}
+
+// Truncates a vector.
+fn (p: ^th.Vf2) flr*(): th.Vf2 {
+	return th.Vf2{trunc(p.x), trunc(p.y)}
+}
+
+// Subtracts a vector from another one.
+fn (p: ^th.Vf2) sub*(p2: th.Vf2): th.Vf2 {
+	return th.Vf2{p.x - p2.x, p.y - p2.y}
+}
+
+// Adds a vector to another one.
+fn (p: ^th.Vf2) add*(p2: th.Vf2): th.Vf2 {
+	return th.Vf2{p.x + p2.x, p.y + p2.y}
+}
+
+// Divides a vector by another one.
+fn (p: ^th.Vf2) div*(p2: th.Vf2): th.Vf2 {
+	return th.Vf2{p.x / p2.x, p.y / p2.y}
+}
+
+// Multiplies a vector by another one.
+fn (p: ^th.Vf2) mul*(p2: th.Vf2): th.Vf2 {
+	return th.Vf2{p.x * p2.x, p.y * p2.y}
+}
+
+// Returns the magnitude of a vector p.
 fn (p: ^th.Vf2) mag*(): th.fu {
 	return sqrt(p.x * p.x + p.y * p.y)
 }
 
+// Normalizes a vector in such a way atleas one values is 1 (unless mag is 0).
 fn (p: ^th.Vf2) norm*(): th.Vf2 {
 	if p.x == 0 && p.y == 0 {
 		return p^

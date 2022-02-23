@@ -1,4 +1,4 @@
-// Dead simple linear interpolation.
+// Simple linear interpolation module.
 
 import (
 	"th.um"								
@@ -8,7 +8,7 @@ type Any* = interface{}
 
 // Lerper queue item. It interpolates between start and end for the duration
 // of length in ms. Additionally you can enable swap, which instead of
-// dequeueing it spwaps start and end and resets the progress.
+// dequeueing swaps start and end and resets the progress.
 type Item* = struct {
 	start, end: th.fu
 	length: th.uu
@@ -25,7 +25,7 @@ fn mk*(start, end: th.fu, length: th.uu, swap: bool): Item {
 }
 
 // Lerper is a queue of items. It will lerp the first one and if it ends
-// and it doesn't have swap enabled, it will dequeue it.
+// and doesn't have swap enabled, it will dequeue it.
 type Lerper* = []Item
 
 // Removes the first lerper item.

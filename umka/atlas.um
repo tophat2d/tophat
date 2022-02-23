@@ -4,7 +4,7 @@ import (
 	"image.um"
 )
 
-// Atlas is an image containing tiles. Mostly used by tilemaps.
+// Atlas is an image containing tiles in a square grid.
 type Atlas* = struct {
 	i: image.Image // source image
 	cs: th.Vf2 // size of a cell in pixels

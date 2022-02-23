@@ -1,4 +1,4 @@
-// Tilemaps allow for easy level construction or fast collisions. You can even
+// Tilemaps allow for easy level construction and fast collisions. You can even
 // use them for some games instead of entities (tetris comes to mind)
 
 import (

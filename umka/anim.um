@@ -1,4 +1,4 @@
-// Module for frame based animation.
+// Module for frame based image animation.
 
 import (
 	"th.um"
@@ -6,8 +6,8 @@ import (
 	"rect.um"
 )
 
-// Anim can turn an array of images into an animation. The difference between
-// anim and ent.animate is that Anim always starts by the first frame.
+// Anim is able to animate an array of images. As opposed to ent.Ent.animate,
+// it starts from the first frame.
 type Anim* = struct {
 	anim: []image.Image
 	rot: th.fu

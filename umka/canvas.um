@@ -1,14 +1,15 @@
-// Canvas library allowing for drawing basic shapes.
+// Canvas library allowing for drawing basic shapes. Coordinates are based on
+// the screen.
 
 import (
 	"th.um"
 	"std/std.um"
 	"rect.um"
 )
-// Draws a basic pixel text usually good for debugging.
+// Draws a basic pixel text. Only ascii is supported.
 fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
 
-// Precomputes line text's dimensions.
+// Returns the size of text taken by an equivalent drawText call.
 fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	var w, maxw, h: int
 	w = 0
@@ -38,4 +39,5 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 // Draws a Rectangle.
 fn drawRect*(color: uint32, r: rect.Rect)
 
+// Draws a line.
 fn drawLine*(color: uint32, b, e: th.Vf2, thickness: th.fu)

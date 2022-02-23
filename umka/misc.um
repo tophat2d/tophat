@@ -1,9 +1,11 @@
+// Misc functions.
 
 import (
 	"th.um"
 	"std.um"							
 )
 
+// Reads file content into a string.
 fn readall*(path: str): str {
 	f := std.fopen(path, "r")
 	const blockSize = 16

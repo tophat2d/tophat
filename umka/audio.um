@@ -1,10 +1,10 @@
-// Sound module for audio loading and playing.
+// Module for audio loading and playback.
 
 import (
 	"th.um"
 )
 
-// Sound is an opaque pointer to c. Creating it manually will cause a crash.
+// Sound is an opaque struct. Do not create manually.
 type Sound* = struct {
 	handle: int
 }
@@ -17,7 +17,7 @@ fn csoundpause(s: int)
 fn csoundvol(s: int, vol: th.fu)
 fn csoundvalidate(s: int): th.uu
 
-// Loads sound at path relative to main.um
+// Loads sound at a path.
 fn load*(path: str): Sound {
 	s := Sound{cauload(path)}
 
@@ -34,8 +34,7 @@ fn (s: ^Sound) looping*(l: bool) {
 	csoundloop(s.handle, 0)
 }
 
-// Plays the sound. If it is already playing, it won't do anything. Soon this
-// behaviour will be changed.
+// Plays the sound.
 fn (s: ^Sound) play*() {
 	csoundplay(s.handle)
 }
@@ -45,7 +44,8 @@ fn (s: ^Sound) stop*() {
 	csoundstop(s.handle)
 }
 
-fn (s: ^Sound) pause() {
+// Pauses the sound and keeps the progress.
+fn (s: ^Sound) pause*() {
 	csoundpause(s.handle)
 }
 
@@ -54,8 +54,7 @@ fn (s: ^Sound) vol*(vol: th.fu) {
 	csoundvol(s.handle, vol)
 }
 
-// Returns true, if the sound is valid. That doesn't mean, it isn't corrupted,
-// but it generally means it was loaded.
+// Returns true, if s points to a sound.
 fn (s: ^Sound) validate*(): bool {
 	return bool(csoundvalidate(s.handle))
 }

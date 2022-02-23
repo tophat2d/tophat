@@ -21,6 +21,8 @@ type Ent* = struct {
 	c: uint32
 }
 
+// Value returned by get coll. It contains a position where the collision
+// happened and the index of the entity involved in said collision.
 type Coll* = struct {
 	index: th.uu
 	pos: th.Vf2
@@ -55,6 +57,7 @@ fn mk*(img: image.Image, t: th.Transform): Ent {
 }
 
 // Checks collisions of e with entities in s. Checks at max maxColl collisions.
+// If s contains e, the collision won't be returned.
 fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
 	if len(s) == 0 {
 		return []Coll{}
@@ -75,7 +78,7 @@ fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
 	return slice(colls, 0, count)
 }
 
-// Animates the entity's image with one of the `anim` array. **Won't** begin on
+// Animates the entity's image with one of the `anim` array. <b>Won't</b> begin on
 // the first frame. If you want that, use anim.Anim.
 fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
 	e.i = frames^[(round(real(t)/(1000/fps)) % len(frames^))]
@@ -83,7 +86,7 @@ fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
 
 fn centysort(e: ^ent.Ent, count: int)
 
-// Performs a y sort on entities.
+// Performs an y sort on entities.
 fn ysort*(ents: ^[]ent.Ent) {
 	if len(ents^) > 0 {
 		centysort(&ents[0], len(ents^))

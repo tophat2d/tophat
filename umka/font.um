@@ -1,4 +1,4 @@
-// Package for font drawing.
+// Module for font rendering. Unicode is supported, but only left to right.
 
 import (
 	"th.um"
@@ -7,11 +7,14 @@ import (
 	"image.um"
 )
 
-// Font type. It is a pointer to c.
+// Font type. It is an opaque structure.
 type Font* = struct {
 	index: th.uu
 }
 
+// A structure built on top of Font. It automatially caches runes used in
+// drawing. Thanks to this it's possible to change the text without performance
+// problems. There is a known bug with letters like q not being offset properly.
 type Cached* = struct {
 	runes: map.Map
 	color: uint32
@@ -24,6 +27,7 @@ fn ctexttoimg(
 	runec: th.uu, size: th.fu, color: uint32, spacing: th.Vf2): uint
 
 // Creates an image.img from a text. ax and ay are character/line spacings.
+// Not recommended to be used on it's own. Use Cached instead.
 fn (t: ^Font) strToImage*(text: str, size: th.fu, color: uint32, spacing: th.Vf2): image.Image {
 	runes := utf8.decode(text)
 	return image.Image{ctexttoimg(t.index, &runes[0], len(runes), size, color, spacing)}
@@ -38,6 +42,7 @@ fn load*(path: str): Font {
 
 fn getYOff(f: th.uu, r: utf8.Rune): int
 
+// Cached font constructor.
 fn mkCached*(f: Font, c: uint32, s: th.fu): Cached {
 	return Cached {
 		runes: map.Map{},
@@ -55,6 +60,8 @@ fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
 		c.font.strToImage(rune.encode(), c.size, 0xffffff00, th.Vf2{0, 0}))
 }
 
+// Precaches all runes inside string s. This can prevent some frame drop on
+// the start of the game.
 fn (c: ^Cached) preCacheStr*(s: str) {
 	runes := utf8.decode(s)
 	
@@ -69,6 +76,7 @@ fn (c: ^Cached) preCacheStr*(s: str) {
 	}
 }
 
+// Draws the text using a Cached font c. Transform roation not supported.
 fn (c: ^Cached) draw*(text: str, t: th.Transform) {
 	lx := t.p.x
 	runes := utf8.decode(text)

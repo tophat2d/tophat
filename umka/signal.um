@@ -1,3 +1,5 @@
+// A module for importless communication between modules. A signal is an array
+// of callbacks with a name.
 
 import (
 	"map.um"
@@ -9,6 +11,8 @@ type Signal* = []Callback
 
 var signals: map.Map
 
+// Registers a callback to a signal. There is no need to explicitely create
+// signals.
 fn register*(name: str, callback: Callback) {
 	ptr := signals.get(name)
 
@@ -21,6 +25,7 @@ fn register*(name: str, callback: Callback) {
 	arr^ = append(arr^, callback)
 }
 
+// Calls all callbacks associated with the passed name.
 fn emit*(name: str, ctx: Any) {
 	arr := ^Signal(signals.get(name))
 	if arr == null {

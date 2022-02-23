@@ -1,4 +1,4 @@
-// Particles allow for *performant* and random particle systems.
+// Particles allow for <i>performant</i> and random particle systems.
 // TODO: a better constructor
 
 import (

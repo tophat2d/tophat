@@ -1,9 +1,9 @@
-// Rectangle is used mainly as camera.
 
 import (
 	"th.um"	
 )
 
+// A set of points representing a rectangle.
 type Rect* = struct {
 	x, y, w, h: th.fu
 }

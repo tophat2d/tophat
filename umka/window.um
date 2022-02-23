@@ -1,8 +1,5 @@
-// Module for interacting with
-// the engine.
-// Useful variables:
-//   delta: length of last cycle
-//   platform: either "linux" or "windows"
+// Module for interacting with tophat. w and h variables store the size of the
+// window.
 
 import (
 	"th.um"
