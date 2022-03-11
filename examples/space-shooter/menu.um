@@ -13,15 +13,15 @@ var (
 )
 
 fn init*() {
-	title := ui.mkLabel(&hud.mainFont, "SPACE SHOOTER", 0.08)
+	title := ui.mkLabel(&hud.mainFont, "SPACE SHOOTER", th.white, 0.08)
 	title.center = true
 	title.get().span(1, 2)
 
-	score := ui.mkLabel(&hud.mainFont, "", 0.04)
+	score := ui.mkLabel(&hud.mainFont, "", th.white, 0.04)
 	score.center = true
 	score.get().grid(0, 2)
 
-	playButton := ui.mkLabel(&hud.mainFont, "PLAY", 0.04)
+	playButton := ui.mkLabel(&hud.mainFont, "PLAY", th.white, 0.04)
 	playButton.center = true
 	playButton.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
 		if eventType != ui.eventRelease {
@@ -32,7 +32,7 @@ fn init*() {
 	}
 	playButton.get().grid(0, 3)
 
-	exitButton := ui.mkLabel(&hud.mainFont, "EXIT", 0.04)
+	exitButton := ui.mkLabel(&hud.mainFont, "EXIT", th.white, 0.04)
 	exitButton.center = true
 	exitButton.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
 		if eventType != ui.eventRelease {
