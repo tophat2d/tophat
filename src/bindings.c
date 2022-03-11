@@ -262,7 +262,6 @@ void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
 	r[0].intVal = thg.just_pressed[keycode];
-	thg.just_pressed[keycode] = 0;
 }
 
 ///////////////////////

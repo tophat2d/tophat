@@ -264,6 +264,7 @@ GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char 
 void th_gl_free_prog(GLuint prog);
 
 void th_input_key(int keycode, int bDown);
+void th_input_cycle();
 
 void th_window_setup(char *name, int w, int h);
 void th_window_get_dimensions(int *w, int *h);

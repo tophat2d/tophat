@@ -1,0 +1,81 @@
+
+import (
+	"th.um"
+	"ui.um"
+	"rect.um"
+	"image.um"
+	"input.um"
+	"canvas.um"
+)
+
+type Item* = struct {
+	img: image.Image
+	text: str
+}
+
+type ItemList* = struct {
+	g: ui.Generic
+
+	items: []Item
+	limit: int
+	offset: int
+	selection: int
+
+	fontSize: th.fu
+	clickToSelect: bool
+}
+
+fn (i: ^Item) draw(pos, dm: th.Vf2, fg, bg: uint32, fs: th.fu) {
+	canvas.drawRect(bg, rect.mk(pos.x, pos.y, dm.x, dm.y))
+	x := 1 * fs
+	if i.img.handle != 0 {
+		i.img.draw(th.Transform{p: pos, s: th.Vf2{1, 1}}, th.white)
+		x := i.img.getDims().x
+	}
+
+	canvas.drawText(i.text, th.Vf2{pos.x + x, pos.y + 1 * fs}, fg, fs)
+}
+
+fn (il: ^ItemList) get*(): ^ui.Generic {
+	return &il.g
+}
+
+fn (il: ^ItemList) handle*() {
+	if input.isJustPressed(input.key_up) && il.offset > 0 {
+		il.offset--
+	}
+
+	if input.isJustPressed(input.key_down) && il.offset < len(il.items) - il.limit {
+		il.offset++
+	}
+
+	mp := input.getMousePos()
+	if (!il.clickToSelect || input.isJustPressed(input.mouse1)) &&
+ 	   (mp.x > il.g.t.p.x && mp.x < il.g.t.p.x + il.g.t.s.x) {
+		il.selection = trunc((mp.y - il.g.t.p.y) / (il.fontSize * 7) + il.offset)
+		il.g.onEvent(ui.eventHover, il.g.ctx)
+	}
+
+	if input.isPressed(input.mouse1) {
+		il.g.pressed = true
+	} else if il.g.pressed {
+		il.g.onEvent(ui.eventRelease, il.g.ctx)
+		il.g.pressed = false
+	}
+}
+
+fn (il: ^ItemList) draw*() {
+	p := il.g.t.p
+
+	for i:=il.offset; i < il.offset + il.limit && i < len(il.items); i++ {
+		fg := th.black
+		bg := th.white
+		if i == il.selection {
+			fg = th.white
+			bg = th.black
+		}
+
+		il.items[i].draw(p, th.Vf2{il.g.t.s.x, 7 * il.fontSize}, fg, bg, il.fontSize)
+		p.y += 7 * il.fontSize
+	}
+}

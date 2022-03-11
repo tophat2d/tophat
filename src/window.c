@@ -109,6 +109,7 @@ void th_window_clear_frame() {
 
 void th_window_swap_buffers() {
 	th_canvas_flush();
+	th_input_cycle();
 
 	glXSwapBuffers(th_dpy, th_win);
 }
@@ -244,6 +245,7 @@ int th_window_handle() {
 
 void th_window_swap_buffers() {
 	th_canvas_flush();
+	th_input_cycle();
 	SwapBuffers(th_hdc);
 }
 
