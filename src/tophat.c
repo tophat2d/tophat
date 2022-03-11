@@ -19,7 +19,7 @@ extern th_global thg;
 }
 
 #define ALLOC_FUNC(name) th_##name *th_alloc_##name() { \
-	void *p = realloc(thg.name##s, ++thg.name##_count * sizeof(th_##name)); \
+	void *p = realloc(thg.name##s, (++thg.name##_count + 1) * sizeof(th_##name)); \
 	if (!p) \
 		return NULL; \
 	thg.name##s = p; \

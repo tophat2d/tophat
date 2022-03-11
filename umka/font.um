@@ -9,7 +9,7 @@ import (
 
 // Font type. It is an opaque structure.
 type Font* = struct {
-	index: th.uu
+	handle: th.uu
 }
 
 // A structure built on top of Font. It automatially caches runes used in
@@ -22,15 +22,13 @@ type Cached* = struct {
 	font: Font
 }
 
-fn ctexttoimg(
-	t: th.uu, text: ^utf8.Rune,
-	runec: th.uu, size: th.fu, color: uint32, spacing: th.Vf2): uint
+fn crenderglyph(font: th.uu, glyph: uint32, scale: th.fu): th.uu
 
-// Creates an image.img from a text. ax and ay are character/line spacings.
-// Not recommended to be used on it's own. Use Cached instead.
-fn (t: ^Font) strToImage*(text: str, size: th.fu, color: uint32, spacing: th.Vf2): image.Image {
-	runes := utf8.decode(text)
-	return image.Image{ctexttoimg(t.index, &runes[0], len(runes), size, color, spacing)}
+// Renders a white glyph with given size. The glyph is properly positioned
+// in relation to the baseline, so it's ready to be drawn at the same height
+// as all other glyph images produced by this method.
+fn (f: ^Font) renderGlyph*(glyph: uint32, scale: th.fu): image.Image {
+	return image.Image{crenderglyph(f.handle, glyph, scale)}
 }
 
 fn cfontload(path: str): th.uu
@@ -56,8 +54,7 @@ fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
 		c.runes = map.Map{}
 	}
 
-	c.runes.set(rune,
-		c.font.strToImage(rune.encode(), c.size, 0xffffff00, th.Vf2{0, 0}))
+	c.runes.set(rune, c.font.renderGlyph(rune, c.size))
 }
 
 // Precaches all runes inside string s. This can prevent some frame drop on
@@ -117,12 +114,8 @@ fn (c: ^Cached) draw*(text: str, t: th.Transform) {
 
 		img := ^image.Image(c.runes.get(r))^
 		dm := img.getDims()
-		off := (maxH - dm.y) + (dm.y + getYOff(c.font.index, r) * c.size)
-		off *= t.s.y	
 
-		t.p.y += off
 		img.draw(t, c.color)
-		t.p.y -= off
 
 		t.p.x += dm.x * t.s.x * 1.1
 	}

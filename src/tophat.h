@@ -230,11 +230,8 @@ th_sound *th_alloc_sound();
 
 // font
 th_font *th_font_load(char *path);
-void th_str_to_img(
-	th_image *out, th_font *font,
-	uint32_t *runes, uu runec,
-	fu scale, uint32_t color,
-	th_vf2 spacing);
+void th_font_render_glyph(th_image *img, th_font *font,
+                          uint32_t glyph, fu scale);
 void th_font_deinit();
 
 th_vf2 th_quad_min(th_quad q);

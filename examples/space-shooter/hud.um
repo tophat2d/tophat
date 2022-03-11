@@ -16,7 +16,7 @@ fn init*() {
 
 	mainFont = font.mkCached(
 		font.load("gfx/marediv-regular.ttf"),
-		0xeeeeeeff, 0.04)
+		0xeeeeeeff, 60)
 	mainFont.preCacheStr("0123456789")
 }
 
@@ -33,5 +33,5 @@ fn draw*() {
 
 	mainFont.draw(
 		repr(global.score), th.Transform{
-			p: th.Vf2{1, 1}, s: th.Vf2{0.06, 0.06}})
+			p: th.Vf2{1, 1}, s: th.Vf2{0.05, 0.05}})
 }

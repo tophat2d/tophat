@@ -6,13 +6,6 @@
 
 extern th_global thg;
 
-struct {
-	uint32_t rune;
-	uint8_t *data;
-	int w, h;
-	int yoff;
-} typedef __th_font_char;
-
 th_font *th_font_load(char *path) {
 	FILE *f = fopen(path, "rb");
 	if (f == NULL) {
@@ -49,80 +42,42 @@ th_font *th_font_load(char *path) {
 	return out;
 }
 
-void th_str_to_img(
-	th_image *out, th_font *font,
-	uint32_t *runes, uu runec,
-	fu scale, uint32_t color,
-	th_vf2 spacing) {
-	__th_font_char *chars = malloc(runec * sizeof(__th_font_char));
-
-	int
-		cw = 0, rh = 0,
-		w = 0, h = 0;
-	for (int i=0; i < runec; i++) {
-		chars[i].rune = runes[i];
-
-		int trash;
-		// get bitmap
-		chars[i].data = stbtt_GetCodepointBitmap(
-			font->info, scale, scale, runes[i],
-			&chars[i].w, &chars[i].h, &trash, &trash);
-
-		// get offset (for characters like q)
-		stbtt_GetCodepointBitmapBox(
-			font->info, runes[i], scale, scale,
-			&trash, &chars[i].yoff, &trash, &trash);
-
-		if (i < runec-1)
-			// add kerning
-			chars[i].w += stbtt_GetCodepointKernAdvance(font->info, runes[i], runes[i+1]) * scale;
-
-		if (chars[i].rune == '\n') {
-			if (cw > w)
-				w = cw;
-
-			h += rh;
-			cw = 0;
-			continue;
-		}
-
-		if (chars[i].rune == ' ')
-			w += w/i;
-
-		if (chars[i].h + spacing.y > rh)
-			rh = chars[i].h + spacing.y;
-
-		w += chars[i].w + spacing.x;
+void th_font_render_glyph(th_image *img, th_font *font,
+                          uint32_t glyph, fu scale) {
+	
+	if (scale < 1) {
+		th_error("Font size too small.\n");
+		return;
 	}
-	// letters like q might not have enough space. kind of a hack
-	h += 1.5 * rh;
 
-	uint32_t *data = malloc(sizeof(uint32_t) * w * h);
-	memset(data, 0, sizeof(uint32_t) * w * h);
-	int
-		x=0, y=0;
-	for (int i=0; i < runec; i++) {
-		if (chars[i].rune == '\n') {
-			x = 0;
-			y += rh;
-			continue;
-		}
+	scale = stbtt_ScaleForPixelHeight(font->info, 5 * scale);
+	
+	int x0, y0, x1, y1;
+	stbtt_GetFontBoundingBox(font->info, &x0, &y0, &x1, &y1);
+	x0 *= scale;
+	y0 *= scale;
+	x1 *= scale;
+	y1 *= scale;
 
-		if (chars[i].rune == ' ')
-			x += x/i; // this is a weird way to do spaces. TODO
+	int ascent;
+	stbtt_GetFontVMetrics(font->info, &ascent, 0, 0);
+	int baseline = (int)(ascent * scale);
 
-		for (int py=y; py - y < chars[i].h; py++)
-			for (int px=x; px - x < chars[i].w; px++)
-				data[(py + (rh - chars[i].h) + (chars[i].h + chars[i].yoff)) * w + px] =
-					color | chars[i].data[(py - y) * chars[i].w + (px - x)];
-		free(chars[i].data);
+	int w, h;
+	uint8_t *bmp = stbtt_GetCodepointBitmap(font->info, scale, scale, glyph, &w, &h, 0, 0);
 
-		x += chars[i].w + spacing.x;
-	}
-	free(chars);
+	int offset;
+	stbtt_GetCodepointBitmapBox(font->info, glyph, scale, scale, 0, &offset, 0, 0);
+	offset = baseline + offset;
 
-	th_image_from_data(out, data, (th_vf2){.w=w, .h=h});
-	free(data);
+	uint32_t *imgdata = calloc(sizeof(uint32_t), w * (offset + h));
+	for (int x=0; x < w; ++x)
+		for (int y=0; y < h; ++y)
+			imgdata[(y + offset)*w + x] = 0xffffff00 | bmp[y*w + x];
+	free(bmp);
+
+	th_image_from_data(img, imgdata, (th_vf2){.w=w, .h=offset + h});
+	free(imgdata);
 }
 
 void th_font_deinit() {

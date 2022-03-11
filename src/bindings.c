@@ -35,25 +35,17 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->ptrVal = f;
 }
 
-void umfonttexttoimg(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_font *f = th_get_font_err(p[5].uintVal);
-	if (!f)
+void umfontrenderglyph(UmkaStackSlot *p, UmkaStackSlot *r) {
+	fu scale = p[0].real32Val;
+	uint32_t glyph = p[1].uintVal;
+	th_font *font = th_get_font(p[2].uintVal);
+	if (!font)
 		return;
 
-	uint32_t *runes = (uint32_t *)p[4].ptrVal;
-	uu runec = p[3].intVal;
-	fu scale = p[2].real32Val;
-	uint32_t color = p[1].uintVal;
-	th_vf2 spacing = *(th_vf2 *)&p[0];
-
-	if (thg.image_count >= MAX_IMAGES - 1) {
-		th_error("Too many images. Create an issue.");
-		return;
-	}
 	th_image *img = th_alloc_image();
 	if (!img)
 		return;
-	th_str_to_img(img, f, runes, runec, scale, color, spacing);
+	th_font_render_glyph(img, font, glyph, scale);
 	r->intVal = thg.image_count;
 }
 
@@ -461,7 +453,7 @@ void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
 
-	umkaAddFunc(umka, "ctexttoimg", &umfonttexttoimg);
+	umkaAddFunc(umka, "crenderglyph", &umfontrenderglyph);
 	umkaAddFunc(umka, "cfontload", &umfontload);
 	umkaAddFunc(umka, "getYOff", &umfontgetyoff);
 
