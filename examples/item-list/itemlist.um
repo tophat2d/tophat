@@ -21,8 +21,12 @@ type ItemList* = struct {
 	offset: int
 	selection: int
 
+	renderer: ui.TextRenderer
 	fontSize: th.fu
 	clickToSelect: bool
+
+	scrollBarWidth: th.fu
+	scrollOffset: th.fu
 }
 
 fn (i: ^Item) draw(pos, dm: th.Vf2, fg, bg: uint32, fs: th.fu) {
@@ -40,31 +44,84 @@ fn (il: ^ItemList) get*(): ^ui.Generic {
 	return &il.g
 }
 
-fn (il: ^ItemList) handle*() {
-	if input.isJustPressed(input.key_up) && il.offset > 0 {
-		il.offset--
-	}
+fn (il: ^ItemList) itemWidth(): th.fu {
+	return (il.renderer.runeDims(int32('A')).y + 2) * il.fontSize
+}
 
-	if input.isJustPressed(input.key_down) && il.offset < len(il.items) - il.limit {
-		il.offset++
-	}
-
+fn (il: ^ItemList) doesHover(): bool {
 	mp := input.getMousePos()
-	if (!il.clickToSelect || input.isJustPressed(input.mouse1)) &&
- 	   (mp.x > il.g.t.p.x && mp.x < il.g.t.p.x + il.g.t.s.x) {
-		il.selection = trunc((mp.y - il.g.t.p.y) / (il.fontSize * 7) + il.offset)
-		il.g.onEvent(ui.eventHover, il.g.ctx)
+	return (mp.x > il.g.t.p.x + il.scrollBarWidth && mp.x < il.g.t.p.x + il.g.t.s.x &&
+		mp.y > il.g.t.p.y && mp.y < il.g.t.p.y + il.limit * il.itemWidth())
+}
+
+fn (il: ^ItemList) handleScrollBar() {
+	iw := real(il.limit)/len(il.items) * il.itemWidth()
+	mp := input.getMousePos()
+
+	if !(mp.x > il.g.t.p.x && mp.y < il.g.t.p.x + il.scrollBarWidth &&
+	   mp.y > il.g.t.p.y + il.offset * iw && mp.y < il.g.t.p.y + (il.offset + il.limit) * iw) {
+		return
+	}
+
+	if input.isJustPressed(input.mouse1) {
+		il.scrollOffset = mp.y - il.g.t.p.y - il.offset * iw
+		return
 	}
 
 	if input.isPressed(input.mouse1) {
-		il.g.pressed = true
-	} else if il.g.pressed {
-		il.g.onEvent(ui.eventRelease, il.g.ctx)
-		il.g.pressed = false
+		il.offset = trunc((mp.y - il.g.t.p.y - il.scrollOffset) / iw)
+
+		if il.offset < 0 {
+			il.offset = 0
+		}
+		if il.offset > len(il.items) - il.limit {
+			il.offset = len(il.items) - il.limit
+		}
 	}
 }
 
+fn (il: ^ItemList) handle*() {
+	il.handleScrollBar()
+
+	mp := input.getMousePos()
+
+	if !il.doesHover() {
+		il.selection = -1
+		il.g.pressed = false
+	} else {
+		if input.isJustPressed(input.key_up) && il.offset > 0 {
+			il.offset--
+		}
+    
+		if input.isJustPressed(input.key_down) && il.offset < len(il.items) - il.limit {
+			il.offset++
+		}
+
+		if !il.clickToSelect || input.isJustPressed(input.mouse1) {
+			il.selection = trunc((mp.y - il.g.t.p.y) / il.itemWidth() + il.offset)
+			il.g.onEvent(ui.eventHover, il.g.ctx)
+		}
+
+		if input.isPressed(input.mouse1) {
+			il.g.pressed = true
+		} else if il.g.pressed {
+			il.g.onEvent(ui.eventRelease, il.g.ctx)
+			il.g.pressed = false
+		}
+	}
+}
+
+fn (il: ^ItemList) drawScrollBar() {
+	iw := real(il.limit)/len(il.items) * il.itemWidth()
+
+	canvas.drawRect(th.white, rect.mk(
+		il.g.t.p.x, il.g.t.p.y + iw * il.offset,
+		il.scrollBarWidth, iw * il.limit))	
+}
+
 fn (il: ^ItemList) draw*() {
+	il.drawScrollBar()
+
 	p := il.g.t.p
 
 	for i:=il.offset; i < il.offset + il.limit && i < len(il.items); i++ {
@@ -75,7 +132,9 @@ fn (il: ^ItemList) draw*() {
 			bg = th.black
 		}
 
-		il.items[i].draw(p, th.Vf2{il.g.t.s.x, 7 * il.fontSize}, fg, bg, il.fontSize)
+		il.items[i].draw(th.Vf2{p.x + il.scrollBarWidth, p.y},
+			th.Vf2{il.g.t.s.x, il.itemWidth()},
+			fg, bg, il.fontSize)
 		p.y += 7 * il.fontSize
 	}
 }
