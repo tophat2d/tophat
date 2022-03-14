@@ -39,6 +39,8 @@ th_font *th_font_load(char *path) {
 	}
 	stbtt_InitFont(out->info, buf, 0);
 
+	out->scale = stbtt_ScaleForPixelHeight(out->info, 5);
+
 	return out;
 }
 
@@ -50,7 +52,7 @@ void th_font_render_glyph(th_image *img, th_font *font,
 		return;
 	}
 
-	scale = stbtt_ScaleForPixelHeight(font->info, 5 * scale);
+	scale *= font->scale;
 	
 	int x0, y0, x1, y1;
 	stbtt_GetFontBoundingBox(font->info, &x0, &y0, &x1, &y1);

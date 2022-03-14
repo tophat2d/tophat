@@ -21,8 +21,13 @@ type Cached* = struct {
 	font: Font
 }
 
-fn crenderglyph(font: th.uu, glyph: uint32, scale: th.fu): th.uu
+fn cfontload(path: str): th.uu
+// Loads a font from file.
+fn load*(path: str): Font {
+	return Font{cfontload(path)}
+}
 
+fn crenderglyph(font: th.uu, glyph: uint32, scale: th.fu): th.uu
 // Renders a white glyph with given size. The glyph is properly positioned
 // in relation to the baseline, so it's ready to be drawn at the same height
 // as all other glyph images produced by this method.
@@ -30,14 +35,15 @@ fn (f: ^Font) renderGlyph*(glyph: uint32, scale: th.fu): image.Image {
 	return image.Image{crenderglyph(f.handle, glyph, scale)}
 }
 
-fn cfontload(path: str): th.uu
-
-// Loads a font from file.
-fn load*(path: str): Font {
-	return Font{cfontload(path)}
+fn cgetkern(font: th.uu, glyph1, glyph2: uint32): th.fu
+fn (f: ^Font) getKern(glyph1, glyph2: uint32): th.fu {
+	return cgetkern(f.handle, glyph1, glyph2)
 }
 
-fn getYOff(f: th.uu, r: utf8.Rune): int
+fn cgetadvance(font: th.uu, glyph: uint32): th.fu
+fn (f: ^Font) getAdvance(glyph: uint32): th.fu {
+	return cgetadvance(f.handle, glyph)
+}
 
 // Cached font constructor.
 fn mkCached*(f: Font, s: th.fu): Cached {
@@ -54,6 +60,17 @@ fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
 
 	c.runes.set(rune, c.font.renderGlyph(rune, c.size))
 }
+
+fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
+	img := ^image.Image(c.runes.get(rune))
+	if img == null {
+		c.preCacheRune(rune)
+		img = ^image.Image(c.runes.get(rune))
+	}
+
+	return img.getDims().div(th.Vf2{c.size, c.size})
+}
+
 
 // Precaches all runes inside string s. This can prevent some frame drop on
 // the start of the game.
@@ -91,11 +108,10 @@ fn (c: ^Cached) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
 	}
 
 	maxH /= 1.5
-	for r in runes {
+	for i,r in runes {
 		// line and space handling is bad.
 		if r == uint32(' ') {
-			dm := ^image.Image(c.runes.get(runes[0])).getDims()
-			pos.x += dm.x * scale
+			pos.x += c.size * scale * c.font.getAdvance(r)
 			continue
 		}
 
@@ -114,17 +130,10 @@ fn (c: ^Cached) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
 
 		img.draw(th.Transform{p: pos, s: th.Vf2{scale, scale}}, color)
 
-		pos.x += dm.x * scale * 1.1
+		pos.x += c.size * scale * c.font.getAdvance(r)//dm.x * scale * 1.1
+		if i < len(runes)-1 {
+			pos.x += c.size * scale * c.font.getKern(r, runes[i+1])
+		}
 	}
-}
-
-fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
-	img := ^image.Image(c.runes.get(rune))
-	if img == null {
-		c.preCacheRune(rune)
-		img = ^image.Image(c.runes.get(rune))
-	}
-
-	return img.getDims().div(th.Vf2{c.size, c.size})
 }
 

@@ -57,14 +57,20 @@ void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = thg.font_count;
 }
 
-void umfontgetyoff(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_font *f = th_get_font_err(p[1].uintVal);
-	if (!f) return;
-	uint32_t rune = p[0].uintVal;
+void umfontgetkern(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_font *font = th_get_font(p[2].intVal);
+	uint32_t glyph1 = p[1].intVal;
+	uint32_t glyph2 = p[0].intVal;
+	int kern = stbtt_GetCodepointKernAdvance(font->info, glyph1, glyph2);
+	r->realVal = kern * font->scale;
+}
 
-	int out, t;
-	stbtt_GetCodepointBitmapBox(f->info, rune, 1, 1, &t, &out, &t, &t);
-	r->intVal = out;
+void umfontgetadvance(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_font *font = th_get_font(p[1].intVal);
+	uint32_t glyph = p[0].intVal;
+	int advance;
+	stbtt_GetCodepointHMetrics(font->info, glyph, &advance, 0);
+	r->realVal = advance * font->scale;
 }
 
 // sets values of all dots to lightmask's color
@@ -455,7 +461,8 @@ void _th_umka_bind(void *umka) {
 
 	umkaAddFunc(umka, "crenderglyph", &umfontrenderglyph);
 	umkaAddFunc(umka, "cfontload", &umfontload);
-	umkaAddFunc(umka, "getYOff", &umfontgetyoff);
+	umkaAddFunc(umka, "cgetadvance", &umfontgetadvance);
+	umkaAddFunc(umka, "cgetkern", &umfontgetkern);
 
 	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
 	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);

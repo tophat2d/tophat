@@ -146,6 +146,7 @@ typedef struct {
 
 typedef struct {
 	stbtt_fontinfo *info;
+	fu scale;
 	unsigned char *buf;
 } th_font;
 
