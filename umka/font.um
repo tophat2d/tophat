@@ -69,8 +69,9 @@ fn (c: ^Cached) preCacheStr*(s: str) {
 	}
 }
 
-// Draws the text using a Cached font c. Transform roation not supported.
+// Draws the text using a Cached font c.
 fn (c: ^Cached) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
+	scale /= c.size
 	lx := pos.x
 	runes := utf8.decode(text)
 
@@ -124,6 +125,6 @@ fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
 		img = ^image.Image(c.runes.get(rune))
 	}
 
-	return img.getDims()
+	return img.getDims().div(th.Vf2{c.size, c.size})
 }
 
