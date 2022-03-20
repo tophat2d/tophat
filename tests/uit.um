@@ -29,16 +29,21 @@ fn main() {
 	cam := rect.mk(0, 0, 250, 250)
 	window.setup("test game", 100, 100)
 
-	l := label.mk(ui.PixelFont{}, "Hello world", th.black, 2)
+	theme := ui.Theme{
+		fg: th.blue,
+		bg: th.red,
+		borderColor: th.blue,
+		borderSize: 3}
+
+	l := label.mk(ui.PixelFont{}, "Hello world", theme, 2)
 	l.get().grid(0, 0).span(3, 1)
-	l.bgColor = th.red
 	l.g.ctx = &l
 	l.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
 		l := ^label.Label(ctx)
 		if eventType == ui.eventPress {
-			l.bgColor = th.cyan
+			l.g.theme.bg = th.cyan
 		} else if eventType == ui.eventRelease {
-			l.bgColor = th.red
+			l.g.theme.bg = th.red
 		}
 	}
 	l.center = true
@@ -50,10 +55,10 @@ fn main() {
 	iBox.image.flipv(true)
 
 	cf := font.mkCached(font.load("examples/space-shooter/gfx/marediv-regular.ttf"), 100)
-	rl := label.mk(&cf, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", th.blue, 4)
+	rl := label.mk(&cf, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", theme, 4)
 	rl.get().grid(0, 1).span(2, 2)
-	rl.bgColor = th.green
 	rl.center = true
+	rl.wrapping = true
 	
 	g := grid.mk(3, 3)
 	g.g.t.s = th.Vf2{cam.w, cam.h}

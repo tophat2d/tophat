@@ -17,6 +17,13 @@ const (
 	eventRelease*
 )
 
+type Theme* = struct {
+	fg, bg: uint32
+
+	borderColor: uint32
+	borderSize: th.fu
+}
+
 // A structure all elements have to contain. t can be set manually by the user,
 // s being the dimensions, or it can be set by another elements. onEvent is an
 // event callback. It will pass whatever is set in the ctx field.
@@ -30,6 +37,7 @@ type Generic* = struct {
 	t: th.Transform
 	gridPos: th.Vf2
 	gridSpan: th.Vf2
+	theme: Theme
 
 	ctx: interface{}
 	onEvent: fn(eventType: th.uu, ctx: interface{})
@@ -108,3 +116,9 @@ fn (g: ^Generic) handle*() {
 	}
 }
 
+fn drawBorder*(p, d: th.Vf2, t: Theme) {
+	canvas.drawRect(t.borderColor, rect.mk(p.x, p.y, t.borderSize, d.y))
+	canvas.drawRect(t.borderColor, rect.mk(p.x, p.y, d.x, t.borderSize))
+	canvas.drawRect(t.borderColor, rect.mk(p.x + d.x - t.borderSize, p.y, t.borderSize, d.y))
+	canvas.drawRect(t.borderColor, rect.mk(p.x, p.y + d.y - t.borderSize, d.x, t.borderSize))
+}

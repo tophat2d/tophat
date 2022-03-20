@@ -15,16 +15,18 @@ type Label* = struct {
 	renderer: ui.TextRenderer
 	center: bool
 	wrapping: bool
-	color: uint32
-	bgColor: uint32
 	scale: th.fu
 }
 
 // Label constructor
-fn mk*(f: ui.TextRenderer, text: str, color: uint32, scale: th.fu): Label {
-	return Label {
-		ui.mkGeneric(), text,
-		f, false, true, color, 0, scale}
+fn mk*(f: ui.TextRenderer, text: str, theme: ui.Theme, scale: th.fu): Label {
+	l := Label{}
+	l.g = ui.mkGeneric()
+	l.g.theme = theme
+	l.text = text
+	l.renderer = f
+	l.scale = scale
+	return l
 }
 
 fn (l: ^Label) get*(): ^ui.Generic {
@@ -40,7 +42,8 @@ fn (l: ^Label) draw*() {
 		return
 	}
 
-	canvas.drawRect(l.bgColor, rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
+	canvas.drawRect(l.g.theme.bg, rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
+	ui.drawBorder(l.g.t.p, l.g.t.s, l.g.theme)
 	text := utf8.decode(l.text)
 	lineCount := 1
 
@@ -93,7 +96,7 @@ fn (l: ^Label) draw*() {
 			if l.center {
 				p.x = (l.g.t.s.x - w) / 2
 			}
-			l.renderer.draw(stext, p, l.color, l.scale)
+			l.renderer.draw(stext, p, l.g.theme.fg, l.scale)
 
 			stext = ""
 			p.y += lineH * l.scale * 1.6

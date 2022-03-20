@@ -68,7 +68,11 @@ fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
 		img = ^image.Image(c.runes.get(rune))
 	}
 
-	return img.getDims().div(th.Vf2{c.size, c.size})
+	dm := img.getDims()
+	dm.y /= c.size
+	dm.x = c.font.getAdvance(rune)
+
+	return dm
 }
 
 
