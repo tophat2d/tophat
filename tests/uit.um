@@ -17,6 +17,9 @@ import (
 	"umka/tilemap.um"
 	"umka/window.um"
 	"umka/ui.um"
+	"umka/ui/grid.um"
+	"umka/ui/label.um"
+	"umka/ui/imagebox.um"
 
 	"umka/std/std.um"
 	"umka/std/map.um"
@@ -26,12 +29,12 @@ fn main() {
 	cam := rect.mk(0, 0, 250, 250)
 	window.setup("test game", 100, 100)
 
-	l := ui.mkLabel(ui.PixelFont{}, "Hello world", th.black, 2)
+	l := label.mk(ui.PixelFont{}, "Hello world", th.black, 2)
 	l.get().grid(0, 0).span(3, 1)
 	l.bgColor = th.red
 	l.g.ctx = &l
 	l.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
-		l := ^ui.Label(ctx)
+		l := ^label.Label(ctx)
 		if eventType == ui.eventPress {
 			l.bgColor = th.cyan
 		} else if eventType == ui.eventRelease {
@@ -40,19 +43,19 @@ fn main() {
 	}
 	l.center = true
 
-	iBox := ui.mkImage(image.load("etc/test.png"))
+	iBox := imagebox.mk(image.load("etc/test.png"))
 	iBox.get().grid(2, 1).span(1, 1)
 	iBox.g.onEvent = fn(eventType: th.uu, ctx: interface{}) { }
 	iBox.image.crop(th.Vf2{0.5, 1.0/12}, th.Vf2{1, 1})
 	iBox.image.flipv(true)
 
 	cf := font.mkCached(font.load("examples/space-shooter/gfx/marediv-regular.ttf"), 100)
-	rl := ui.mkLabel(&cf, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", th.blue, 0.04)
+	rl := label.mk(&cf, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", th.blue, 4)
 	rl.get().grid(0, 1).span(2, 2)
 	rl.bgColor = th.green
 	rl.center = true
 	
-	g := ui.mkGrid(3, 3)
+	g := grid.mk(3, 3)
 	g.g.t.s = th.Vf2{cam.w, cam.h}
 	g.elements = []ui.Element{&l, &iBox, &rl}
 	g.border = 10	

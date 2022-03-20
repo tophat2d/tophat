@@ -6,22 +6,24 @@ import (
 	"hud.um"
 	"rect.um"
 	"global.um"
+	"ui/grid.um"
+	"ui/label.um"
 )
 
 var (
-	grid: ui.Grid
+	maingrid: grid.Grid
 )
 
 fn init*() {
-	title := ui.mkLabel(&hud.mainFont, "SPACE SHOOTER", th.white, 0.08)
+	title := label.mk(&hud.mainFont, "SPACE SHOOTER", th.white, 4)
 	title.center = true
 	title.get().span(1, 2)
 
-	score := ui.mkLabel(&hud.mainFont, "", th.white, 0.04)
+	score := label.mk(&hud.mainFont, "", th.white, 2)
 	score.center = true
 	score.get().grid(0, 2)
 
-	playButton := ui.mkLabel(&hud.mainFont, "PLAY", th.white, 0.04)
+	playButton := label.mk(&hud.mainFont, "PLAY", th.white, 2)
 	playButton.center = true
 	playButton.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
 		if eventType != ui.eventRelease {
@@ -32,7 +34,7 @@ fn init*() {
 	}
 	playButton.get().grid(0, 3)
 
-	exitButton := ui.mkLabel(&hud.mainFont, "EXIT", th.white, 0.04)
+	exitButton := label.mk(&hud.mainFont, "EXIT", th.white, 2)
 	exitButton.center = true
 	exitButton.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
 		if eventType != ui.eventRelease {
@@ -42,16 +44,16 @@ fn init*() {
 	}
 	exitButton.get().grid(0, 4)
 
-	grid = ui.mkGrid(1, 5)
-	grid.g.t.s = th.Vf2{global.cam.w, global.cam.h-20}
-	grid.g.t.p.y += 20
-	grid.elements = []ui.Element{title, score, playButton, exitButton}
+	maingrid = grid.mk(1, 5)
+	maingrid.g.t.s = th.Vf2{global.cam.w, global.cam.h-20}
+	maingrid.g.t.p.y += 20
+	maingrid.elements = []ui.Element{title, score, playButton, exitButton}
 }
 
 fn handle*() {
-	^ui.Label(grid.elements[1]).text =
+	^label.Label(maingrid.elements[1]).text =
 		"TOP " + repr(global.hi) + " SCORE " + repr(global.score)
 
-	grid.handle()
-	grid.draw()
+	maingrid.handle()
+	maingrid.draw()
 }

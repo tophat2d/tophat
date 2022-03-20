@@ -548,4 +548,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "th.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "signal.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "atlas.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ui/label.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ui/grid.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "ui/imagebox.um", th_em_modulesrc[index++]);
 }
