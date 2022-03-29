@@ -1,0 +1,12 @@
+
+import (
+	"std.um"
+)
+
+fn main() {
+	argc := std.argc()
+	printf("%d arguments\n", argc)
+	for i:=0; i < argc; i++ {
+		printf("%s\n", std.argv(i))
+	}
+}

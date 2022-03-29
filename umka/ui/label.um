@@ -96,7 +96,7 @@ fn (l: ^Label) draw*() {
 			if l.center {
 				p.x = (l.g.t.s.x - w) / 2
 			}
-			l.renderer.draw(stext, p, l.g.theme.fg, l.scale)
+			l.renderer.draw(stext, th.Vf2{p.x + l.g.t.p.x, p.y}, l.g.theme.fg, l.scale)
 
 			stext = ""
 			p.y += lineH * l.scale * 1.6

@@ -152,7 +152,7 @@ typedef struct {
 
 // struct holding all tophat's global variables.
 typedef struct {
-	char respath[1024];
+	char respath[4096];
 	fu scaling;
 	void *umka;
 

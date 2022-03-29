@@ -31,7 +31,9 @@ void die() {
 int main(int argc, char *argv[]) {
 	thg.umka = umkaAlloc();
 	int umkaOK;
+	strcpy(thg.respath, "");
 
+	int argOffset = 1;
 	if (argc != 1) {
 		if (strcmp(argv[1], "modsrc") == 0) {
 			if (argc != 3) {
@@ -52,7 +54,15 @@ int main(int argc, char *argv[]) {
 			return 0;
 		} else if (strcmp(argv[1], "version") == 0) {
 			printf("%s\n", th_em_misc[1]);
-		} else {
+		} else if (strcmp(argv[1], "dir") == 0) {
+			if (argc != 3) {
+				printf("dir takes 1 argument.\n");
+				return 1;
+			}
+
+			strcpy(thg.respath, argv[2]);
+			argOffset += 2;
+		} else if (strcmp(argv[1], "help") == 0) {
 			printf(
 				"tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um or tophat.dat/main.um\n"
@@ -63,26 +73,23 @@ int main(int argc, char *argv[]) {
 				"Visit mrms.cz/tophat.html for more info.");
 			return 0;
 		}
-
-		return 0;
 	}
 
 	FILE *f;
-	char scriptpath[512];
-	if ((f = fopen("main.um", "r"))) {
-		thg.respath[0] = 0;
-		strcpy(scriptpath, "main.um");
-		fclose(f);
-	} else if ((f = fopen("tophat.dat/main.um", "r"))) {
-		strcpy(thg.respath, "tophat.dat/");
-		strcpy(scriptpath, "tophat.dat/main.um");
+	char scriptpath[4096];
+	strcpy(scriptpath, thg.respath);
+	strcat(scriptpath, "main.um");
+	if ((f = fopen(scriptpath, "r"))) {
 		fclose(f);
 	} else {
-		th_error("Could not find game.um or main.um. Make sure you are in a proper directory.");
+		th_error("Could not find main.um. Make sure you are in a proper directory, or specify it using the dir flag.");
 
 		return 1;
 	}
-	umkaOK = umkaInit(thg.umka, scriptpath, NULL, 1024 * 1024, 1024 * 1024, NULL, 0, NULL);
+
+	umkaOK = umkaInit(thg.umka, scriptpath, NULL,
+		1024 * 1024, 1024 * 1024, NULL,
+		argc - argOffset, argv + argOffset);
 
 	th_audio_init();
 
