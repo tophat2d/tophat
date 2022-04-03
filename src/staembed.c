@@ -675,6 +675,7 @@ const char *th_em_modulesrc[] = {
 "\t}\n"
 "\n"
 "\tclockOffset = std.clock() * 1000\n"
+"\tstart = std.clock() * 1000\n"
 "}\n"
 "\n"
 "// Sets window title on runtime\n"
