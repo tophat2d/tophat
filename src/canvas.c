@@ -75,9 +75,9 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	sh /= 2;
 
 	const float verts[] = {
-		a.x / sw - 1, a.y / sh + 1, 0,
-	 	b.x / sw - 1, b.y / sh + 1, 0,
-		c.x / sw - 1, c.y / sh + 1, 0,
+		(a.x + thg.offset.x) / sw - 1, (a.y + thg.offset.y) / sh + 1, 0,
+	 	(b.x + thg.offset.x) / sw - 1, (b.y + thg.offset.y) / sh + 1, 0,
+		(c.x + thg.offset.x) / sw - 1, (c.y + thg.offset.y) / sh + 1, 0,
 	};
 
 	float *base = &batch_verts[cur_batch * 3 * 7];

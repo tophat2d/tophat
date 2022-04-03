@@ -154,6 +154,7 @@ typedef struct {
 typedef struct {
 	char respath[4096];
 	fu scaling;
+	th_vf2 offset;
 	void *umka;
 
 	uu pressed[255];

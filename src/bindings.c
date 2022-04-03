@@ -429,6 +429,9 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 	} else {
 		thg.scaling = ((float)h/camh);
 	}
+
+	thg.offset.x = (w - camw*thg.scaling)/2;
+	thg.offset.y = (h - camh*thg.scaling)/2;
 }
 
 void umcanvasrect(UmkaStackSlot *p, UmkaStackSlot *r) {

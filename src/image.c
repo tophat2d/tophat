@@ -111,7 +111,9 @@ void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
 
 	for (uu i=0; i < 4; i++) {
 		q.v[i].x *= thg.scaling;
+		q.v[i].x += thg.offset.x;
 		q.v[i].y *= thg.scaling;
+		q.v[i].y += thg.offset.y;
 	}
 
 	int sw, sh;

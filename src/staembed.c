@@ -686,6 +686,8 @@ const char *th_em_modulesrc[] = {
 "// i used to calculate tophat\'s scaling. It returns true, if the window is\n"
 "// still running.\n"
 "fn cycle*(cam: rect.Rect): bool {\n"
+"\tcanvas.drawRect(th.black, rect.Rect{0, -h, w, h})\n"
+"\tcanvas.drawRect(th.black, rect.Rect{-w, 0, w, h})\n"
 "\tcanvas.drawRect(th.black, rect.Rect{0, cam.h, w, h})\n"
 "\tcanvas.drawRect(th.black, rect.Rect{cam.w, 0, w, h})\n"
 "\tswapbuffers()\n"
