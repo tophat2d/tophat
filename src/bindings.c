@@ -246,8 +246,8 @@ void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
 // gets position of mouse cursor
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 *out = (th_vf2 *)p[0].ptrVal;
-	out->x = thg.mouse.x / thg.scaling;
-	out->y = thg.mouse.y / thg.scaling;
+	out->x = (thg.mouse.x - thg.offset.x) / thg.scaling;
+	out->y = (thg.mouse.y - thg.offset.y) / thg.scaling;
 }
 
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
