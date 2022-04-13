@@ -16,9 +16,15 @@ void th_error(char *text, ...) {
 
 	va_list args;
 	va_start(args, text);
+#ifdef _WIN32
+#include <winuser.h>
+	char buf[4096];
+	vsnprintf(buf, 4096, text, args);
+	MessageBox(NULL, buf, "tophat error", 0x10);
+#endif
 	vfprintf(stderr, text, args);
-	va_end(args);
 	fprintf(stderr, "\n");
+	va_end(args);
 }
 
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
