@@ -22,13 +22,16 @@ void th_error(char *text, ...) {
 }
 
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
-	float angle = (rot * M_PI)/180;
+	const float angle = (rot * M_PI)/180;
+
+	const fu cosa = cos(angle);
+	const fu sina = sin(angle);
 
 	p->x -= o.x;
 	p->y -= o.y;
 
-	fu x = p->x * cos(angle) - p->y * sin(angle);
-	fu y = p->x * sin(angle) + p->y * cos(angle);
+	const fu x = p->x * cosa - p->y * sina;
+	const fu y = p->x * sina + p->y * cosa;
 
 	p->x = o.x + x;
 	p->y = o.y + y;

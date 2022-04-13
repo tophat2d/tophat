@@ -237,6 +237,7 @@ void th_font_render_glyph(th_image *img, th_font *font,
 void th_font_deinit();
 
 th_vf2 th_quad_min(th_quad q);
+void th_transform_rect(th_quad *q, th_transform t, th_rect r);
 
 //// "unexported" functions
 

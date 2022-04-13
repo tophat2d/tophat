@@ -51,7 +51,7 @@ fn (l: ^Lerper) byDelta*(delta: th.uu): th.fu {
 		return 0
 	}
 
-	for l[0].progress >= 1.0 {
+	/*for l[0].progress >= 1.0 {
 		l[0].callback(l[0].ctx)
 
 		if l[0].swap {
@@ -67,6 +67,12 @@ fn (l: ^Lerper) byDelta*(delta: th.uu): th.fu {
 		if len(l^) == 0 {
 			return 0
 		}
+	}*/
+
+	if l[0].progress >= 1 {
+		end := l[0].end
+		l.dequeue()
+		return end
 	}
 
 	l[0].progress += th.fu(delta)/l[0].length
