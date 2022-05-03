@@ -123,6 +123,7 @@ fn (c: ^Cached) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
 			dm := ^image.Image(c.runes.get(runes[0])).getDims()
 			pos.y += maxH*1.1 * scale
 			pos.x = lx
+			continue
 		}
 
 		if ^image.Image(c.runes.get(r)) == null {

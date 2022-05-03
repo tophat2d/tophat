@@ -1662,6 +1662,7 @@ const char *th_em_modulesrc[] = {
 "\t\t\tdm := ^image.Image(c.runes.get(runes[0])).getDims()\n"
 "\t\t\tpos.y += maxH*1.1 * scale\n"
 "\t\t\tpos.x = lx\n"
+"\t\t\tcontinue\n"
 "\t\t}\n"
 "\n"
 "\t\tif ^image.Image(c.runes.get(r)) == null {\n"
