@@ -16,19 +16,28 @@ void th_error(char *text, ...) {
 
 	va_list args;
 	va_start(args, text);
+#ifdef _WIN32
+#include <winuser.h>
+	char buf[4096];
+	vsnprintf(buf, 4096, text, args);
+	MessageBox(NULL, buf, "tophat error", 0x10);
+#endif
 	vfprintf(stderr, text, args);
-	va_end(args);
 	fprintf(stderr, "\n");
+	va_end(args);
 }
 
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
-	float angle = (rot * M_PI)/180;
+	const float angle = (rot * M_PI)/180;
+
+	const fu cosa = cos(angle);
+	const fu sina = sin(angle);
 
 	p->x -= o.x;
 	p->y -= o.y;
 
-	fu x = p->x * cos(angle) - p->y * sin(angle);
-	fu y = p->x * sin(angle) + p->y * cos(angle);
+	const fu x = p->x * cosa - p->y * sina;
+	const fu y = p->x * sina + p->y * cosa;
 
 	p->x = o.x + x;
 	p->y = o.y + y;

@@ -12,18 +12,18 @@ static GLuint vbo;
 
 #define BATCH 1024
 static int cur_batch = 0;
-static float batch_verts[BATCH * 3 * 7];
+static float batch_verts[BATCH * 3 * 6];
 
 extern th_global thg;
 
 void th_canvas_init() {
 	const char *attribs[] = { "pos", "color" };
 	th_canvas_prog = th_gl_create_prog(
-		"attribute vec3 pos;\n"
+		"attribute vec2 pos;\n"
 		"attribute vec4 color;\n"
 		"varying vec4 vcolor;\n"
 		"void main() {\n"
-		"  gl_Position = vec4(pos, 1.0);\n"
+		"  gl_Position = vec4(pos, 0, 1.0);\n"
 		"  vcolor = color;\n"
 		"}",
 
@@ -39,8 +39,8 @@ void th_canvas_init() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(batch_verts), batch_verts, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 7 * sizeof(float), NULL);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 7 * sizeof(float), (void *)(3 * sizeof(float)));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), NULL);
+	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(2 * sizeof(float)));
 
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
@@ -53,7 +53,7 @@ void th_canvas_flush() {
 	if (!cur_batch) return;
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER,
-		0, cur_batch * 3 * 7 * sizeof(float), batch_verts);
+		0, cur_batch * 3 * 6 * sizeof(float), batch_verts);
 
 	glUseProgram(th_canvas_prog);
 	glBindVertexArray(vao);
@@ -75,15 +75,15 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	sh /= 2;
 
 	const float verts[] = {
-		(a.x + thg.offset.x) / sw - 1, (a.y + thg.offset.y) / sh + 1, 0,
-	 	(b.x + thg.offset.x) / sw - 1, (b.y + thg.offset.y) / sh + 1, 0,
-		(c.x + thg.offset.x) / sw - 1, (c.y + thg.offset.y) / sh + 1, 0,
+		(a.x + thg.offset.x) / sw - 1, (a.y + thg.offset.y) / sh + 1,
+	 	(b.x + thg.offset.x) / sw - 1, (b.y + thg.offset.y) / sh + 1,
+		(c.x + thg.offset.x) / sw - 1, (c.y + thg.offset.y) / sh + 1,
 	};
 
-	float *base = &batch_verts[cur_batch * 3 * 7];
+	float *base = &batch_verts[cur_batch * 3 * 6];
 	for (int i=0; i < 3; ++i) {
-		memcpy(base, &verts[i * 3], sizeof(float) * 3);
-		base += 3;
+		memcpy(base, &verts[i * 2], sizeof(float) * 2);
+		base += 2;
 		memcpy(base, colors, sizeof(float) * 4);
 		base += 4;
 	}
