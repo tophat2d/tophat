@@ -18,6 +18,12 @@ typedef short iu;
 #define SWAP_VARS(v1, v2, type) { type tmp = v1; v1 = v2; v2 = tmp; }
 #define LEN(a) (sizeof(a) / sizeof(a[0]))
 
+#ifdef EMSCRIPTEN
+#define SHADER_BEGIN "precision mediump float;\n"
+#else
+#define SHADER_BEGIN
+#endif
+
 typedef union {
 	struct {fu w, h;};
 	struct {fu x, y;};

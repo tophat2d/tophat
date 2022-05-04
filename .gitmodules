@@ -13,3 +13,6 @@
 [submodule "lib/sokol"]
 	path = lib/sokol
 	url = https://github.com/floooh/sokol.git
+[submodule "emsdk"]
+	path = emsdk
+	url = https://github.com/emscripten-core/emsdk.git

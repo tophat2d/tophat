@@ -12,6 +12,7 @@ void th_gl_init() {
 #endif
 }
 
+#ifndef EMSCRIPTEN
 GLuint th_gl_compile_shader(const char **src, GLenum type) {
 	GLuint obj = glCreateShader(type);
 	if (!obj) {
@@ -98,6 +99,8 @@ fail:
 	return 0;
 }
 
+
 void th_gl_free_prog(GLuint prog) {
 	glDeleteShader(prog);
 }
+#endif

@@ -178,6 +178,7 @@ void th_image_init() {
 		"vert", "tex_vert"
 	};
 	th_blit_prog = th_gl_create_prog(
+		SHADER_BEGIN
 		"attribute vec2 vert;\n"
 		"attribute vec2 tex_vert;\n"
 		"varying vec2 tc;\n"
@@ -186,6 +187,8 @@ void th_image_init() {
 		"  tc = tex_vert;\n"
 		"}\n",
 		
+		SHADER_BEGIN
+		"precision mediump float;\n"
 		"uniform sampler2D tex;\n"
 		"uniform vec4 color;\n"
 		"varying vec2 tc;\n"

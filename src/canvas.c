@@ -4,6 +4,7 @@
 #include <string.h>
 #include <math.h>
 #include "pixelfont.h"
+#include <stdio.h>
 
 GLuint th_canvas_prog;
 
@@ -19,6 +20,7 @@ extern th_global thg;
 void th_canvas_init() {
 	const char *attribs[] = { "pos", "color" };
 	th_canvas_prog = th_gl_create_prog(
+		SHADER_BEGIN
 		"attribute vec2 pos;\n"
 		"attribute vec4 color;\n"
 		"varying vec4 vcolor;\n"
@@ -27,12 +29,14 @@ void th_canvas_init() {
 		"  vcolor = color;\n"
 		"}",
 
+		SHADER_BEGIN
 		"varying vec4 vcolor;\n"
 		"void main() {\n"
 		"  gl_FragColor = vcolor;\n"
 		"}", attribs, 2);
 
 	glGenVertexArrays(1, &vao);
+	printf("%d\n", vao);
 	glGenBuffers(1, &vbo);
 
 	glBindVertexArray(vao);
@@ -51,6 +55,7 @@ void th_canvas_init() {
 
 void th_canvas_flush() {
 	if (!cur_batch) return;
+	printf("flush\n");
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER,
 		0, cur_batch * 3 * 6 * sizeof(float), batch_verts);

@@ -33,6 +33,7 @@ int main(int argc, char *argv[]) {
 	int umkaOK;
 	strcpy(thg.respath, "");
 
+#ifndef EMSCRIPTEN
 	int argOffset = 1;
 	if (argc != 1) {
 		if (strcmp(argv[1], "modsrc") == 0) {
@@ -90,6 +91,33 @@ int main(int argc, char *argv[]) {
 	umkaOK = umkaInit(thg.umka, scriptpath, NULL,
 		1024 * 1024, 1024 * 1024, NULL,
 		argc - argOffset, argv + argOffset);
+#else
+	umkaOK = umkaInit(thg.umka, "main.um",
+"import (\n"
+	"\"th.um\"\n"
+	"\"std.um\"\n"
+	"\"rect.um\"\n"
+	"\"input.um\"\n"
+	"\"image.um\"\n"
+	"\"canvas.um\"\n"
+	"\"window.um\"\n"
+")\n"
+"\n"
+"fn main() {\n"
+	"window.setup(\"my title\", 400, 400)\n"
+	"cam := rect.mk(0, 0, 192, 168)\n"
+"\n"
+	"for window.cycle(cam) {\n"
+		"canvas.drawRect(th.red, rect.mk(10, 10, 20, 5))\n"
+		"canvas.drawRect(0x0022ff88, rect.mk(10, 10, 10, 10))\n"
+		"canvas.drawLine(th.red, th.Vf2{10, 10}, th.Vf2{20, 20}, 1)\n"
+
+		"if th.time > 10000 { return }\n"
+	"}\n"
+"}\n",
+		1024 * 1024, 1024 * 1024, NULL,
+		argc, argv);
+#endif
 
 	th_audio_init();
 

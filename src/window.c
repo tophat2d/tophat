@@ -254,6 +254,52 @@ void th_window_clear_frame() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+#elif EMSCRIPTEN
+#include <emscripten.h>
+
+void th_window_deinit() { }
+
+EM_JS(void, th_window_setup, (char *name, int w, int h), {
+	const canvas = document.querySelector("#th_gl_canvas");
+	window.gl = WebGLDebugUtils.makeDebugContext(canvas.getContext("webgl2"));
+	window.gl.disable(window.gl.DEPTH_TEST);
+	window.gl.enable(window.gl.BLEND);
+	//window.gl.blendFund(window.gl.SRC_ALPHA, window.gl.ONE_MINUS_SRC_ALPHA);
+	
+	window.VAOs = new Array();
+	window.VBOs = new Array();
+	window.progs = new Array();
+
+	if (gl === null) {
+		alert("Unable to initialize WebGL. Your browser may not support it.");
+		return;
+	}
+})
+
+void th_window_swap_buffers() {
+	th_canvas_flush();
+	th_input_cycle();
+
+	EM_ASM(
+		window.gl.flush();								
+	);
+}
+
+void th_window_get_dimensions(int *w, int *h) {
+	*w = EM_ASM_INT( return document.querySelector("#th_gl_canvas").width; );
+	*h = EM_ASM_INT( return document.querySelector("#th_gl_canvas").height; );
+}
+
+int th_window_handle() {
+	emscripten_sleep(16);
+	return 1;
+}
+
+EM_JS(void, th_window_clear_frame, (), {
+	window.gl.clearColor(1, 1, 1, 1);
+	window.gl.clear(window.gl.COLOR_BUFFER_BIT | window.gl.DEPTH_BUFFER_BIT);
+})
+
 #else
 #error tophat cant create a window on this platform yet
 #endif
