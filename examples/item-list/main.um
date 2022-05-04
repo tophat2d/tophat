@@ -16,8 +16,7 @@ fn main() {
 
 	il := itemlist.ItemList{
 		g: ui.Generic{
-			t: th.Transform{
-				s: th.Vf2{60, 0}},
+			r: rect.mk(0, 0, 60, 0),
 			onEvent: fn(eventType: th.uu, ctx: interface{}) {
 				if eventType == ui.eventRelease {
 					printf("pressed item\n")
@@ -39,13 +38,15 @@ fn main() {
 	for window.cycle(cam) {
 		canvas.drawRect(th.blue, rect.mk(0, 0, 400, 400))
 
-		if il.g.t.p.x != 0 && il.g.t.p.y != 0 {
+		if il.g.r.x != 0 && il.g.r.y != 0 {
 			il.handle()
 			il.draw()
 		}
 
 		if input.isJustPressed(input.mouse3) {
-			il.g.t.p = input.getMousePos()
+			p := input.getMousePos()
+			il.g.r.x = p.x
+			il.g.r.y = p.y
 		}
 	}
 }
