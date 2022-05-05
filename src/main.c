@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 	thg.umka = umkaAlloc();
 	int umkaOK;
 	strcpy(thg.respath, "");
-	const char *scriptroot = ".";
+	const char *scriptpath = "main.um";
 	bool check = false;
 
 	int argOffset = 1;
@@ -58,13 +58,13 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(argv[argOffset], "license") == 0) {
 			printf("%s\n", th_em_misc[0]);
 			return 0;
-		} else if (strcmp(argv[argOffset], "root") == 0) {
+		} else if (strcmp(argv[argOffset], "main") == 0) {
 			if ((argc-argOffset) < 2) {
-				printf("root takes one argument - root directory of main module\n");
+				printf("main takes one argument - path to the main module\n");
 				return 1;
 			}
 
-			scriptroot = argv[argOffset+1];
+			scriptpath = argv[argOffset+1];
 			argOffset += 2;
 		} else if (strcmp(argv[argOffset], "version") == 0) {
 			printf("%s\n", th_em_misc[1]);
@@ -92,9 +92,6 @@ int main(int argc, char *argv[]) {
 	}
 
 	FILE *f;
-	char scriptpath[4096];
-	strcpy(scriptpath, scriptroot);
-	strcat(scriptpath, "/main.um");
 	if ((f = fopen(scriptpath, "r"))) {
 		fclose(f);
 	} else {
