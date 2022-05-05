@@ -34,7 +34,7 @@ type Theme* = struct {
 // eventJustPress
 // eventRelease
 type Generic* = struct {
-	t: th.Transform
+	r: rect.Rect
 	gridPos: th.Vf2
 	gridSpan: th.Vf2
 	theme: Theme
@@ -92,8 +92,8 @@ fn (g: ^Generic) span*(x, y: th.uu): ^Generic {
 // don't have to use it.
 fn (g: ^Generic) handle*() {
 	m := input.getMousePos()
-	if m.x < g.t.p.x || m.y < g.t.p.y ||
-		m.x > g.t.p.x + g.t.s.x || m.y > g.t.p.y + g.t.s.y {
+	if m.x < g.r.x || m.y < g.r.y ||
+		m.x > g.r.x + g.r.w || m.y > g.r.y + g.r.h {
 		if g.pressed {
 			g.pressed = false
 			g.onEvent(eventRelease, g.ctx)

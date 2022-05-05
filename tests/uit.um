@@ -61,7 +61,8 @@ fn main() {
 	rl.wrapping = true
 	
 	g := grid.mk(3, 3)
-	g.g.t.s = th.Vf2{cam.w, cam.h}
+	g.g.r.w = cam.w
+	g.g.r.h = cam.h
 	g.elements = []ui.Element{&l, &iBox, &rl}
 	g.border = 10	
 
