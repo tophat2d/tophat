@@ -50,26 +50,26 @@ fn (il: ^ItemList) itemWidth(): th.fu {
 
 fn (il: ^ItemList) doesHover(): bool {
 	mp := input.getMousePos()
-	return (mp.x > il.g.t.p.x + il.scrollBarWidth && mp.x < il.g.t.p.x + il.g.t.s.x &&
-		mp.y > il.g.t.p.y && mp.y < il.g.t.p.y + il.limit * il.itemWidth())
+	return (mp.x > il.g.r.x + il.scrollBarWidth && mp.x < il.g.r.x + il.g.r.w &&
+		mp.y > il.g.r.y && mp.y < il.g.r.y + il.limit * il.itemWidth())
 }
 
 fn (il: ^ItemList) handleScrollBar() {
 	iw := real(il.limit)/len(il.items) * il.itemWidth()
 	mp := input.getMousePos()
 
-	if !(mp.x > il.g.t.p.x && mp.y < il.g.t.p.x + il.scrollBarWidth &&
-	   mp.y > il.g.t.p.y + il.offset * iw && mp.y < il.g.t.p.y + (il.offset + il.limit) * iw) {
+	if !(mp.x > il.g.r.x && mp.y < il.g.r.x + il.scrollBarWidth &&
+	   mp.y > il.g.r.y + il.offset * iw && mp.y < il.g.r.y + (il.offset + il.limit) * iw) {
 		return
 	}
 
 	if input.isJustPressed(input.mouse1) {
-		il.scrollOffset = mp.y - il.g.t.p.y - il.offset * iw
+		il.scrollOffset = mp.y - il.g.r.y - il.offset * iw
 		return
 	}
 
 	if input.isPressed(input.mouse1) {
-		il.offset = trunc((mp.y - il.g.t.p.y - il.scrollOffset) / iw)
+		il.offset = trunc((mp.y - il.g.r.y - il.scrollOffset) / iw)
 
 		if il.offset < 0 {
 			il.offset = 0
@@ -98,7 +98,7 @@ fn (il: ^ItemList) handle*() {
 		}
 
 		if !il.clickToSelect || input.isJustPressed(input.mouse1) {
-			il.selection = trunc((mp.y - il.g.t.p.y) / il.itemWidth() + il.offset)
+			il.selection = trunc((mp.y - il.g.r.y) / il.itemWidth() + il.offset)
 			il.g.onEvent(ui.eventHover, il.g.ctx)
 		}
 
@@ -115,14 +115,14 @@ fn (il: ^ItemList) drawScrollBar() {
 	iw := real(il.limit)/len(il.items) * il.itemWidth()
 
 	canvas.drawRect(th.white, rect.mk(
-		il.g.t.p.x, il.g.t.p.y + iw * il.offset,
+		il.g.r.x, il.g.r.y + iw * il.offset,
 		il.scrollBarWidth, iw * il.limit))	
 }
 
 fn (il: ^ItemList) draw*() {
 	il.drawScrollBar()
 
-	p := il.g.t.p
+	p := il.g.r.getPos()
 
 	for i:=il.offset; i < il.offset + il.limit && i < len(il.items); i++ {
 		fg := th.black
@@ -133,7 +133,7 @@ fn (il: ^ItemList) draw*() {
 		}
 
 		il.items[i].draw(th.Vf2{p.x + il.scrollBarWidth, p.y},
-			th.Vf2{il.g.t.s.x, il.itemWidth()},
+			th.Vf2{il.g.r.w, il.itemWidth()},
 			fg, bg, il.fontSize)
 		p.y += 7 * il.fontSize
 	}

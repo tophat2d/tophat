@@ -38,11 +38,11 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	th_quad q = th_ent_transform(&(th_ent){.rect = r, .t = t});
 	
 	// this logic is incorrect
-	if (q.br.x < 0 || q.br.y < 0)
+	/*if (q.br.x < 0 || q.br.y < 0)
 		return;
 
 	if (q.tl.x > camera->w || q.tl.y > camera->h)
-		return;
+		return;*/
 
 	for (uu i=0; i < 4; i++) {
 		q.v[i].x *= thg.scaling;

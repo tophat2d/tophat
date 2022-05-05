@@ -42,13 +42,13 @@ fn (l: ^Label) draw*() {
 		return
 	}
 
-	canvas.drawRect(l.g.theme.bg, rect.Rect{l.g.t.p.x, l.g.t.p.y, l.g.t.s.x, l.g.t.s.y})
-	ui.drawBorder(l.g.t.p, l.g.t.s, l.g.theme)
+	canvas.drawRect(l.g.theme.bg, rect.Rect{l.g.r.x, l.g.r.y, l.g.r.w, l.g.r.h})
+	ui.drawBorder(l.g.r.getPos(), l.g.r.getDims(), l.g.theme)
 	text := utf8.decode(l.text)
 	lineCount := 1
 
 	if l.wrapping {
-		maxW := l.g.t.s.x
+		maxW := l.g.r.w
 		w := 0.0
 		wordW := 0.0
 		lastSpace := 0
@@ -84,23 +84,23 @@ fn (l: ^Label) draw*() {
 	stext := ""
 	w := 0.0
 	lineH := -1.0
-	origY := l.g.t.p.y
-	p := l.g.t.p
+	origY := l.g.r.y
+	p := l.g.r.getPos()
 
 	if l.center {
-		p.y += (l.g.t.s.y - l.renderer.runeDims(utf8.Rune('A')).y*lineCount*l.scale)/2
+		p.y += (l.g.r.h - l.renderer.runeDims(utf8.Rune('A')).y*lineCount*l.scale)/2
 	}
 	
 	for i:=0; true; i++ {
 		if i >= len(text) || text[i] == uint32('\n') {
 			if l.center {
-				p.x = (l.g.t.s.x - w) / 2
+				p.x = (l.g.r.w - w) / 2
 			}
-			l.renderer.draw(stext, th.Vf2{p.x + l.g.t.p.x, p.y}, l.g.theme.fg, l.scale)
+			l.renderer.draw(stext, th.Vf2{p.x + l.g.r.x, p.y}, l.g.theme.fg, l.scale)
 
 			stext = ""
 			p.y += lineH * l.scale * 1.6
-			if p.y + lineH*l.scale*1.8 > origY + l.g.t.s.y {
+			if p.y + lineH*l.scale*1.8 > origY + l.g.r.h {
 				return
 			}
 			w = 0
