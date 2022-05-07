@@ -455,7 +455,20 @@ void umimagedraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_transform *t = (th_transform *)p[1].ptrVal;
 	uint32_t c = p[0].uintVal;
 
-	th_blit_tex(img, *t, c);
+	th_quad q = {0};
+	th_transform_rect(&q, *t, (th_rect){
+		.w = (img->crop.w - img->crop.x) * img->dm.x,
+		.h = (img->crop.h - img->crop.y) * img->dm.y});
+	th_blit_tex(img, q, c);
+}
+
+void umimgdrawonquad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_quad q;
+	q = *(th_quad *)&p[0];
+	uint32_t filter = p[4].uintVal;
+	th_image *img = th_get_image(p[5].uintVal);	
+
+	th_blit_tex(img, q, filter);
 }
 
 void _th_umka_bind(void *umka) {
@@ -488,6 +501,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
 	umkaAddFunc(umka, "imgcopy", &umimgcopy);
 	umkaAddFunc(umka, "imgsetfilter", &umimgsetfilter);
+	umkaAddFunc(umka, "imgdrawonquad", &umimgdrawonquad);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);

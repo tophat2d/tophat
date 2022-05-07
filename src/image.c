@@ -99,13 +99,8 @@ unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
 }
 
 // stolen from rawdraw
-void th_blit_tex(th_image *img, th_transform t, uint32_t color) {
+void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	th_canvas_flush();
-
-	th_quad q = {0};
-	th_transform_rect(&q, t, (th_rect){
-				.w = (img->crop.w - img->crop.x) * img->dm.x,
-				.h = (img->crop.h - img->crop.y) * img->dm.y});
 
 	for (uu i=0; i < 4; i++) {
 		q.v[i].x *= thg.scaling;

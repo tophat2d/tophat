@@ -34,8 +34,11 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	th_rect r = o->rect;
 	th_image *img = th_get_image(o->img);
 	if (img)
-		r = (th_rect){.w = img->dm.w, .h = img->dm.h};
-	th_quad q = th_ent_transform(&(th_ent){.rect = r, .t = t});
+		r = (th_rect){
+		.w = (img->crop.w - img->crop.x) * img->dm.x,
+		.h = (img->crop.h - img->crop.y) * img->dm.y};
+	th_quad q = {0};
+	th_transform_rect(&q, t, r);
 	
 	// this logic is incorrect
 	/*if (q.br.x < 0 || q.br.y < 0)
@@ -44,18 +47,17 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	if (q.tl.x > camera->w || q.tl.y > camera->h)
 		return;*/
 
-	for (uu i=0; i < 4; i++) {
-		q.v[i].x *= thg.scaling;
-		q.v[i].y *= thg.scaling;
-	}
-
 	if (!o->img) {
+		for (uu i=0; i < 4; i++) {
+			q.v[i].x *= thg.scaling;
+			q.v[i].y *= thg.scaling;
+		}
 		th_canvas_triangle(o->color, q.v[0], q.v[1], q.v[2]);
 		th_canvas_triangle(o->color, q.v[0], q.v[2], q.v[3]);
 		return;
 	}
 
-	th_blit_tex(img, t, o->color);
+	th_blit_tex(img, q, o->color);
 }
 
 void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
