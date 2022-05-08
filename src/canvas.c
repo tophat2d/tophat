@@ -64,6 +64,8 @@ void th_canvas_flush() {
 }
 
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
+	th_image_flush();
+
 	float colors[4];
 	for (int i=0; i < 4; ++i)
 		colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;

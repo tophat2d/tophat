@@ -312,6 +312,8 @@ const char *th_em_modulesrc[] = {
 "\tcdrawimage(i.handle, &t, color)\n"
 "}\n"
 "\n"
+"// Draws the image on top of a quad with corners of the image positioned\n"
+"// on the verticies of the quad.\n"
 "fn (i: ^Image) drawOnQuad*(q: [4]th.Vf2, color: uint32 = th.white) {\n"
 "\timgdrawonquad(i.handle, color, q)\n"
 "}\n"

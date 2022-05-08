@@ -195,6 +195,7 @@ unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(th_image *img, th_quad q, uint32_t color);
 void th_image_init();
 void th_image_deinit();
+void th_image_flush();
 
 // light
 void th_lightmask_clear(th_lightmask *d);
