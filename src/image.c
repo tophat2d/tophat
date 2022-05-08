@@ -18,7 +18,7 @@ static GLuint vbo;
 
 #define BATCH_SIZE 1024
 static int cur_batch_size = 0;
-static float batch_base[BATCH_SIZE * 3 * (2 + 2 + 4)];
+static float batch_base[BATCH_SIZE * 6 * (2 + 2 + 4)];
 static float *batch_ptr = batch_base;
 static GLuint batch_tex = 0;
 
