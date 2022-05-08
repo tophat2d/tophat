@@ -202,7 +202,7 @@ void th_image_init() {
 		"uniform sampler2D tex;\n"
 		"varying vec2 tc;\n"
 		"varying vec4 vcolor;\n"
-		"void main() { gl_FragColor = texture2D(tex,tc).abgr * vcolor;}",
+		"void main() { gl_FragColor = texture2D(tex,tc).abgr * vcolor.abgr;}",
 		attribs, 3);
 
 	th_blit_prog_tex = glGetUniformLocation(th_blit_prog, "tex");
