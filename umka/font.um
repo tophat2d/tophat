@@ -96,22 +96,6 @@ fn (c: ^Cached) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
 	lx := pos.x
 	runes := utf8.decode(text)
 
-	maxH := -1.0
-	for r in runes {
-		if r == uint32(' ') {
-			continue
-		}
-
-		if ^image.Image(c.runes.get(r)) == null {
-			c.preCacheRune(r)
-		}
-
-		if h := ^image.Image(c.runes.get(r)).getDims().y; maxH < 0 || maxH < h {
-			maxH = h
-		}
-	}
-
-	maxH /= 1.5
 	for i,r in runes {
 		// line and space handling is bad.
 		if r == uint32(' ') {
@@ -121,18 +105,18 @@ fn (c: ^Cached) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
 
 		if r == uint32('\n') {
 			dm := ^image.Image(c.runes.get(runes[0])).getDims()
-			pos.y += maxH*1.1 * scale
+			pos.y += 5*1.1 * scale
 			pos.x = lx
 			continue
 		}
 
-		if ^image.Image(c.runes.get(r)) == null {
+		img := ^image.Image(c.runes.get(r))
+		if img == null {
 			c.preCacheRune(r)
+			img = ^image.Image(c.runes.get(r))
 		}
 
-		img := ^image.Image(c.runes.get(r))^
 		dm := img.getDims()
-
 		img.draw(th.Transform{p: pos, s: th.Vf2{scale, scale}}, color)
 
 		pos.x += c.size * scale * c.font.getAdvance(r)//dm.x * scale * 1.1
