@@ -21,7 +21,8 @@ endif
 CFLAGS ?= -g -pipe
 CFLAGS += -Ilib/stb/ \
 		  -Ilib/rawdraw/ \
-		  -Ilib/miniaudio/
+		  -Ilib/miniaudio/ \
+			-Ilib/umprof/
 
 DEFS += -DUMKA_STATIC -DUMKA_EXT_LIBS
 WARNS = \
