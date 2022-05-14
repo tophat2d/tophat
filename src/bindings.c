@@ -471,6 +471,15 @@ void umimgdrawonquad(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_blit_tex(img, q, filter);
 }
 
+void umutf8getnextrune(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int idx = p[0].intVal;
+	char *str = p[1].ptrVal;
+
+	uint32_t rune;
+	th_utf8_decode(&rune, &str[idx]);
+	r->uintVal = rune;
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
@@ -540,6 +549,9 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "drawRect", &umcanvasrect);
 	umkaAddFunc(umka, "drawLine", &umcanvasline);
 	umkaAddFunc(umka, "cdrawimage", &umimagedraw);
+
+	// utf8
+	umkaAddFunc(umka, "getNextRune", &umutf8getnextrune);
 
 	int index = 0;
 	umkaAddModule(umka, "anim.um", th_em_modulesrc[index++]);
