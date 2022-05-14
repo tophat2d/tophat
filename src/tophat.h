@@ -150,6 +150,19 @@ typedef struct {
 	unsigned char *buf;
 } th_font;
 
+typedef struct {
+	uint64_t i;
+	uint32_t r;
+} th_font_cache_item; 
+
+typedef UmkaDynArray(th_font_cache_item) th_font_cache;
+
+typedef struct {
+	th_font_cache cache;
+	fu size;
+	uu font;
+} th_cached_font;
+
 // struct holding all tophat's global variables.
 typedef struct {
 	char respath[4096];
@@ -211,6 +224,8 @@ th_font *th_font_load(char *path);
 void th_font_render_glyph(th_image *img, th_font *font,
                           uint32_t glyph, fu scale);
 void th_font_deinit();
+void th_cached_font_draw(th_cached_font *c, char *str,
+                         th_vf2 pos, uint32_t color, fu scale);
 
 // gl
 void th_gl_init();
