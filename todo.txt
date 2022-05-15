@@ -1,10 +1,6 @@
 
-image batching
-
-input overhaul
-	- use keycodes instead of keysyms
-	- add a function that handles text input
-
+convert scancode to keycode
+draw to a texture
+custom shaders
 c side docs
-
 shader based lighting

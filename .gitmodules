@@ -15,4 +15,4 @@
 	url = https://github.com/floooh/sokol.git
 [submodule "lib/umprof"]
 	path = lib/umprof
-	url = git@github.com:marekmaskarinec/umprof
+	url = https://github.com/marekmaskarinec/umprof.git
