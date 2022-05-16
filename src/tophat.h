@@ -291,7 +291,7 @@ th_font *th_alloc_font();
 th_sound *th_alloc_sound();
 
 // utf8
-uint32_t th_utf8_decode(uint32_t *out, char *c);
+size_t th_utf8_decode(uint32_t *out, const char *s);
 
 // window
 void th_window_setup(char *name, int w, int h);

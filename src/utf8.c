@@ -1,28 +1,31 @@
-
+// vim: noet
 #include <stdint.h>
+#include <stddef.h>
 
-uint32_t th_utf8_decode(uint32_t *out, char *c) {
-	if (!(*c & 0x80)) {
-		*out = *c;
-		return 1;
+size_t th_utf8_decode(uint32_t *out, const char *s_) {
+	const unsigned char *s = (const unsigned char*)s_;
+	if ((*s & 0xC0) != 0xC0) {
+		*out = *s;
+		return *s > 0;
 	}
 
-	int size = 1;
-	for (; c[size] && (c[size] & 0xc0) == 0x80; size++)
-		;
+	const static size_t clas[32] = {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,2,2,2,2,3,3,4,5};
+	size_t cl = clas[*s>>3];
 
-	uint32_t mask = 0;
-	for (int i=0; i < 8 - size - 1; i++)
-		mask |= 1 << i;
-
-	uint32_t sum = 0;
-	uint32_t shift = (size - 1) * 6;
-	for (int i=0; i < size && c[i]; i++) {
-		sum |= (c[i] & mask) << shift;
-		if (i == 0) mask = 0x3f; // following bytes have 0011 1111 mask
-		shift -= 6;
+	for (size_t i = 1; i < cl; ++i) {
+		if ((s[i] & 0xC0) == 0xC0 || (s[i] & 0x80) == 0) {
+			*out = s[0];
+			return 1;
+		}
 	}
 
-	*out = sum;
-	return size;
+	switch (cl) {
+		case 2: *out = ((s[0]&0x1f)<<6) | (s[1]&0x3f); break;
+		case 3: *out = ((s[0]&0xf)<<12) | ((s[1]&0x3f)<<6) | (s[2]&0x3f); break;
+		case 4: *out = ((s[0]&0x7)<<18) | ((s[1]&0x3f)<<12) | ((s[2]&0x3f)<<6) | (s[3]&0x3f); break;
+		// NOTE(skejeton): 5 octet sequences are not a part of UTF-8 standard, I've included them regardless 
+		case 5: *out = ((s[0]&0x2)<<24) | ((s[0]&0x3f)<<18) | ((s[1]&0x3f)<<12) | ((s[2]&0x3f)<<6) | (s[3]&0x3f); break; 
+	}
+
+	return cl;
 }
