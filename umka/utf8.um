@@ -58,10 +58,7 @@ fn decode*(s: str): []Rune {
 	runeCount := 0
 
 	l := len(s)
-	// NOTE(skejeton): silly workaround for now, because empty slice isn't valid for some reason
-	if l == 0 {
-		return []Rune{}
-	}
+	
 	for i := 0; i < l; runeCount++ {
 		runes[runeCount] = getNextRune(s, i)
 		i += runes[runeCount].size()
