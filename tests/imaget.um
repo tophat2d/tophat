@@ -3,6 +3,7 @@ import (
 	"th.um"
 	"rect.um"
 	"image.um"
+	"input.um"
 	"window.um"
 )
 
@@ -11,7 +12,7 @@ fn main() {
 	cam := rect.mk(0, 0, 600, 600)
 
 	img := image.load("etc/test.png")
-	printf("etc/test.png: %s", repr(img.validate()))
+	printf("etc/test.png: %s\n", repr(img.validate()))
 
 	for window.cycle(cam) {
 		img.draw(th.Transform{
@@ -24,5 +25,7 @@ fn main() {
 			th.Vf2{20, 15},
 			th.Vf2{20, 30},
 			th.Vf2{0, 35}})
+
+		if input.isJustPressed('q') { break }
 	}
 }

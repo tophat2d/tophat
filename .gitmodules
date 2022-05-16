@@ -13,3 +13,6 @@
 [submodule "lib/sokol"]
 	path = lib/sokol
 	url = https://github.com/floooh/sokol.git
+[submodule "lib/umprof"]
+	path = lib/umprof
+	url = https://github.com/marekmaskarinec/umprof.git

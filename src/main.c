@@ -5,6 +5,10 @@
 #include "bindings.h"
 #include "tophat.h"
 
+#include <stdlib.h>
+#define UMPROF_IMPL
+#include <umprof.h>
+
 th_global thg = {0};
 int destroyfunc;
 int died = 0;
@@ -34,6 +38,7 @@ int main(int argc, char *argv[]) {
 	strcpy(thg.respath, "");
 	const char *scriptpath = "main.um";
 	bool check = false;
+	bool prof = false;
 
 	int argOffset = 1;
 	while ((argc-argOffset) > 0) {
@@ -79,13 +84,21 @@ int main(int argc, char *argv[]) {
 		} else if (strcmp(argv[argOffset], "help") == 0) {
 			printf(
 				"tophat - a minimalist game engine for making games in umka.\n"
-				"Just launching tophat without flags will run main.um or tophat.dat/main.um\n"
+				"Just launching tophat without flags will run main.um\n"
 				"Available modes:\n"
+				"  check - only check the program for errors\n"
+				"  dir - specify the resource directory (. by default)\n"
+				"  main - specify the main file (dir/main.um by default)\n"
 				"  modsrc <module name> - print source of a builtin module\n"
+				"  prof - use the profiler\n"
+				"  help - show this help\n"
 				"  license - print the license\n"
 				"  version - print the version\n"
-				"Visit mrms.cz/tophat.html for more info.");
+				"Visit th.mrms.cz for more info.\n");
 			return 0;
+		} else if (strcmp(argv[argOffset], "prof") == 0) {
+			prof = true;
+			argOffset += 1;
 		} else {
 			argOffset += 1;
 		}
@@ -103,6 +116,7 @@ int main(int argc, char *argv[]) {
 	umkaOK = umkaInit(thg.umka, scriptpath, NULL,
 		1024 * 1024, 1024 * 1024, NULL,
 		argc - argOffset, argv + argOffset);
+	if (prof) umprofInit(thg.umka);
 
 	th_audio_init();
 
@@ -154,6 +168,10 @@ int main(int argc, char *argv[]) {
 #endif
 			fprintf(stderr, "%s\n", fnName);
 		}
+	} else if (prof) {
+		UmprofInfo info[2048] = {0};
+		int len = umprofGetInfo(info, 2048);
+		umprofPrintInfo(stderr, info, len);
 	}
 
 	die();

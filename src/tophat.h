@@ -150,6 +150,19 @@ typedef struct {
 	unsigned char *buf;
 } th_font;
 
+typedef struct {
+	uint64_t i;
+	uint32_t r;
+} th_font_cache_item; 
+
+typedef UmkaDynArray(th_font_cache_item) th_font_cache;
+
+typedef struct {
+	th_font_cache cache;
+	fu size;
+	uu font;
+} th_cached_font;
+
 // struct holding all tophat's global variables.
 typedef struct {
 	char respath[4096];
@@ -179,12 +192,46 @@ th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell);
 void th_audio_init();
 void th_audio_deinit();
 th_sound *th_sound_load(char *path);
+void _th_audio_data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
+
+// bindings
+void _th_umka_bind(void *umka);
+
+// canvas
+void th_canvas_rect(uint32_t color, th_rect r);
+void th_canvas_init();
+void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
+void th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size);
+void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);
+void th_canvas_flush();
+
+// collisions
+int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
+uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
+uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
+uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
+uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
+bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
 
 // entity
 th_quad th_ent_transform(th_ent *e);
 void th_ent_draw(th_ent *o, th_rect *camera);
 void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
 	uu maxColls, th_coll *colls);
+
+// font
+th_font *th_font_load(char *path);
+void th_font_render_glyph(th_image *img, th_font *font,
+                          uint32_t glyph, fu scale);
+void th_font_deinit();
+void th_cached_font_draw(th_cached_font *c, char *str,
+                         th_vf2 pos, uint32_t color, fu scale);
+
+// gl
+void th_gl_init();
+GLuint th_gl_compile_shader(const char **src, GLenum type);
+GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char **attribs, int nattribs);
+void th_gl_free_prog(GLuint prog);
 
 // image
 th_image *th_load_image(char *path);
@@ -196,20 +243,32 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color);
 void th_image_init();
 void th_image_deinit();
 void th_image_flush();
+void _th_rdimg(th_image *img, unsigned char *data);
+
+// input
+void th_input_key(int keycode, int bDown);
+void th_input_cycle();
 
 // light
 void th_lightmask_clear(th_lightmask *d);
 void th_lightmask_draw(th_lightmask *d, th_rect *cam);
 void th_spotlight_stamp(th_spotlight *l, th_lightmask *d);
+void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color);
 
 // misc
 float th_get_scaling(int w, int h, int camw, int camh);
 void th_error(char *text, ...);
-void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
-void th_vector_normalize(float *x, float *y);
 
 // particles
 void th_particles_draw(th_particles *p, th_rect cam, int t);
+
+// quad/transform
+th_vf2 th_quad_min(th_quad q);
+void th_transform_rect(th_quad *q, th_transform t, th_rect r);
+
+// vector
+void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
+void th_vector_normalize(float *x, float *y);
 
 // raycast
 int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, th_vf2 *ic);
@@ -231,55 +290,14 @@ th_image *th_alloc_image();
 th_font *th_alloc_font();
 th_sound *th_alloc_sound();
 
-// font
-th_font *th_font_load(char *path);
-void th_font_render_glyph(th_image *img, th_font *font,
-                          uint32_t glyph, fu scale);
-void th_font_deinit();
+// utf8
+uint32_t th_utf8_decode(uint32_t *out, char *c);
 
-th_vf2 th_quad_min(th_quad q);
-void th_transform_rect(th_quad *q, th_transform t, th_rect r);
-
-//// "unexported" functions
-
-// audio
-void _th_audio_data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
-
-// collisions
-int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
-uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
-uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
-uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
-uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
-bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
-
-// image
-void _th_rdimg(th_image *img, unsigned char *data);
-
-// light
-void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color);
-
-void th_gl_init();
-GLuint th_gl_compile_shader(const char **src, GLenum type);
-GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char **attribs, int nattribs);
-void th_gl_free_prog(GLuint prog);
-
-void th_input_key(int keycode, int bDown);
-void th_input_cycle();
-
+// window
 void th_window_setup(char *name, int w, int h);
 void th_window_get_dimensions(int *w, int *h);
 int th_window_handle();
 void th_window_swap_buffers();
 void th_window_clear_frame();
-
-void _th_umka_bind(void *umka);
-
-void th_canvas_rect(uint32_t color, th_rect r);
-void th_canvas_init();
-void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
-void th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size);
-void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);
-void th_canvas_flush();
 
 #endif

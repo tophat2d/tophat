@@ -18,10 +18,11 @@ ifeq ($(SHORT_PLATFORM), MINGW64_NT)
 endif
 endif
 
-CFLAGS ?= -g -pipe
+CFLAGS ?= -s -O3 -pipe
 CFLAGS += -Ilib/stb/ \
 		  -Ilib/rawdraw/ \
-		  -Ilib/miniaudio/
+		  -Ilib/miniaudio/ \
+			-Ilib/umprof/
 
 DEFS += -DUMKA_STATIC -DUMKA_EXT_LIBS
 WARNS = \

@@ -12,15 +12,6 @@ type Font* = struct {
 	handle: th.uu
 }
 
-// A structure built on top of Font. It automatially caches runes used in
-// drawing. Thanks to this it's possible to change the text without performance
-// problems. There is a known bug with letters like q not being offset properly.
-type Cached* = struct {
-	runes: map.Map
-	size: th.fu
-	font: Font
-}
-
 fn cfontload(path: str): th.uu
 // Loads a font from file.
 fn load*(path: str): Font {
@@ -33,6 +24,60 @@ fn crenderglyph(font: th.uu, glyph: uint32, scale: th.fu): th.uu
 // as all other glyph images produced by this method.
 fn (f: ^Font) renderGlyph*(glyph: uint32, scale: th.fu): image.Image {
 	return image.Image{crenderglyph(f.handle, glyph, scale)}
+}
+
+type FontCacheItem = struct {
+	i: image.Image
+	r: utf8.Rune
+}
+
+type FontCache = []FontCacheItem
+
+fn (fc: ^FontCache) hash(r: utf8.Rune): uint32 { // djb2 hash from map.um
+	var hash: uint32 = 5381;
+	for r != 0 {
+		hash = (((hash << 5) + hash) + r & 0xff) & 0xffffffff;
+		r = r >> 8
+	}
+	return hash
+}
+
+fn (fc: ^FontCache) grow() {
+	nfc := make(FontCache, len(fc^) * 2)
+	for i:=0; i < len(fc^); i++ {
+		hash := fc.hash(fc[i].r)
+		nfc[hash % len(nfc)] = fc[i]
+	}
+
+	fc^ = nfc
+}
+
+fn (fc: ^FontCache) set(r: utf8.Rune, i: image.Image) {
+	hash := fc.hash(r)
+
+	for true {
+		mhash := hash % len(fc^)
+		if fc[mhash].r == r || fc[mhash].r == 0 {
+			fc[mhash] = FontCacheItem{i, r}
+			return
+		}
+		fc.grow()
+	}
+}
+
+fn (fc: ^FontCache) get(r: utf8.Rune): image.Image {
+	hash := fc.hash(r) % len(fc^)
+	if fc[hash].r != r { return image.Image{} }
+	return fc[hash].i
+}
+
+// A structure built on top of Font. It automatially caches runes used in
+// drawing. Thanks to this it's possible to change the text without performance
+// problems. There is a known bug with letters like q not being offset properly.
+type Cached* = struct {
+	cache: FontCache
+	size: th.fu
+	font: Font
 }
 
 fn cgetkern(font: th.uu, glyph1, glyph2: uint32): th.fu
@@ -48,24 +93,24 @@ fn (f: ^Font) getAdvance(glyph: uint32): th.fu {
 // Cached font constructor.
 fn mkCached*(f: Font, s: th.fu): Cached {
 	return Cached {
-		runes: map.Map{},
+		cache: make(FontCache, 64),
 		size: s,
 		font: f}
 }
 
 fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
-	if ^image.Image(c.runes.get(rune)) != null {
+	if c.cache.get(rune).handle != 0 {
 		return
 	}
 
-	c.runes.set(rune, c.font.renderGlyph(rune, c.size))
+	c.cache.set(rune, c.font.renderGlyph(rune, c.size))
 }
 
 fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
-	img := ^image.Image(c.runes.get(rune))
-	if img == null {
+	img := c.cache.get(rune)
+	if img.handle == 0 {
 		c.preCacheRune(rune)
-		img = ^image.Image(c.runes.get(rune))
+		img = c.cache.get(rune)
 	}
 
 	dm := img.getDims()
@@ -90,55 +135,17 @@ fn (c: ^Cached) preCacheStr*(s: str) {
 	}
 }
 
+fn ccachedfontdraw(c: ^Cached, text: str, pos: th.Vf2, color: uint32, scale: th.fu)
 // Draws the text using a Cached font c.
 fn (c: ^Cached) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
-	scale /= c.size
-	lx := pos.x
-	runes := utf8.decode(text)
-
-	maxH := -1.0
-	for r in runes {
-		if r == uint32(' ') {
-			continue
-		}
-
-		if ^image.Image(c.runes.get(r)) == null {
-			c.preCacheRune(r)
-		}
-
-		if h := ^image.Image(c.runes.get(r)).getDims().y; maxH < 0 || maxH < h {
-			maxH = h
-		}
+	l := len(text)
+	i := 0
+	for i < l {
+		r := utf8.getNextRune(text, i)
+		c.preCacheRune(r)
+		i += r.size()
 	}
 
-	maxH /= 1.5
-	for i,r in runes {
-		// line and space handling is bad.
-		if r == uint32(' ') {
-			pos.x += c.size * scale * c.font.getAdvance(r)
-			continue
-		}
-
-		if r == uint32('\n') {
-			dm := ^image.Image(c.runes.get(runes[0])).getDims()
-			pos.y += maxH*1.1 * scale
-			pos.x = lx
-			continue
-		}
-
-		if ^image.Image(c.runes.get(r)) == null {
-			c.preCacheRune(r)
-		}
-
-		img := ^image.Image(c.runes.get(r))^
-		dm := img.getDims()
-
-		img.draw(th.Transform{p: pos, s: th.Vf2{scale, scale}}, color)
-
-		pos.x += c.size * scale * c.font.getAdvance(r)//dm.x * scale * 1.1
-		if i < len(runes)-1 {
-			pos.x += c.size * scale * c.font.getKern(r, runes[i+1])
-		}
-	}
+	ccachedfontdraw(c, text, pos, color, scale)
 }
 

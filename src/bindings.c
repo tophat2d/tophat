@@ -73,6 +73,16 @@ void umfontgetadvance(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->realVal = advance * font->scale;
 }
 
+void umcachedfontdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_cached_font *cf = p[4].ptrVal;
+	char *text = p[3].ptrVal;
+	th_vf2 pos = *(th_vf2 *)&p[2];
+	uint32_t color = p[1].uintVal;
+	fu scale = p[0].real32Val;
+
+	th_cached_font_draw(cf, text, pos, color, scale);
+}
+
 // sets values of all dots to lightmask's color
 void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_lightmask *l = (th_lightmask *)p[0].ptrVal;
@@ -471,6 +481,15 @@ void umimgdrawonquad(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_blit_tex(img, q, filter);
 }
 
+void umutf8getnextrune(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int idx = p[0].intVal;
+	char *str = p[1].ptrVal;
+
+	uint32_t rune;
+	th_utf8_decode(&rune, &str[idx]);
+	r->uintVal = rune;
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
@@ -479,6 +498,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cfontload", &umfontload);
 	umkaAddFunc(umka, "cgetadvance", &umfontgetadvance);
 	umkaAddFunc(umka, "cgetkern", &umfontgetkern);
+	umkaAddFunc(umka, "ccachedfontdraw", &umcachedfontdraw);
 
 	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
 	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
@@ -540,6 +560,9 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "drawRect", &umcanvasrect);
 	umkaAddFunc(umka, "drawLine", &umcanvasline);
 	umkaAddFunc(umka, "cdrawimage", &umimagedraw);
+
+	// utf8
+	umkaAddFunc(umka, "getNextRune", &umutf8getnextrune);
 
 	int index = 0;
 	umkaAddModule(umka, "anim.um", th_em_modulesrc[index++]);

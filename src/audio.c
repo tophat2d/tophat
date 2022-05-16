@@ -19,41 +19,41 @@ ma_device audev;
 extern th_global thg;
 
 ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32, ma_uint32 frameCount, float volume) {
-    float temp[4096];
-    ma_uint32 tempCapInFrames = ma_countof(temp) / CHANNEL_COUNT;
-    ma_uint32 totalFramesRead = 0;
+	float temp[4096];
+	ma_uint32 tempCapInFrames = ma_countof(temp) / CHANNEL_COUNT;
+	ma_uint32 totalFramesRead = 0;
 
-    while (totalFramesRead < frameCount) {
-        ma_uint32 iSample;
-        ma_uint32 totalFramesRemaining = frameCount - totalFramesRead;
-        ma_uint32 framesToReadThisIteration = tempCapInFrames;
-        if (framesToReadThisIteration > totalFramesRemaining) {
-            framesToReadThisIteration = totalFramesRemaining;
-        }
+	while (totalFramesRead < frameCount) {
+		ma_uint32 iSample;
+		ma_uint32 totalFramesRemaining = frameCount - totalFramesRead;
+		ma_uint32 framesToReadThisIteration = tempCapInFrames;
+		if (framesToReadThisIteration > totalFramesRemaining) {
+			framesToReadThisIteration = totalFramesRemaining;
+		}
 
 
-        ma_uint64 framesReadThisIteration;
-				ma_decoder_read_pcm_frames(pDecoder, temp, framesToReadThisIteration, &framesReadThisIteration);
-        if (framesReadThisIteration == 0) {
-            break;
-        }
+		ma_uint64 framesReadThisIteration;
+		ma_decoder_read_pcm_frames(pDecoder, temp, framesToReadThisIteration, &framesReadThisIteration);
+		if (framesReadThisIteration == 0) {
+			break;
+		}
 
-        /* Mix the frames together. */
-        for (iSample = 0; iSample < framesReadThisIteration*CHANNEL_COUNT; ++iSample) {
-            pOutputF32[totalFramesRead*CHANNEL_COUNT + iSample] += temp[iSample] * volume;
-        }
+		/* Mix the frames together. */
+		for (iSample = 0; iSample < framesReadThisIteration*CHANNEL_COUNT; ++iSample) {
+			pOutputF32[totalFramesRead*CHANNEL_COUNT + iSample] += temp[iSample] * volume;
+		}
 
-        totalFramesRead += framesReadThisIteration;
+		totalFramesRead += framesReadThisIteration;
 
-        if (framesReadThisIteration < framesToReadThisIteration) {
-            break;  /* Reached EOF. */
-        }
-    }
+		if (framesReadThisIteration < framesToReadThisIteration) {
+			break;  /* Reached EOF. */
+		}
+	}
 
-    return totalFramesRead;
+	return totalFramesRead;
 }
 
-void _th_audio_data_callback(ma_device * pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
+void _th_audio_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
 	for (int i=thg.sound_count; i > 0; i--) {
 		th_sound *csound = th_get_sound(i);
 
