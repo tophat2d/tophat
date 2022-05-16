@@ -1449,7 +1449,6 @@ const char *th_em_modulesrc[] = {
 "    return out + \" }\"\n"
 "}\n"
 "",
-"// vim: noet\n"
 "// UTF-8 utilities\n"
 "\n"
 "type (\n"

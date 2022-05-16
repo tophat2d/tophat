@@ -1,4 +1,3 @@
-// vim: noet
 #include <stdint.h>
 #include <stddef.h>
 
