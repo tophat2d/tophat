@@ -22,8 +22,9 @@ fn getdimensions(w, h: ^int32)
 fn swapbuffers()
 fn handleinput(): bool
 // Set's up the engine and opens a window.
-fn setup*(title: str, w, h: int32) {
-	wsetup(title, w, h)
+fn setup*(title: str, width, height: int32) {
+	w, h = width, height
+	wsetup(title, width, height)
 	clearframe()
 
 	if std.getenv("HOME") == "" {
