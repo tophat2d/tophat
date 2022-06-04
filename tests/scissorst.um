@@ -1,0 +1,26 @@
+
+import (
+	"th.um"
+	"std.um"
+	"rect.um"
+	"input.um"
+	"image.um"
+	"canvas.um"
+	"window.um"
+)
+
+fn main() {
+	window.setup("my title", 400, 400)
+	cam := rect.mk(0, 0, 200, 200)
+
+	img := image.load("etc/test.png")
+
+	for window.cycle(cam) {
+		mpos := input.getMousePos()
+		canvas.beginScissorRect(rect.Rect{mpos.x-32, mpos.y-32, 64, 64})
+			img.draw(th.Transform{p: th.Vf2{0, 0}, s: th.Vf2{17, 17}})
+			canvas.drawText("Hey :)", th.Vf2{10, 10}, th.white, 3);
+			canvas.drawRect(th.red, rect.Rect{40, 40, 40, 40});
+		canvas.endScissor()
+	}
+}

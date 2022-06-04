@@ -63,6 +63,23 @@ void th_canvas_flush() {
 	glBindVertexArray(0);
 }
 
+void th_canvas_begin_scissor(int x, int y, size_t w, size_t h) {
+	x *= thg.scaling;
+	y *= thg.scaling;
+	w *= thg.scaling;
+	h *= thg.scaling;
+	glEnable(GL_SCISSOR_TEST);
+	int dimX, dimY;
+	th_window_get_dimensions(&dimX, &dimY);
+	glScissor(x+thg.offset.x, (dimY-(int)h)-y-thg.offset.y, w, h);
+}
+
+void th_canvas_end_scissor() {
+	th_canvas_flush();
+	th_image_flush();
+	glDisable(GL_SCISSOR_TEST);
+}
+
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	th_image_flush();
 

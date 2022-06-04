@@ -385,6 +385,14 @@ void umgettime(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 ///////////////////////
 // rawdraw TODO: hide rawdraw from c lib
+void umth_canvas_begin_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_canvas_begin_scissor(p[3].intVal, p[2].intVal, p[1].uintVal, p[0].uintVal);
+}
+
+void umth_canvas_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_canvas_end_scissor();
+}
+
 // draws text
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fu size = p[0].real32Val;
@@ -550,6 +558,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "getTime", &umgettime);
 
 	// canvas
+	umkaAddFunc(umka, "umth_canvas_begin_scissor", &umth_canvas_begin_scissor);
+	umkaAddFunc(umka, "umth_canvas_end_scissor", &umth_canvas_end_scissor);
 	umkaAddFunc(umka, "drawText", &umdrawtext);
 	umkaAddFunc(umka, "wsetup", &umwindowsetup);
 	umkaAddFunc(umka, "clearframe", &umwindowclearframe);

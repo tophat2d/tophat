@@ -6,6 +6,20 @@ import (
 	"std/std.um"
 	"rect.um"
 )
+
+fn umth_canvas_begin_scissor(x, y: int, w, h: uint)
+fn umth_canvas_end_scissor()
+
+// Disable rendering outside of rect `r`
+fn beginScissorRect*(r: rect.Rect) {
+	umth_canvas_begin_scissor(trunc(r.x), trunc(r.y), trunc(r.w), trunc(r.h))
+}
+
+// Stops cropping
+fn endScissor*() {
+	umth_canvas_end_scissor();
+}
+
 // Draws a basic pixel text. Only ascii is supported.
 fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
 
