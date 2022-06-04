@@ -6,6 +6,7 @@ import (
 	"std/std.um"
 	"rect.um"
 )
+
 // Draws a basic pixel text. Only ascii is supported.
 fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
 
