@@ -1,0 +1,77 @@
+
+// Shader allows you to define your own vertex and fragment GLSL shaders. This
+// is a low-level feature, so it's very easy to mess up.
+//
+// In tophat, instead of a main function, shaders provide th_vertex and
+// th_fragment. The signature of th_vertex is:
+// vec2 th_vertex(vec2 vert);
+// where vert is the position of the vertex taken from the vertex buffer.
+// The output is the vertex shader output.
+//
+// As for fragment shaders, there are two types of them. One for canvas
+// and one for images. In canvas shaders, the fragment function is very simple:
+// vec4 th_fragment(vec4 color);
+//
+// Image fragment function looks like this:
+// vec4 th_fragment(sampler2D tex, vec2 coord);
+// where tex is the texture and coord are the texture coordinates. Be aware to
+// swap the output of the texture2D function. Example:
+// texture2D(tex, coord).abgr
+type Shader* = struct {
+	handle: int
+}
+
+const (
+	defaultImageShader* = Shader{1}
+	defaultCanvasShader* = Shader{2}
+)
+
+// Represents a GLSL uniform.
+type Uniform* = struct {
+	s: Shader
+	l: uint
+}
+
+fn ccompilecanvasshader(vertex, fragment: str): int
+
+// Compiles a canvas shader from source. If there is a compilation error, it
+// will print something to the console.
+fn mkCanvas*(vertex, fragment: str): Shader {
+	return Shader{ccompilecanvasshader(vertex, fragment)}
+}
+
+fn ccompileimageshader(vertex, fragment: str): int
+
+// Compiles an image shader from source. If there is a compilation error, it
+// will print something to the console.
+fn mkImage*(vertex, fragment: str): Shader {
+	return Shader{ccompileimageshader(vertex, fragment)}
+}
+
+fn cpickcanvasshader(handle: int)
+
+// Picks the shader to be used for canvas drawing. Flushes the canvas batch.
+fn (s: ^Shader) pickForCanvas*() {
+	cpickcanvasshader(s.handle)
+}
+
+fn cpickimageshader(handle: int)
+
+// Picks the shader to be used for image drawing. Flushes the image batch.
+fn (s: ^Shader) pickForImage*() {
+	cpickimageshader(s.handle)
+}
+
+fn cgetuniformlocation(handle: int, name: str): uint
+
+// Retunrs a uniform by name.
+fn (s: ^Shader) getUniformLocation*(name: str): Uniform {
+	return Uniform{s^, cgetuniformlocation(s.handle, name)}
+}
+
+fn csetuniformint(shandle, uhandle: uint, value: int)
+
+// Sets a uniform to an int value. Flushes both batches.
+fn (u: ^Uniform) setInt*(value: int) {
+	csetuniformint(u.s.handle, u.l, value)
+}

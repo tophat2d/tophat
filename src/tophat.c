@@ -30,11 +30,14 @@ extern th_global thg;
 GET_FUNC(image)
 GET_FUNC(font)
 GET_FUNC(sound)
+GET_FUNC(shader)
 
 GET_FUNC_ERR(image)
 GET_FUNC_ERR(font)
 GET_FUNC_ERR(sound)
+GET_FUNC_ERR(shader)
 
 ALLOC_FUNC(image)
 ALLOC_FUNC(font)
 ALLOC_FUNC(sound)
+ALLOC_FUNC(shader)

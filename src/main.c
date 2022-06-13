@@ -11,7 +11,7 @@
 
 th_global thg = {0};
 int destroyfunc;
-int died = 0;
+int dead = 0;
 
 extern char *th_em_modulenames[];
 extern char *th_em_modulesrc[];
@@ -19,17 +19,18 @@ extern char *th_em_misc[];
 extern int th_em_modulenames_count;
 
 void die() {
-	if (died) return;
+	if (dead) return;
 	
 	th_audio_deinit();
 	th_font_deinit();
 	th_image_deinit();
+	free(thg.shaders);
 	if (destroyfunc) {
 		umkaCall(thg.umka, destroyfunc, 0, NULL, NULL);
 	}
 
 	umkaFree(thg.umka);
-	died = 1;
+	dead = 1;
 }
 
 int main(int argc, char *argv[]) {
