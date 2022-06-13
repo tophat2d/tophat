@@ -22,7 +22,6 @@ int th_shader_compile(
 	strcpy(frag, fragb);
 	strcat(frag, fragf);
 
-	printf("%s\n%s\n\n\n\n", vert, frag);
 	GLuint prog = th_gl_create_prog(vert, frag, verta, vertac);
 	th_shader *s = th_alloc_shader();
 	*s = prog;

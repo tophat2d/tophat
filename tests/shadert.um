@@ -4,7 +4,7 @@ import (
 	"rect.um"
 	"image.um"
 	"canvas.um"
-	"../umka/shader.um"
+	"shader.um"
 	"window.um"
 )
 
