@@ -118,6 +118,11 @@ void th_cached_font_draw(th_cached_font *c, char *str,
 	do {
 		str += th_utf8_decode(&r, str);
 		const th_font_cache_item *fci = font_cache_get(&c->cache, r);
+		if (!fci) {
+			th_error("You forgot to cache '%c' (U+%d). Use font.Cached.preCacheStr to cache it.\n", r, r);
+			break;
+		}
+
 		const uint32_t g = fci->g;
 
 		if (lg)
