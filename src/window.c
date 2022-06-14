@@ -269,3 +269,20 @@ void th_window_clear_frame() {
 #else
 #error tophat cant create a window on this platform yet
 #endif
+
+void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
+	x *= thg.scaling;
+	y *= thg.scaling;
+	w *= thg.scaling;
+	h *= thg.scaling;
+	glEnable(GL_SCISSOR_TEST);
+	int dimX, dimY;
+	th_window_get_dimensions(&dimX, &dimY);
+	glScissor(x+thg.offset.x, (dimY-(int)h)-y-thg.offset.y, w, h);
+}
+
+void th_window_end_scissor() {
+	th_canvas_flush();
+	th_image_flush();
+	glDisable(GL_SCISSOR_TEST);
+}

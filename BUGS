@@ -1,0 +1,5 @@
+Playing some audio will cause a floating point exception
+Thread 2 "tophat" received signal SIGFPE, Arithmetic exception.
+[Switching to Thread 0x7fffd6aa0640 (LWP 29836)]
+0x0000555555593285 in ma_linear_resampler_get_required_input_frame_count (pResampler=0x5555562deaa0, outputFrameCount=1322, pInputFrameCount=0x7fffd6a987c8) at lib/miniaudio/miniaudio.h:49714
+49714       inputFrameCount += (pResampler->inTimeFrac + (outputFrameCount * pResampler->inAdvanceFrac)) / pResampler->config.sampleRateOut;

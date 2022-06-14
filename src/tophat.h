@@ -153,6 +153,7 @@ typedef struct {
 typedef struct {
 	uint64_t i;
 	uint32_t r;
+	int32_t g;
 } th_font_cache_item; 
 
 typedef UmkaDynArray(th_font_cache_item) th_font_cache;
@@ -162,6 +163,8 @@ typedef struct {
 	fu size;
 	uu font;
 } th_cached_font;
+
+typedef GLuint th_shader;
 
 // struct holding all tophat's global variables.
 typedef struct {
@@ -182,6 +185,9 @@ typedef struct {
 
 	th_image *images;
 	uu image_count;
+	
+	th_shader *shaders;
+	uu shader_count;
 } th_global;
 
 // atlas
@@ -198,6 +204,7 @@ void _th_audio_data_callback(ma_device* pDevice, void* pOutput, const void* pInp
 void _th_umka_bind(void *umka);
 
 // canvas
+int th_canvas_compile_shader(char *frag, char *vert);
 void th_canvas_rect(uint32_t color, th_rect r);
 void th_canvas_init();
 void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
@@ -246,6 +253,7 @@ void th_image_init();
 void th_image_deinit();
 void th_image_flush();
 void _th_rdimg(th_image *img, unsigned char *data);
+int th_image_compile_shader(char *frag, char *vert);
 
 // input
 void th_input_key(int keycode, int bDown);
@@ -275,6 +283,11 @@ void th_vector_normalize(float *x, float *y);
 // raycast
 int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, th_vf2 *ic);
 
+// shader
+int th_shader_compile(
+	char *vertf, char *fragf, char *vertb, char *fragb,
+	const char **verta, int vertac);
+
 // tilemap
 void th_tmap_draw(th_tmap *t, th_rect *cam);
 void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
@@ -283,14 +296,17 @@ void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 th_image *th_get_image(uu index);
 th_font *th_get_font(uu index);
 th_sound *th_get_sound(uu index);
+th_shader *th_get_shader(uu index);
 
 th_image *th_get_image_err(uu index);
 th_font *th_get_font_err(uu index);
 th_sound *th_get_sound_err(uu index);
+th_shader *th_get_shader_err(uu index);
 
 th_image *th_alloc_image();
 th_font *th_alloc_font();
 th_sound *th_alloc_sound();
+th_shader *th_alloc_shader();
 
 // utf8
 size_t th_utf8_decode(uint32_t *out, const char *s);
@@ -301,5 +317,7 @@ void th_window_get_dimensions(int *w, int *h);
 int th_window_handle();
 void th_window_swap_buffers();
 void th_window_clear_frame();
+void th_window_begin_scissor(int x, int y, size_t w, size_t h);
+void th_window_end_scissor();
 
 #endif

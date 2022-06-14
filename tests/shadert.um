@@ -1,0 +1,29 @@
+
+import (
+	"th.um"
+	"rect.um"
+	"image.um"
+	"canvas.um"
+	"shader.um"
+	"window.um"
+)
+
+fn main() {
+	window.setup("shader test", 400, 400)
+	cam := rect.mk(0, 0, 400, 400)
+
+	s := shader.mkImage(
+"uniform int time;\nvec2 th_vertex(vec2 vert) { float timef = float(time) / 2000.0; return vec2( vert.x + sin(timef) * 0.4, vert.y + cos(timef) * 0.4 ); }",
+"uniform int time;\nvec4 th_fragment(sampler2D tex, vec2 coord) { float timef = float(time) / 600.0; return texture2D(tex, coord).abgr * abs(sin(timef)); }")
+
+	s.pickForImage()
+	timeu := s.getUniformLocation("time")
+	printf("%s\n", repr(timeu))
+
+	i := image.load("etc/test.png")
+	for window.cycle(cam) {
+		timeu.setInt(th.time)
+		canvas.drawRect(th.red, rect.mk(198, 198, 4, 4))
+		i.draw(th.Transform{p: th.Vf2{200, 200}, s: th.Vf2{3, 3}})
+	}
+}

@@ -26,9 +26,15 @@ fn (f: ^Font) renderGlyph*(glyph: uint32, scale: th.fu): image.Image {
 	return image.Image{crenderglyph(f.handle, glyph, scale)}
 }
 
+fn cfontgetglyphindex(f: int, c: uint32): uint32
+fn (f: ^Font) getGlyphIndex(c: uint32): uint32 {
+	return cfontgetglyphindex(f.handle, c)
+}
+
 type FontCacheItem = struct {
 	i: image.Image
 	r: utf8.Rune
+	g: int32
 }
 
 type FontCache = []FontCacheItem
@@ -52,13 +58,13 @@ fn (fc: ^FontCache) grow() {
 	fc^ = nfc
 }
 
-fn (fc: ^FontCache) set(r: utf8.Rune, i: image.Image) {
+fn (fc: ^FontCache) set(r: utf8.Rune, i: image.Image, g: int32) {
 	hash := fc.hash(r)
 
 	for true {
 		mhash := hash % len(fc^)
 		if fc[mhash].r == r || fc[mhash].r == 0 {
-			fc[mhash] = FontCacheItem{i, r}
+			fc[mhash] = FontCacheItem{i, r, g}
 			return
 		}
 		fc.grow()
@@ -103,7 +109,7 @@ fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
 		return
 	}
 
-	c.cache.set(rune, c.font.renderGlyph(rune, c.size))
+	c.cache.set(rune, c.font.renderGlyph(rune, c.size), c.font.getGlyphIndex(rune))
 }
 
 fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
@@ -127,10 +133,6 @@ fn (c: ^Cached) preCacheStr*(s: str) {
 	runes := utf8.decode(s)
 	
 	for r in runes {
-		if r == uint32(' ') {
-			continue
-		}
-
 		c.preCacheRune(r)
 	}
 }
