@@ -28,6 +28,7 @@ void die() {
 		umkaCall(thg.umka, destroyfunc, 0, NULL, NULL);
 	}
 
+
 	umkaFree(thg.umka);
 	died = 1;
 }

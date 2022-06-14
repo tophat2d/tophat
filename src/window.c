@@ -7,6 +7,8 @@ extern th_global thg;
 #ifdef linux
 #include <X11/Xlib.h>
 #include <GL/glx.h>
+
+Atom wm_delete_message;
 Display *th_dpy;
 Window th_win;
 Window th_root_win;
@@ -25,6 +27,7 @@ void th_window_setup(char *name, int w, int h) {
 		th_error("Could not open X display.");
 		return;
 	}
+	wm_delete_message = XInternAtom(th_dpy, "WM_DELETE_WINDOW", False);
 
 	int screen = DefaultScreen(th_dpy);
 	th_root_win = DefaultRootWindow(th_dpy);
@@ -46,6 +49,8 @@ void th_window_setup(char *name, int w, int h) {
 	attribs.colormap = XCreateColormap(th_dpy, th_root_win, vi->visual, AllocNone);
 	th_win = XCreateWindow(th_dpy, th_root_win, 0, 0, w, h, 0, vi->depth, InputOutput,
 		vi->visual, CWColormap | CWBackPixel, &attribs);
+	
+	XSetWMProtocols(th_dpy, th_win, &wm_delete_message, 1);
 
 	XMapWindow(th_dpy, th_win);
 	XStoreName(th_dpy, th_win, name);
@@ -95,6 +100,11 @@ int th_window_handle() {
 			break;
 		case MotionNotify:
 			thg.mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
+			break;
+		case ClientMessage:
+			if (ev.xclient.data.l[0] == wm_delete_message) {
+				return 0;
+			}
 			break;
 		}
 	}
