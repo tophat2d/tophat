@@ -183,29 +183,42 @@ void _th_rdimg(th_image *img, unsigned char *data) {
 	img->data = rd;
 }
 
-void th_image_init() {
+int th_image_compile_shader(char *frag, char *vert) {
 	const char *attribs[] = {
 		"vert", "tex_vert", "color"
 	};
-	th_blit_prog = th_gl_create_prog(
-		"attribute vec2 vert;\n"
-		"attribute vec2 tex_vert;\n"
-		"attribute vec4 color;\n"
-		"varying vec2 tc;\n"
-		"varying vec4 vcolor;\n"
-		"void main() {\n"
-		"  vcolor = color;\n"
-		"  gl_Position = vec4( vert.xy, 0, 1 );\n"
-		"  tc = tex_vert;\n"
-		"}\n",
-		
-		"uniform sampler2D tex;\n"
-		"varying vec2 tc;\n"
-		"varying vec4 vcolor;\n"
-		"void main() { gl_FragColor = texture2D(tex,tc).abgr * vcolor.abgr;}",
-		attribs, 3);
 
-	th_blit_prog_tex = glGetUniformLocation(th_blit_prog, "tex");
+	return th_shader_compile(frag, vert,
+		"attribute vec2 th_vert;\n"
+		"attribute vec2 th_tex_vert;\n"
+		"attribute vec4 th_color;\n"
+		"varying vec2 th_tc;\n"
+		"varying vec4 th_vcolor;\n"
+
+		"vec2 th_vertex(vec2 vert);\n"
+
+		"void main() {\n"
+		"  th_vcolor = th_color;\n"
+		"  gl_Position = vec4( th_vertex(th_vert), 0, 1 );\n"
+		"  th_tc = th_tex_vert;\n"
+		"}\n",
+
+		"uniform sampler2D th_tex;\n"
+		"varying vec2 th_tc;\n"
+		"varying vec4 th_vcolor;\n"
+
+		"vec4 th_fragment(sampler2D tex, vec2 coord);\n"
+
+		"void main() { gl_FragColor = th_fragment(th_tex, th_tc) * th_vcolor.abgr;}\n",
+		attribs, 3);
+}
+
+void th_image_init() {
+	th_blit_prog = *th_get_shader_err(th_image_compile_shader(
+		"vec2 th_vertex(vec2 vert) { return vert; }",
+		"vec4 th_fragment(sampler2D tex, vec2 coord) { return texture2D(tex, coord).abgr; }"));
+
+	th_blit_prog_tex = glGetUniformLocation(th_blit_prog, "th_tex");
 
 	glGenVertexArrays(1, &vao);
 	glGenBuffers(1, &vbo);
