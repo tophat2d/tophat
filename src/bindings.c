@@ -83,6 +83,13 @@ void umcachedfontdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_cached_font_draw(cf, text, pos, color, scale);
 }
 
+void umfontgetglyphindex(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_font *f = th_get_font(p[1].intVal);
+	uint32_t codepoint = p[0].intVal;
+
+	r->intVal = stbtt_FindGlyphIndex(f->info, codepoint);
+}
+
 // sets values of all dots to lightmask's color
 void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_lightmask *l = (th_lightmask *)p[0].ptrVal;
@@ -561,6 +568,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cgetadvance", &umfontgetadvance);
 	umkaAddFunc(umka, "cgetkern", &umfontgetkern);
 	umkaAddFunc(umka, "ccachedfontdraw", &umcachedfontdraw);
+	umkaAddFunc(umka, "cfontgetglyphindex", &umfontgetglyphindex);
 
 	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
 	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);

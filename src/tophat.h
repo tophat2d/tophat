@@ -153,6 +153,7 @@ typedef struct {
 typedef struct {
 	uint64_t i;
 	uint32_t r;
+	int32_t g;
 } th_font_cache_item; 
 
 typedef UmkaDynArray(th_font_cache_item) th_font_cache;

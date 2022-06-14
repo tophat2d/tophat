@@ -101,10 +101,10 @@ static uint32_t font_cache_hash(uint32_t r) {
 	return hash;
 }
 
-static th_image *font_cache_get(th_font_cache *fc, uint32_t r) {
+static th_font_cache_item *font_cache_get(th_font_cache *fc, uint32_t r) {
 	uint32_t hash = font_cache_hash(r) % fc->len;
 	if (fc->data[hash].r != r) return NULL;
-	return th_get_image(fc->data[hash].i);
+	return &fc->data[hash];
 }
 
 void th_cached_font_draw(th_cached_font *c, char *str,
@@ -114,15 +114,18 @@ void th_cached_font_draw(th_cached_font *c, char *str,
 	fu lx = pos.x;
 	th_font *font = th_get_font_err(c->font);
 	
-	uint32_t lr = 0, r;
+	uint32_t lg = 0, r;
 	do {
 		str += th_utf8_decode(&r, str);
-		if (lr)
-			pos.x = c->size * scale *
-				stbtt_GetCodepointKernAdvance(font->info, lr, r)*font->scale;
+		const th_font_cache_item *fci = font_cache_get(&c->cache, r);
+		const uint32_t g = fci->g;
+
+		if (lg)
+			pos.x += c->size * scale *
+				stbtt_GetGlyphKernAdvance(font->info, lg, g)*font->scale;
 
 		int advance;
-		stbtt_GetCodepointHMetrics(font->info, r, &advance, 0);
+		stbtt_GetGlyphHMetrics(font->info, g, &advance, 0);
 		if (r == ' ') {
 			pos.x += c->size * scale * advance*font->scale;
 			continue;
@@ -134,14 +137,15 @@ void th_cached_font_draw(th_cached_font *c, char *str,
 			continue;
 		}
 
-		th_image *i = font_cache_get(&c->cache, r);
+		th_image *i = th_get_image(fci->i);
 		th_blit_tex(i, (th_quad){{
-				.tl = (th_vf2){ .x = pos.x                , .y = pos.y         },
-				.tr = (th_vf2){ .x = pos.x + scale*i->dm.w, .y = pos.y         },
+				.tl = (th_vf2){ .x = pos.x                , .y = pos.y                 },
+				.tr = (th_vf2){ .x = pos.x + scale*i->dm.w, .y = pos.y                 },
 				.br = (th_vf2){ .x = pos.x + scale*i->dm.w, .y = pos.y + scale*i->dm.h },
 				.bl = (th_vf2){ .x = pos.x                , .y = pos.y + scale*i->dm.h },
 			}}, color);
 
 		pos.x += c->size * scale * advance*font->scale;
+		lg = g;
 	} while (*str);
 }

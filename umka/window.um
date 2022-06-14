@@ -21,7 +21,7 @@ fn clearframe()
 fn getdimensions(w, h: ^int32)
 fn swapbuffers()
 fn handleinput(): bool
-// Set's up the engine and opens a window.
+// Sets up the engine and opens a window.
 fn setup*(title: str, width, height: int32) {
 	w, h = width, height
 	wsetup(title, width, height)
