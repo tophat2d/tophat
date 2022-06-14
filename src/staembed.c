@@ -687,6 +687,7 @@ const char *th_em_modulesrc[] = {
 "fn getdimensions(w, h: ^int32)\n"
 "fn swapbuffers()\n"
 "fn handleinput(): bool\n"
+"\n"
 "// Sets up the engine and opens a window.\n"
 "fn setup*(title: str, width, height: int32) {\n"
 "\tw, h = width, height\n"
