@@ -56,7 +56,6 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
 void _th_audio_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
 	for (int i=thg.sound_count; i > 0; i--) {
 		th_sound *csound = th_get_sound(i);
-
 		if (csound == NULL)
 			continue;
 
@@ -96,8 +95,10 @@ void th_audio_init(){
 void th_audio_deinit() {
 	ma_device_uninit(&audev);
 
-	while (thg.sound_count--)
-		ma_decoder_uninit(&thg.sounds[thg.sound_count].decoder);
+	while (thg.sound_count--) {
+		ma_decoder_uninit(&thg.sounds[thg.sound_count]->decoder);
+		free(thg.sounds[thg.sound_count]);
+	}
 	free(thg.sounds);
 }
 

@@ -177,7 +177,7 @@ typedef struct {
 	uu just_pressed[255];
 	th_vf2 mouse;
 
-	th_sound *sounds;
+	th_sound **sounds;
 	uu sound_count;
 
 	th_font *fonts;
