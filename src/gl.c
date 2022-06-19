@@ -85,6 +85,8 @@ GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char 
 		goto fail;
 	}
 
+	glDeleteShader(vert);
+	glDeleteShader(frag);
 	glUseProgram(prog);
 	return prog;
 

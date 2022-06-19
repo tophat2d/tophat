@@ -39,8 +39,8 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 
 	int sx = fabs((fabs(t->pos.x)-abs(camx))) / (t->scale * t->a.cs.x);
 	int sy = fabs((fabs(t->pos.y)-abs(camy))) / (t->scale * t->a.cs.y);
-	int sw = cam->w/(t->scale * t->a.cs.x) + 2;
-	int sh = cam->h/(t->scale * t->a.cs.y) + 2;
+	int sw = cam->w/(t->scale * t->a.cs.x) * 2;
+	int sh = cam->h/(t->scale * t->a.cs.y) * 2;
 
 	if (t->pos.x>=camx)
 		sx = 0;
@@ -52,7 +52,7 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	if (sh > th)
 		sh = th - sy;
 
-	for (int i=sx; i < sx+sw; i++) for (int j=sy; j < sy+sh; j++) {
+	for (int i=0; i < tw; i++) for (int j=0; j < th; j++) {
 		if (t->cells.data[j*t->w+i] == 0) continue;
 		int cell = t->cells.data[j * t->w + i];
 

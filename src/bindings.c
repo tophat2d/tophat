@@ -559,6 +559,17 @@ void umsetuniformint(UmkaStackSlot *p, UmkaStackSlot *r) {
 	glUniform1i(p[1].intVal, p[0].intVal);
 }
 
+void umsetuniformvf2(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_shader *s = th_get_shader_err(p[2].intVal);
+	if (!s) return;
+	th_vf2 *v = (th_vf2 *)&p[0];
+
+	th_canvas_flush();
+	th_image_flush();
+	glUseProgram(*s);
+	glUniform2f(p[1].intVal, v->x, v->y);
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
@@ -639,6 +650,7 @@ void _th_umka_bind(void *umka) {
 
 	// shader
 	umkaAddFunc(umka, "csetuniformint", umsetuniformint);
+	umkaAddFunc(umka, "csetuniformvf2", umsetuniformvf2);
 	umkaAddFunc(umka, "ccompilecanvasshader", umcompilecanvasshader);
 	umkaAddFunc(umka, "ccompileimageshader", umcompileimageshader);
 	umkaAddFunc(umka, "cpickcanvasshader", umpickcanvasshader);

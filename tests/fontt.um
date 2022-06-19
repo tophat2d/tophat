@@ -1,0 +1,17 @@
+
+import (
+	"th.um"
+	"font.um"
+	"rect.um"
+	"window.um"
+)
+
+fn main() {
+	window.setup("font test", 400, 400)
+
+	cf := font.mkCached(font.load("examples/space-shooter/gfx/marediv-regular.ttf"), 100)
+
+	for window.cycle(rect.mk(0, 0, 400, 400)) {
+		//cf.draw("Lorem ipsum dolor sit amet, consectetur adipiscing elit.\nCurabitur facilisis est sed lectus ultrices, nec\npellentesque ipsum lacinia. Donec sodales.", th.Vf2{}, th.black, 4)
+	}
+}

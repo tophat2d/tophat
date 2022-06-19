@@ -17,13 +17,11 @@ static float batch_verts[BATCH * 3 * 6];
 extern th_global thg;
 
 int th_canvas_compile_shader(char *frag, char *vert) {
-	const char *attribs[] = { "pos", "color" };
+	const char *attribs[] = { "th_pos", "th_color" };
 	return th_shader_compile(frag, vert,
 		"attribute vec2 th_pos;\n"
 		"attribute vec4 th_color;\n"
 		"varying vec4 th_vcolor;\n"
-
-		"uniform int th_time;\n"
 
 		"vec2 th_vertex(vec2 vert);\n"
 
@@ -33,8 +31,6 @@ int th_canvas_compile_shader(char *frag, char *vert) {
 		"}\n",
 
 		"varying vec4 th_vcolor;\n"
-
-		"uniform int th_time;\n"
 
 		"vec4 th_fragment(vec4 color);\n"
 

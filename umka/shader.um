@@ -1,4 +1,8 @@
 
+import (
+	"th.um"
+)
+
 // Shader allows you to define your own vertex and fragment GLSL shaders. This
 // is a low-level feature, so it's very easy to mess up.
 //  
@@ -74,4 +78,11 @@ fn csetuniformint(shandle, uhandle: uint, value: int)
 // Sets a uniform to an int value. Flushes both batches.
 fn (u: ^Uniform) setInt*(value: int) {
 	csetuniformint(u.s.handle, u.l, value)
+}
+
+fn csetuniformvf2(shandle, uhandle: uint, value: th.Vf2)
+
+// Sets a uniform to a vf2. Flushes both batches.
+fn (u: ^Uniform) setVf2*(value: th.Vf2) {
+	csetuniformvf2(u.s.handle, u.l, value)
 }

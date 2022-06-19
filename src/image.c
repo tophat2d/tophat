@@ -185,7 +185,7 @@ void _th_rdimg(th_image *img, unsigned char *data) {
 
 int th_image_compile_shader(char *frag, char *vert) {
 	const char *attribs[] = {
-		"vert", "tex_vert", "color"
+		"th_vert", "th_tex_vert", "th_color"
 	};
 
 	return th_shader_compile(frag, vert,
