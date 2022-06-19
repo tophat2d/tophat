@@ -15,7 +15,7 @@
 
 import (
 	"th.um"
-	"std/std.um"
+	"std.um"
 	"rect.um"
 )
 

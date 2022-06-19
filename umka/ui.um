@@ -60,10 +60,10 @@ type TextRenderer* = interface {
 // Bindings around canvas's font rendering functions to make them usable
 // with the TextRenderer interface.
 type PixelFont* = struct { }
-fn (pf: ^PixelFont) draw(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
+fn (pf: ^PixelFont) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
 	canvas.drawText(text, pos, color, scale)
 }
-fn (pf: ^PixelFont) runeDims(rune: utf8.Rune): th.Vf2 {
+fn (pf: ^PixelFont) runeDims*(rune: utf8.Rune): th.Vf2 {
 	return th.Vf2{5, 5}
 }
 

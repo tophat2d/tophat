@@ -19,9 +19,6 @@ fn main() {
 	bg := image.load("etc/test.png")
 
 	for window.cycle(cam) {
-		canvas.setColor(th.white)
-		canvas.drawRect(cam)
-
 		sl.pos = input.getGlobalMousePos(cam)
 		sl.stamp(&lm, cam)
 

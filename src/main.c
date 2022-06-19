@@ -115,9 +115,8 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	umkaOK = umkaInit(thg.umka, scriptpath, NULL,
-		1024 * 1024, 1024 * 1024, NULL,
-		argc - argOffset, argv + argOffset);
+	umkaOK = umkaInit(thg.umka, scriptpath, NULL, 1024 * 1024, NULL,
+		argc - argOffset, argv + argOffset, true, true);
 	if (prof) umprofInit(thg.umka);
 
 	th_audio_init();

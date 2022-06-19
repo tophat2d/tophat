@@ -2,8 +2,7 @@
 
 import (
 	"th.um"
-	"std/map.um"
-	"std/utf8.um"
+	"utf8.um"
 	"image.um"
 )
 

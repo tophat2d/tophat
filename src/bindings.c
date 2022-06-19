@@ -684,5 +684,5 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "ui/label.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "ui/grid.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "ui/imagebox.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ui/shader.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "shader.um", th_em_modulesrc[index++]);
 }

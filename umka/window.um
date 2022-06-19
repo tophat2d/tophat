@@ -6,7 +6,7 @@ import (
 	"canvas.um"
 	"rect.um"
 	"input.um"
-	"std/std.um"
+	"std.um"
 )
 
 var (
