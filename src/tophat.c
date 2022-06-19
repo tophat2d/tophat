@@ -52,7 +52,6 @@ th_sound *th_get_sound_err(uu index) {
 
 th_sound *th_alloc_sound() {
 	void *p = realloc(thg.sounds, (++thg.sound_count + 1) * sizeof(th_sound *));
-	printf("alloc %d\n", thg.sound_count);
 	if (!p)
 		return NULL;
 	thg.sounds = p;

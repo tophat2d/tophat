@@ -1,0 +1,25 @@
+
+import (
+	"th.um"
+	"rect.um"
+	"input.um"
+	"canvas.um"
+	"window.um"
+)
+
+fn main() {
+	window.setup("input test", 400, 400)
+
+	y := 200
+
+	for window.cycle(rect.mk(0, 0, 400, 400)) {
+		if input.isJustPressed(input.mouse_up) {
+			y -= 5
+		}
+		if input.isJustPressed(input.mouse_down) {
+			y += 5
+		}
+
+		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
+	}
+}

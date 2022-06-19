@@ -23,6 +23,8 @@ const (
 	mouse1* =        char(1)
 	mouse2* =        char(2)
 	mouse3* =        char(3)
+	mouse_up* =      char(4)
+	mouse_down* =    char(5)
 	key_shift* =     char(16)
 	key_backspace* = char(8)
 	key_delete* =    char(46)

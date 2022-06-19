@@ -80,6 +80,9 @@ int th_window_handle() {
 	if (!th_win)
 		return 0;
 
+	th_input_key(4, 0);
+	th_input_key(5, 0);
+
 	XEvent ev;
 	while (XPending(th_dpy)) {
 		XNextEvent(th_dpy, &ev);
@@ -95,6 +98,8 @@ int th_window_handle() {
 			break;
 		case ButtonRelease:
 			keyDir = 0;
+			if (ev.xbutton.button > 3) break;
+
 		case ButtonPress:
 			th_input_key(ev.xbutton.button, keyDir);
 			break;
@@ -218,6 +223,8 @@ void th_window_get_dimensions(int *w, int *h) {
 
 int th_window_handle() {
 	MSG msg;
+	th_input_key(4, 0);
+	th_input_key(5, 0);
 
 	while (PeekMessage(&msg, NULL, 0, 0, 1)) {
 		TranslateMessage(&msg);
@@ -242,6 +249,9 @@ int th_window_handle() {
 			break;
 		case WM_MOUSEMOVE:
 			thg.mouse = (th_vf2){ .x = GET_X_LPARAM(msg.lParam), .y = GET_Y_LPARAM(msg.lParam) };
+			break;
+		case WM_MOUSEWHEEL:
+			th_input_key(GET_WHEEL_DELTA_WPARAM(msg.wParam) < 0 ? 5 : 4, 1);
 			break;
 		default:
 			DispatchMessage(&msg);
