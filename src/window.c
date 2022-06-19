@@ -271,6 +271,11 @@ void th_window_clear_frame() {
 #endif
 
 void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
+	// NOTE(skejeton): The flush is necessary because all the previous render calls
+	//				   shouldn't be cut out using the rectangle.
+	th_canvas_flush();
+	th_image_flush();
+
 	x *= thg.scaling;
 	y *= thg.scaling;
 	w *= thg.scaling;
