@@ -230,7 +230,7 @@ void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 dm = *(th_vf2 *)&p[0];
 	uint32_t *data = (uint32_t *)p[1].ptrVal;
 
-	th_image *img = th_get_image_err(p[2].uintVal);
+	th_image *img = th_alloc_image();
 	if (!img) return;
 	th_image_from_data(img, data, dm);
 

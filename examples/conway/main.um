@@ -72,8 +72,7 @@ fn main() {
 	lastStep := th.time
 
 	for window.cycle(cam) {
-		canvas.setColor(th.black)
-		canvas.drawRect(cam)
+		canvas.drawRect(th.black, cam)
 
 		grid.draw(cam)
 		switch mode {

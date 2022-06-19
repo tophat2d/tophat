@@ -17,10 +17,7 @@ fn main() {
 	})
 
 	for window.cycle(cam) {
-		canvas.setColor(th.white)
-		canvas.drawRect(cam)
-
-		if input.isPressed(input.KEY_SPACE) {
+		if input.isPressed(' ') {
 			signal.emit("spacePress", th.time)
 		}
 	}
