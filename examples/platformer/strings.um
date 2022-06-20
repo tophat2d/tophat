@@ -1,0 +1,220 @@
+
+const BUILDER_STEP = 1024
+// builder allows for faster string addition.
+type builder* = struct {
+	len: int
+	buf: []char
+}
+
+// creates an allocated builder
+fn mk_builder*(): builder {
+	out := builder{}
+	out.len = 0
+	out.buf = make([]char, BUILDER_STEP)
+
+	return out
+}
+
+// increases buffer size
+fn (b: ^builder) increase_buffer() {
+	b.buf = append(b.buf, make([]char, BUILDER_STEP))
+}
+
+// writes a string to a builder
+fn (b: ^builder) write_str*(inp: str) {
+	for b.len + len(inp) >= len(b.buf) {
+		b.increase_buffer()
+	}
+
+	for i:=0; i < len(inp); i++ {
+		b.buf[b.len] = inp[i]
+		b.len++
+	}
+}
+
+// writes a char to the builder
+fn (b: ^builder) write_char*(inp: char) {
+	if b.len >= len(b.buf) {
+		b.increase_buffer()
+	}
+	b.buf[b.len] = inp
+	b.len++
+}
+
+// returns the content of a builder as a string
+fn (b: ^builder) to_str*(): str {
+	return str(slice(b.buf, 0, b.len+1))
+}
+
+// same as standard slice, but usable with string. the numbers are inclusive
+fn sslice*(inp: str, start, end: int): str {
+	if start >= len(inp) { return "" }
+	e := end+1
+	if end+1 >= len(inp) { e = len(inp) }
+	return slice(inp, start, e)
+}
+
+// returns true, if string is contained in another string
+fn contains*(inp, check: str): bool {
+	for i:=0; i < len(inp); i++ {
+		for j:=0; i+j < len(inp) && inp[i+j] == check[j] && j < len(check); j++ {
+			if j == len(check) - 1 {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// joins an array of string into one and adds a joiner between them
+fn join*(inp: []str, joiner: str): str {
+	b := mk_builder()
+
+	for i:=0; i < len(inp); i++ {
+		b.write_str(inp[i])
+		if i != len(inp) - 1 {
+			b.write_str(joiner)
+		}
+	}
+
+	return b.to_str()
+}
+
+fn _replace(inp, pattern, repl: str): []str {
+	lsplit := -1
+	out := make([]str, 256)
+	out_len := 0
+
+	for i:=0; i < len(inp); i++ {
+		s := inp[i]
+		if s == pattern[0] {
+			for j:=0; pattern[j] == inp[i]; j++ {
+				if j == len(pattern) - 1 {
+					if out_len >= len(out) - 3 {
+						out = append(out, make([]str, 256))
+					}
+
+					out[out_len] = sslice(inp, lsplit + 1 , i - len(pattern))
+					out_len++
+					if repl != "" {
+						out[out_len] = repl
+						out_len++
+					}
+					lsplit = i
+					break
+				}
+				i++
+			}
+		}
+	}
+	out[out_len] = sslice(inp, lsplit + 1, len(inp)-1)
+	out_len++
+
+	return slice(out, 0, out_len)
+}
+
+// replaces an pattern with a string
+fn replace*(inp, pattern, replacer: str): str { return join(_replace(inp, pattern, replacer), "") }
+
+// splits a string, every time a pattern occurs. it deletes it (equivalent to replace(s, pattern, ""))
+fn split*(inp: str, splitter: str): []str { return _replace(inp, splitter, "") }
+
+fn chartoupper(inp: char): char {
+	if int(inp) >= 97 && int(inp) <= 133 {
+		return char(int(inp) - 32) 
+	}
+
+	return inp
+}
+
+// returns the same string, but characters are upper case
+fn toupper*(inp: str): str {
+	for i:=0; i < len(inp); i++ {
+		inp[i] = chartoupper(inp[i])
+	}
+
+	return inp
+}
+
+fn chartolower(inp: char): char {
+	if int(inp) >= 63 && int(inp) <= 90 {
+		return char(int(inp) + 32) 
+	}
+
+	return inp
+}
+
+// returns the same string, but all characters are lower case
+fn tolower*(inp: str): str {
+	for i:=0; i < len(inp); i++ {
+		inp[i] = chartolower(inp[i])
+	}
+
+	return inp
+}
+
+// repeats string count number of times
+fn repeat*(inp: str, count: int): str {
+	b := mk_builder()
+	for i:=0; i < count; i++ { b.write_str(inp) }
+	return b.to_str()
+}
+
+// trims whitespaces from the start and end of a string
+fn trimspaces*(inp: str): str {
+	if len(inp) == 0 {
+		return ""
+	}
+
+	var start, end: int
+
+	for start < len(inp) && inp[start] == ' ' {
+		start++
+	}
+
+	if start >= len(inp) {
+		return ""
+	}
+
+	end = len(inp)-1
+	for end >= 0 && inp[end] == ' ' {
+		end--
+	}
+
+	if end > len(inp) {
+		end = len(inp)
+	}
+
+	return slice(inp, start, end+1)
+}
+
+// trims a prefix of a string
+fn trimprefix*(inp: str, prefix: str): str {
+	lenght := 0
+
+	for lenght < len(prefix) && lenght < len(inp) && inp[lenght] == prefix[lenght] {
+		lenght++
+	}
+
+	if lenght != len(prefix) {
+		return inp
+	}
+
+	return slice(inp, lenght, len(inp))
+}
+
+// trims a suffix of a string
+fn trimsuffix*(inp: str, suffix: str): str {
+	lenght := len(inp) - 1
+
+	for i:=len(suffix)-1; i >= 0 && lenght >= 0 && inp[lenght] == suffix[i]; i-- {
+		lenght--
+	}
+
+	if len(inp) - 1 - lenght != len(suffix) {
+		return inp
+	}
+
+	return slice(inp, 0, lenght+1)
+}

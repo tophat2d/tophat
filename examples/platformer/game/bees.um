@@ -1,0 +1,74 @@
+
+import (
+	"th.um"
+	"ent.um"
+	"std.um"
+	"rect.um"
+	"atlas.um"
+	"image.um"
+	"input.um"
+	"canvas.um"
+	"shader.um"
+	"window.um"
+	"tilemap.um"
+	"../strings.um"
+
+	"env.um"
+	"player.um"
+	"../global.um"
+)
+
+const (
+	beeSpeed = 0.03 / 16
+)
+
+var (
+	beePreset: ent.Ent
+	scn: []^ent.Ent
+)
+
+fn setup*() {
+	beePreset = ent.mk(image.load("res/bee.png"), th.Transform{ p: env.tm.pos, s: th.Vf2{ 1, 1 }, o: th.Vf2{13/2, 11/2}})
+}
+
+fn reset*() {
+	scn = []^ent.Ent{}
+}
+
+fn spawn*(p: th.Vf2) {
+	b := new(ent.Ent)
+	b^ = beePreset
+	b.t.p = p
+	scn = append(scn, b)
+}
+
+fn handle*() {
+	if coll := player.body.getColl(env.plants, 1); len(coll) != 0 {
+		spawn(env.plants[coll[0].index].t.p.sub(th.Vf2{-32, 32}))
+		env.plants = delete(env.plants, coll[0].index)
+	}
+
+	for i:=0; i < len(scn); i++ {
+		scn[i].t.p = scn[i].t.p.add(player.body.t.p.sub(scn[i].t.p).mul(th.Vf2{beeSpeed, beeSpeed}).mul(th.Vf2{th.delta, th.delta}))
+	}
+
+	if coll := player.body.getColl(scn, 1); len(coll) != 0 {
+		b := scn[coll[0].index]
+
+		scn = delete(scn, coll[0].index)
+
+		if player.body.t.p.y < b.t.p.y {
+			env.score += 5
+		} else {
+			player.die()
+		}
+	}
+}
+
+fn draw*() {
+	rot := th.time/200 % 2 * 45
+	for i:=0; i < len(scn); i++ {
+		scn[i].t.r = rot + scn[i].t.p.angleTo(player.body.t.p)
+		scn[i].draw(global.cam)
+	}
+}

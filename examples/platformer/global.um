@@ -1,0 +1,46 @@
+
+import (
+	"std.um"
+	"rect.um"
+)
+
+const (
+	tileSize* = 16
+)
+
+var (
+	cam*: rect.Rect
+)
+
+fn readall*(path: str): str {
+		f := std.fopen(path, "r")
+    const blockSize = 16
+    res := ""
+
+    for ok := true; ok {
+	    var buff: [blockSize + 1]char
+	    ok = std.fread(f, ^[blockSize]char(&buff)) == 1
+	    res += str([]char(buff))
+    }
+
+		std.fclose(f)
+    return res
+}
+
+fn timeStr*(ms: int): str {
+	s := ""
+
+	// hours
+	if ms > 60 * 60 * 1000 {
+		s += std.itoa(ms / 1000 / 60 / 60) + ":"
+	}
+
+	// minutes
+	if ms > 60 * 1000 {
+		s += std.itoa(ms / 1000 / 60 % 60) + ":"
+	}
+
+	s += std.itoa(ms / 1000 % 60) + "." + std.itoa(ms % 1000)
+
+	return s
+}

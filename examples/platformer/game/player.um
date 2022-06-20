@@ -1,0 +1,170 @@
+
+import (
+	"th.um"
+	"ent.um"
+	"std.um"
+	"lerp.um"
+	"rect.um"
+	"atlas.um"
+	"image.um"
+	"input.um"
+	"canvas.um"
+	"shader.um"
+	"signal.um"
+	"window.um"
+	"tilemap.um"
+	"../strings.um"
+
+	"env.um"
+	"../global.um"
+)
+
+const (
+	gravity = 0.004 / global.tileSize
+	jumpForce = -0.16
+	moveSpeed = 0.1
+)
+
+var (
+	body*: ent.Ent
+	feet: ent.Ent
+	plYMotion: real32
+	canJump: bool
+
+	Xlerper: lerp.Lerper
+	Ylerper: lerp.Lerper
+	dying: bool
+)
+
+fn die*() {
+	if dying {
+		return
+	}
+
+	Xlerper = append(Xlerper, lerp.mk(body.t.p.x, env.spawn.x, trunc(body.t.p.distanceTo(env.spawn) * 1), false))
+	Ylerper = append(Ylerper, lerp.mk(body.t.p.y, env.spawn.y, trunc(body.t.p.distanceTo(env.spawn) * 1), false))
+	dying = true
+}
+
+fn move() {
+	mot := th.Vf2{}
+	if !canJump {
+		plYMotion += gravity * th.delta
+	}
+
+	if input.isJustPressed(' ') && canJump {
+		body.t.p.y -= 1
+		plYMotion = jumpForce
+		canJump = false
+	}
+
+	if input.isPressed(input.key_left) {
+		mot.x = -1
+		body.i.fliph(false)
+	}
+
+	if input.isPressed(input.key_right) {
+		mot.x = 1
+		body.i.fliph(true)
+	}
+
+	mot.x *= th.delta * moveSpeed
+	mot.y = plYMotion * th.delta
+
+	const steps = 20
+	mot = mot.div(th.Vf2{steps, steps})
+
+	var vert: th.uu
+	var pos: th.Vf2
+
+	for i:=0; i < steps; i++ {
+		body.t.p.x += mot.x
+
+		if env.tm.getColl(body, &vert, &pos) {
+			body.t.p.x -= mot.x
+			break
+		}
+	}
+
+	feet.t.p = body.t.p
+	feet.t.p.y += feet.r.y
+	for i:=0; i < steps; i++ {
+		feet.t.p.y += mot.y
+
+		if env.tm.getColl(feet, &vert, &pos) {
+			//feet.t.p.y -= mot.y
+			plYMotion = 0
+			canJump = true
+			break
+		}
+
+		if env.tm.getColl(body, &vert, &pos) {
+			feet.t.p.y -= mot.y * steps * 2
+			plYMotion = 0
+			break
+		}
+
+		canJump = false
+	}
+
+	body.t.p.y = feet.t.p.y - feet.r.y
+
+	if len(Xlerper) != 0 {
+		body.t.p.x = Xlerper.byDelta(th.delta)
+	}
+
+	if len(Ylerper) != 0 {
+		body.t.p.y = Ylerper.byDelta(th.delta)
+	} else if dying {
+		signal.emit("die", null)
+		dying = false
+	}
+
+	feet.t.p = body.t.p
+	feet.t.p.y += feet.r.y
+}
+
+fn setup*() {
+	body = ent.mk(image.load("res/hat.png"), th.Transform{ p: env.spawn, s: th.Vf2{1, 1} })
+	body.r = rect.mk(0, 0, body.i.getDims().x, body.i.getDims().y - 0.4)
+	feet = ent.mk(image.Image{0}, th.Transform{ s: th.Vf2{1, 1} })
+	feet.r = rect.mk(0, body.i.getDims().y - 2, body.i.getDims().x, 2)
+	feet.c = th.red
+}
+
+fn reset*() {
+	body.t.p = env.spawn
+
+	Xlerper = lerp.Lerper{}
+	Ylerper = lerp.Lerper{}
+}
+
+fn handle*() {
+	move()
+
+	if !dying && body.t.p.distanceTo(env.end) < global.tileSize {
+		signal.emit("finish", null)
+	}
+	
+	if colls := body.getColl(env.coins, 1); len(colls) != 0 {
+		env.coins = delete(env.coins, colls[0].index)
+		env.score++
+	}
+
+	if body.t.p.y > env.tm.pos.y + len(env.tm.cells) / env.tm.w * global.tileSize * 2.2 {
+		die()
+	}
+
+	if input.isJustPressed(input.key_escape) {
+		body.t.p = env.spawn
+	}
+
+	global.cam.x += round((body.t.p.x - global.cam.x) * 0.9)
+	global.cam.y += round((body.t.p.y - global.cam.y) * 0.9)
+	global.cam.x = body.t.p.x
+	global.cam.y = body.t.p.y
+}
+
+fn draw*() {
+	body.draw(global.cam)
+}
