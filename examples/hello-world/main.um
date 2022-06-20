@@ -14,14 +14,8 @@ fn main() {
 	global.cam = rect.mk(0, 0, 192, 108)
 
 	for window.cycle(global.cam) {
-		canvas.setColor(th.white)
-		canvas.drawRect(global.cam)
+		canvas.drawRect(th.black, rect.mk(0, 0, cam.w, cam.h))
 
-		switch global.scene {
-		case global.NONE:
-			return
-		}
-
-		canvas.drawText("hello world", th.Vf2{2, 2}, th.black, 2)
+		canvas.drawText("hello world", th.Vf2{2, 2}, th.white, 2)
 	}
 }
