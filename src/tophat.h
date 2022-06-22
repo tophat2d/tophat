@@ -279,7 +279,8 @@ void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
 void th_vector_normalize(float *x, float *y);
 
 // raycast
-int th_ray_getcoll(th_ray *ra, th_ent **scene, int count, th_vf2 *ic);
+void th_ray_getcoll(th_ray *ra, th_coll *colls, int maxColls,
+                    int *collCount, th_ent **scene, int sceneLen);
 
 // shader
 int th_shader_compile(

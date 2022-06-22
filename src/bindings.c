@@ -370,12 +370,14 @@ void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // raycast
 void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_ent **scene = (th_ent **)p[0].ptrVal;
+	th_coll *colls = p[5].ptrVal;
+	int *count = p[4].ptrVal;
+	int maxColls = p[3].intVal;
+	int sceneLen = p[2].intVal;
 	th_ray *ra = (th_ray *)p[1].ptrVal;
-	int count = p[2].intVal;
-	th_vf2 *ic = (th_vf2 *)p[3].ptrVal;
+	th_ent **scene = (th_ent **)p[0].ptrVal;
 
-	r->intVal = th_ray_getcoll(ra, scene, count, ic);
+	th_ray_getcoll(ra, colls, maxColls, count, scene, sceneLen);
 }
 
 void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
