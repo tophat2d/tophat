@@ -566,10 +566,15 @@ void umsetuniformvf2(UmkaStackSlot *p, UmkaStackSlot *r) {
 	if (!s) return;
 	th_vf2 *v = (th_vf2 *)&p[0];
 
+	int sw, sh;
+	th_window_get_dimensions(&sw, &sh);
+	sw *= 0.5f;
+	sh *= -0.5f;
+
 	th_canvas_flush();
 	th_image_flush();
 	glUseProgram(*s);
-	glUniform2f(p[1].intVal, v->x, v->y);
+	glUniform2f(p[1].intVal, v->x / sw + 1.f, v->y / sh + 1.f);
 }
 
 void _th_umka_bind(void *umka) {

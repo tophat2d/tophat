@@ -72,7 +72,7 @@ vec2 worley(vec2 P, float jitter, bool manhattanDistance) {
 }
 
 vec4 th_fragment(vec4 color) {
-	vec2 worl = worley(vpos * 10.0 + off / 10.0, 0.6, false);
+	vec2 worl = worley(vpos * 10.0 + off * 10.0, 0.6, false);
 	float n = worl.x;
 
 	return mix(vec4(0.31, 0.22, 0.16, 1), vec4(1, 0.64, 0, 1), n);

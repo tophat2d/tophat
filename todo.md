@@ -6,5 +6,8 @@
 * [ ] - more ui containers
 * [ ] - use default values in constructors
 * [ ] - more uniform set functions
+	* [x] - vector 2
+	* [ ] - vector 2 raw
+	* [ ] - color
 * [x] - function to clear an input
 * [x] - custom shaders
