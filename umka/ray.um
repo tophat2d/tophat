@@ -15,8 +15,6 @@ type Ray* = struct {
 	r: th.fu // rotation
 }
 
-var colldatax, colldatay: int32
-
 // Makes a ray.
 fn mk*(pos: th.Vf2, l, r: th.fu): Ray {
 	return Ray{pos, l, r}
