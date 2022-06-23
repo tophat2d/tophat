@@ -38,7 +38,7 @@ fn (e: ^Ent) draw*(c: rect.Rect) {
 fn cgetcoll(coll: ^Coll, collC: ^int, maxCount: th.uu, count: int32, e: ^Ent, s: ^^Ent)
 
 // ent's constructor
-fn mk*(img: image.Image, t: th.Transform): Ent {
+fn mk*(img: image.Image = image.Image{0}, t: th.Transform = th.Transform{ s: th.Vf2{1, 1} }): Ent {
 	var e: Ent
 	e.i = img
 	e.t = t

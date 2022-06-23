@@ -4,10 +4,10 @@
 * [ ] - shader based lighting
 * [ ] - preference of input and selection in ui
 * [ ] - more ui containers
-* [ ] - use default values in constructors
 * [ ] - more uniform set functions
 	* [x] - vector 2
 	* [ ] - vector 2 raw
 	* [ ] - color
+* [x] - use default values in constructors
 * [x] - function to clear an input
 * [x] - custom shaders

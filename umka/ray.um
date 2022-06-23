@@ -16,7 +16,7 @@ type Ray* = struct {
 }
 
 // Makes a ray.
-fn mk*(pos: th.Vf2, l, r: th.fu): Ray {
+fn mk*(pos: th.Vf2, l: th.fu, r: th.fu = 0.0): Ray {
 	return Ray{pos, l, r}
 }
 

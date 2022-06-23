@@ -18,6 +18,11 @@ type Vf2* = struct {
 	x, y: fu
 }
 
+// Vf2 constructor
+fn mkVf2*(x: fu = 0, y: fu = 0): Vf2 {
+	return Vf2{x, y}
+}
+
 // rotates `p` around `origin` with `rot` in degrees
 fn (p: ^th.Vf2) rotated*(origin: th.Vf2, rot: th.fu): th.Vf2 {
 	angle := (rot * std.pi) / 180
@@ -111,6 +116,11 @@ type Transform* = struct {
 	s: Vf2 // scale
 	o: Vf2 // origin
 	r: fu  // rotation
+}
+
+// Transform constructor
+fn mkTransform*(p: Vf2, s: Vf2 = Vf2{1, 1}, o: Vf2 = Vf2{0, 0}, r: fu = 0.0): Transform {
+	return Transform{p: p, s: s, o: o, r: r}
 }
 
 const (

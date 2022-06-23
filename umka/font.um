@@ -96,7 +96,7 @@ fn (f: ^Font) getAdvance(glyph: uint32): th.fu {
 }
 
 // Cached font constructor.
-fn mkCached*(f: Font, s: th.fu): Cached {
+fn mkCached*(f: Font, s: th.fu = 40): Cached {
 	return Cached {
 		cache: make(FontCache, 64),
 		size: s,

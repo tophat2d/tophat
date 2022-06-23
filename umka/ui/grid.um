@@ -13,11 +13,10 @@ type Grid* = struct {
 }
 
 // Grid's constructor
-fn mk*(w, h: th.uu): Grid {
+fn mk*(w, h: th.uu, border: th.fu = 0): Grid {
 	return Grid {
 		g: ui.mkGeneric(),
-		w: w, h: h, border: 0,
-		elements: []ui.Element{}}
+		w: w, h: h, border: border}
 }
 
 fn (g: ^Grid) get*(): ^ui.Generic {

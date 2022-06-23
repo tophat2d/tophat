@@ -23,7 +23,7 @@ fn swapbuffers()
 fn handleinput(): bool
 
 // Sets up the engine and opens a window.
-fn setup*(title: str, width, height: int32) {
+fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	w, h = width, height
 	wsetup(title, width, height)
 	clearframe()

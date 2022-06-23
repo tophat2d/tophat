@@ -26,7 +26,7 @@ fn register*(name: str, callback: Callback) {
 }
 
 // Calls all callbacks associated with the passed name.
-fn emit*(name: str, ctx: Any) {
+fn emit*(name: str, ctx: Any = null) {
 	arr := ^Signal(signals.get(name))
 	if arr == null {
 		return

@@ -19,13 +19,16 @@ type Label* = struct {
 }
 
 // Label constructor
-fn mk*(f: ui.TextRenderer, text: str, theme: ui.Theme, scale: th.fu): Label {
+fn mk*(f: ui.TextRenderer, text: str, theme: ui.Theme, scale: th.fu, center: bool = false, wrapping: bool = false): Label {
 	l := Label{}
 	l.g = ui.mkGeneric()
 	l.g.theme = theme
 	l.text = text
 	l.renderer = f
 	l.scale = scale
+	l.center = center
+	l.wrapping = wrapping
+
 	return l
 }
 

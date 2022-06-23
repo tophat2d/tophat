@@ -12,10 +12,11 @@ type Image* = struct {
 	stretch: bool
 }
 
-fn mk*(i: image.Image): Image {
+fn mk*(i: image.Image, stretch: bool = false): Image {
 	return Image {
 		g: ui.Generic{},
-		image: i}
+		image: i,
+		stretch: stretch}
 }
 
 fn (i: ^Image) get*(): ^ui.Generic {
