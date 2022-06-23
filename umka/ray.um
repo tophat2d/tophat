@@ -43,7 +43,7 @@ fn (r: ^Ray) getColl*(s: []^ent.Ent, maxColls: th.uu): []ent.Coll {
 }
 
 // Gets ray's collision to a tilemap.
-fn (r: ^Ray) gettmapcoll*(t: tilemap.Tilemap, ic: ^th.Vf2): bool {
+fn (r: ^Ray) getTilemapColl*(t: tilemap.Tilemap, ic: ^th.Vf2): bool {
 	return craygettmapcoll(r, &t, ic)
 }
 
