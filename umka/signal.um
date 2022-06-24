@@ -9,30 +9,29 @@ type Any* = interface{}
 type Callback* = fn(ctx: Any) 
 type Signal* = []Callback
 
-var signals: map.Map
+var signals: map[str]Signal
 
 // Registers a callback to a signal. There is no need to explicitely create
 // signals.
 fn register*(name: str, callback: Callback) {
-	ptr := signals.get(name)
-
-	arr := ^Signal(ptr)
-	if arr == null {
-		signals.set(name, []Callback{})
-		arr = ^Signal(signals.get(name))
+	if !valid(signals) {
+		signals = make(map[str]Signal)
 	}
 
-	arr^ = append(arr^, callback)
+	if !validkey(signals, name) {
+		signals[name] = Signal{callback}
+	} else {
+		signals[name] = append(signals[name], callback)
+	}
 }
 
 // Calls all callbacks associated with the passed name.
-fn emit*(name: str, ctx: Any = null) {
-	arr := ^Signal(signals.get(name))
-	if arr == null {
-		return
+fn emit*(name: str, ctx: Any) {
+	if !valid(signals) {
+		signals = make(map[str]Signal)
 	}
 
-	for c in arr^ {
+	for c in signals[name] {
 		c(ctx)
 	}
 }
