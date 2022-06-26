@@ -1,10 +1,6 @@
 // A module for importless communication between modules. A signal is an array
 // of callbacks with a name.
 
-import (
-	"map.um"
-)
-
 type Any* = interface{}
 type Callback* = fn(ctx: Any) 
 type Signal* = []Callback
