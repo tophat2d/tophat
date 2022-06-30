@@ -1894,7 +1894,7 @@ const char *th_em_modulesrc[] = {
 "\t\tsignals = make(map[str]Signal)\n"
 "\t}\n"
 "\n"
-"\tfor c in signals[name] {\n"
+"\tfor i, c in signals[name] {\n"
 "\t\tc(ctx)\n"
 "\t}\n"
 "}\n"

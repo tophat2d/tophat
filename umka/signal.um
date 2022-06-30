@@ -27,7 +27,7 @@ fn emit*(name: str, ctx: Any) {
 		signals = make(map[str]Signal)
 	}
 
-	for c in signals[name] {
+	for i, c in signals[name] {
 		c(ctx)
 	}
 }
