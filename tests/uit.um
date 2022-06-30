@@ -22,7 +22,6 @@ import (
 	"ui/imagebox.um"
 
 	"std.um"
-	"map.um"
 )
 
 fn main() { 

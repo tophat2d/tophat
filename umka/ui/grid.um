@@ -64,7 +64,7 @@ fn (g: ^Grid) handle*() {
 }
 
 fn (g: ^Grid) draw*() {
-	for e in g.elements {
+	for i, e in g.elements {
 		e.draw()
 	}
 }

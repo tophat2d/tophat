@@ -42,6 +42,7 @@ type Generic* = struct {
 	ctx: interface{}
 	onEvent: fn(eventType: th.uu, ctx: interface{})
 	pressed: bool
+	selected: bool
 }
 
 // An interface every ui element has to implements.

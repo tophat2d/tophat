@@ -16,8 +16,8 @@ fn readall(f: std.File): str {
 }
 
 fn chcnt(chars: str, c: str): bool {
-	for c2 in chars {
-		if c == c2 {
+	for i in chars {
+		if c == chars[i] {
 			return true
 		}
 	}
@@ -29,7 +29,7 @@ fn strtoc(inp: str): str {
 	out := ""
 	out += "\""
 
-	for c in inp {
+	for i, c in inp {
 		if chcnt("\"\n\t'\\", str(c)) {
 			out += "\\"
 		}

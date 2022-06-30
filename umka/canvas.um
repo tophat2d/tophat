@@ -17,8 +17,8 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	maxw = 0
 	h = 1
 
-	for s in text {
-		if s == "\n" {
+	for i in text {
+		if text[i] == "\n" {
 			h += 1
 			if w > maxw {
 				maxw = w
