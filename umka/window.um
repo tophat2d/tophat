@@ -6,7 +6,7 @@ import (
 	"canvas.um"
 	"rect.um"
 	"input.um"
-	"std/std.um"
+	"std.um"
 )
 
 var (
@@ -21,9 +21,11 @@ fn clearframe()
 fn getdimensions(w, h: ^int32)
 fn swapbuffers()
 fn handleinput(): bool
-// Set's up the engine and opens a window.
-fn setup*(title: str, w, h: int32) {
-	wsetup(title, w, h)
+
+// Sets up the engine and opens a window.
+fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
+	w, h = width, height
+	wsetup(title, width, height)
 	clearframe()
 
 	if std.getenv("HOME") == "" {
@@ -61,3 +63,14 @@ fn cycle*(cam: rect.Rect): bool {
 	return running
 }
 
+fn umth_window_begin_scissor(x, y: int, w, h: uint)
+fn umth_window_end_scissor()
+// Disable rendering outside of rect `r`
+fn beginScissorRect*(r: rect.Rect) {
+	umth_window_begin_scissor(trunc(r.x), trunc(r.y), trunc(r.w), trunc(r.h))
+}
+
+// Stops cropping
+fn endScissor*() {
+	umth_window_end_scissor();
+}

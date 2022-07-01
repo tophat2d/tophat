@@ -19,7 +19,7 @@ type Item* = struct {
 }
 
 // Item's constructor
-fn mk*(start, end: th.fu, length: th.uu, swap: bool): Item {
+fn mk*(start, end: th.fu, length: th.uu, swap: bool = false): Item {
 	return Item{
 		start, end, length, 0, swap, null, fn(ctx: Any) {}}
 }

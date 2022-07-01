@@ -1,0 +1,80 @@
+
+import (
+	"th.um"
+	"input.um"
+	"canvas.um"
+	"signal.um"
+
+	"env.um"
+	"bees.um"
+	"player.um"
+	"../global.um"
+)
+
+const (
+	stateGame = 1
+	stateFinished = 2
+)
+
+var (
+	state: int
+	finishTime: int
+	deathCount: int
+)
+
+fn reset*() {
+	env.reset()
+	bees.reset()
+	player.reset()
+}
+
+fn setup*() {
+	env.setup()
+	bees.setup()
+	player.setup()
+
+	signal.register("die", signal.Callback{
+		reset()
+		deathCount++
+	})
+
+	signal.register("finish", signal.Callback{
+		finishTime = th.time - env.start
+		state = stateFinished
+	})
+
+	state = stateGame
+}
+
+fn handle*() {
+	switch state {
+	case stateGame:
+		env.handle()
+		bees.handle()
+		player.handle()
+	case stateFinished:
+		if input.isJustPressed(input.key_enter) {
+			state = stateGame
+			reset()
+		}
+	}
+}
+
+fn draw*() {
+	env.draw()
+	bees.draw()
+	player.draw()
+  
+	switch state {
+	case stateGame:
+		canvas.drawText(repr(env.score) + "\n" + global.timeStr(th.time - env.start), th.Vf2{1, 1}, th.black, 2)
+	case stateFinished:
+		canvas.drawText(
+			"TIME: " + global.timeStr(finishTime) +
+			"\nNUMBER OF DEATHS: " + repr(deathCount) +
+			"\nSCORE: " + repr(env.score) +
+			"\nPRESS ENTER\nTO TRY AGAIN",
+			th.Vf2{}, th.black, 2)
+	}
+}
+

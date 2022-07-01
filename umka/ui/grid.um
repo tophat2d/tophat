@@ -13,11 +13,10 @@ type Grid* = struct {
 }
 
 // Grid's constructor
-fn mk*(w, h: th.uu): Grid {
+fn mk*(w, h: th.uu, border: th.fu = 0): Grid {
 	return Grid {
 		g: ui.mkGeneric(),
-		w: w, h: h, border: 0,
-		elements: []ui.Element{}}
+		w: w, h: h, border: border}
 }
 
 fn (g: ^Grid) get*(): ^ui.Generic {
@@ -25,7 +24,7 @@ fn (g: ^Grid) get*(): ^ui.Generic {
 }
 
 fn (g: ^Grid) handle*() {
-	cellSize := th.Vf2{g.g.t.s.x/g.w, g.g.t.s.y/g.h}
+	cellSize := th.Vf2{g.g.r.w/g.w, g.g.r.h/g.h}
 
 	for i:=0; i < len(g.elements); i++ {
 		e := &g.elements[i]
@@ -35,10 +34,11 @@ fn (g: ^Grid) handle*() {
 			error("ui.Grid: out of bounds.")
 		}
 
-		ge.t.p = ge.gridPos.mul(cellSize)
+		ge.r.x = ge.gridPos.x * cellSize.x
+		ge.r.y = ge.gridPos.y * cellSize.y
 		// divide by to as there are two borders
-		ge.t.p.x += g.border/2 + g.g.t.p.x
-		ge.t.p.y += g.border/2 + g.g.t.p.y
+		ge.r.x += g.border/2 + g.g.r.x
+		ge.r.y += g.border/2 + g.g.r.y
 
 		if ge.gridPos.x + ge.gridSpan.x > g.w ||
 			ge.gridPos.y + ge.gridSpan.y > g.h {
@@ -53,17 +53,18 @@ fn (g: ^Grid) handle*() {
 			ge.gridSpan.y = 1
 		}
 
-		ge.t.s = ge.gridSpan.mul(cellSize)
+		ge.r.w = ge.gridSpan.x * cellSize.x
+		ge.r.h = ge.gridSpan.y * cellSize.y
 		// don't divide by two as size is relative to position
-		ge.t.s.x -= g.border
-		ge.t.s.y -= g.border
+		ge.r.w -= g.border
+		ge.r.h -= g.border
 
 		e.handle()
 	}
 }
 
 fn (g: ^Grid) draw*() {
-	for e in g.elements {
+	for i, e in g.elements {
 		e.draw()
 	}
 }

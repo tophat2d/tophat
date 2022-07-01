@@ -4,11 +4,6 @@ import (
 	"rect.um"
 )
 
-const (
-	NONE* = -1
-)
-
 var (
-	scene*: th.uu
 	cam*: rect.Rect
 )

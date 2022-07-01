@@ -1,0 +1,30 @@
+
+import (
+	"th.um"
+	"ent.um"
+	"std.um"
+	"rect.um"
+	"atlas.um"
+	"image.um"
+	"input.um"
+	"canvas.um"
+	"shader.um"
+	"window.um"
+	"tilemap.um"
+
+	"game/game.um"
+	"global.um"
+)
+
+fn main() {
+	window.setup("hra", 400, 400)
+	global.cam = rect.mk(0, 0, 16 * 16, 16 * 16)
+
+	game.setup()
+	game.reset()
+
+	for window.cycle(global.cam) {
+		game.handle()
+		game.draw()
+	}
+}

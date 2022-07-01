@@ -1,4 +1,5 @@
 // Module for frame based image animation.
+// TODO: Rework this module to use atlases.
 
 import (
 	"th.um"

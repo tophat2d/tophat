@@ -1,28 +1,27 @@
 import (
-	"umka/anim.um"
-	"umka/audio.um"
-	"umka/csv.um"
-	"umka/ent.um"
-	"umka/font.um"
-	"umka/image.um"
-	"umka/input.um"
-	"umka/lerp.um"
-	"umka/light.um"
-	"umka/misc.um"
-	"umka/particles.um"
-	"umka/canvas.um"
-	"umka/ray.um"
-	"umka/rect.um"
-	"umka/th.um"
-	"umka/tilemap.um"
-	"umka/window.um"
-	"umka/ui.um"
-	"umka/ui/grid.um"
-	"umka/ui/label.um"
-	"umka/ui/imagebox.um"
+	"anim.um"
+	"audio.um"
+	"csv.um"
+	"ent.um"
+	"font.um"
+	"image.um"
+	"input.um"
+	"lerp.um"
+	"light.um"
+	"misc.um"
+	"particles.um"
+	"canvas.um"
+	"ray.um"
+	"rect.um"
+	"th.um"
+	"tilemap.um"
+	"window.um"
+	"ui.um"
+	"ui/grid.um"
+	"ui/label.um"
+	"ui/imagebox.um"
 
-	"umka/std/std.um"
-	"umka/std/map.um"
+	"std.um"
 )
 
 fn main() { 
@@ -55,13 +54,16 @@ fn main() {
 	iBox.image.flipv(true)
 
 	cf := font.mkCached(font.load("examples/space-shooter/gfx/marediv-regular.ttf"), 100)
+	cf.preCacheStr("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ,. ")
+
 	rl := label.mk(&cf, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", theme, 4)
 	rl.get().grid(0, 1).span(2, 2)
 	rl.center = true
 	rl.wrapping = true
 	
 	g := grid.mk(3, 3)
-	g.g.t.s = th.Vf2{cam.w, cam.h}
+	g.g.r.w = cam.w
+	g.g.r.h = cam.h
 	g.elements = []ui.Element{&l, &iBox, &rl}
 	g.border = 10	
 

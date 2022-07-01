@@ -73,6 +73,23 @@ void umfontgetadvance(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->realVal = advance * font->scale;
 }
 
+void umcachedfontdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_cached_font *cf = p[4].ptrVal;
+	char *text = p[3].ptrVal;
+	th_vf2 pos = *(th_vf2 *)&p[2];
+	uint32_t color = p[1].uintVal;
+	fu scale = p[0].real32Val;
+
+	th_cached_font_draw(cf, text, pos, color, scale);
+}
+
+void umfontgetglyphindex(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_font *f = th_get_font(p[1].intVal);
+	uint32_t codepoint = p[0].intVal;
+
+	r->intVal = stbtt_FindGlyphIndex(f->info, codepoint);
+}
+
 // sets values of all dots to lightmask's color
 void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_lightmask *l = (th_lightmask *)p[0].ptrVal;
@@ -213,7 +230,7 @@ void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 dm = *(th_vf2 *)&p[0];
 	uint32_t *data = (uint32_t *)p[1].ptrVal;
 
-	th_image *img = th_get_image_err(p[2].uintVal);
+	th_image *img = th_alloc_image();
 	if (!img) return;
 	th_image_from_data(img, data, dm);
 
@@ -260,6 +277,13 @@ void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
 	r[0].intVal = thg.just_pressed[keycode];
+}
+
+void umclear(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int keycode = p[0].intVal;
+
+	thg.just_pressed[keycode] = 0;
+	thg.pressed[keycode] = 0;
 }
 
 ///////////////////////
@@ -346,12 +370,14 @@ void umsoundstop(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // raycast
 void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_ent **scene = (th_ent **)p[0].ptrVal;
+	th_coll *colls = p[5].ptrVal;
+	int *count = p[4].ptrVal;
+	int maxColls = p[3].intVal;
+	int sceneLen = p[2].intVal;
 	th_ray *ra = (th_ray *)p[1].ptrVal;
-	int count = p[2].intVal;
-	th_vf2 *ic = (th_vf2 *)p[3].ptrVal;
+	th_ent **scene = (th_ent **)p[0].ptrVal;
 
-	r->intVal = th_ray_getcoll(ra, scene, count, ic);
+	th_ray_getcoll(ra, colls, maxColls, count, scene, sceneLen);
 }
 
 void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -373,8 +399,14 @@ void umgettime(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = (long int)(t.tv_usec);
 }
 
-///////////////////////
-// rawdraw TODO: hide rawdraw from c lib
+void umth_window_begin_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_window_begin_scissor(p[3].intVal, p[2].intVal, p[1].uintVal, p[0].uintVal);
+}
+
+void umth_window_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_window_end_scissor();
+}
+
 // draws text
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fu size = p[0].real32Val;
@@ -396,7 +428,6 @@ void umwindowsetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image_init();
 	th_canvas_init();
 }
-
 
 void umwindowclearframe(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_window_clear_frame();
@@ -455,7 +486,95 @@ void umimagedraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_transform *t = (th_transform *)p[1].ptrVal;
 	uint32_t c = p[0].uintVal;
 
-	th_blit_tex(img, *t, c);
+	th_quad q = {0};
+	th_transform_rect(&q, *t, (th_rect){
+		.w = (img->crop.w - img->crop.x) * img->dm.x,
+		.h = (img->crop.h - img->crop.y) * img->dm.y});
+	th_blit_tex(img, q, c);
+}
+
+void umimgdrawonquad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_quad q;
+	q = *(th_quad *)&p[0];
+	uint32_t filter = p[4].uintVal;
+	th_image *img = th_get_image(p[5].uintVal);	
+
+	th_blit_tex(img, q, filter);
+}
+
+void umutf8getnextrune(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int idx = p[0].intVal;
+	char *str = p[1].ptrVal;
+
+	uint32_t rune;
+	th_utf8_decode(&rune, &str[idx]);
+	r->uintVal = rune;
+}
+
+void umcompilecanvasshader(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char *frag = p[0].ptrVal;
+	char *vert = p[1].ptrVal;
+
+	r->intVal = th_canvas_compile_shader(vert, frag);
+}
+
+void umcompileimageshader(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char *frag = p[0].ptrVal;
+	char *vert = p[1].ptrVal;
+
+	r->intVal = th_image_compile_shader(vert, frag);
+}
+
+void umpickcanvasshader(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_shader *s = th_get_shader_err(p[0].intVal);
+	if (!s) return;
+
+	th_canvas_flush();
+	extern GLuint th_canvas_prog;
+	th_canvas_prog = *s;
+}
+
+void umpickimageshader(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_shader *s = th_get_shader_err(p[0].intVal);
+	if (!s) return;
+
+	th_image_flush();
+	extern GLuint th_blit_prog;
+	th_blit_prog = *s;
+}
+
+void umgetuniformlocation(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_shader *s = th_get_shader_err(p[1].intVal);
+	if (!s) return;
+
+	glUseProgram(*s);
+	r->intVal = glGetUniformLocation(*s, p[0].ptrVal);
+}
+
+void umsetuniformint(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_shader *s = th_get_shader_err(p[2].intVal);
+	if (!s) return;
+
+	th_canvas_flush();
+	th_image_flush();
+	glUseProgram(*s);
+	glUniform1i(p[1].intVal, p[0].intVal);
+}
+
+void umsetuniformvf2(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_shader *s = th_get_shader_err(p[2].intVal);
+	if (!s) return;
+	th_vf2 *v = (th_vf2 *)&p[0];
+
+	int sw, sh;
+	th_window_get_dimensions(&sw, &sh);
+	sw *= 0.5f;
+	sh *= -0.5f;
+
+	th_canvas_flush();
+	th_image_flush();
+	glUseProgram(*s);
+	glUniform2f(p[1].intVal, v->x / sw + 1.f, v->y / sh + 1.f);
 }
 
 void _th_umka_bind(void *umka) {
@@ -466,6 +585,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cfontload", &umfontload);
 	umkaAddFunc(umka, "cgetadvance", &umfontgetadvance);
 	umkaAddFunc(umka, "cgetkern", &umfontgetkern);
+	umkaAddFunc(umka, "ccachedfontdraw", &umcachedfontdraw);
+	umkaAddFunc(umka, "cfontgetglyphindex", &umfontgetglyphindex);
 
 	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
 	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
@@ -488,11 +609,13 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
 	umkaAddFunc(umka, "imgcopy", &umimgcopy);
 	umkaAddFunc(umka, "imgsetfilter", &umimgsetfilter);
+	umkaAddFunc(umka, "imgdrawonquad", &umimgdrawonquad);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
 	umkaAddFunc(umka, "cispressed", &umispressed);
 	umkaAddFunc(umka, "cisjustpressed", &umisjustpressed);
+	umkaAddFunc(umka, "cclear", &umclear);
 
 	// entities
 	umkaAddFunc(umka, "centdraw", &umentdraw);
@@ -516,6 +639,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "getTime", &umgettime);
 
 	// canvas
+	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
+	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
 	umkaAddFunc(umka, "drawText", &umdrawtext);
 	umkaAddFunc(umka, "wsetup", &umwindowsetup);
 	umkaAddFunc(umka, "clearframe", &umwindowclearframe);
@@ -526,6 +651,18 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "drawRect", &umcanvasrect);
 	umkaAddFunc(umka, "drawLine", &umcanvasline);
 	umkaAddFunc(umka, "cdrawimage", &umimagedraw);
+
+	// utf8
+	umkaAddFunc(umka, "getNextRune", &umutf8getnextrune);
+
+	// shader
+	umkaAddFunc(umka, "csetuniformint", umsetuniformint);
+	umkaAddFunc(umka, "csetuniformvf2", umsetuniformvf2);
+	umkaAddFunc(umka, "ccompilecanvasshader", umcompilecanvasshader);
+	umkaAddFunc(umka, "ccompileimageshader", umcompileimageshader);
+	umkaAddFunc(umka, "cpickcanvasshader", umpickcanvasshader);
+	umkaAddFunc(umka, "cpickimageshader", umpickimageshader);
+	umkaAddFunc(umka, "cgetuniformlocation", umgetuniformlocation);
 
 	int index = 0;
 	umkaAddModule(umka, "anim.um", th_em_modulesrc[index++]);
@@ -554,4 +691,5 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "ui/label.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "ui/grid.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "ui/imagebox.um", th_em_modulesrc[index++]);
+	umkaAddModule(umka, "shader.um", th_em_modulesrc[index++]);
 }

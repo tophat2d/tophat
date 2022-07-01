@@ -34,7 +34,7 @@ type Theme* = struct {
 // eventJustPress
 // eventRelease
 type Generic* = struct {
-	t: th.Transform
+	r: rect.Rect
 	gridPos: th.Vf2
 	gridSpan: th.Vf2
 	theme: Theme
@@ -42,6 +42,7 @@ type Generic* = struct {
 	ctx: interface{}
 	onEvent: fn(eventType: th.uu, ctx: interface{})
 	pressed: bool
+	selected: bool
 }
 
 // An interface every ui element has to implements.
@@ -60,10 +61,10 @@ type TextRenderer* = interface {
 // Bindings around canvas's font rendering functions to make them usable
 // with the TextRenderer interface.
 type PixelFont* = struct { }
-fn (pf: ^PixelFont) draw(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
+fn (pf: ^PixelFont) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
 	canvas.drawText(text, pos, color, scale)
 }
-fn (pf: ^PixelFont) runeDims(rune: utf8.Rune): th.Vf2 {
+fn (pf: ^PixelFont) runeDims*(rune: utf8.Rune): th.Vf2 {
 	return th.Vf2{5, 5}
 }
 
@@ -92,8 +93,8 @@ fn (g: ^Generic) span*(x, y: th.uu): ^Generic {
 // don't have to use it.
 fn (g: ^Generic) handle*() {
 	m := input.getMousePos()
-	if m.x < g.t.p.x || m.y < g.t.p.y ||
-		m.x > g.t.p.x + g.t.s.x || m.y > g.t.p.y + g.t.s.y {
+	if m.x < g.r.x || m.y < g.r.y ||
+		m.x > g.r.x + g.r.w || m.y > g.r.y + g.r.h {
 		if g.pressed {
 			g.pressed = false
 			g.onEvent(eventRelease, g.ctx)

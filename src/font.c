@@ -89,3 +89,68 @@ void th_font_deinit() {
 	}
 	free(thg.fonts);
 }
+
+// cached font
+
+static uint32_t font_cache_hash(uint32_t r) {
+	uint32_t hash = 5381;
+	while (r) {
+		hash = (((hash << 5) + hash) + (r & 0xff)) & 0xffffffff;
+		r = r >> 8;
+	}
+	return hash;
+}
+
+static th_font_cache_item *font_cache_get(th_font_cache *fc, uint32_t r) {
+	uint32_t hash = font_cache_hash(r) % fc->len;
+	if (fc->data[hash].r != r) return NULL;
+	return &fc->data[hash];
+}
+
+void th_cached_font_draw(th_cached_font *c, char *str,
+                         th_vf2 pos, uint32_t color, fu scale) {
+
+	scale /= c->size;
+	fu lx = pos.x;
+	th_font *font = th_get_font_err(c->font);
+	
+	uint32_t lg = 0, r;
+	do {
+		str += th_utf8_decode(&r, str);
+		const th_font_cache_item *fci = font_cache_get(&c->cache, r);
+		if (!fci) {
+			th_error("You forgot to cache '%c' (U+%d). Use font.Cached.preCacheStr to cache it.\n", r, r);
+			break;
+		}
+
+		const uint32_t g = fci->g;
+
+		if (lg)
+			pos.x += c->size * scale *
+				stbtt_GetGlyphKernAdvance(font->info, lg, g)*font->scale;
+
+		int advance;
+		stbtt_GetGlyphHMetrics(font->info, g, &advance, 0);
+		if (r == ' ') {
+			pos.x += c->size * scale * advance*font->scale;
+			continue;
+		}
+
+		if (r == '\n') {
+			pos.y += 5 * 1.1 * scale;
+			pos.x = lx;
+			continue;
+		}
+
+		th_image *i = th_get_image(fci->i);
+		th_blit_tex(i, (th_quad){{
+				.tl = (th_vf2){ .x = pos.x                , .y = pos.y                 },
+				.tr = (th_vf2){ .x = pos.x + scale*i->dm.w, .y = pos.y                 },
+				.br = (th_vf2){ .x = pos.x + scale*i->dm.w, .y = pos.y + scale*i->dm.h },
+				.bl = (th_vf2){ .x = pos.x                , .y = pos.y + scale*i->dm.h },
+			}}, color);
+
+		pos.x += c->size * scale * advance*font->scale;
+		lg = g;
+	} while (*str);
+}

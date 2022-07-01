@@ -15,7 +15,7 @@
 
 import (
 	"th.um"
-	"std/std.um"
+	"std.um"
 	"rect.um"
 )
 
@@ -23,6 +23,8 @@ const (
 	mouse1* =        char(1)
 	mouse2* =        char(2)
 	mouse3* =        char(3)
+	mouse_up* =      char(4)
+	mouse_down* =    char(5)
 	key_shift* =     char(16)
 	key_backspace* = char(8)
 	key_delete* =    char(46)
@@ -64,4 +66,10 @@ fn isPressed*(code: char): bool {
 // this loop.
 fn isJustPressed*(code: char): bool {
 	return bool(cisjustpressed(code))
+}
+
+fn cclear*(code: char)
+// Clears both the pressed and justPressed state of a code.
+fn clear*(code: char) {
+	cclear(code)
 }

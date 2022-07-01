@@ -7,6 +7,8 @@ extern th_global thg;
 #ifdef linux
 #include <X11/Xlib.h>
 #include <GL/glx.h>
+
+Atom wm_delete_message;
 Display *th_dpy;
 Window th_win;
 Window th_root_win;
@@ -25,6 +27,7 @@ void th_window_setup(char *name, int w, int h) {
 		th_error("Could not open X display.");
 		return;
 	}
+	wm_delete_message = XInternAtom(th_dpy, "WM_DELETE_WINDOW", False);
 
 	int screen = DefaultScreen(th_dpy);
 	th_root_win = DefaultRootWindow(th_dpy);
@@ -46,6 +49,8 @@ void th_window_setup(char *name, int w, int h) {
 	attribs.colormap = XCreateColormap(th_dpy, th_root_win, vi->visual, AllocNone);
 	th_win = XCreateWindow(th_dpy, th_root_win, 0, 0, w, h, 0, vi->depth, InputOutput,
 		vi->visual, CWColormap | CWBackPixel, &attribs);
+	
+	XSetWMProtocols(th_dpy, th_win, &wm_delete_message, 1);
 
 	XMapWindow(th_dpy, th_win);
 	XStoreName(th_dpy, th_win, name);
@@ -75,6 +80,9 @@ int th_window_handle() {
 	if (!th_win)
 		return 0;
 
+	th_input_key(4, 0);
+	th_input_key(5, 0);
+
 	XEvent ev;
 	while (XPending(th_dpy)) {
 		XNextEvent(th_dpy, &ev);
@@ -90,11 +98,18 @@ int th_window_handle() {
 			break;
 		case ButtonRelease:
 			keyDir = 0;
+			if (ev.xbutton.button > 3) break;
+
 		case ButtonPress:
 			th_input_key(ev.xbutton.button, keyDir);
 			break;
 		case MotionNotify:
 			thg.mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
+			break;
+		case ClientMessage:
+			if (ev.xclient.data.l[0] == wm_delete_message) {
+				return 0;
+			}
 			break;
 		}
 	}
@@ -109,6 +124,7 @@ void th_window_clear_frame() {
 
 void th_window_swap_buffers() {
 	th_canvas_flush();
+	th_image_flush();
 	th_input_cycle();
 
 	glXSwapBuffers(th_dpy, th_win);
@@ -207,6 +223,8 @@ void th_window_get_dimensions(int *w, int *h) {
 
 int th_window_handle() {
 	MSG msg;
+	th_input_key(4, 0);
+	th_input_key(5, 0);
 
 	while (PeekMessage(&msg, NULL, 0, 0, 1)) {
 		TranslateMessage(&msg);
@@ -232,6 +250,9 @@ int th_window_handle() {
 		case WM_MOUSEMOVE:
 			thg.mouse = (th_vf2){ .x = GET_X_LPARAM(msg.lParam), .y = GET_Y_LPARAM(msg.lParam) };
 			break;
+		case WM_MOUSEWHEEL:
+			th_input_key(GET_WHEEL_DELTA_WPARAM(msg.wParam) < 0 ? 5 : 4, 1);
+			break;
 		default:
 			DispatchMessage(&msg);
 			break;
@@ -245,6 +266,7 @@ int th_window_handle() {
 
 void th_window_swap_buffers() {
 	th_canvas_flush();
+	th_image_flush();
 	th_input_cycle();
 	SwapBuffers(th_hdc);
 }
@@ -303,3 +325,25 @@ EM_JS(void, th_window_clear_frame, (), {
 #else
 #error tophat cant create a window on this platform yet
 #endif
+
+void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
+	// NOTE(skejeton): The flush is necessary because all the previous render calls
+	//				   shouldn't be cut out using the rectangle.
+	th_canvas_flush();
+	th_image_flush();
+
+	x *= thg.scaling;
+	y *= thg.scaling;
+	w *= thg.scaling;
+	h *= thg.scaling;
+	glEnable(GL_SCISSOR_TEST);
+	int dimX, dimY;
+	th_window_get_dimensions(&dimX, &dimY);
+	glScissor(x+thg.offset.x, (dimY-(int)h)-y-thg.offset.y, w, h);
+}
+
+void th_window_end_scissor() {
+	th_canvas_flush();
+	th_image_flush();
+	glDisable(GL_SCISSOR_TEST);
+}

@@ -1,0 +1,44 @@
+
+type Scene* = struct {
+	name: str
+	reset: fn()
+	handle: fn()
+	draw: fn() 
+}
+
+var (
+	scenes: []Scene
+
+	curr*: int // -1 if changing
+)
+
+fn init*() {
+	scenes = []Scene{}
+}
+
+fn (scn: ^Scene) register*(): int {
+	id := len(scenes)
+	scenes = append(scenes, scn^)
+	return id
+}
+
+fn byId*(id: int): ^Scene {
+	if id >= len(scenes) {
+		error("scene id out of range")
+	}
+
+	return &scenes[id]
+}
+
+fn change*(to: int) {
+	byId(to).reset()
+	curr = to
+}
+
+fn handle*() {
+	byId(curr).handle()
+}
+
+fn draw*() {
+	byId(curr).draw()
+}

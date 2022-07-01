@@ -12,10 +12,11 @@ type Image* = struct {
 	stretch: bool
 }
 
-fn mk*(i: image.Image): Image {
+fn mk*(i: image.Image, stretch: bool = false): Image {
 	return Image {
 		g: ui.Generic{},
-		image: i}
+		image: i,
+		stretch: stretch}
 }
 
 fn (i: ^Image) get*(): ^ui.Generic {
@@ -30,20 +31,20 @@ fn (i: ^Image) draw*() {
 	dm := i.image.getDims()
 	s := th.Vf2{}
 	if i.stretch {
-		s.x = i.g.t.s.x/dm.x
-		s.y = i.g.t.s.y/dm.y
+		s.x = i.g.r.w/dm.x
+		s.y = i.g.r.h/dm.y
 	} else {
-		if i.g.t.s.x < i.g.t.s.y {
-			s.x = i.g.t.s.x/dm.x
+		if i.g.r.w < i.g.r.h {
+			s.x = i.g.r.w/dm.x
 			s.y = s.x
-			i.g.t.p.y += (i.g.t.s.y - s.y*dm.y)/2
+			i.g.r.y += (i.g.r.h - s.y*dm.y)/2
 		} else {
-			s.y = i.g.t.s.y/dm.y
+			s.y = i.g.r.h/dm.y
 			s.x = s.y
-			i.g.t.p.x += (i.g.t.s.x - s.x*dm.x)/2
+			i.g.r.x += (i.g.r.w - s.x*dm.x)/2
 		}
 	}
 
-	i.image.draw(th.Transform{p: i.g.t.p, s: s}, th.white)
+	i.image.draw(th.Transform{p: i.g.r.getPos(), s: s}, th.white)
 }
 

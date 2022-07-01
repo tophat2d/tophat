@@ -1,0 +1,31 @@
+
+import (
+	"th.um"
+	"rect.um"
+	"image.um"
+	"input.um"
+	"window.um"
+)
+
+fn main() {
+	window.setup("image test", 600, 600)
+	cam := rect.mk(0, 0, 600, 600)
+
+	img := image.load("etc/test.png")
+	printf("etc/test.png: %s\n", repr(img.validate()))
+
+	for window.cycle(cam) {
+		img.draw(th.Transform{
+			s: th.Vf2{4, 8},
+			p: th.Vf2{100, 100},
+			r: 45}, 0xaaaaffaa)
+
+		img.drawOnQuad([4]th.Vf2{
+			th.Vf2{10, 10},
+			th.Vf2{20, 15},
+			th.Vf2{20, 30},
+			th.Vf2{0, 35}})
+
+		if input.isJustPressed('q') { break }
+	}
+}

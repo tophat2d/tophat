@@ -16,24 +16,35 @@ static int cur_batch = 0;
 static float batch_verts[BATCH * 3 * 6];
 
 extern th_global thg;
+int th_canvas_compile_shader(char *frag, char *vert) {
+	const char *attribs[] = { "th_pos", "th_color" };
+	return th_shader_compile(frag, vert,
+		SHADER_BEGIN
+		"attribute vec2 th_pos;\n"
+		"attribute vec4 th_color;\n"
+		"varying vec4 th_vcolor;\n"
+
+		"vec2 th_vertex(vec2 vert);\n"
+
+		"void main() {\n"
+		"  gl_Position = vec4(th_vertex(th_pos), 0, 1.0);\n"
+		"  th_vcolor = th_color;\n"
+		"}\n",
+
+		SHADER_BEGIN
+		"varying vec4 th_vcolor;\n"
+
+		"vec4 th_fragment(vec4 color);\n"
+
+		"void main() {\n"
+		"  gl_FragColor = th_fragment(th_vcolor);\n"
+		"}\n", attribs, 2);
+}
 
 void th_canvas_init() {
-	const char *attribs[] = { "pos", "color" };
-	th_canvas_prog = th_gl_create_prog(
-		SHADER_BEGIN
-		"attribute vec2 pos;\n"
-		"attribute vec4 color;\n"
-		"varying vec4 vcolor;\n"
-		"void main() {\n"
-		"  gl_Position = vec4(pos, 0, 1.0);\n"
-		"  vcolor = color;\n"
-		"}",
-
-		SHADER_BEGIN
-		"varying vec4 vcolor;\n"
-		"void main() {\n"
-		"  gl_FragColor = vcolor;\n"
-		"}", attribs, 2);
+	th_canvas_prog = *th_get_shader_err(th_canvas_compile_shader(
+		"vec2 th_vertex(vec2 vert) { return vert; }\n",
+		"vec4 th_fragment(vec4 color) { return color; }\n"));
 
 	glGenVertexArrays(1, &vao);
 	printf("%d\n", vao);
@@ -69,6 +80,8 @@ void th_canvas_flush() {
 }
 
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
+	th_image_flush();
+
 	float colors[4];
 	for (int i=0; i < 4; ++i)
 		colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;

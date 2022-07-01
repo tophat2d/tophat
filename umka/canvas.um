@@ -3,9 +3,10 @@
 
 import (
 	"th.um"
-	"std/std.um"
+	"std.um"
 	"rect.um"
 )
+
 // Draws a basic pixel text. Only ascii is supported.
 fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
 
@@ -16,8 +17,8 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	maxw = 0
 	h = 1
 
-	for s in text {
-		if s == "\n" {
+	for i in text {
+		if text[i] == "\n" {
 			h += 1
 			if w > maxw {
 				maxw = w

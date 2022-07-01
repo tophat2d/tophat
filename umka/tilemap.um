@@ -28,7 +28,7 @@ type Tilemap* = struct {
 	scale: th.fu
 }
 
-fn mk*(cells: []th.uu, w: th.uu, at: atlas.Atlas, scale: th.fu): Tilemap {
+fn mk*(cells: []th.uu, w: th.uu, at: atlas.Atlas, scale: th.fu = 1): Tilemap {
 	t := Tilemap{}
 	t.cells = cells
 	t.w = w

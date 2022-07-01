@@ -3,6 +3,8 @@
 import (
 	"th.um"
 	"ent.um"
+	"rect.um"
+	"canvas.um"
 	"tilemap.um"
 )
 
@@ -13,22 +15,38 @@ type Ray* = struct {
 	r: th.fu // rotation
 }
 
-var colldatax, colldatay: int32
-
 // Makes a ray.
-fn mk*(pos: th.Vf2, l, r: th.fu): Ray {
+fn mk*(pos: th.Vf2, l: th.fu, r: th.fu = 0.0): Ray {
 	return Ray{pos, l, r}
 }
 
-fn craygetcoll(ic: ^th.Vf2, count: int32, r: ^Ray, s: ^^ent.Ent): int32
+fn craygetcoll(colls: ^ent.Coll, count: ^int, maxCount,
+	sceneLen: int, r: ^Ray, scene: ^^ent.Ent)
 fn craygettmapcoll(r: ^Ray, t: ^tilemap.Tilemap, ic: ^th.Vf2): bool
 
 // Same as ent.getcoll. Same changes will apply.
-fn (r: ^Ray) getcoll*(s: []^ent.Ent, ic: ^th.Vf2): int32 {
-	return craygetcoll(ic, len(s), r, &s[0])
+fn (r: ^Ray) getColl*(s: []^ent.Ent, maxColls: th.uu): []ent.Coll {
+	if len(s) == 0 {
+		return []ent.Coll{}
+	}
+
+	if maxColls > len(s) {
+		maxColls = len(s)
+	}
+
+	colls := make([]ent.Coll, maxColls)
+	count := 0
+	craygetcoll(&colls[0], &count, maxColls, len(s), r, &s[0])
+	return slice(colls, 0, count)
 }
 
 // Gets ray's collision to a tilemap.
-fn (r: ^Ray) gettmapcoll*(t: tilemap.Tilemap, ic: ^th.Vf2): bool {
+fn (r: ^Ray) getTilemapColl*(t: tilemap.Tilemap, ic: ^th.Vf2): bool {
 	return craygettmapcoll(r, &t, ic)
+}
+
+fn (r: ^Ray) draw*(cam: rect.Rect, color: uint32, thickness: th.fu) {
+	p1 := cam.toScreen(r.pos)
+	p2 := cam.toScreen(r.pos.add(th.Vf2{0, r.l}.rotated(th.Vf2{}, r.r)))
+	canvas.drawLine(color, p1, p2, thickness)
 }
