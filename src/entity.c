@@ -6,19 +6,8 @@
 extern th_global thg;
 
 th_quad th_ent_transform(th_ent *e) {
-	th_quad q = {0};
-
-	q.tr.x = e->rect.w;
-	q.br = (th_vf2){{e->rect.w, e->rect.h}};
-	q.bl.y = e->rect.h;
-
-	for (uu i=0; i < 4; i++) {
-		q.v[i].x *= e->t.scale.x;
-		q.v[i].y *= e->t.scale.y;
-		th_rotate_point(&q.v[i], e->t.origin, e->t.rot);
-		q.v[i].x += e->t.pos.x;
-		q.v[i].y += e->t.pos.y;
-	}
+	th_quad q;
+	th_transform_rect(&q, e->t, e->rect);
 
 	return q;
 }
