@@ -1,9 +1,0 @@
-
-import (
-	"th.um"
-	"rect.um"
-)
-
-var (
-	cam*: rect.Rect
-)
