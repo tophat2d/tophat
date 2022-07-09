@@ -4,18 +4,16 @@ import (
 	"rect.um"
 	"canvas.um"
 	"window.um"
-
-	"global.um"
 )
 
 fn main() {
-	window.setup("title", 1280, 720)
+	window.setup("title", 400, 400)
 
-	global.cam = rect.mk(0, 0, 192, 108)
+	cam := rect.mk(0, 0, 400, 400)
 
-	for window.cycle(global.cam) {
-		canvas.drawRect(th.black, rect.mk(0, 0, cam.w, cam.h))
+	for window.cycle(cam) {
+		canvas.drawRect(th.blue, rect.mk(0, 0, cam.w, cam.h))
 
-		canvas.drawText("hello world", th.Vf2{2, 2}, th.white, 2)
+		canvas.drawText("hello world", th.Vf2{2, 2}, th.white, 4)
 	}
 }
