@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
 			prof = true;
 			argOffset += 1;
 		} else {
-			argOffset += 1;
+			break; // NOTE(skejeton): This is for arguments in the game itself
 		}
 	}
 
@@ -114,7 +114,7 @@ int main(int argc, char *argv[]) {
 
 		return 1;
 	}
-
+	
 	umkaOK = umkaInit(thg.umka, scriptpath, NULL, 1024 * 1024, NULL,
 		argc - argOffset, argv + argOffset, true, true);
 	if (prof) umprofInit(thg.umka);
