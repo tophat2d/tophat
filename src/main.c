@@ -75,6 +75,7 @@ int main(int argc, char *argv[]) {
 			argOffset += 2;
 		} else if (strcmp(argv[argOffset], "version") == 0) {
 			printf("%s\n", th_em_misc[1]);
+			return 0;
 		} else if (strcmp(argv[argOffset], "dir") == 0) {
 			if ((argc-argOffset) < 2) {
 				printf("dir takes 1 argument.\n");
