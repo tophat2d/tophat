@@ -131,8 +131,8 @@ fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
 fn (c: ^Cached) preCacheStr*(s: str) {
 	runes := utf8.decode(s)
 	
-	for r in runes {
-		c.preCacheRune(r)
+	for i in runes {
+		c.preCacheRune(runes[i])
 	}
 }
 

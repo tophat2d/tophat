@@ -682,7 +682,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddModule(umka, "particles.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "light.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "lerp.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "map.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "utf8.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "font.um", th_em_modulesrc[index++]);
 	umkaAddModule(umka, "th.um", th_em_modulesrc[index++]);
