@@ -245,6 +245,7 @@ th_image *th_load_image(char *path);
 void th_free_image(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 void th_image_set_filter(th_image *img, int filter);
+void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(th_image *img, th_quad q, uint32_t color);
 void th_image_init();
