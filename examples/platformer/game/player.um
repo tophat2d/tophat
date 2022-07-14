@@ -87,7 +87,6 @@ fn move() {
 	}
 
 	feet.t.p = body.t.p
-	feet.t.p.y += feet.r.y
 	for i:=0; i < steps; i++ {
 		feet.t.p.y += mot.y
 
@@ -107,7 +106,7 @@ fn move() {
 		canJump = false
 	}
 
-	body.t.p.y = feet.t.p.y - feet.r.y
+	body.t.p = feet.t.p
 
 	if len(Xlerper) != 0 {
 		body.t.p.x = Xlerper.byDelta(th.delta)
@@ -121,7 +120,6 @@ fn move() {
 	}
 
 	feet.t.p = body.t.p
-	feet.t.p.y += feet.r.y
 }
 
 fn setup*() {
