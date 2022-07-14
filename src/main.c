@@ -18,7 +18,11 @@ extern char *th_em_modulesrc[];
 extern char *th_em_misc[];
 extern int th_em_modulenames_count;
 
-void die() {
+static void warning(UmkaError *error) {
+	fprintf(stderr, "Warning %s (%d, %d): %s\n", error->fileName, error->line, error->pos, error->msg);
+}
+
+static void die() {
 	if (dead) return;
 	
 	th_audio_deinit();
@@ -41,11 +45,15 @@ int main(int argc, char *argv[]) {
 	const char *scriptpath = "main.um";
 	bool check = false;
 	bool prof = false;
+	bool silent = false;
 
 	int argOffset = 1;
 	while ((argc-argOffset) > 0) {
 		if (strcmp(argv[argOffset], "check") == 0) {
 			check = true;
+			argOffset += 1;
+		} else if (strcmp(argv[argOffset], "silent") == 0) {
+			silent = true;
 			argOffset += 1;
 		} else if (strcmp(argv[argOffset], "modsrc") == 0) {
 			if ((argc-argOffset) < 2) {
@@ -90,11 +98,12 @@ int main(int argc, char *argv[]) {
 				"Available modes:\n"
 				"  check - only check the program for errors\n"
 				"  dir - specify the resource directory (. by default)\n"
+				"  help - show this help\n"
+				"  license - print the license\n"
 				"  main - specify the main file (dir/main.um by default)\n"
 				"  modsrc <module name> - print source of a builtin module\n"
 				"  prof - use the profiler\n"
-				"  help - show this help\n"
-				"  license - print the license\n"
+				"  silent - omit warnings\n"
 				"  version - print the version\n"
 				"Visit th.mrms.cz for more info.\n");
 			return 0;
@@ -116,7 +125,7 @@ int main(int argc, char *argv[]) {
 	}
 	
 	umkaOK = umkaInit(thg.umka, scriptpath, NULL, 1024 * 1024, NULL,
-		argc - argOffset, argv + argOffset, true, true);
+		argc - argOffset, argv + argOffset, true, true, silent ? NULL : warning);
 	if (prof) umprofInit(thg.umka);
 
 	th_audio_init();
