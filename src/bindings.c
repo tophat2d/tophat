@@ -242,9 +242,10 @@ void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_image *img2 = th_alloc_image();
 	if (!img2) return;
-	*img2 = *img1;
-	img2->data = calloc(sizeof(uint32_t), img2->dm.w * img2->dm.h);
-	memcpy(img2->data, img1->data, sizeof(uint32_t) * img2->dm.w * img2->dm.h);
+	th_image_from_data(img2, img1->data, img1->dm);
+	img2->flipv = img1->flipv;
+	img2->fliph = img1->fliph;
+	img2->crop = img1->crop;
 
 	r->intVal = thg.image_count;
 }
@@ -255,6 +256,22 @@ void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int filter = p[0].intVal;
 
 	th_image_set_filter(img, filter);
+}
+
+void umimgupdatedata(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *img = th_get_image_err(p[2].intVal);
+	if (!img) return;
+	uint32_t *data = p[1].ptrVal;
+	th_vf2 dm = *(th_vf2 *)&p[0];
+
+	th_image_update_data(img, data, dm);
+}
+
+void umimggetdata(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *img = th_get_image_err(p[1].intVal);
+	if (!img) return;
+	uint32_t *data = p[0].ptrVal;
+	memcpy(data, img->data, sizeof(uint32_t) * img->dm.w * img->dm.h);
 }
 
 ///////////////////////
@@ -601,6 +618,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "imgcopy", &umimgcopy);
 	umkaAddFunc(umka, "imgsetfilter", &umimgsetfilter);
 	umkaAddFunc(umka, "imgdrawonquad", &umimgdrawonquad);
+	umkaAddFunc(umka, "imgupdatedata", &umimgupdatedata);
+	umkaAddFunc(umka, "imggetdata", &umimggetdata);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);

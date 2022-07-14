@@ -74,6 +74,25 @@ void th_image_set_filter(th_image *img, int filter) {
 	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 }
 
+void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm) {
+	uint32_t *b = NULL;
+	if ((b = realloc(img->data, sizeof(uint32_t) * dm.x * dm.y)) == NULL) {
+		th_error("th_image_update_data: could not allocate\n");
+		return;
+	}
+
+	img->data = b;
+	memcpy(img->data, data, sizeof(uint32_t) * dm.x * dm.y);
+
+	glEnable(GL_TEXTURE_2D);
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D, img->gltexture);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dm.w, dm.h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, img->data);
+
+	img->dm = dm;
+}
+
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
 	GLuint tex;
 
