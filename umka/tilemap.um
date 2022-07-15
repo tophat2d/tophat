@@ -3,9 +3,6 @@
 
 import (
 	"th.um"
-	"csv.um"
-	"image.um"
-	"std.um"
 	"rect.um"
 	"ent.um"
 	"atlas.um"

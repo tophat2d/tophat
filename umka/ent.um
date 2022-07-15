@@ -1,7 +1,6 @@
 
 import (
 	"rect.um"
-	"std.um"
 	"image.um"
 	"th.um"
 )

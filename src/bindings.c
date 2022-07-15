@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 #include <GL/gl.h>
 
 #include <chew.h>
@@ -408,14 +407,6 @@ void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // misc
 
-// gets current time in ms
-void umgettime(UmkaStackSlot *p, UmkaStackSlot *r) {
-	struct timeval t;
-	gettimeofday(&t, NULL);
-
-	r->intVal = (long int)(t.tv_usec);
-}
-
 void umth_window_begin_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_window_begin_scissor(p[3].intVal, p[2].intVal, p[1].uintVal, p[0].uintVal);
 }
@@ -653,9 +644,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "csoundpause", &umsoundpause);
 	umkaAddFunc(umka, "csoundvol", &umsoundvol);
 	umkaAddFunc(umka, "csoundvalidate", &umsoundvalidate);
-
-	// misc
-	umkaAddFunc(umka, "getTime", &umgettime);
 
 	// canvas
 	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
