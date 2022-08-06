@@ -1,7 +1,6 @@
 
 import (
 	"th.um"
-	"canvas.um"
 )
 
 // Represents a drawable image. It is an opaque structure.
@@ -87,7 +86,7 @@ fn (i: ^Image) copy*(): Image {
 // used in a loop.
 // https://learnopengl.com/img/getting-started/texture_filtering.png
 // left is nearest, right is linear.
-fn (i: ^Image) setfilter(filter: int) {
+fn (i: ^Image) setfilter*(filter: int) {
 	imgsetfilter(i.handle, filter)
 }
 
