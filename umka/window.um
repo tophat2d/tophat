@@ -21,6 +21,7 @@ fn clearframe()
 fn getdimensions(w, h: ^int32)
 fn swapbuffers()
 fn handleinput(): bool
+fn updatescaling(w, h, camw, camh: int32)
 
 // Sets up the engine and opens a window.
 fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
@@ -32,13 +33,11 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 		th.platform = "windows"
 	}
 
+	updatescaling(width, height, width, height)
+
 	clockOffset = std.clock() * 1000
 	start = std.clock() * 1000
 }
-
-// Sets window title on runtime
-//fn setwindowtitle*(title: str)
-fn updatescaling(w, h, camw, camh: int32)
 
 // Cycle needs to be called every cycle. Pass the currently used camera, which
 // i used to calculate tophat's scaling. It returns true, if the window is
@@ -52,6 +51,9 @@ fn cycle*(cam: rect.Rect): bool {
 
 	end = std.clock()*1000
 	th.delta = round(end - start)
+	// zero delta may cause incorrect behaviour
+	if th.delta == 0 { th.delta = 1 }
+
 	start = std.clock()*1000
 	th.time = round(start - clockOffset)
 
