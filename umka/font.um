@@ -31,8 +31,7 @@ fn (f: ^Font) getGlyphIndex(c: uint32): uint32 {
 }
 
 type FontCacheItem = struct {
-	x: int
-	w: int
+	i: image.Image
 	r: utf8.Rune
 	g: int32
 }
@@ -58,7 +57,7 @@ fn (fc: ^FontCache) grow() {
 	fc^ = nfc
 }
 
-fn (fc: ^FontCache) set(r: utf8.Rune, x, w: int, g: int32) {
+fn (fc: ^FontCache) set(r: utf8.Rune, i: image.Image, g: int32) {
 	hash := fc.hash(r)
 
 	for true {
@@ -71,10 +70,10 @@ fn (fc: ^FontCache) set(r: utf8.Rune, x, w: int, g: int32) {
 	}
 }
 
-fn (fc: ^FontCache) get(r: utf8.Rune): FontCacheItem {
+fn (fc: ^FontCache) get(r: utf8.Rune): image.Image {
 	hash := fc.hash(r) % len(fc^)
-	if fc[hash].r != r { return FontCacheItem{ r: -1 } }
-	return fc[hash]
+	if fc[hash].r != r { return image.Image{} }
+	return fc[hash].i
 }
 
 // A structure built on top of Font. It automatially caches runes used in
@@ -82,7 +81,6 @@ fn (fc: ^FontCache) get(r: utf8.Rune): FontCacheItem {
 // problems. There is a known bug with letters like q not being offset properly.
 type Cached* = struct {
 	cache: FontCache
-	image: image.Image
 	size: th.fu
 	font: Font
 }
@@ -106,7 +104,7 @@ fn mkCached*(f: Font, s: th.fu = 40): Cached {
 }
 
 fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
-	if c.cache.get(rune).r < 0 {
+	if c.cache.get(rune).handle != 0 {
 		return
 	}
 
@@ -114,13 +112,13 @@ fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
 }
 
 fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
-	i := c.cache.get(rune)
-	if i.r < 0 {
+	img := c.cache.get(rune)
+	if img.handle == 0 {
 		c.preCacheRune(rune)
-		i = c.cache.get(rune)
+		img = c.cache.get(rune)
 	}
 
-	dm := c.image.getDims()
+	dm := img.getDims()
 	dm.y /= c.size
 	dm.x = c.font.getAdvance(rune)
 
