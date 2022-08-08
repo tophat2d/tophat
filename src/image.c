@@ -45,6 +45,8 @@ th_image *th_load_image(char *path) {
 	_th_rdimg(img, data);
 	stbi_image_free(data);
 
+	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
+
 	return img;
 }
 

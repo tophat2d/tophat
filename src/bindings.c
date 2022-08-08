@@ -171,9 +171,8 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = th_alloc_image();
 	if (!img) return;
 	img = th_load_image(conv_path(pathcpy, path));
-	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
 
-	r[0].intVal = thg.image_count;
+	r[0].intVal = img ? thg.image_count : 0;
 }
 
 // checks, if image is correctly loaded
