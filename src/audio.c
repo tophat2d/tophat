@@ -59,15 +59,15 @@ void _th_audio_data_callback(ma_device *pDevice, void *pOutput, const void *pInp
 		if (csound == NULL)
 			continue;
 
-		if (!csound->playing)
-			continue;
-
-		ma_uint32 framesread = __read_and_mix_pcm_frames_f32(&csound->decoder, (float *)pOutput, frameCount, csound->volume);
-
 		if (csound->seek_to >= 0) {
 			ma_decoder_seek_to_pcm_frame(&csound->decoder, csound->seek_to);
 			csound->seek_to = -1;
 		}
+
+		if (!csound->playing)
+			continue;
+
+		ma_uint32 framesread = __read_and_mix_pcm_frames_f32(&csound->decoder, (float *)pOutput, frameCount, csound->volume);
 
 		if (framesread <= 0) {
 			ma_decoder_seek_to_pcm_frame(&csound->decoder, 0);
