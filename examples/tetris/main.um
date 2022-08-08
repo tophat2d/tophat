@@ -1,0 +1,49 @@
+import (
+	"window.um"
+	"canvas.um"
+	"gameplay.um"
+	"global.um"
+	"field.um"
+	"fx.um"
+	"input.um"
+	"audio.um"
+	"falling_piece.um"
+	"background.um"
+	"crazytext.um"
+)
+
+fn main() {
+	window.setup("bricks lol", 640, 480)
+
+	global.initAudio()
+	global.audioBackground.play()
+	bgPlaying := true
+
+	background.init()
+	fx.init()
+  field.setClearCallback(fx.clearEffect)
+	gameplay.init()
+	crazytext.init()
+	scoreText := crazytext.putText("SCORE: 0", crazytext.lifetimeForever)
+	crazytext.putText("ARROW KEYS - MOVE", crazytext.lifetimeForever, false)
+	crazytext.putText("Z, X, C - ROTATE", crazytext.lifetimeForever, false)
+	crazytext.putText("M - MUTE", crazytext.lifetimeForever, false)
+
+	for window.cycle(global.cam) {
+		if input.isJustPressed('m') {
+			if bgPlaying {
+				global.audioBackground.stop()
+			} else {
+				global.audioBackground.play()
+			}
+			bgPlaying = !bgPlaying
+		}
+		scoreText.text = "SCORE: "+repr(global.score)
+		gameplay.update()
+		falling_piece.update()
+		canvas.drawRect(0x000000FF, global.cam)
+		background.update()
+		background.draw()
+		fx.draw()
+	}
+}

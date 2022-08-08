@@ -59,8 +59,9 @@ uu th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic) {
 }
 
 uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic) {
-	th_quad q1 = th_ent_transform(e1);
-	th_quad q2 = th_ent_transform(e2);
+	th_quad q1, q2;
+ 	th_transform_rect(&q1, e1->t, e1->rect);
+ 	th_transform_rect(&q2, e2->t, e2->rect);
 	
 	return th_quad_to_quad(&q1, &q2, ic);
 }

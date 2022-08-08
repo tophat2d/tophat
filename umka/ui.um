@@ -3,9 +3,7 @@ import (
 	"th.um"
 	"utf8.um"
 	"rect.um"
-	"font.um"
 	"input.um"
-	"image.um"
 	"canvas.um"
 )
 

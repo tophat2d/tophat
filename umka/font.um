@@ -86,12 +86,12 @@ type Cached* = struct {
 }
 
 fn cgetkern(font: th.uu, glyph1, glyph2: uint32): th.fu
-fn (f: ^Font) getKern(glyph1, glyph2: uint32): th.fu {
+fn (f: ^Font) getKern*(glyph1, glyph2: uint32): th.fu {
 	return cgetkern(f.handle, glyph1, glyph2)
 }
 
 fn cgetadvance(font: th.uu, glyph: uint32): th.fu
-fn (f: ^Font) getAdvance(glyph: uint32): th.fu {
+fn (f: ^Font) getAdvance*(glyph: uint32): th.fu {
 	return cgetadvance(f.handle, glyph)
 }
 
@@ -131,8 +131,8 @@ fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
 fn (c: ^Cached) preCacheStr*(s: str) {
 	runes := utf8.decode(s)
 	
-	for r in runes {
-		c.preCacheRune(r)
+	for i in runes {
+		c.preCacheRune(runes[i])
 	}
 }
 

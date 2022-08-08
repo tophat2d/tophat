@@ -2,7 +2,7 @@
 fn gettocomma(s: int, inp: str, le: ^int): str {
 	out := ""
 	i := s
-	for j:=0; i < len(inp) && inp[i] != ',' && inp[i] != '\n'; i++ {
+	for _ := 0; i < len(inp) && inp[i] != ',' && inp[i] != '\n'; i++ {
 		out += inp[i]
 	}
 	le^ = i - 1

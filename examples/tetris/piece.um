@@ -1,0 +1,40 @@
+import (
+	"field.um"
+)
+
+type Piece* = struct {
+	data: str
+	color: int
+}
+
+// Checks if I can put the piece at a certain cell
+fn canPut*(it: Piece, cell_x, cell_y: int): bool {
+	x_origin := cell_x
+	for _, chr in it.data {
+		if chr == '#' {
+			if !field.isFree(cell_x, cell_y) {
+				return false;
+			}
+		}
+		cell_x += 1
+		if chr == '\n' {
+			cell_y += 1
+			cell_x = x_origin
+		}
+	}
+	return true;
+} 
+
+fn project*(it: Piece, cell_x, cell_y: int) {
+	x_origin := cell_x
+	for _, chr in it.data {
+		if chr == '#' {
+			field.put(cell_x, cell_y, it.color)
+		}
+		cell_x += 1
+		if chr == '\n' {
+			cell_y += 1
+			cell_x = x_origin
+		}
+	}
+}

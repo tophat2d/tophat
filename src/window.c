@@ -48,7 +48,7 @@ void th_window_setup(char *name, int w, int h) {
 	attribs.background_pixel = 0;
 	attribs.colormap = XCreateColormap(th_dpy, th_root_win, vi->visual, AllocNone);
 	th_win = XCreateWindow(th_dpy, th_root_win, 0, 0, w, h, 0, vi->depth, InputOutput,
-		vi->visual, CWColormap | CWBackPixel, &attribs);
+		vi->visual, CWBorderPixel | CWColormap, &attribs);
 	
 	XSetWMProtocols(th_dpy, th_win, &wm_delete_message, 1);
 
@@ -92,6 +92,7 @@ int th_window_handle() {
 		case Expose:
 			XGetWindowAttributes(th_dpy, th_win, &th_win_attribs);
 			glViewport(0, 0, th_win_attribs.width, th_win_attribs.height);
+			break;
 		case KeyRelease:
 		case KeyPress:
 			th_input_key(XLookupKeysym(&ev.xkey, 0), ev.type == KeyPress);
@@ -99,7 +100,6 @@ int th_window_handle() {
 		case ButtonRelease:
 			keyDir = 0;
 			if (ev.xbutton.button > 3) break;
-
 		case ButtonPress:
 			th_input_key(ev.xbutton.button, keyDir);
 			break;

@@ -1,0 +1,17 @@
+import (
+	"font.um"
+	"th.um"
+	"window.um"
+	"rect.um"
+)
+
+fn main() {
+	window.setup("my title", 400, 400)
+	cam := rect.mk(0, 0, 400, 400)
+	fontHandle := font.load("etc/roboto.ttf")
+	f := font.mkCached(fontHandle, 4)
+
+	for window.cycle(cam) {
+		f.draw("Hello, folks!", th.Vf2{0, 0}, th.black, 4)
+	}
+}

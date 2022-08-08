@@ -1,0 +1,187 @@
+import (
+	"th.um"
+	"piece.um"
+	"presets.um"
+	"global.um"
+	"input.um"
+	"field.um"
+)
+
+var (
+	x*: real = 0.0
+	y*: real = 0.0
+	placeTimer*: real = 0.0
+	isTspin*: bool = false
+	rotation*: int = 0
+	kind*: int = 0
+)
+
+fn reset*(_kind: int) {
+	x = 4
+	kind = _kind
+	y = 0
+	placeTimer = 0
+	rotation = 0
+	isTspin = false
+}
+
+fn pieceValue*(rotation: int): piece.Piece {
+	return presets.pieceValue(kind, rotation)
+}
+
+fn place*() {
+	val := pieceValue(rotation)
+	piece.project(val, trunc(x), trunc(y))
+}
+
+fn invalid(): bool {
+	val := pieceValue(rotation)
+	return !piece.canPut(val, trunc(x), trunc(y));
+}
+
+fn getKicks(from, to: int): [4]presets.Kick {
+	clockwise := ((from+1)%4) == to
+	if kind == 0 {
+		if clockwise {
+			return presets.ClockwiseI[from]
+		} else {
+			return presets.CounterclockwiseI[from] 
+		}
+	}
+	if clockwise {
+		return presets.ClockwiseNI[from]
+	}
+	return presets.CounterclockwiseNI[from] 
+}
+
+fn checkTSpinCorners() {
+	isTspin = false
+	if kind == presets.pieceTypeT {
+		corners := 0
+		ix, iy := trunc(x), trunc(y)
+
+		if !field.isFree(ix, iy) { corners += 1 }
+		if !field.isFree(ix+2, iy) { corners += 1 }
+		if !field.isFree(ix, iy+2) { corners += 1 }
+		if !field.isFree(ix+2, iy+2) { corners += 1 }
+		if corners >= 3 {
+			isTspin = true
+		}
+	}
+}
+
+fn runKickTable(table: [4]presets.Kick): bool {
+	if !invalid() {
+		return true
+	}
+	original_x := x
+	original_y := y
+	for i, kick in table {
+		x += real(kick.x)
+		y += real(-kick.y)
+		if !invalid() {
+			if kind == presets.pieceTypeT {
+				isTspin = true
+			} 
+			return true
+		}
+		x = original_x
+		y = original_y
+	}
+	return false
+} 
+
+fn rotate180() {
+	from := rotation
+	to := (rotation + 2)%4
+	rotation = to
+	if invalid() {
+		rotation = from
+	}
+}
+
+fn rotateClockwise() {
+	from := rotation
+	to := (rotation + 1)%4
+	rotation = to
+	checkTSpinCorners()
+	if !runKickTable(getKicks(from, to)) {
+		rotation = from
+	}
+}
+
+fn rotateCounterclockwise() {
+	from := rotation
+	to := rotation - 1
+	if to < 0 {
+		to = 3
+	}
+
+	rotation = to
+	checkTSpinCorners()
+	if !runKickTable(getKicks(from, to)) {
+		rotation = from
+	}
+}
+
+fn push*() {
+	for !invalid() {
+		y += 1
+	}
+	placeTimer = 0.6
+	y -= 1
+}
+
+fn update*() {
+	prev := y
+	y += 0.001*th.delta;
+	if invalid() {
+		y = prev
+		placeTimer += th.delta/1000.0
+	} else {
+		placeTimer = 0
+	}
+	if (input.isPressed(input.key_left)) {
+		placeTimer = 0
+		prev := x
+		x -= 0.01*th.delta;
+		if invalid() {
+			x = prev
+		}
+	}
+	if (input.isPressed(input.key_right)) {
+		placeTimer = 0
+		prev := x
+		x += 0.01*th.delta;
+		if invalid() {
+			x = prev
+		}
+	}
+	if (input.isPressed(input.key_down)) {
+		placeTimer += th.delta/1000.0
+		prev := y
+		y += 0.01*th.delta;
+		if invalid() {
+			y = prev
+		}
+	}
+	if (input.isJustPressed('x')) {
+		global.playSound(&global.audioRotate)
+		placeTimer = 0
+		rotateClockwise()
+	} else if (input.isJustPressed('z')) {
+		global.playSound(&global.audioRotate)
+		placeTimer = 0
+		rotateCounterclockwise()
+	} else if (input.isJustPressed('c')) {
+		global.playSound(&global.audioRotate)
+		placeTimer = 0
+		rotate180()
+	}
+	if (input.isJustPressed(' ')) {
+		global.playSound(&global.audioPush)
+		push()	
+	}
+}
+
+

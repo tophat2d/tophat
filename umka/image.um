@@ -1,7 +1,6 @@
 
 import (
 	"th.um"
-	"canvas.um"
 )
 
 // Represents a drawable image. It is an opaque structure.
@@ -21,6 +20,8 @@ fn imgfromdata(data: ^uint32, dm: th.Vf2): int
 fn imgcopy(data: int): int
 fn imgsetfilter(data, filter: int)
 fn imgdrawonquad(img: int, color: uint32, q: [4]th.Vf2)
+fn imgupdatedata(img: int, data: ^uint32, dm: th.Vf2)
+fn imggetdata(img: int, data: ^uint32)
 
 // Loads an image at path.
 fn load*(path: str): Image {
@@ -81,9 +82,33 @@ fn (i: ^Image) copy*(): Image {
 }
 
 // Sets a mag/min filter. 0 is linear, others are nearest.
-// This function will regenerate the texture, so it's slow.
+// This function will regenerate the texture. This means it shouldn't be
+// used in a loop.
 // https://learnopengl.com/img/getting-started/texture_filtering.png
 // left is nearest, right is linear.
-fn (i: ^Image) setfilter(filter: int) {
+fn (i: ^Image) setfilter*(filter: int) {
 	imgsetfilter(i.handle, filter)
+}
+
+// Updates the image data. dm are the dimensions of the new image.
+fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
+	if (dm.x * dm.y > len(data)) {
+		error("setData: incorrect dimensions")
+	}
+
+	if (len(data) == 0) {
+		error("setData: can't set empty image")
+	}
+
+	imgupdatedata(i.handle, &data[0], dm)
+}
+
+// Gets the image data.
+fn (i: ^Image) getData*(): []uint32 {
+	if (i.handle == 0) { return []uint32{} }
+
+	buf := make([]uint32, trunc(i.getDims().x * i.getDims().y))
+	imggetdata(i.handle, &buf[0])
+
+	return buf
 }

@@ -7,12 +7,32 @@ import (
 	"window.um"
 )
 
+fn pixelsplit(inp: uint32): (uint8, uint8, uint8, uint8) {
+	var ps: [4]uint8
+	for i:=0; i < 4; i++ { ps[i] = uint8(inp >> (24 - (i * 8)) & 0xff) }
+	return ps[0], ps[1], ps[2], ps[3]
+}
+
+fn pixelmerge(r, g, b, a: uint8): uint32 { return r << 24 | g << 16 | b << 8 | a }
+
 fn main() {
 	window.setup("image test", 600, 600)
 	cam := rect.mk(0, 0, 600, 600)
 
 	img := image.load("etc/test.png")
 	printf("etc/test.png: %s\n", repr(img.validate()))
+
+	img2 := img.copy()
+	data := img.getData()
+	dm := img.getDims()
+	for i in data {
+		r, g, b, a := pixelsplit(data[i])
+		avg := (r + g + b) / 3
+		data[i] = pixelmerge(avg, avg, avg, a)
+	}
+
+	//img2 := image.mk(data, dm)
+	img2.setData(data, th.Vf2{dm.x, dm.y / 2})
 
 	for window.cycle(cam) {
 		img.draw(th.Transform{
@@ -25,6 +45,10 @@ fn main() {
 			th.Vf2{20, 15},
 			th.Vf2{20, 30},
 			th.Vf2{0, 35}})
+
+		img2.draw(th.Transform{
+			s: th.Vf2{10, 10},
+			p: th.Vf2{400, 400}})
 
 		if input.isJustPressed('q') { break }
 	}
