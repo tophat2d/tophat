@@ -1,0 +1,37 @@
+import (
+	"global.um"
+	"image.um"; "window.um"; "th.um"
+)
+
+var (
+	bgTile: image.Image
+	time: real
+)
+
+fn init*() {
+	bgTile = image.load("bg_tile.png")
+}
+
+fn update*() {
+	time += th.delta/1000.0
+}
+
+fn drawBgRow*(xOffset: int, y: int, slice: int) {
+	dims := bgTile.getDims()
+
+	for xOffset < 0 {
+		xOffset = trunc(dims.x) + xOffset;
+	}
+	rowColor := (global.hsvToRgb(y/real(window.h)+time, (sin(time)/2.0+0.5), 1.0)&0xFFFFFF00)|trunc(y/real(window.h)*255)
+
+	for x := -(xOffset % trunc(dims.x)); x <= window.w; x += trunc(dims.x) {
+		bgTile.draw(th.Transform{p: th.Vf2{x, y}, s: th.Vf2{1, 1}}, rowColor)
+	}
+}
+
+fn draw*() {
+	for y := 0; y < window.h; y += 32 {
+		x := (y/32/real(window.h/32)-0.5) * 2
+		drawBgRow(trunc(x*x*time*1000+y/32), y, y)
+	}
+}

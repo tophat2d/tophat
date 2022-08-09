@@ -1,0 +1,137 @@
+
+import (
+	"th.um"
+	"std.um"
+	"rect.um"
+	"canvas.um"
+	"window.um"
+	"input.um"
+
+	"findpath.um"
+)
+
+type (
+	NodePos = struct {
+		x, y: int
+	}
+
+	Lattice = [32][32]findpath.Node
+)
+
+var (
+	screenTiles: [32][32]bool
+	screenDirty: bool
+	posStart: NodePos = NodePos{1, 1} 
+	lattice: ^Lattice
+	posEnd: NodePos = NodePos{30, 30} 
+
+)
+
+fn pointVsRect(point: th.Vf2, rec: rect.Rect): bool {
+	return point.x > rec.x && point.y > rec.y && point.x < (rec.x+rec.w) && point.y < (rec.y+rec.h);
+}
+
+fn getTileRect(pos: NodePos): rect.Rect {
+	return rect.Rect{pos.x*16, pos.y*16, 16, 16}
+}
+
+fn drawTile(color: uint32, pos: NodePos) {
+	tRect := getTileRect(pos)
+
+	canvas.drawRect(0x00000055, tRect)
+
+	tRect.w -= 1
+	tRect.h -= 1
+
+	canvas.drawRect(color, tRect)
+}
+
+fn drawField() {
+	mpos := input.getMousePos()
+	m1down := input.isPressed(input.mouse1)
+	m2down := input.isPressed(input.mouse3)
+
+	for y := 0; y < len(screenTiles); y++ {
+		for x := 0; x < len(screenTiles[y]); x++ {
+			tRect := getTileRect(NodePos{x, y})
+
+			if m1down && pointVsRect(mpos, tRect) {
+				screenDirty = screenTiles[y][x] == false
+				screenTiles[y][x] = true
+			} else if m2down && pointVsRect(mpos, tRect) {
+				screenDirty = screenTiles[y][x] == true
+				screenTiles[y][x] = false
+			}
+
+			if lattice[y][x].visited {
+				drawTile(th.blue, NodePos{x, y})
+			} else if screenTiles[y][x] {
+				drawTile(th.black, NodePos{x, y})
+			} else {
+				drawTile(th.white, NodePos{x, y})
+			}
+		}
+	}
+
+	drawTile(th.red, posStart)
+	drawTile(th.green, posEnd)
+}
+
+fn findPath(): []^findpath.Node {
+	lattice = new(Lattice)
+	for y := 0; y < 32; y++ {
+		for x := 0; x < 32; x++ {
+
+			if screenTiles[y][x] == true {
+				continue
+			}
+			lattice[y][x].neighbours = []findpath.Link{}
+			lattice[y][x].datum = NodePos{x, y}
+			lattice[y][x].heuristic = (posEnd.x - x)*(posEnd.x - x)+(posEnd.y - y)*(posEnd.y - y)
+			for ny := -1; ny <= 1; ny++ {
+				if (y + ny) < 0 || (y + ny) >= 32 {
+					continue
+				}
+				for nx := -1; nx <= 1; nx++ {
+					if (x + nx) < 0 || (x + nx) >= 32 {
+						continue
+					}
+					if nx == 0 && ny == 0 || nx != 0 && ny != 0 {
+						continue
+					}
+					if screenTiles[y+ny][x+nx] == true {
+						continue
+					}
+					lattice[y][x].neighbours = append(lattice[y][x].neighbours, findpath.Link{neighbour: &lattice[y+ny][x+nx], distance: 1})
+				}
+			}
+		}
+	}
+
+	return lattice[posStart.y][posStart.x].findPath(&lattice[posEnd.y][posEnd.x])
+}
+
+fn drawPath(path: []^findpath.Node) {
+	for node in path {
+		if NodePos(node.datum).x == posEnd.x && NodePos(node.datum).y == posEnd.y {
+			continue
+		}
+		drawTile(th.yellow, NodePos(node.datum))
+	}
+}
+
+fn main() {
+	window.setup("title", 512, 512)
+	screen := rect.mk(0, 0, 512, 512)
+	path := findPath()
+
+	for window.cycle(screen) {
+		if screenDirty {
+			path = findPath()
+			screenDirty = false
+		}
+		drawField()
+		drawPath(path)
+		canvas.drawText(std.itoa(trunc(1000.0/th.delta)), th.Vf2{0, 0}, th.red, 1)
+	}
+}

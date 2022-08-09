@@ -1,0 +1,90 @@
+type (
+    Link* = struct {
+        neighbour: ^Node
+        distance: int
+    }
+
+    Node* = struct {
+        neighbours: []Link
+        heuristic: int 
+        datum: interface{}
+
+        previous: ^Node
+        distance: int
+        visited: bool
+    }
+)
+
+const (
+    limit = 1000000
+)
+
+fn appendNodeSorted(list: []^Node, node: ^Node): []^Node {
+    if len(list) == 0 {
+        return []^Node{node}
+    }
+
+    for n := 0; n < len(list); n++ {
+        if list[n] == node {
+            list = delete(list, n)
+            break
+        } 
+    }
+
+    newList := make([]^Node, len(list)+1)
+    n := 0
+
+    for n < len(list) && (list[n].distance+list[n].heuristic) < (node.distance+node.heuristic) {
+        newList[n] = list[n]
+        n++
+    }
+    newList[n] = node
+    for n < len(list) {
+        newList[n+1] = list[n]
+        n++
+    }
+
+    return newList
+}
+
+fn (mouse: ^Node) findPath*(cheese: ^Node): []^Node {
+    unvisited := []^Node{mouse}
+
+    for !cheese.visited && len(unvisited) > 0 {
+        current := unvisited[0]
+        current.visited = true
+
+        unvisited = delete(unvisited, 0)
+
+        for n := 0; n < len(current.neighbours); n++ {
+            link := current.neighbours[n]
+            if !link.neighbour.visited {
+                if link.neighbour.previous == null || (current.distance + link.distance) < link.neighbour.distance {
+                    link.neighbour.distance = current.distance + link.distance
+                    link.neighbour.previous = current
+                }
+                unvisited = appendNodeSorted(unvisited, link.neighbour)
+            }
+        }
+
+    }
+
+    if !cheese.visited {
+        return []^Node{}
+    }
+
+    l := 0
+    for n := cheese; n.previous != null; n = n.previous {
+        l += 1
+    }
+    
+    result := make([]^Node, l)
+
+    for n := cheese; n.previous != null; n = n.previous {
+        result[l-1] = n
+        l -= 1
+    }
+
+
+    return result
+}

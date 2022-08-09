@@ -1,0 +1,90 @@
+import (
+  "global.um"
+  "canvas.um"
+  "th.um"
+)
+
+type (
+  Entry = struct {
+    text: str
+    life: real
+    lifeGenesis: real
+    frantic: bool
+    y: real
+  }
+)
+
+var (
+  entries: []^Entry
+)
+
+const (
+  fontSize = 2
+  padding = 10
+  lifetimeForever* = 133713371337.0
+)
+
+fn init*() {
+  entries = make([]^Entry, 0)
+}
+
+fn putText*(text: str, lifetime: real, frantic: bool = true): ^Entry {
+  entry := new(Entry)
+  entry ^= Entry{text, lifetime, lifetime, frantic, padding*len(entries)+fontSize*5*len(entries)}
+  entries = append(entries, entry)
+  return entry
+}
+
+fn draw*(x, y: real) {
+  const (
+    slidingSpan = 100
+  )
+  
+  dt := th.delta/1000.0
+
+  py := 0.0
+
+  for i, entry in entries {
+    reverseFading := 0.0
+    fading := 0.0
+    if entry.life < 1.0 {
+      fading = 1.0 - entry.life
+    }
+    if entry.lifeGenesis-entry.life < 1.0 {
+      reverseFading = 1.0 - (entry.lifeGenesis-entry.life)
+    }
+
+    // Fade away animation
+    xOffset := slidingSpan * (fading * fading * fading)
+    alphaMask := trunc((1.0-fading)*(1.0-reverseFading)*255)&0xFF
+
+    color := th.white
+    rotation := th.Vf2{0, 0}
+    if entry.frantic {
+      color = global.hsvToRgb(th.time/1000.0, 0.5, 1.0)
+      rotation = th.Vf2{cos(th.time/1000.0*4.0)*5*(1.0-fading), sin(th.time/1000.0*4.0)*5*(1.0-fading)}
+    }
+    color = color&0xFFFFFF00|alphaMask
+
+    scale := 1.0+reverseFading*reverseFading
+
+    canvas.drawText(entry.text, th.Vf2{x+xOffset, y+entry.y}.add(rotation), color, fontSize*scale)
+
+    // Slerp the entry.y to making approach the wanted y
+    entry.y += (py-entry.y)*dt*100
+
+    py += (5*fontSize+padding)*(1.0-fading)
+  }
+
+  // Recreate entry list removing expired entries
+  newEntries := []^Entry{}
+
+  for i, entry in entries {
+    entry.life -= dt
+    if entry.life > 0 {
+      newEntries = append(newEntries, entry)
+    }
+  }
+
+  entries = newEntries
+}

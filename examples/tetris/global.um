@@ -1,0 +1,49 @@
+import (
+	"rect.um"
+	"audio.um"
+)
+
+var (
+	cam*: rect.Rect = rect.Rect { 0, 0, 640, 480 }
+	score*: int
+
+	audioBackground*: audio.Sound
+	audioRotate*: audio.Sound
+	audioPush*: audio.Sound
+	audioClear*: audio.Sound
+	audioClearMega*: audio.Sound
+)
+
+fn initAudio*() {
+	audioBackground = audio.load("IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
+	audioBackground.looping(true)
+	audioBackground.vol(0.05)
+	audioRotate = audio.load("Rotation.wav")
+	audioPush = audio.load("Placement.wav")
+	audioClear = audio.load("Clear.wav")
+	audioClearMega = audio.load("ClearMega.wav")
+}
+
+fn playSound*(sound: ^audio.Sound) {
+	sound.stop()
+	sound.play()
+}
+
+// stolen :)
+fn hsvToRgb*(h, s, v: real): uint32 {
+	var (r, g, b, i, f, p, q, t: real);
+	i = trunc(h * 6);
+	f = h * 6 - i;
+	p = v * (1 - s);
+	q = v * (1 - f * s);
+	t = v * (1 - (1 - f) * s);
+	switch (trunc(i) % 6) {
+		case 0: r = v; g = t; b = p;
+		case 1: r = q; g = v; b = p;
+		case 2: r = p; g = v; b = t;
+		case 3: r = p; g = q; b = v;
+		case 4: r = t; g = p; b = v;
+		case 5: r = v; g = p; b = q;
+	}
+	return trunc(r * 255) << 24 | trunc(g * 255) << 16 | trunc(b * 255) << 8 | 0xFF
+}

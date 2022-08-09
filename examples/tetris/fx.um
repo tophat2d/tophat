@@ -1,0 +1,142 @@
+import (
+	"canvas.um"
+	"rect.um"
+	"th.um"
+	"gameplay.um"
+	"presets.um"
+	"global.um"
+	"piece.um"
+	"field.um"
+	"falling_piece.um"
+	"crazytext.um"
+)
+
+const (
+	reference_frame = rect.Rect{
+		0, 0,
+		field.FieldWidth*16+6*16,
+		field.FieldHeight*16 }
+
+	EffectClearRow = 0
+)
+
+type Effect = struct {
+	kind: int
+	life: real
+
+	int_data: int
+}
+
+var (
+	offset_x : real = 0
+	offset_y : real = 0
+	effects: []Effect
+)
+
+fn init*() {
+	effects = make([]Effect, 0)
+}
+
+fn clearEffect*(row: int) {
+	effects = append(effects, Effect { EffectClearRow, 1, row })
+}
+
+fn drawEffect(effect: Effect) {
+	opacity := trunc(effect.life * effect.life * 255);
+	switch effect.kind {
+	case EffectClearRow:
+		canvas.drawRect(0xFFFFFF00|opacity, rect.Rect{offset_x, offset_y + effect.int_data*16, field.FieldWidth*16, 16})
+	}
+}
+
+fn processFx() {
+		newEffects := []Effect{}
+
+	for i, effect in effects {
+		drawEffect(effect)
+		effect.life -= th.delta/1000.0
+		if effect.life > 0 {
+			newEffects = append(newEffects, effect)
+		}
+	}
+
+		effects = newEffects
+}
+
+fn drawCell(c: uint32, r: rect.Rect) {
+	canvas.drawRect(c, r)
+	for i := 0; i < 5; i++ {
+		value := trunc((i / 5.0 * 255.0) / 8.0)
+		if (c & 0xFFFFFF00 == 0) {
+			value /= 4
+		}
+
+		color := value << 24 | value << 16 | value << 8 | (c & 0xFF)
+		canvas.drawRect(c | color, rect.Rect{r.x, r.y+(i / 5.0)*r.h, r.w, 3})
+	}
+	canvas.drawRect(0xFFFFFF33, rect.Rect{r.x, r.y, r.w, 1})
+}
+
+fn cellRec(x, y: int) {
+	drawCell(field.Colors[field.playfield[x][y]], rect.Rect { offset_x + x * 16, offset_y + y * 16, 15, 15 })
+}
+
+fn drawPiece(it: piece.Piece, x, y: int, mask: int) {
+	x_origin := x
+	for _, chr in it.data {
+		if chr == '#' {
+			drawCell(field.Colors[it.color] & mask, rect.Rect { x, y, 15, 15 })
+		}
+		x += 16
+		if chr == '\n' {
+			y += 16
+			x = x_origin
+		}
+	}
+}
+
+fn drawStash() {
+	canvas.drawRect(0xFFFFFF11, rect.Rect {16*11-1+offset_x, 1*16-1+offset_y, 16*4+1, 16*4+1})
+	for i := 0; i < 4; i += 1 {
+		for j := 0; j < 4; j += 1 {
+			drawCell(field.Colors[field.None], rect.Rect{ (11+i)*16+offset_x, (1+j)*16+offset_y, 15, 15 })
+		}
+	}
+	if gameplay.stash < 0 {
+		return 
+	}
+	drawPiece(presets.pieceValue(gameplay.stash, 0), 16*11+trunc(offset_x), 1*16+trunc(offset_y), 0xFFFFFFFF)
+}
+
+fn drawFallingPiece() {
+	val := falling_piece.pieceValue(falling_piece.rotation)
+
+	// draw ghost
+	prev := falling_piece.y
+	timerPrev := falling_piece.placeTimer
+	falling_piece.push()
+	drawPiece(val, trunc(falling_piece.x)*16+trunc(offset_x), trunc(falling_piece.y)*16+trunc(offset_y), 0x555555FF)
+	falling_piece.y = prev
+	falling_piece.placeTimer = timerPrev
+
+	drawPiece(val, trunc(falling_piece.x)*16+trunc(offset_x), trunc(falling_piece.y)*16+trunc(offset_y), 0xFFFFFFFF)
+}
+
+fn draw*() {
+	offset_x = (global.cam.w-reference_frame.w)/2
+	offset_y = (global.cam.h-reference_frame.h)/2
+
+	drawStash()
+	field_rect := rect.Rect { offset_x-1, offset_y-1, field.FieldWidth * 16+1, field.FieldHeight * 16+1 }
+	canvas.drawRect(0xFFFFFF11, field_rect)
+	
+	for i := 0; i < field.FieldWidth; i += 1 {
+		for j := 0; j < field.FieldHeight; j += 1 {
+			cellRec(i, j)
+		}
+	}
+	drawFallingPiece()
+	processFx()
+
+	crazytext.draw(16.0*11.0-1.0+offset_x, 6.0*16.0-1.0+offset_y)
+}
