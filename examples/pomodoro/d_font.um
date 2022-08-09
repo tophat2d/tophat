@@ -1,0 +1,92 @@
+import (
+  "th.um"; "rect.um"; "image.um"; "utf8.um"
+)
+
+type (
+  Font* = struct {
+    handle: th.uu
+    cache: map[uint32]image.Image
+    size: th.fu
+    height: th.fu
+  }
+)
+
+fn cfontload(path: str): th.uu
+fn crenderglyph(font: th.uu, rune: uint32, scale: th.fu): th.uu
+fn cgetkern(font: th.uu, runeA, runeB: uint32): th.fu
+fn cgetadvance(font: th.uu, rune: uint32): th.fu
+
+fn (f: ^Font) getGlyph(rune: uint32): image.Image {
+  if validkey(f.cache, rune) {
+    return f.cache[rune]
+  }
+  f.cache[rune] = image.Image{crenderglyph(f.handle, rune, f.size/5.0)}
+  return f.cache[rune]
+}
+
+fn loadFont*(path: str, size: th.fu): Font {
+  return Font{
+    cache: map[uint32]image.Image{},
+    size: size,
+    handle: cfontload(path),
+    height: size}
+}
+
+fn (f: ^Font) measure*(text: str): th.Vf2 {
+  runes := utf8.decode(text)
+  x, y, maxW := 0.0, 0.0, 0.0
+
+  for i := 0; i < len(runes); i++ {
+    rune := runes[i]
+    if rune == uint32('\n') {
+      y += f.height
+      if x > maxW {
+        maxW = x
+      }
+      x = 0
+    } else {
+      advance := cgetadvance(f.handle, rune)
+      if i < len(runes)-1 {
+        advance += cgetkern(f.handle, runes[i+1], rune)
+      }
+      advance *= f.size/5.0
+      x += trunc(advance)
+    }
+  }
+  if x > maxW {
+    maxW = x
+  }
+  return th.Vf2{maxW, y+f.height}
+}
+
+// Returns the rect of the font
+fn (f: ^Font) draw*(text: str, pos: th.Vf2, color: uint32): rect.Rect {
+  runes := utf8.decode(text)
+  x, y, maxW := pos.x, pos.y, pos.x
+
+  for i := 0; i < len(runes); i++ {
+    rune := runes[i]
+
+    if rune == uint32('\n') {
+      y += f.height
+      if x > maxW {
+        maxW = x
+      }
+      x = pos.x
+    } else {
+      glyph := f.getGlyph(rune)
+      glyph.draw(th.Transform{p: th.Vf2{round(x), round(y)}, s: th.Vf2{1, 1}}, color)
+
+      advance := cgetadvance(f.handle, rune)
+      if i < len(runes)-1 {
+        advance += cgetkern(f.handle, rune, runes[i+1])
+      }
+      x += trunc(advance*(f.size/5.0))
+    }
+  }
+  if x > maxW {
+    maxW = x
+  }
+
+  return rect.mk(pos.x, pos.y, maxW-pos.x, y-pos.y+f.height);
+}
