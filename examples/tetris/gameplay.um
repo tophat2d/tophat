@@ -1,0 +1,118 @@
+import (
+	"falling_piece.um"
+	"th.um"
+	"field.um"
+	"input.um"
+	"presets.um"
+	"global.um"
+	"std.um"
+	"crazytext.um"
+)
+
+var (
+	combo: int = 0
+	lock_stash: bool = false
+	stash*: int = -1
+	bag_index: int = 0
+	bag: [7]int = [7]int{ 0, 0, 0, 0, 0, 0, 0 }
+)
+
+fn makeBag() {
+	bag_index = 0
+	bag = [7]int{0,1,2,3,4,5,6}
+	// Shuffle
+	for i := 0; i < 7; i += 1 {
+		temp := bag[i]
+		dest := (i+std.rand())%7
+		bag[i] = bag[dest]
+		bag[dest] = temp
+	}
+	for i := 0; i < 7; i += 1 {
+		printf("%d ", bag[i]);
+	}
+}
+
+fn kind(): int {
+	return bag[bag_index]
+}
+
+// 7 bag
+fn nextTetromino() {
+	bag_index += 1
+	if bag_index >= 7 {
+		makeBag()
+	}
+}
+
+fn init*() {
+	std.srand(trunc(th.time*3000000))
+	makeBag()
+	falling_piece.reset(kind())
+}
+
+fn place() {
+	tspin := falling_piece.isTspin
+	falling_piece.place()
+	streak := field.clearRows()
+
+	if tspin {
+		global.playSound(&global.audioClearMega)
+		combo += 1
+		switch streak {
+			case 0:
+				crazytext.putText("T-SPIN EMPTY! x"+repr(combo), 4)
+			case 1:
+				crazytext.putText("T-SPIN SINGLE! x"+repr(combo), 4)
+			case 2:
+				crazytext.putText("T-SPIN DOUBLE! x"+repr(combo), 5)
+			case 3:
+				crazytext.putText("T-SPIN TRIPLE! x"+repr(combo), 6)
+		}
+	} else {
+		if streak == 4 {
+			combo += 1
+			crazytext.putText("TETRIS! x"+repr(combo), 6)
+			global.playSound(&global.audioClearMega)
+		} else if streak > 0 {
+			combo = 0
+			global.playSound(&global.audioClear)
+		}
+	}
+
+	global.score += presets.getScore(streak, tspin) * combo
+
+	nextTetromino()
+	falling_piece.reset(kind())
+	lock_stash = false
+}
+
+fn stashPiece() {
+	if lock_stash {
+		return 
+	}
+	lock_stash = true
+	if stash == -1 {
+		stash = falling_piece.kind
+		nextTetromino()
+		falling_piece.reset(kind())
+	} else {
+		tmp := falling_piece.kind
+		falling_piece.reset(stash)
+		stash = tmp
+	}
+}
+
+fn update*() {
+	if field.lost {
+		global.score = 0
+		crazytext.putText("YOU LOST! BAD LUCK.", 5.0, false)
+		field.init()
+		field.lost = false
+	}
+	if input.isJustPressed(input.key_shift) {
+		stashPiece()
+	}
+	if falling_piece.placeTimer > 0.5 {
+		place()
+	}
+}

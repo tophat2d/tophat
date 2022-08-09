@@ -1,0 +1,3 @@
+-Ilib/miniaudio
+-Ilib/stb
+-Ilib/umka/src

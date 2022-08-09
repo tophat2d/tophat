@@ -71,6 +71,10 @@ void th_font_render_glyph(th_image *img, th_font *font,
 	int offset;
 	stbtt_GetCodepointBitmapBox(font->info, glyph, scale, scale, 0, &offset, 0, 0);
 	offset = baseline + offset;
+	if (offset < 0) {
+		offset = 0;
+	}
+
 
 	uint32_t *imgdata = calloc(sizeof(uint32_t), w * (offset + h));
 	for (int x=0; x < w; ++x)

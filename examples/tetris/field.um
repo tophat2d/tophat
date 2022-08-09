@@ -1,0 +1,88 @@
+const (
+	None* = 0
+	Red* = 1
+	Green* = 2
+	Blue* = 3
+	Yellow* = 4
+	Purple* = 5
+	Orange* = 6
+	Cyan* = 7
+
+	FieldWidth* = 10
+	FieldHeight* = 22
+	Colors* = [8]int{
+		/*None*/  0x000000FF,
+		/*Red*/   0xFF0000FF,
+		/*Green*/ 0x00FF00FF,
+		/*Blue*/  0x0000FFFF,
+		/*Yellow*/0xFFFF00FF,
+		/*Purple*/0xFF00FFFF,
+		/*Orange*/0xFF9900FF,
+		/*Cyan*/  0x00CCFFFF}
+)
+
+var (
+	lost*: bool
+	playfield*: [FieldWidth][FieldHeight]int
+	clearCallback: fn (row: int)
+)
+
+fn init*() {
+	for i := 0; i < FieldWidth; i += 1 {
+		for j := 0; j < FieldHeight; j += 1 {
+			playfield[i][j] = 0
+		}
+	}
+}
+
+fn put*(x, y, cell: int) {
+	if y < 0 || playfield[x][y] != 0 {
+		lost = true
+		return
+	}
+	playfield[x][y] = cell;
+}
+
+fn setClearCallback*(f: fn (row: int)) {
+	clearCallback = f
+}
+
+fn clearRow(row: int) {
+	clearCallback(row)
+	for row > 0 {
+		row -= 1
+		for i := 0; i < FieldWidth; i += 1 {
+			playfield[i][row+1] = playfield[i][row]
+		}
+	}
+	for i := 0; i < FieldWidth; i += 1 {
+		playfield[i][0] = 0
+	}
+}
+
+fn clearRows*(): int {
+	streak := 0
+
+	for j := 0; j < FieldHeight; j += 1 {
+		row_full := true
+		for i := 0; i < FieldWidth; i += 1 {
+			if playfield[i][j] == None {
+				row_full = false
+				break
+			}
+		}
+		if row_full {
+			streak += 1
+			clearRow(j)
+		}
+	}
+
+	return streak
+}
+
+fn isFree*(x, y: int): bool {
+	if x < 0 || y < 0 || y >= FieldHeight || x >= FieldWidth {
+		return false
+	}
+	return playfield[x][y] == None;
+}

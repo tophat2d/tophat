@@ -54,8 +54,8 @@ fn cycle*(cam: rect.Rect): bool {
 	start = std.clock()*1000
 	th.time = round(start - clockOffset)
 
-	clearframe()
 	running := handleinput()
+	clearframe()
 	getdimensions(&w, &h)
 
 	updatescaling(w, h, round(cam.w), round(cam.h))

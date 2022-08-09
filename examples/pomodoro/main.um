@@ -1,0 +1,547 @@
+import (
+  th_rect = "rect.um"
+  th_window = "window.um"
+  th_canvas = "canvas.um"
+  th = "th.um"
+  th_input = "input.um"
+  th_image = "image.um"
+  th_font = "d_font.um"
+  th_audio = "audio.um"
+)
+
+type (
+  ElemState = struct {
+    rect: th_rect.Rect
+    color: uint32
+  }
+
+  Elem = struct {
+    tweenState: ElemState
+    targetState: ElemState
+
+    shown: bool
+    next: str // name of the next element
+  }
+
+  BoundRect = struct {
+    elementName: str
+    rect: th_rect.Rect
+  }
+
+  Gui = struct {
+    rectStack: []BoundRect
+    elements: map[str]Elem
+    lastElement: str
+    padding: real
+  }
+
+  ButtonState = struct {
+    hovered: bool
+    pressed: bool
+  }
+)
+
+const (
+  cutSideTop = 0
+  cutSideBottom = 1
+  cutSideLeft = 2
+  cutSideRight = 3
+)
+
+fn rectVsPoint(rect: th_rect.Rect, p: th.Vf2): bool {
+  return p.x >= rect.x && p.y >= rect.y && p.x <= (rect.x+rect.w) && p.y <= (rect.y+rect.h)
+}
+
+fn guiInit(): Gui {
+  return Gui {rectStack: make([]BoundRect, 0), elements: map[str]Elem{}}
+}
+
+fn guiPushRect(gui: ^Gui, rect: th_rect.Rect) {
+  gui.rectStack = append(gui.rectStack, BoundRect{rect: rect, elementName: ""})
+}
+
+fn guiPopRect(gui: ^Gui) {
+  if len(gui.rectStack) == 1 {
+    // cleanup
+    gui.lastElement = ""
+  }
+
+  if len(gui.rectStack) == 0 {
+    error("Gui rectangle stack is empty!\n")
+  }
+  gui.rectStack = delete(gui.rectStack, len(gui.rectStack)-1)
+}
+
+fn guiGetLastRect(gui: ^Gui): ^BoundRect {
+  if len(gui.rectStack) == 0 {
+    error("Gui rectangle stack is empty!\n")
+  }
+  return &gui.rectStack[len(gui.rectStack)-1]
+}
+
+fn guiDefaultElement(gui: ^Gui): Elem {
+  return Elem{tweenState: ElemState{rect: th_rect.mk(th_window.w/2, th_window.h/2, 0, 0)}}
+}
+
+fn guiGetElement(gui: ^Gui, name: str): ^Elem {
+  if !validkey(gui.elements, name) {
+    gui.elements[name] = guiDefaultElement(gui)
+  }
+
+  return &gui.elements[name]
+}
+
+fn guiGetButtonState(gui: ^Gui): ButtonState {
+  lastRect := guiGetLastRect(gui).rect
+  state := ButtonState{}
+  state.hovered = rectVsPoint(lastRect, th_input.getMousePos())
+  state.pressed = state.hovered && th_input.isJustPressed(th_input.mouse1) 
+  return state
+}
+
+fn guiGetProperties(gui: ^Gui): ElemState {
+  return guiGetElement(gui, guiGetLastRect(gui).elementName).tweenState
+}
+
+fn guiSetElement(gui: ^Gui, name: str): ^ElemState {
+  element := guiGetElement(gui, name)
+
+  lastRect := guiGetLastRect(gui)
+  lastRect.elementName = name
+
+  element.targetState.rect = lastRect.rect
+  element.shown = true
+
+  if gui.lastElement != "" {
+    gui.elements[gui.lastElement].next = name;
+    gui.elements[gui.lastElement].next = name;
+  }
+
+  gui.lastElement = name
+
+  return &element.targetState
+} 
+  
+fn guiCutRect(gui: ^Gui, side: int, by: th.Vf2): th_rect.Rect {
+  lastRect := &guiGetLastRect(gui).rect
+  rect := th_rect.mk(0, 0, 0, 0)
+
+  by.x += gui.padding*2
+  by.y += gui.padding*2
+
+  switch side {
+    case cutSideTop:
+      rect = th_rect.mk(lastRect.x, lastRect.y, lastRect.w, by.y)
+
+      lastRect.y += by.y
+      lastRect.h -= by.y
+
+    case cutSideBottom:
+      rect = th_rect.mk(lastRect.x, lastRect.y+lastRect.h-by.y, lastRect.w, by.y)
+
+      lastRect.h -= by.y
+
+    case cutSideLeft:
+      rect = th_rect.mk(lastRect.x, lastRect.y, by.x, lastRect.h)
+
+      lastRect.x += by.x
+      lastRect.w -= by.x
+
+    case cutSideRight:
+      rect = th_rect.mk(lastRect.x+lastRect.w-by.x, lastRect.y, by.x, lastRect.h)
+
+      lastRect.w -= by.x
+  }
+
+  rect.x += gui.padding
+  rect.y += gui.padding
+  rect.w -= gui.padding*2
+  rect.h -= gui.padding*2
+
+  return rect
+}
+
+fn slerpUint32(tween: ^uint32, target: uint32, weight: th.fu) {
+  t := th.fu(tween^)+(target-tween^)*weight
+
+  if t < 0 {
+    return
+  }
+
+  tween ^= trunc(t)
+}
+
+fn slerpUint32Color(tween: ^uint32, target: uint32, weight: th.fu) {
+  r := tween^&0xFF000000>>24
+  g := tween^&0x00FF0000>>16
+  b := tween^&0x0000FF00>>8
+  a := tween^&0x000000FF>>0
+  slerpUint32(&r, target&0xFF000000>>24, weight)
+  slerpUint32(&g, target&0x00FF0000>>16, weight)
+  slerpUint32(&b, target&0x0000FF00>>8, weight)
+  slerpUint32(&a, target&0x000000FF>>0, weight)
+
+  tween ^= (r&0xFF<<24)|(g&0xFF<<16)|(b&0xFF<<8)|(a&0xFF<<0)
+}
+
+fn slerpReal(tween: ^th.fu, target: th.fu, weight: th.fu) {
+  tween^ += (target-tween^)*weight
+}
+
+// run animations
+fn guiUpdate(gui: ^Gui, delta: real) {
+  if delta > 0.05 {
+    delta = 0.05
+  }
+
+  for name in gui.elements {
+    element := &gui.elements[name]
+    if !element.shown {
+      element.targetState = guiDefaultElement(gui).tweenState
+    }
+    element.shown = false
+
+    weight := delta * 20
+    slerpReal(&element.tweenState.rect.x, element.targetState.rect.x, weight)
+    slerpReal(&element.tweenState.rect.y, element.targetState.rect.y, weight)
+    slerpReal(&element.tweenState.rect.w, element.targetState.rect.w, weight)
+    slerpReal(&element.tweenState.rect.h, element.targetState.rect.h, weight)
+    slerpUint32Color(&element.tweenState.color, element.targetState.color, weight/2.0)
+  }
+}
+
+fn drawRectLines*(color: uint32, r: th_rect.Rect) {
+  th_canvas.drawRect(color, th_rect.Rect{r.x, r.y, r.w, 1})
+  th_canvas.drawRect(color, th_rect.Rect{r.x, r.y+r.h-1, r.w, 1})
+  th_canvas.drawRect(color, th_rect.Rect{r.x, r.y+1, 1, r.h-1})
+  th_canvas.drawRect(color, th_rect.Rect{r.x+r.w-1, r.y+1, 1, r.h-1})
+}
+
+fn drawGuiElementFrame(name: str, element: ^Elem, mask: uint32, showTitle: bool = true) {
+  rect := element.tweenState.rect
+  
+  drawRectLines(th.red&mask, rect)
+
+  if showTitle {
+    nameLabelSize := th_canvas.textSize(name, 1)
+    th_canvas.drawRect(th.red&mask, th_rect.mk(rect.x, rect.y, nameLabelSize.x+2, nameLabelSize.y+2))
+    th_canvas.drawText(name, th.Vf2{rect.x+1, rect.y+1}, th.white&mask, 1)
+  }
+}
+
+fn drawGuiElementFrames(gui: ^Gui) {
+  // draw all elements
+  hoveredOver := ""
+  for name := "ROOT"; name != ""; name = gui.elements[name].next {
+    drawGuiElementFrame(name, &gui.elements[name], 0xFFFFFF77, false)
+
+    if rectVsPoint(gui.elements[name].tweenState.rect, th_input.getMousePos()) {
+      hoveredOver = name
+    }
+  }
+
+  drawGuiElementFrame(hoveredOver, &gui.elements[hoveredOver], 0xFFFFFFFF)
+}
+
+type (
+  Colorscheme = struct {
+    item: uint32
+    itemHovered: uint32
+    background: uint32
+    text: uint32
+    current: uint32
+  }
+
+  Countdown = struct {
+    name: str
+    time: real
+  }
+)
+
+const (
+  c_colorschemeDark = Colorscheme{item: 0x565758FF, itemHovered: 0x727475FF, text: 0xFFFFFFFF, background: 0x202122FF, current: 0x4ffa7aFF}
+  c_colorschemeLight = Colorscheme{item: 0xd7d7d7FF, itemHovered: 0xC4C4C4FF, text: 0x000000FF, background: 0xEEEEEFFF, current: 0x178c35FF}
+)
+
+var (
+  v_mainFont: th_font.Font
+  v_mainFontSmall: th_font.Font
+  v_rectBase: th_image.Image
+
+  isDark: bool = true
+  v_colorscheme: Colorscheme = c_colorschemeDark
+  v_countdown: Countdown
+  v_countdownNumber: int
+  v_alarm: th_audio.Sound
+)
+
+fn putGuiText(gui: ^Gui, text: str, small: bool = false, anchor: th.Vf2 = th.Vf2{0.0, 0.0}): th.Vf2 {
+  props := guiGetProperties(gui)
+  font := v_mainFont
+
+  if small {
+    font = v_mainFontSmall
+  }
+
+  rect := props.rect
+  size := font.measure(text)
+
+  pos := props.rect.getPos().add(rect.getDims().sub(size).mul(anchor))
+
+  font.draw(text, pos, props.color)
+  return size
+}
+
+fn formatTime(time: real): str {
+  hours := trunc(time / 3600)
+  minutes := trunc(time / 60)%60
+  seconds := trunc(time)%60
+
+  buf := str(make([]char, 256))
+
+  if hours > 0 {
+    sprintf(buf, "%d:%02d:%02d", hours, minutes, seconds)
+  } else if minutes > 0 {
+    sprintf(buf, "%d:%02d", minutes, seconds)
+  } else {
+    sprintf(buf, "0:%02d", seconds)
+  }
+
+  return buf
+}
+
+//
+// Draws nine-patch rectangle
+//
+// img: Source image
+// outer: Outer rectangle of source
+// inner: Inner rectangle of source (Positioned relative to outer)
+// dest: Destination rectangle
+//
+fn drawRectNinepatch*(img: th_image.Image, outer, inner, dest: th_rect.Rect, tint: uint32 = th.white) {
+  if dest.w < 0 {
+    dest.x += dest.w
+    dest.w = -dest.w
+  }
+
+  if dest.h < 0 {
+    dest.y += dest.h
+    dest.h = -dest.h
+  }
+
+  stepSrc := [3]th.Vf2{th.Vf2{inner.x, inner.y}, th.Vf2{inner.w, inner.h}, th.Vf2{outer.w-(inner.x+inner.w), outer.h-(inner.y+inner.h)}}
+  stepDst := [3]th.Vf2{th.Vf2{stepSrc[0].x, stepSrc[0].y}, th.Vf2{dest.w-stepSrc[0].x-stepSrc[2].x, dest.h-stepSrc[0].y-stepSrc[2].y}, th.Vf2{stepSrc[2].x, stepSrc[2].y}}
+
+  src := th.Vf2{outer.x, outer.y}
+  dst := th.Vf2{dest.x, dest.y}
+
+  imgDims := img.getDims()
+
+  // failsafe
+  if imgDims.x == 0 || imgDims.y == 0 {
+    return
+  }
+
+  for x := 0; x < 3; x++ {
+    ssX := stepSrc[x].x
+    sdX := stepDst[x].x
+    for y := 0; y < 3; y++ {
+      ssY := stepSrc[y].y
+      sdY := stepDst[y].y
+
+      img.crop(th.Vf2{src.x/imgDims.x, src.y/imgDims.y}, th.Vf2{(src.x+ssX)/imgDims.x, (src.y+ssY)/imgDims.y})
+      img.draw(th.Transform{p: th.Vf2{dst.x, dst.y}, s: th.Vf2{sdX/ssX, sdY/ssY}}, tint)
+
+      src.y += ssY
+      dst.y += sdY
+    }
+    src.x += ssX
+    dst.x += sdX
+    src.y = outer.y
+    dst.y = dest.y
+  }
+}
+
+fn putGuiRect(gui: ^Gui) {
+  props := guiGetProperties(gui)
+
+  drawRectNinepatch(v_rectBase, th_rect.mk(0, 0, 16, 16), th_rect.mk(5, 5, 5, 5), props.rect, props.color)
+}
+
+fn putGuiCountdown(id: str, gui: ^Gui, cd: Countdown) {
+  props := guiGetProperties(gui)
+  lastRect := guiGetLastRect(gui).rect
+  button := guiGetButtonState(gui)
+  mul := ((props.color&0xFF)/255.0)
+  mul2 := mul/7.0
+  if button.hovered {
+    mul = 1.0
+    mul2 = 0.5
+  }
+  color := trunc(0xFF * mul) | (props.color & 0xFFFFFF00)
+  nameRect := guiCutRect(gui, cutSideLeft, v_mainFont.measure(cd.name))
+
+
+  guiPushRect(gui, nameRect)
+    guiSetElement(gui, id+"NAME").color = color
+    putGuiText(gui, cd.name)
+  guiPopRect(gui)
+  
+
+  timeRect := guiCutRect(gui, cutSideLeft, v_mainFont.measure(formatTime(cd.time)))
+  guiPushRect(gui, th_rect.mk(timeRect.x, lastRect.y, props.rect.w-timeRect.w-timeRect.x-5, props.rect.h))
+    guiSetElement(gui, id+"DASH").color = trunc(0xFF * mul2) | (props.color & 0xFFFFFF00)
+    putGuiRect(gui)
+  guiPopRect(gui)
+  timeRect.x = (props.rect.w-timeRect.w)
+
+  guiPushRect(gui, timeRect)
+    guiSetElement(gui, id+"TIME").color = color
+    putGuiText(gui, formatTime(cd.time))
+  guiPopRect(gui)
+}
+
+fn putGuiButton(gui: ^Gui, id: str, text: str, side: int = cutSideLeft): ButtonState {
+
+  guiPushRect(gui, guiCutRect(gui, side, th.Vf2{80, 0}))
+    props := guiSetElement(gui, id)
+    props.color = v_colorscheme.item
+    putGuiRect(gui)
+    guiPushRect(gui, guiGetLastRect(gui).rect)
+      state := guiGetButtonState(gui)
+      if state.hovered {
+        props.color = v_colorscheme.itemHovered
+      }
+      guiSetElement(gui, id+"_TEXT").color = v_colorscheme.text
+      putGuiText(gui, text, true, th.Vf2{0.5, 0.5})
+    guiPopRect(gui)
+  guiPopRect(gui)
+
+  return state
+}
+
+fn getCountdown(num: int): Countdown {
+  switch num % 6 {
+    case 0: return Countdown{"Work", 25*60}
+    case 1: return Countdown{"Break", 5*60}
+    case 2: return Countdown{"Work", 25*60}
+    case 3: return Countdown{"Break", 5*60}
+    case 4: return Countdown{"Work", 25*60}
+    case 5: return Countdown{"Long Break", 35*60}
+  }
+  return Countdown{"Invalid", 0}
+}
+
+fn updateCountdown() {
+  v_countdown.time -= th.delta/1000.0
+  for v_countdown.time <= 0 {
+    diff := -v_countdown.time
+    v_countdownNumber += 1
+    v_countdown = getCountdown(v_countdownNumber)
+    v_countdown.time -= diff
+    v_alarm.play()
+  }
+}
+
+fn main() {
+  screen := th_rect.mk(0, 0, 512, 512)
+  th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
+  v_mainFont = th_font.loadFont("Font.ttf", 32)
+  v_mainFontSmall = th_font.loadFont("Font.ttf", 20)
+  v_countdown = getCountdown(0)
+  v_alarm = th_audio.load("Alarm.wav")
+  v_rectBase = th_image.load("rectbase.png")
+
+  gui := guiInit()
+  started := false
+  debug := false
+  gui.padding = 2
+  var (state: ^ElemState)
+
+  for th_window.cycle(screen) {
+    if isDark {
+      v_colorscheme = c_colorschemeDark
+    } else {
+      v_colorscheme = c_colorschemeLight
+    }
+
+    if th_input.isJustPressed(th_input.key_escape) {
+      debug = !debug
+    }
+
+    if started {
+      updateCountdown()
+    }
+
+    screen.w = th_window.w
+    screen.h = th_window.h
+
+	th_canvas.drawRect(v_colorscheme.background, screen)
+
+    guiPushRect(&gui, screen)
+      guiSetElement(&gui, "ROOT").color = v_colorscheme.background
+      putGuiRect(&gui)
+	
+	  elementCount := th_window.h/36-2
+      for i := 0; i < elementCount; i++ {
+        guiPushRect(&gui, guiCutRect(&gui, cutSideTop, th.Vf2{0, 32}))
+          id := "ENTRY"+repr(i+v_countdownNumber)
+          state = guiSetElement(&gui, id)
+
+          if i == 0 {
+            state.color = v_colorscheme.current
+            putGuiCountdown(id, &gui, v_countdown)
+          } else {
+            state.color = (v_colorscheme.text & 0xFFFFFF00) + trunc(0x000000FF * (elementCount-int(i))/elementCount)
+            putGuiCountdown(id, &gui, getCountdown(i+v_countdownNumber))
+          }
+        guiPopRect(&gui)
+      }
+
+      guiPushRect(&gui, guiCutRect(&gui, cutSideBottom, th.Vf2{0, 40}))
+        guiSetElement(&gui, "TOOLBAR").color = v_colorscheme.background&0xFFFFFFFF
+
+        if started {
+          if putGuiButton(&gui, "START", "Stop").pressed {
+            started = false
+          }
+        } else {
+          if putGuiButton(&gui, "START", "Start").pressed {
+            started = true
+          }
+        }
+
+        if putGuiButton(&gui, "RESET", "Reset").pressed {
+          started = false
+          v_countdownNumber = 0
+          v_countdown = getCountdown(0)
+        }
+
+        if putGuiButton(&gui, "SKIP", "Skip").pressed {
+		  guiGetElement(&gui, "ENTRY"+repr(v_countdownNumber)).targetState.color = 0xFFFFFF00
+          v_countdownNumber += 1
+          v_countdown = getCountdown(v_countdownNumber)
+        }
+
+				if debug && putGuiButton(&gui, "EMPTY", "Empty").pressed {
+					v_countdown.time = 0.01
+				}
+
+        currentThemeName := "Dark"
+        if !isDark {
+          currentThemeName = "Light"
+        }
+
+        if putGuiButton(&gui, "THEME_TOGGLE", currentThemeName, cutSideRight).pressed {
+          isDark = !isDark
+        }
+      guiPopRect(&gui)
+    guiPopRect(&gui)
+
+    guiUpdate(&gui, real(th.delta/1000.0))
+
+    if debug {
+      drawGuiElementFrames(&gui)
+    }
+  }
+}
