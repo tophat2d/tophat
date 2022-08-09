@@ -24,3 +24,5 @@ import (
 	"utf8.um"
 	"window.um"
 )
+
+fn main() { }

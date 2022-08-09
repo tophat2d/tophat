@@ -57,13 +57,18 @@ fn (p: ^th.Vf2) abs*(): th.Vf2 {
 }
 
 // Rounds a vector.
-fn (p: ^th.Vf2) rnd*(): th.Vf2 {
+fn (p: ^th.Vf2) round*(): th.Vf2 {
 	return th.Vf2{round(p.x), round(p.y)}
 }
 
 // Truncates a vector.
-fn (p: ^th.Vf2) flr*(): th.Vf2 {
+fn (p: ^th.Vf2) trunc*(): th.Vf2 {
 	return th.Vf2{trunc(p.x), trunc(p.y)}
+}
+
+// Creates a vector with both x and y set to f
+fn (p: ^th.Vf2) vf2f*(f: th.fu): th.Vf2 {
+	return th.Vf2{f, f}
 }
 
 // Subtracts a vector from another one.
@@ -71,9 +76,19 @@ fn (p: ^th.Vf2) sub*(p2: th.Vf2): th.Vf2 {
 	return th.Vf2{p.x - p2.x, p.y - p2.y}
 }
 
+// Subtracts a fu from a vector.
+fn (p: ^th.Vf2) subf*(f: th.fu): th.Vf2 {
+	return th.Vf2{p.x - f, p.y - f}
+}
+
 // Adds a vector to another one.
 fn (p: ^th.Vf2) add*(p2: th.Vf2): th.Vf2 {
 	return th.Vf2{p.x + p2.x, p.y + p2.y}
+}
+
+// Addst a fu to a vector.
+fn (p: ^th.Vf2) addf*(f: th.fu): th.Vf2 {
+	return th.Vf2{p.x + f, p.y + f}
 }
 
 // Divides a vector by another one.
@@ -81,9 +96,19 @@ fn (p: ^th.Vf2) div*(p2: th.Vf2): th.Vf2 {
 	return th.Vf2{p.x / p2.x, p.y / p2.y}
 }
 
+// Divides a vector by a fu.
+fn (p: ^th.Vf2) divf*(f: th.fu): th.Vf2 {
+	return th.Vf2{p.x / f, p.y / f}
+}
+
 // Multiplies a vector by another one.
 fn (p: ^th.Vf2) mul*(p2: th.Vf2): th.Vf2 {
 	return th.Vf2{p.x * p2.x, p.y * p2.y}
+}
+
+// Multiplies a vector by a fu.
+fn (p: ^th.Vf2) mulf*(f: th.fu): th.Vf2 {
+	return th.Vf2{p.x * f, p.y * f}
 }
 
 // Returns the magnitude of a vector p.
