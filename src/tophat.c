@@ -33,28 +33,3 @@ type *th_alloc_##name() { \
 OPAQUE(image, th_image)
 OPAQUE(font, th_font)
 OPAQUE(shader, th_shader)
-
-th_sound *th_get_sound(uu index) {
-	if (!index) return NULL;
-
-	if (index > thg.sound_count)
-		return NULL;
-
-	return thg.sounds[index - 1];
-}
-
-th_sound *th_get_sound_err(uu index) {
-	th_sound *p = th_get_sound(index);
-	if (!p)
-		th_error("Could not find sound with index %d.", index);
-	return p;
-}
-
-th_sound *th_alloc_sound() {
-	void *p = realloc(thg.sounds, (++thg.sound_count + 1) * sizeof(th_sound *));
-	if (!p)
-		return NULL;
-	thg.sounds = p;
-	thg.sounds[thg.sound_count - 1] = calloc(sizeof(th_sound), 1);
-	return thg.sounds[thg.sound_count - 1];
-}

@@ -18,7 +18,7 @@ ifeq ($(SHORT_PLATFORM), MINGW64_NT)
 endif
 endif
 
-CFLAGS ?= -g#-s -O3 -pipe
+CFLAGS ?= -fsanitize=leak -g#-s -O3 -pipe
 CFLAGS += -Ilib/stb/ \
 		  -Ilib/rawdraw/ \
 		  -Ilib/miniaudio/ \

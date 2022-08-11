@@ -15,6 +15,7 @@
 
 ma_device_config auconf;
 ma_device audev;
+ma_decoder_config decodercfg;
 
 extern th_global thg;
 
@@ -54,26 +55,38 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
 }
 
 void _th_audio_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
-	for (int i=thg.sound_count; i > 0; i--) {
-		th_sound *csound = th_get_sound(i);
-		if (csound == NULL)
-			continue;
+	th_playback_item *prev = NULL;
 
-		if (csound->seek_to >= 0) {
-			ma_decoder_seek_to_pcm_frame(&csound->decoder, csound->seek_to);
-			csound->seek_to = -1;
+	for (th_playback_item *pbi = thg.playbacks; pbi; pbi = pbi->next) {
+		th_playback *pk = pbi->pk;
+		if (pk->paused) continue;
+
+		if (pk->frame >= 0) {
+			ma_decoder_seek_to_pcm_frame(pk->decoder, pk->frame);
+			pk->frame = -1;
 		}
 
-		if (!csound->playing)
-			continue;
+		ma_uint32 framesread = __read_and_mix_pcm_frames_f32(
+			pk->decoder,
+			(float *)pOutput,
+			frameCount,
+			pk->volume);
 
-		ma_uint32 framesread = __read_and_mix_pcm_frames_f32(&csound->decoder, (float *)pOutput, frameCount, csound->volume);
+		if (framesread <= 0 || !pk->playing) {
+			pk->frame = 0;
+			if (pk->looping) continue;
 
-		if (framesread <= 0) {
-			ma_decoder_seek_to_pcm_frame(&csound->decoder, 0);
-			if (csound->looping)
-				continue;
-			csound->playing = 0;
+			pk->playing = 0;
+			umkaDecRef(thg.umka, pk);
+			if (prev)
+				prev->next = pbi->next;
+			else
+				thg.playbacks = pbi->next;
+
+			free(pbi);
+			pbi = prev ? prev->next : thg.playbacks;
+
+			if (!pbi) break;
 		}
 	}
 }
@@ -95,35 +108,19 @@ void th_audio_init(){
 		th_error("Failed to start playback device.");
 		return;
 	}
+
+	decodercfg = ma_decoder_config_init(SAMPLE_FORMAT, CHANNEL_COUNT, SAMPLE_RATE);
 }
 
 void th_audio_deinit() {
 	ma_device_uninit(&audev);
 
-	while (thg.sound_count--) {
-		ma_decoder_uninit(&thg.sounds[thg.sound_count]->decoder);
-		free(thg.sounds[thg.sound_count]);
+	for (th_playback_item *pbi = thg.playbacks; pbi;) {
+		umkaDecRef(thg.umka, pbi->pk);
+		th_playback_item *tmp = pbi;
+
+		pbi = pbi->next;
+
+		free(tmp);
 	}
-	free(thg.sounds);
-}
-
-th_sound *th_sound_load(char *path) {
-	ma_decoder_config decodercfg;
-	decodercfg = ma_decoder_config_init(SAMPLE_FORMAT, CHANNEL_COUNT, SAMPLE_RATE);
-
-	th_sound *s = th_alloc_sound();
-	if (!s) {
-		th_error("Could not allocate space for a sound.");
-		return NULL;
-	}
-
-	ma_result res;
-	res = ma_decoder_init_file(path, &decodercfg, &s->decoder);
-	if (res != MA_SUCCESS)
-		th_error("Couldn't load sound at path %s", path);
-
-	s->seek_to = -1;
-	s->volume = 1;
-
-	return s;
 }

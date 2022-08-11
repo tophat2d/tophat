@@ -30,11 +30,13 @@ fn main() {
 	crazytext.putText("M - MUTE", crazytext.lifetimeForever, false)
 
 	for window.cycle(global.cam) {
+				global.playbackBackground.frame = 0
 		if input.isJustPressed('m') {
 			if bgPlaying {
-				global.audioBackground.stop()
+				global.playbackBackground.frame = 0
+				global.playbackBackground.paused = true
 			} else {
-				global.audioBackground.play()
+				global.playbackBackground.paused = false
 			}
 			bgPlaying = !bgPlaying
 		}

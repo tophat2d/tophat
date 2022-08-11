@@ -8,6 +8,8 @@ var (
 	score*: int
 
 	audioBackground*: audio.Sound
+	playbackBackground*: ^audio.Playback
+
 	audioRotate*: audio.Sound
 	audioPush*: audio.Sound
 	audioClear*: audio.Sound
@@ -16,8 +18,11 @@ var (
 
 fn initAudio*() {
 	audioBackground = audio.load("IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
-	audioBackground.looping(true)
-	audioBackground.vol(0.05)
+	audioBackground.looping = true
+	audioBackground.volume = 0.05
+	playbackBackground = audioBackground.play()
+	playbackBackground.paused = true
+
 	audioRotate = audio.load("Rotation.wav")
 	audioPush = audio.load("Placement.wav")
 	audioClear = audio.load("Clear.wav")
@@ -25,7 +30,6 @@ fn initAudio*() {
 }
 
 fn playSound*(sound: ^audio.Sound) {
-	sound.stop()
 	sound.play()
 }
 

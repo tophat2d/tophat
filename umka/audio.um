@@ -4,57 +4,42 @@ import (
 	"th.um"
 )
 
-// Sound is an opaque struct. Do not create manually.
+// A structure used to create playbacks.
 type Sound* = struct {
-	handle: int
+	looping: bool
+	volume: th.fu
+	path: str
 }
 
-fn cauload(path: str): int
-fn csoundloop(s: int, looping: th.uu)
-fn csoundplay(s: int) 
-fn csoundstop(s: int)
-fn csoundpause(s: int)
-fn csoundvol(s: int, vol: th.fu)
-fn csoundvalidate(s: int): th.uu
+// Playback is a currently played instance of a sound.
+// The properties are set to the value the sound has.
+// sound.play returns a pointer. Be sure to keep it if you want to
+// change the sound while its playing.
+type Playback* = struct{
+	decoder: ^struct{}
+	// Indicates if the sound is playing.
+	playing: bool
+	// If set to true, playback will be paused.
+	paused: bool
+	// If true, playback will keep on playing again after it ends.
+	looping: bool
+	// Multiplier of the volume.
+	volume: th.fu
+	// Sets the current PCM frame. Write only.
+	frame: int
+}
+
+fn csoundplay(s: ^Sound): ^Playback
 
 // Loads sound at a path.
 fn load*(path: str): Sound {
-	s := Sound{cauload(path)}
-
-	return s
-}
-
-// Sets the Sound as looping. Off by default.
-fn (s: ^Sound) looping*(l: bool) {
-	if l {
-		csoundloop(s.handle, 1)
-		return
-	}
-
-	csoundloop(s.handle, 0)
+	return Sound{
+		looping: false,
+		volume: 1,
+		path: path }
 }
 
 // Plays the sound.
-fn (s: ^Sound) play*() {
-	csoundplay(s.handle)
-}
-
-// Stops the sound and resets the progress.
-fn (s: ^Sound) stop*() {
-	csoundstop(s.handle)
-}
-
-// Pauses the sound and keeps the progress.
-fn (s: ^Sound) pause*() {
-	csoundpause(s.handle)
-}
-
-// Set's the volume of the sound as a multiplier of it's default volume.
-fn (s: ^Sound) vol*(vol: th.fu) {
-	csoundvol(s.handle, vol)
-}
-
-// Returns true, if s points to a sound.
-fn (s: ^Sound) validate*(): bool {
-	return bool(csoundvalidate(s.handle))
+fn (s: ^Sound) play*(): ^Playback {
+	return csoundplay(s)
 }

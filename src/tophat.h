@@ -40,10 +40,24 @@ typedef struct {
 } th_transform;
 
 typedef struct {
-	int playing, looping, seek_to;
+	bool looping;
 	fu volume;
-	ma_decoder decoder;
+	char *path;
 } th_sound;
+
+typedef struct {
+	ma_decoder *decoder;
+	bool playing;
+	bool paused;
+	bool looping;
+	fu volume;
+	int64_t frame;
+} th_playback;
+
+typedef struct th_playback_item {
+	th_playback *pk;
+	struct th_playback_item *next;
+} th_playback_item;
 
 typedef struct {
 	th_vf2 dm;
@@ -177,8 +191,7 @@ typedef struct {
 	uu just_pressed[255];
 	th_vf2 mouse;
 
-	th_sound **sounds;
-	uu sound_count;
+	th_playback_item *playbacks;
 
 	th_font *fonts;
 	uu font_count;
@@ -197,7 +210,6 @@ th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell);
 // audio
 void th_audio_init();
 void th_audio_deinit();
-th_sound *th_sound_load(char *path);
 void _th_audio_data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
 
 // bindings
@@ -295,17 +307,14 @@ void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 // tophat
 th_image *th_get_image(uu index);
 th_font *th_get_font(uu index);
-th_sound *th_get_sound(uu index);
 th_shader *th_get_shader(uu index);
 
 th_image *th_get_image_err(uu index);
 th_font *th_get_font_err(uu index);
-th_sound *th_get_sound_err(uu index);
 th_shader *th_get_shader_err(uu index);
 
 th_image *th_alloc_image();
 th_font *th_alloc_font();
-th_sound *th_alloc_sound();
 th_shader *th_alloc_shader();
 
 // utf8
