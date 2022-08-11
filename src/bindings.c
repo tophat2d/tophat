@@ -41,11 +41,13 @@ void umfontrenderglyph(UmkaStackSlot *p, UmkaStackSlot *r) {
 	if (!font)
 		return;
 
-	th_image *img = th_alloc_image();
+	th_image **ret = p[3].ptrVal;
+
+	th_image *img = th_image_alloc();
 	if (!img)
 		return;
 	th_font_render_glyph(img, font, glyph, scale);
-	r->intVal = thg.image_count;
+	*ret = img;
 }
 
 void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -165,19 +167,16 @@ void umtmapautotile(UmkaStackSlot *p, UmkaStackSlot *r) {
 // images
 // loads an image at respath + path
 void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image **img = p[1].ptrVal;
 	char *path = (char *)p[0].ptrVal;
 
 	char pathcpy[1024];
-	th_image *img = th_alloc_image();
-	if (!img) return;
-	img = th_load_image(conv_path(pathcpy, path));
-
-	r[0].intVal = img ? thg.image_count : 0;
+	*img = th_load_image(conv_path(pathcpy, path));
 }
 
 // checks, if image is correctly loaded
 void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[0].uintVal);
+	th_image *img = p[0].ptrVal;
 	if (!img) return;
 	if (img->data != NULL) {
 		r->intVal = 1;
@@ -189,7 +188,7 @@ void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // flips image
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[1].uintVal);
+	th_image *img = p[1].ptrVal;
 	if (!img) return;
 
 	img->flipv = p[0].intVal;
@@ -197,14 +196,14 @@ void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // flips image
 void umimgfliph(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[1].uintVal);
+	th_image *img = p[1].ptrVal;
 	if (!img) return;
 
 	img->fliph = p[0].intVal;
 }
 
 void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[0].uintVal);
+	th_image *img = p[0].ptrVal;
 	if (!img) return;
 	th_vf2 *out = (th_vf2 *)p[1].ptrVal;
 
@@ -215,7 +214,7 @@ void umimggetdims(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[2].uintVal);
+	th_image *img = p[2].ptrVal;
 	if (!img) return;
 	th_vf2 tl = *(th_vf2 *)&p[1];
 	th_vf2 br = *(th_vf2 *)&p[0];
@@ -227,30 +226,32 @@ void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umimgfromdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 dm = *(th_vf2 *)&p[0];
 	uint32_t *data = (uint32_t *)p[1].ptrVal;
+	th_image **ret = p[2].ptrVal;
 
-	th_image *img = th_alloc_image();
+	th_image *img = th_image_alloc();
 	if (!img) return;
 	th_image_from_data(img, data, dm);
 
-	r->intVal = thg.image_count;
+	*ret = img;
 }
 
 void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img1 = th_get_image_err(p[0].intVal);
+	th_image *img1 = p[0].ptrVal;
+	th_image **ret = p[1].ptrVal;
 	if (!img1) return;
 
-	th_image *img2 = th_alloc_image();
+	th_image *img2 = th_image_alloc();
 	if (!img2) return;
 	th_image_from_data(img2, img1->data, img1->dm);
 	img2->flipv = img1->flipv;
 	img2->fliph = img1->fliph;
 	img2->crop = img1->crop;
 
-	r->intVal = thg.image_count;
+	*ret = img2;
 }
 
 void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[1].intVal);
+	th_image *img = p[1].ptrVal;
 	if (!img) return;
 	int filter = p[0].intVal;
 
@@ -258,7 +259,7 @@ void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimgupdatedata(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[2].intVal);
+	th_image *img = p[2].ptrVal;
 	if (!img) return;
 	uint32_t *data = p[1].ptrVal;
 	th_vf2 dm = *(th_vf2 *)&p[0];
@@ -267,7 +268,7 @@ void umimgupdatedata(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimggetdata(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[1].intVal);
+	th_image *img = p[1].ptrVal;
 	if (!img) return;
 	uint32_t *data = p[0].ptrVal;
 	memcpy(data, img->data, sizeof(uint32_t) * img->dm.w * img->dm.h);
@@ -476,7 +477,7 @@ void umcanvasline(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimagedraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = th_get_image_err(p[2].uintVal);
+	th_image *img = p[2].ptrVal;
 	if (!img) return;
 	th_transform *t = (th_transform *)p[1].ptrVal;
 	uint32_t c = p[0].uintVal;
@@ -492,7 +493,7 @@ void umimgdrawonquad(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_quad q;
 	q = *(th_quad *)&p[0];
 	uint32_t filter = p[4].uintVal;
-	th_image *img = th_get_image(p[5].uintVal);	
+	th_image *img = p[5].ptrVal;	
 
 	th_blit_tex(img, q, filter);
 }

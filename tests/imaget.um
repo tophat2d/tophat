@@ -23,6 +23,7 @@ fn main() {
 	printf("etc/test.png: %s\n", repr(img.validate()))
 
 	img2 := img.copy()
+	printf("copy: %s\n", repr(img2.validate()))
 	data := img.getData()
 	dm := img.getDims()
 	for i in data {
@@ -32,7 +33,7 @@ fn main() {
 	}
 
 	//img2 := image.mk(data, dm)
-	img2.setData(data, th.Vf2{dm.x, dm.y / 2})
+	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
 
 	for window.cycle(cam) {
 		img.draw(th.Transform{

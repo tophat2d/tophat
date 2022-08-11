@@ -7,9 +7,8 @@ th_vf2 th_atlas_nth_coords(th_atlas *a, uu n) {
 }
 
 th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell) {
-	th_image *i = th_get_image(a->i);
 	return (th_rect) {
-		.x = cell.x * a->cs.x / i->dm.x, .y = cell.y * a->cs.y / i->dm.y,
-		.w = a->cs.x / i->dm.x, .h = a->cs.y / i->dm.y
+		.x = cell.x * a->cs.x / a->i->dm.x, .y = cell.y * a->cs.y / a->i->dm.y,
+		.w = a->cs.x / a->i->dm.x, .h = a->cs.y / a->i->dm.y
 	};
 }

@@ -12,7 +12,7 @@ type (
 )
 
 fn cfontload(path: str): th.uu
-fn crenderglyph(font: th.uu, rune: uint32, scale: th.fu): th.uu
+fn crenderglyph(ret: ^image.Image, font: th.uu, rune: uint32, scale: th.fu): th.uu
 fn cgetkern(font: th.uu, runeA, runeB: uint32): th.fu
 fn cgetadvance(font: th.uu, rune: uint32): th.fu
 
@@ -20,7 +20,7 @@ fn (f: ^Font) getGlyph(rune: uint32): image.Image {
   if validkey(f.cache, rune) {
     return f.cache[rune]
   }
-  f.cache[rune] = image.Image{crenderglyph(f.handle, rune, f.size/5.0)}
+  crenderglyph(&f.cache[rune], f.handle, rune, f.size/5.0)
   return f.cache[rune]
 }
 

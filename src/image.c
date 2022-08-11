@@ -24,6 +24,19 @@ static GLuint batch_tex = 0;
 
 extern th_global thg;
 
+void th_image_free(th_image *img) {
+	glDeleteTextures(1, &img->gltexture);
+	free(img->data);
+}
+
+void th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image_free(p[0].ptrVal);
+}
+
+th_image *th_image_alloc() {
+	return umkaAllocData(thg.umka, sizeof(th_image), th_image_free_umka);
+}
+
 th_image *th_load_image(char *path) {
 	int w, h, c;
 
@@ -33,7 +46,7 @@ th_image *th_load_image(char *path) {
 		return NULL;
 	}
 
-	th_image *img = th_alloc_image();
+	th_image *img = th_image_alloc();
 	img->dm.w = w;
 	img->dm.h = h;
 	img->channels = c;
@@ -259,11 +272,4 @@ void th_image_init() {
 	glBindVertexArray(0);
 }
 
-void th_image_deinit() {
-	while (thg.image_count--) {
-		th_image img = thg.images[thg.image_count];
-		glDeleteTextures(1, &img.gltexture);
-		free(img.data);
-	}
-	free(thg.images);
-}
+void th_image_deinit() { }

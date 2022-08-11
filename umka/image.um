@@ -6,61 +6,59 @@ import (
 // Represents a drawable image. It is an opaque structure.
 // Images support a color filter. It is applied by multiplying the color
 // of each pixel with the filter.
-type Image* = struct {
-	handle: int
-}
+type Image* = struct{ _: ^struct{} }
 
-fn loadimg(path: ^char): int
-fn flipvimg(i: int, f: bool)
-fn fliphimg(i: int, f: bool)
-fn imgvalid(i: int): int32
-fn imggetdims(dm: ^th.Vf2, i: int)
-fn imgcrop(img: int, tl, br: th.Vf2)
-fn imgfromdata(data: ^uint32, dm: th.Vf2): int
-fn imgcopy(data: int): int
-fn imgsetfilter(data, filter: int)
-fn imgdrawonquad(img: int, color: uint32, q: [4]th.Vf2)
-fn imgupdatedata(img: int, data: ^uint32, dm: th.Vf2)
-fn imggetdata(img: int, data: ^uint32)
+fn loadimg(ret: ^Image, path: ^char)
+fn flipvimg(i: Image, f: bool)
+fn fliphimg(i: Image, f: bool)
+fn cdrawimage(img: Image, t: ^th.Transform, color: uint32)
+fn imggetdims(dm: ^th.Vf2, i: Image)
+fn imgcrop(img: Image, tl, br: th.Vf2)
+fn imgfromdata(ret: ^Image, data: ^uint32, dm: th.Vf2)
+fn imgcopy(ret: ^Image, data: Image)
+fn imgsetfilter(data: Image, filter: int)
+fn imgdrawonquad(img: Image, color: uint32, q: [4]th.Vf2)
+fn imgupdatedata(img: Image, data: ^uint32, dm: th.Vf2)
+fn imggetdata(img: Image, data: ^uint32)
 
 // Loads an image at path.
 fn load*(path: str): Image {
-	i := loadimg(&path[0])
-	return Image{i}
+	img := Image{}
+	loadimg(&img, &path[0])
+	return img
 }
 
 // Flips image on it's vertical axis.
 fn (i: ^Image) flipv*(flip: bool) {
-	flipvimg(i.handle, flip)
+	flipvimg(i^, flip)
 }
 
 // Flips image on it's horizontal axis.
 fn (i: ^Image) fliph*(flip: bool) {
-	fliphimg(i.handle, flip)
+	fliphimg(i^, flip)
 }
 
-fn cdrawimage(img: int, t: ^th.Transform, color: uint32)
 // Draws the image in screen coordinates. It transforms it with t and
 // applies color as a color filter.
 fn (i: ^Image) draw*(t: th.Transform, color: uint32 = th.white) {
-	cdrawimage(i.handle, &t, color)
+	cdrawimage(i^, &t, color)
 }
 
 // Draws the image on top of a quad with corners of the image positioned
 // on the verticies of the quad.
 fn (i: ^Image) drawOnQuad*(q: [4]th.Vf2, color: uint32 = th.white) {
-	imgdrawonquad(i.handle, color, q)
+	imgdrawonquad(i^, color, q)
 }
 
 // Returns true, if i's handle points to an image.
 fn (i: ^Image) validate*(): bool {
-	return bool(imgvalid(i.handle))
+	return i._ != null
 }
 
 // Returns width and heigth.
 fn (i: ^Image) getDims*(): th.Vf2 {
 	out := th.Vf2{}
-	imggetdims(&out, i.handle)
+	imggetdims(&out, i^)
 
 	return out
 }
@@ -68,17 +66,23 @@ fn (i: ^Image) getDims*(): th.Vf2 {
 // Crops an image. Coordinates are between 0, 0 (top left) and
 // 1, 1 (bottom right)
 fn (i: ^Image) crop*(tl, br: th.Vf2) {
-	imgcrop(i.handle, tl, br)
+	imgcrop(i^, tl, br)
 }
 
 // Creates an image from raw data.
 fn mk*(data: []uint32, dm: th.Vf2): Image {
-	return Image{imgfromdata(&data[0], dm)}
+	img := Image{}
+	imgfromdata(&img, &data[0], dm)
+
+	return img
 }
 
 // Copies image into a new one.
 fn (i: ^Image) copy*(): Image {
-	return Image{imgcopy(i.handle)}
+	img := Image{}
+	imgcopy(&img, i^)
+	
+	return img
 }
 
 // Sets a mag/min filter. 0 is linear, others are nearest.
@@ -87,28 +91,35 @@ fn (i: ^Image) copy*(): Image {
 // https://learnopengl.com/img/getting-started/texture_filtering.png
 // left is nearest, right is linear.
 fn (i: ^Image) setfilter*(filter: int) {
-	imgsetfilter(i.handle, filter)
+	imgsetfilter(i^, filter)
 }
 
 // Updates the image data. dm are the dimensions of the new image.
+// The new image doesn't have to be the same size as the old one.
 fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
-	if (dm.x * dm.y > len(data)) {
-		error("setData: incorrect dimensions")
+	if dm.x * dm.y != len(data) {
+		error("setData: incorrect dimensions: " + repr(dm.x * dm.y) + "!= " + repr(len(data)))
 	}
 
-	if (len(data) == 0) {
+	if len(data) == 0 {
 		error("setData: can't set empty image")
 	}
 
-	imgupdatedata(i.handle, &data[0], dm)
+	imgupdatedata(i^, &data[0], dm)
 }
 
 // Gets the image data.
 fn (i: ^Image) getData*(): []uint32 {
-	if (i.handle == 0) { return []uint32{} }
+	if i._ == null {
+		return []uint32{}
+	}
 
 	buf := make([]uint32, trunc(i.getDims().x * i.getDims().y))
-	imggetdata(i.handle, &buf[0])
+	if len(buf) == 0 {
+		return buf
+	}
+
+	imggetdata(i^, &buf[0])
 
 	return buf
 }

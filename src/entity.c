@@ -21,11 +21,10 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 	t.pos.y -= camy;
 
 	th_rect r = o->rect;
-	th_image *img = th_get_image(o->img);
-	if (img)
+	if (o->img)
 		r = (th_rect){
-		.w = (img->crop.w - img->crop.x) * img->dm.x,
-		.h = (img->crop.h - img->crop.y) * img->dm.y};
+		.w = (o->img->crop.w - o->img->crop.x) * o->img->dm.x,
+		.h = (o->img->crop.h - o->img->crop.y) * o->img->dm.y};
 	th_quad q = {0};
 	th_transform_rect(&q, t, r);
 	
@@ -46,7 +45,7 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 		return;
 	}
 
-	th_blit_tex(img, q, o->color);
+	th_blit_tex(o->img, q, o->color);
 }
 
 void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,

@@ -17,12 +17,14 @@ fn load*(path: str): Font {
 	return Font{cfontload(path)}
 }
 
-fn crenderglyph(font: th.uu, glyph: uint32, scale: th.fu): th.uu
+fn crenderglyph(ret: ^image.Image, font: th.uu, glyph: uint32, scale: th.fu): th.uu
 // Renders a white glyph with given size. The glyph is properly positioned
 // in relation to the baseline, so it's ready to be drawn at the same height
 // as all other glyph images produced by this method.
 fn (f: ^Font) renderGlyph*(glyph: uint32, scale: th.fu): image.Image {
-	return image.Image{crenderglyph(f.handle, glyph, scale)}
+	img := image.Image{}
+	crenderglyph(&img, f.handle, glyph, scale)
+	return img
 }
 
 fn cfontgetglyphindex(f: int, c: uint32): uint32
@@ -104,7 +106,7 @@ fn mkCached*(f: Font, s: th.fu = 40): Cached {
 }
 
 fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
-	if c.cache.get(rune).handle != 0 {
+	if c.cache.get(rune).validate() {
 		return
 	}
 
@@ -113,7 +115,7 @@ fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
 
 fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
 	img := c.cache.get(rune)
-	if img.handle == 0 {
+	if !img.validate() {
 		c.preCacheRune(rune)
 		img = c.cache.get(rune)
 	}

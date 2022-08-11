@@ -30,6 +30,5 @@ type *th_alloc_##name() { \
 } \
 
 
-OPAQUE(image, th_image)
 OPAQUE(font, th_font)
 OPAQUE(shader, th_shader)

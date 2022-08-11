@@ -71,17 +71,8 @@ typedef struct {
 } th_image;
 
 typedef struct {
-	int x;
-	int y;
-	int *v;
-	int w;
-	int h;
-	int vc;
-} th_poly;
-
-typedef struct {
 	th_rect rect;
-	uint64_t img;
+	th_image *img;
 	th_transform t;
 	uint32_t color;
 } th_ent;
@@ -144,7 +135,7 @@ typedef struct {
 } th_ray;
 
 typedef struct {
-	uint64_t i;
+	th_image *i;
 	th_vf2 cs;
 	th_vf2 dm;
 } th_atlas;
@@ -165,7 +156,7 @@ typedef struct {
 } th_font;
 
 typedef struct {
-	uint64_t i;
+	th_image *i;
 	uint32_t r;
 	int32_t g;
 } th_font_cache_item; 
@@ -196,9 +187,6 @@ typedef struct {
 	th_font *fonts;
 	uu font_count;
 
-	th_image *images;
-	uu image_count;
-	
 	th_shader *shaders;
 	uu shader_count;
 } th_global;
@@ -253,17 +241,21 @@ GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char 
 void th_gl_free_prog(GLuint prog);
 
 // image
+th_image *th_image_alloc();
 th_image *th_load_image(char *path);
-void th_free_image(th_image *img);
+void th_image_free(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
-void th_image_set_filter(th_image *img, int filter);
-void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
+
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(th_image *img, th_quad q, uint32_t color);
+void _th_rdimg(th_image *img, unsigned char *data);
+
+void th_image_set_filter(th_image *img, int filter);
+void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
+
 void th_image_init();
 void th_image_deinit();
 void th_image_flush();
-void _th_rdimg(th_image *img, unsigned char *data);
 int th_image_compile_shader(char *frag, char *vert);
 
 // input
@@ -306,15 +298,12 @@ void th_tmap_draw(th_tmap *t, th_rect *cam);
 void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 
 // tophat
-th_image *th_get_image(uu index);
 th_font *th_get_font(uu index);
 th_shader *th_get_shader(uu index);
 
-th_image *th_get_image_err(uu index);
 th_font *th_get_font_err(uu index);
 th_shader *th_get_shader_err(uu index);
 
-th_image *th_alloc_image();
 th_font *th_alloc_font();
 th_shader *th_alloc_shader();
 

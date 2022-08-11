@@ -146,7 +146,7 @@ void th_cached_font_draw(th_cached_font *c, char *str,
 			continue;
 		}
 
-		th_image *i = th_get_image(fci->i);
+		th_image *i = fci->i;
 		th_blit_tex(i, (th_quad){{
 				.tl = (th_vf2){ .x = pos.x                , .y = pos.y                 },
 				.tr = (th_vf2){ .x = pos.x + scale*i->dm.w, .y = pos.y                 },

@@ -1,1 +1,17 @@
-tests/imaget.um
+import (
+	"th.um"
+	"rect.um"
+	"image.um"
+	"window.um"	
+)
+
+fn main() {
+	window.setup()
+
+	i := image.load("etc/test.png")
+	printf("%s\n", repr(i))
+
+	for window.cycle(rect.mk(0, 0, 100, 100)) {
+		i.draw(th.mkTransform(th.Vf2{10, 10}))
+	}
+}
