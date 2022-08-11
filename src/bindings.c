@@ -174,18 +174,6 @@ void umimgload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	*img = th_load_image(conv_path(pathcpy, path));
 }
 
-// checks, if image is correctly loaded
-void umimgvalid(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = p[0].ptrVal;
-	if (!img) return;
-	if (img->data != NULL) {
-		r->intVal = 1;
-		return;
-	}
-
-	r->intVal = 0;
-}
-
 // flips image
 void umimgflipv(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = p[1].ptrVal;
@@ -599,7 +587,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "loadimg", &umimgload);
 	umkaAddFunc(umka, "flipvimg", &umimgflipv);
 	umkaAddFunc(umka, "fliphimg", &umimgfliph);
-	umkaAddFunc(umka, "imgvalid", &umimgvalid);
 	umkaAddFunc(umka, "imggetdims", &umimggetdims);
 	umkaAddFunc(umka, "imgcrop", &umimgcrop);
 	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
