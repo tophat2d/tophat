@@ -28,3 +28,10 @@ int th_shader_compile(
 
 	return thg.shader_count;
 }
+
+void th_shader_deinit() {
+	for (int i=0; i < thg.shader_count; i++)
+		th_gl_free_prog(thg.shaders[i]);
+
+	free(thg.shaders);
+}

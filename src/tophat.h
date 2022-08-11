@@ -299,6 +299,7 @@ void th_ray_getcoll(th_ray *ra, th_coll *colls, int maxColls,
 int th_shader_compile(
 	char *vertf, char *fragf, char *vertb, char *fragb,
 	const char **verta, int vertac);
+void th_shader_deinit();
 
 // tilemap
 void th_tmap_draw(th_tmap *t, th_rect *cam);
