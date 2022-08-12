@@ -26,6 +26,9 @@ int th_shader_compile(
 	th_shader *s = th_alloc_shader();
 	*s = prog;
 
+	free(vert);
+	free(frag);
+
 	return thg.shader_count;
 }
 
