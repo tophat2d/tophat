@@ -8,14 +8,13 @@ import (
 
 var (
 	hearth: image.Image
-	mainFont*: font.Cached
+	mainFont*: font.Font
 )
 
 fn init*() {
 	hearth = image.load("gfx/hearth.png")
 
-	mainFont = font.mkCached(font.load("gfx/marediv-regular.ttf"), 60)
-	mainFont.preCacheStr("0123456789")
+	mainFont = font.load("gfx/marediv-regular.ttf", 16)
 }
 
 fn handle*() { }
@@ -29,5 +28,5 @@ fn draw*() {
 				s: th.Vf2{1, 1}}, th.white)
 	}
 
-	mainFont.draw(repr(global.score), th.Vf2{1, 1}, th.white, 5)
+	mainFont.draw(repr(global.score), th.Vf2{1, 1}, th.white, 1.0)
 }

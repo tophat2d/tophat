@@ -63,13 +63,6 @@ th_image *th_load_image(char *path) {
 	return img;
 }
 
-void th_free_image(th_image *img) {
-	glDeleteTextures(1, &img->gltexture);
-
-	free(img->data);
-	free(img);
-}
-
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 	img->data = malloc(sizeof(uint32_t) * dm.w * dm.h);
 	memcpy(img->data, data, sizeof(uint32_t) * dm.w * dm.h);

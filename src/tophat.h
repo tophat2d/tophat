@@ -149,25 +149,27 @@ typedef struct {
 	fu scale;
 } th_tmap;
 
+
+#define TH_FONTPLATFORM_PAGECOUNT 1024
+#define TH_FONTPLATFORM_CHARSPERPAGE 256
+
+// this fits 256 characters into an img.
+// with an nxn image. size is power of 2. don't go over 1024x1024 please.
 typedef struct {
-	stbtt_fontinfo *info;
-	fu scale;
-	unsigned char *buf;
+	th_image img; // Can i really safely do that
+	stbtt_packedchar pc[TH_FONTPLATFORM_CHARSPERPAGE];
+} th_font_atlas_page;
+
+typedef struct {
+	uint32_t filter;
+	double size, ascent, descent, scale;
+
+	void* data;
+	stbtt_fontinfo info;
+	// 1024 is a reasonable amount to represent about 262k glyphs (256*1024)
+	// page 0 (ascii set), is always allocated at startup for frequencey reasons.
+	th_font_atlas_page *pages[TH_FONTPLATFORM_PAGECOUNT];
 } th_font;
-
-typedef struct {
-	th_image *i;
-	uint32_t r;
-	int32_t g;
-} th_font_cache_item; 
-
-typedef UmkaDynArray(th_font_cache_item) th_font_cache;
-
-typedef struct {
-	th_font_cache cache;
-	fu size;
-	uu font;
-} th_cached_font;
 
 typedef GLuint th_shader;
 
@@ -227,12 +229,10 @@ void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
 	uu maxColls, th_coll *colls);
 
 // font
-th_font *th_font_load(char *path);
-void th_font_render_glyph(th_image *img, th_font *font,
-                          uint32_t glyph, fu scale);
+th_font *th_font_load(char *path, double size, uint32_t filter);
+void th_font_draw(th_font *font, const char *s, double x, double y, uint32_t color, double scale);
+th_vf2 th_font_measure(th_font *font, const char *s);
 void th_font_deinit();
-void th_cached_font_draw(th_cached_font *c, char *str,
-                         th_vf2 pos, uint32_t color, fu scale);
 
 // gl
 void th_gl_init();

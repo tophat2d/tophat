@@ -14,10 +14,14 @@ extern th_global thg;
 
 extern char *th_em_modulesrc[];
 
+// FIXME(skejeton): Using this function is an easy buffer overflow.
 static
 char *conv_path(char *out, char *path) {
-	if (strstr(path, "raw://") == path) {
-		strcpy(out, path + strlen("raw://"));
+	const char *RAW_PFX = "raw://";
+	const int RAW_PFX_LEN = strlen("raw://");
+
+	if (strncmp(path, RAW_PFX, RAW_PFX_LEN) == 0) {
+		strcpy(out, path + RAW_PFX_LEN);
 	} else {
 		strcpy(out, thg.respath);
 		strcat(out, path);
@@ -34,61 +38,36 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->ptrVal = f;
 }
 
-void umfontrenderglyph(UmkaStackSlot *p, UmkaStackSlot *r) {
-	fu scale = p[0].real32Val;
-	uint32_t glyph = p[1].uintVal;
-	th_font *font = th_get_font(p[2].uintVal);
-	if (!font)
-		return;
+// fn cfontload((2) path: str, (1) size: real, (0) filter: uint32) 
+static void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
+	uint32_t filter = p[0].uintVal;
+	double size = p[1].realVal;
+	char path[1024];
+	conv_path(path, p[2].ptrVal);
 
-	th_image **ret = p[3].ptrVal;
-
-	th_image *img = th_image_alloc();
-	if (!img)
-		return;
-	th_font_render_glyph(img, font, glyph, scale);
-	*ret = img;
+	// NOTE(skejeton): The font load function may return null pointer on fail,
+	//	   				     it would be the responsibility of the user to verify the validity.
+	r->ptrVal = th_font_load(path, size, filter);
 }
 
-void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
-	char buf[1024];
-	th_font *f = th_font_load(conv_path(buf, p[0].ptrVal));
-	if (!f)
-		r->intVal = 0;
-	r->intVal = thg.font_count;
-}
-
-void umfontgetkern(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_font *font = th_get_font(p[2].intVal);
-	uint32_t glyph1 = p[1].intVal;
-	uint32_t glyph2 = p[0].intVal;
-	int kern = stbtt_GetCodepointKernAdvance(font->info, glyph1, glyph2);
-	r->realVal = kern * font->scale;
-}
-
-void umfontgetadvance(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_font *font = th_get_font(p[1].intVal);
-	uint32_t glyph = p[0].intVal;
-	int advance;
-	stbtt_GetCodepointHMetrics(font->info, glyph, &advance, 0);
-	r->realVal = advance * font->scale;
-}
-
-void umcachedfontdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_cached_font *cf = p[4].ptrVal;
-	char *text = p[3].ptrVal;
-	th_vf2 pos = *(th_vf2 *)&p[2];
+// fn cfontdraw((5) font: Font, (4) s: str, (3) x: real, (2) y: real, (1) color: uint32, (0) scale: real)
+static void umfontdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
+	double scale = p[0].realVal;
 	uint32_t color = p[1].uintVal;
-	fu scale = p[0].real32Val;
+	double y = p[2].realVal;
+	double x = p[3].realVal;
+	const char *s = p[4].ptrVal;
+	th_font *font = p[5].ptrVal;
 
-	th_cached_font_draw(cf, text, pos, color, scale);
+	th_font_draw(font, s, x, y, color, scale);
 }
 
-void umfontgetglyphindex(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_font *f = th_get_font(p[1].intVal);
-	uint32_t codepoint = p[0].intVal;
+// fn cfontmeasure((2) font: Font, (1) s: str, (0) o: ^th.Vf2)
+static void umfontmeasure(UmkaStackSlot *p, UmkaStackSlot *r) {
+	const char *s = p[1].ptrVal;
+	th_font *font = p[2].ptrVal;
 
-	r->intVal = stbtt_FindGlyphIndex(f->info, codepoint);
+	*((th_vf2*)p[0].ptrVal) = th_font_measure(font, s);
 }
 
 // sets values of all dots to lightmask's color
@@ -565,17 +544,17 @@ void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
 
-	umkaAddFunc(umka, "crenderglyph", &umfontrenderglyph);
+	// font
 	umkaAddFunc(umka, "cfontload", &umfontload);
-	umkaAddFunc(umka, "cgetadvance", &umfontgetadvance);
-	umkaAddFunc(umka, "cgetkern", &umfontgetkern);
-	umkaAddFunc(umka, "ccachedfontdraw", &umcachedfontdraw);
-	umkaAddFunc(umka, "cfontgetglyphindex", &umfontgetglyphindex);
+	umkaAddFunc(umka, "cfontdraw", &umfontdraw);
+	umkaAddFunc(umka, "cfontmeasure", &umfontmeasure);
 
+	// light
 	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
 	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
 	umkaAddFunc(umka, "cspotlightstamp", &umspotlightstamp);
 
+	// particles
 	umkaAddFunc(umka, "c_particles_draw", &umparticlesdraw);
 
 	// tilemaps

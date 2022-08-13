@@ -5,7 +5,7 @@ import (
   th = "th.um"
   th_input = "input.um"
   th_image = "image.um"
-  th_font = "d_font.um"
+  th_font = "font.um"
   th_audio = "audio.um"
 )
 
@@ -446,8 +446,8 @@ fn updateCountdown() {
 fn main() {
   screen := th_rect.mk(0, 0, 512, 512)
   th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
-  v_mainFont = th_font.loadFont("Font.ttf", 32)
-  v_mainFontSmall = th_font.loadFont("Font.ttf", 20)
+  v_mainFont = th_font.load("Font.ttf", 32, 1)
+  v_mainFontSmall = th_font.load("Font.ttf", 20, 1)
   v_countdown = getCountdown(0)
   v_alarm = th_audio.load("Alarm.wav")
   v_rectBase = th_image.load("rectbase.png")

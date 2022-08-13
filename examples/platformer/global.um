@@ -13,18 +13,18 @@ var (
 )
 
 fn readall*(path: str): str {
-		f := std.fopen(path, "r")
-    const blockSize = 16
-    res := ""
+	f := std.fopen(path, "r")
+	const blockSize = 16
+	res := ""
 
-    for ok := true; ok {
-	    var buff: [blockSize + 1]char
-	    ok = std.fread(f, ^[blockSize]char(&buff)) == 1
-	    res += str([]char(buff))
-    }
+	for ok := true; ok {
+		var buff: [blockSize + 1]char
+		ok = std.fread(f, ^[blockSize]char(&buff)) == 1
+		res += str([]char(buff))
+	}
 
-		std.fclose(f)
-    return res
+	std.fclose(f)
+	return res
 }
 
 fn timeStr*(ms: int): str {

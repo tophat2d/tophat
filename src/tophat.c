@@ -29,6 +29,4 @@ type *th_alloc_##name() { \
 	return &thg.name##s[thg.name##_count - 1]; \
 } \
 
-
-OPAQUE(font, th_font)
 OPAQUE(shader, th_shader)

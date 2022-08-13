@@ -1,17 +1,30 @@
 import (
 	"font.um"
 	"th.um"
+	"canvas.um"
 	"window.um"
 	"rect.um"
 )
 
+var f: font.Font
+
+fn drawTextRect(text: str, pos: th.Vf2, scale: real = 1.0) {
+	size := f.measure(text)
+	canvas.drawRect(th.red, rect.mk(pos.x, pos.y, size.x*scale, size.y*scale))
+	f.draw(text, pos, th.white, scale)
+}
+
 fn main() {
 	window.setup("my title", 400, 400)
 	cam := rect.mk(0, 0, 400, 400)
-	fontHandle := font.load("etc/roboto.ttf")
-	f := font.mkCached(fontHandle, 4)
+	f = font.load("etc/roboto.ttf", 16, 0)
+	if f.validate() == false {
+		error("Invalid font.");
+	}
 
 	for window.cycle(cam) {
-		f.draw("Hello, folks!", th.Vf2{0, 0}, th.black, 4)
+		drawTextRect("Awesome\nSkip", th.Vf2{0, 0})
+		drawTextRect("Reset\nTest", th.Vf2{50, 50}, 2.0)
+		drawTextRect("|||||||", th.Vf2{100, 0})
 	}
 }
