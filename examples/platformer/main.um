@@ -17,7 +17,7 @@ import (
 )
 
 fn main() {
-	window.setup("hra", 400, 400)
+	window.setup("hra", 512, 512)
 	global.cam = rect.mk(0, 0, 16 * 16, 16 * 16)
 
 	game.setup()

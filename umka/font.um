@@ -2,153 +2,33 @@
 
 import (
 	"th.um"
-	"utf8.um"
-	"image.um"
 )
 
-// Font type. It is an opaque structure.
-type Font* = struct {
-	handle: th.uu
+const (
+	filterBilinear* = 0
+	filterNearest* = 1
+)
+
+type Font* = struct { _: ^struct{} }
+
+fn cfontload(path: str, size: real, filter: uint32): ^struct{}
+fn cfontdraw(font: Font, s: str, x: real, y: real, color: uint32, scale: th.fu)
+fn cfontmeasure(font: Font, s: str, o: ^th.Vf2)
+
+fn load*(path: str, size: real, filter: uint32 = filterBilinear): Font {
+	return Font{cfontload(path, size, filter)}
 }
 
-fn cfontload(path: str): th.uu
-// Loads a font from file.
-fn load*(path: str): Font {
-	return Font{cfontload(path)}
+fn (f: ^Font) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu = 1.0) {
+	cfontdraw(f^, text, pos.x, pos.y, color, scale)
 }
 
-fn crenderglyph(ret: ^image.Image, font: th.uu, glyph: uint32, scale: th.fu): th.uu
-// Renders a white glyph with given size. The glyph is properly positioned
-// in relation to the baseline, so it's ready to be drawn at the same height
-// as all other glyph images produced by this method.
-fn (f: ^Font) renderGlyph*(glyph: uint32, scale: th.fu): image.Image {
-	img := image.Image{}
-	crenderglyph(&img, f.handle, glyph, scale)
-	return img
+fn (f: ^Font) validate*(): bool {
+	return f._ != null
 }
 
-fn cfontgetglyphindex(f: int, c: uint32): uint32
-fn (f: ^Font) getGlyphIndex(c: uint32): uint32 {
-	return cfontgetglyphindex(f.handle, c)
+fn (f: ^Font) measure*(text: str): th.Vf2 {
+	var size: th.Vf2
+	cfontmeasure(f^, text, &size)
+	return size
 }
-
-type FontCacheItem = struct {
-	i: image.Image
-	r: utf8.Rune
-	g: int32
-}
-
-type FontCache = []FontCacheItem
-
-fn (fc: ^FontCache) hash(r: utf8.Rune): uint32 { // djb2 hash from map.um
-	var hash: uint32 = 5381;
-	for r != 0 {
-		hash = (((hash << 5) + hash) + r & 0xff) & 0xffffffff;
-		r = r >> 8
-	}
-	return hash
-}
-
-fn (fc: ^FontCache) grow() {
-	nfc := make(FontCache, len(fc^) * 2)
-	for i:=0; i < len(fc^); i++ {
-		hash := fc.hash(fc[i].r)
-		nfc[hash % len(nfc)] = fc[i]
-	}
-
-	fc^ = nfc
-}
-
-fn (fc: ^FontCache) set(r: utf8.Rune, i: image.Image, g: int32) {
-	hash := fc.hash(r)
-
-	for true {
-		mhash := hash % len(fc^)
-		if fc[mhash].r == r || fc[mhash].r == 0 {
-			fc[mhash] = FontCacheItem{i, r, g}
-			return
-		}
-		fc.grow()
-	}
-}
-
-fn (fc: ^FontCache) get(r: utf8.Rune): image.Image {
-	hash := fc.hash(r) % len(fc^)
-	if fc[hash].r != r { return image.Image{} }
-	return fc[hash].i
-}
-
-// A structure built on top of Font. It automatially caches runes used in
-// drawing. Thanks to this it's possible to change the text without performance
-// problems. There is a known bug with letters like q not being offset properly.
-type Cached* = struct {
-	cache: FontCache
-	size: th.fu
-	font: Font
-}
-
-fn cgetkern(font: th.uu, glyph1, glyph2: uint32): th.fu
-fn (f: ^Font) getKern*(glyph1, glyph2: uint32): th.fu {
-	return cgetkern(f.handle, glyph1, glyph2)
-}
-
-fn cgetadvance(font: th.uu, glyph: uint32): th.fu
-fn (f: ^Font) getAdvance*(glyph: uint32): th.fu {
-	return cgetadvance(f.handle, glyph)
-}
-
-// Cached font constructor.
-fn mkCached*(f: Font, s: th.fu = 40): Cached {
-	return Cached {
-		cache: make(FontCache, 64),
-		size: s,
-		font: f}
-}
-
-fn (c: ^Cached) preCacheRune(rune: utf8.Rune) {
-	if c.cache.get(rune).validate() {
-		return
-	}
-
-	c.cache.set(rune, c.font.renderGlyph(rune, c.size), c.font.getGlyphIndex(rune))
-}
-
-fn (c: ^Cached) runeDims*(rune: utf8.Rune): th.Vf2 {
-	img := c.cache.get(rune)
-	if !img.validate() {
-		c.preCacheRune(rune)
-		img = c.cache.get(rune)
-	}
-
-	dm := img.getDims()
-	dm.y /= c.size
-	dm.x = c.font.getAdvance(rune)
-
-	return dm
-}
-
-
-// Precaches all runes inside string s. This can prevent some frame drop on
-// the start of the game.
-fn (c: ^Cached) preCacheStr*(s: str) {
-	runes := utf8.decode(s)
-	
-	for i in runes {
-		c.preCacheRune(runes[i])
-	}
-}
-
-fn ccachedfontdraw(c: ^Cached, text: str, pos: th.Vf2, color: uint32, scale: th.fu)
-// Draws the text using a Cached font c.
-fn (c: ^Cached) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu) {
-	l := len(text)
-	i := 0
-	for i < l {
-		r := utf8.getNextRune(text, i)
-		c.preCacheRune(r)
-		i += r.size()
-	}
-
-	ccachedfontdraw(c, text, pos, color, scale)
-}
-

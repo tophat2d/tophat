@@ -32,7 +32,7 @@ type ItemList* = struct {
 fn (i: ^Item) draw(pos, dm: th.Vf2, fg, bg: uint32, fs: th.fu) {
 	canvas.drawRect(bg, rect.mk(pos.x, pos.y, dm.x, dm.y))
 	x := 1 * fs
-	if i.img.handle != 0 {
+	if i.img.validate() {
 		i.img.draw(th.Transform{p: pos, s: th.Vf2{1, 1}}, th.white)
 		x := i.img.getDims().x
 	}

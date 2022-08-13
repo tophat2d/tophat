@@ -157,10 +157,8 @@ fn handle*() {
 		body.t.p = env.spawn
 	}
 
-	global.cam.x += round((body.t.p.x - global.cam.x) * 0.9)
-	global.cam.y += round((body.t.p.y - global.cam.y) * 0.9)
-	global.cam.x = body.t.p.x
-	global.cam.y = body.t.p.y
+	global.cam.x += (body.t.p.x - global.cam.x) * th.delta/1000.0 * 10.0
+	global.cam.y += (body.t.p.y - global.cam.y) * th.delta/1000.0 * 10.0
 }
 
 fn draw*() {
