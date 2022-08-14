@@ -49,6 +49,8 @@ fn (l: ^Label) draw*() {
 	ui.drawBorder(l.g.r.getPos(), l.g.r.getDims(), l.g.theme)
 
 	text := utf8.decode(l.text)
+	// hack to wrap the last word too
+	text = append(text, uint32(' '))
 	lineCount := 1
 
 	lines := [][]utf8.Rune{}
@@ -62,7 +64,7 @@ fn (l: ^Label) draw*() {
 			if text[i] == uint32(' ') {
 				if lineWidth > limit {
 					lines = append(lines, slice(text, 0, wordStart))
-					text = slice(text, wordStart)
+					text = slice(text, wordStart - 1)
 
 					wordStart = 0
 					lineWidth = 0
@@ -84,6 +86,8 @@ fn (l: ^Label) draw*() {
 			}
 		}
 
+		// we have to remove the space again to prevent alignment issues
+		lines = append(lines, slice(text, 0, len(text) - 1))
 	} else {
 		lines = append(lines, text)
 	}
