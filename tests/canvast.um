@@ -1,9 +1,6 @@
-
 import (
 	"th.um"
-	"std.um"
 	"rect.um"
-	"input.um"
 	"image.um"
 	"canvas.um"
 	"window.um"
