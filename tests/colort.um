@@ -1,0 +1,22 @@
+import (
+  "th.um"
+  "rect.um"
+  "window.um"
+  "canvas.um"
+  "color.um"
+)
+
+fn main() {
+  window.setup("Test", 512, 512)
+
+  printf("%x\n", color.alpha(color.rgb(0.5, 0.5, 0.5, 0.6), 0.1));
+  for window.cycle(rect.mk(0, 0, 256, 256)) {
+    t := (sin(th.time/1000.0)+1)*128
+    t2 := th.time/5000.0
+    for x := 0; x < 256; x++ {
+      for y := 0; y < 256; y++ {
+        canvas.drawRect(color.hsv(t2+x/256.0, y/256.0, t/256.0), rect.mk(x, y, 1, 1))
+      }
+    }
+  }
+}

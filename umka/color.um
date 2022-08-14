@@ -1,0 +1,29 @@
+// Color operations. Operate on RGBA uint32 values.
+
+import (
+  "th.um"
+)
+
+fn umth_hsv2rgb_uint32(h, s, v, a: th.fu): uint32
+
+// Now this is hard to decide, but in my opinion executing a C function,
+//   for the current Umka VM would be much better than implementing it in umka itself.
+// It's somewhat less trivial than most other operations like alpha.
+fn umth_rgb_uint32(r, g, b, a: th.fu): uint32
+
+// Converts HSV values into RGBA uint32 color.
+// NOTE: Hue is between 0 and 1
+fn hsv*(h, s, v: th.fu, a: th.fu = 1.0): uint32 {
+  return umth_hsv2rgb_uint32(h, s, v, a);
+}
+
+// Sets alpha of the color c to a value in to.
+fn alpha*(c: uint32, to: th.fu): uint32 {
+  return (c & 0xFFFFFF00) | (trunc(to * 255) & 0xFF)
+}
+
+// Constructs RGBA uint32 from RGBA of reals.
+fn rgb*(r, g, b: th.fu, a: th.fu = 1.0): uint32 {
+  return umth_rgb_uint32(r, g, b, a)
+}
+
