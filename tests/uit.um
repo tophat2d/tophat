@@ -53,9 +53,9 @@ fn main() {
 	iBox.image.crop(th.Vf2{0.5, 1.0/12}, th.Vf2{1, 1})
 	iBox.image.flipv(true)
 
-	cf := font.load("examples/space-shooter/gfx/marediv-regular.ttf", 16)
+	cf := font.load("examples/space-shooter/gfx/marediv-regular.ttf", 100)
 
-	rl := label.mk(&cf, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", theme, 4)
+	rl := label.mk(&cf, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", theme, 0.1)
 	rl.get().grid(0, 1).span(2, 2)
 	rl.center = true
 	rl.wrapping = true

@@ -58,7 +58,7 @@ fn (l: ^Label) draw*() {
 		for i:=0; i < len(text); i++ {
 			if text[i] == uint32(' ') {
 				lastSpace = i
-				step := l.renderer.runeDims(uint32('A')).x * l.scale * 1.1
+				step := l.renderer.measure(" ").x * l.scale * 1.1
 				w += step
 				if wordW > maxW {
 					text[i] = uint32('\n')
@@ -66,7 +66,7 @@ fn (l: ^Label) draw*() {
 				}
 				wordW = 0
 			} else {
-				step := l.renderer.runeDims(text[i]).x * l.scale * 1.1
+				step := l.renderer.measure(text[i].encode()).x * l.scale * 1.1
 				w += step
 				wordW += step
 			}
@@ -91,7 +91,7 @@ fn (l: ^Label) draw*() {
 	p := l.g.r.getPos()
 
 	if l.center {
-		p.y += (l.g.r.h - l.renderer.runeDims(utf8.Rune('A')).y*lineCount*l.scale)/2
+		p.y += (l.g.r.h - l.renderer.measure("A").y*lineCount*l.scale)/2
 	}
 	
 	for i:=0; true; i++ {
@@ -112,9 +112,9 @@ fn (l: ^Label) draw*() {
 		}
 
 		if text[i] == uint32(' ') {
-			w += l.renderer.runeDims(uint32('A')).x * l.scale * 1.1
+			w += l.renderer.measure(" ").x * l.scale * 1.1
 		} else {
-			dm := l.renderer.runeDims(text[i]).x
+			dm := l.renderer.measure(text[i].encode()).x
 			w += dm * l.scale * 1.1
 			if h := dm; lineH == -1 || h > lineH {
 				lineH = h
