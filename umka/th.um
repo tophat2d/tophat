@@ -66,8 +66,18 @@ fn (p: ^th.Vf2) trunc*(): th.Vf2 {
 	return th.Vf2{trunc(p.x), trunc(p.y)}
 }
 
+// Floors a vector.
+fn (p: ^th.Vf2) floor*(): th.Vf2 {
+	return th.Vf2{floor(p.x), floor(p.y)}
+}
+
+// Ceils a vector.
+fn (p: ^th.Vf2) ceil*(): th.Vf2 {
+	return th.Vf2{ceil(p.x), ceil(p.y)}
+}
+
 // Creates a vector with both x and y set to f
-fn (p: ^th.Vf2) vf2f*(f: th.fu): th.Vf2 {
+fn vf2f*(f: th.fu): th.Vf2 {
 	return th.Vf2{f, f}
 }
 
@@ -86,7 +96,7 @@ fn (p: ^th.Vf2) add*(p2: th.Vf2): th.Vf2 {
 	return th.Vf2{p.x + p2.x, p.y + p2.y}
 }
 
-// Addst a fu to a vector.
+// Adds a fu to a vector.
 fn (p: ^th.Vf2) addf*(f: th.fu): th.Vf2 {
 	return th.Vf2{p.x + f, p.y + f}
 }
@@ -116,23 +126,18 @@ fn (p: ^th.Vf2) mag*(): th.fu {
 	return sqrt(p.x * p.x + p.y * p.y)
 }
 
-// Normalizes a vector in such a way atleas one values is 1 (unless mag is 0).
+// Normalizes a vector.
 fn (p: ^th.Vf2) norm*(): th.Vf2 {
 	if p.x == 0 && p.y == 0 {
 		return p^
 	}
 
-	a := p.abs()
-	o := p^
-	if a.x > a.y {
-		o.x /= a.x
-		o.y /= a.x
-	} else {
-		o.y /= a.y
-		o.x /= a.y
-	}
+	return p.divf(p.mag())
+}
 
-	return o
+// Calculates dot product between 2 vectors.
+fn (p: ^th.Vf2) dot*(q: th.Vf2): fu {
+	return p.x*q.x + p.y*q.y
 }
 
 // Struct defining transformation. Used for example by entities.

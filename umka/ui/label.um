@@ -47,81 +47,74 @@ fn (l: ^Label) draw*() {
 
 	canvas.drawRect(l.g.theme.bg, rect.Rect{l.g.r.x, l.g.r.y, l.g.r.w, l.g.r.h})
 	ui.drawBorder(l.g.r.getPos(), l.g.r.getDims(), l.g.theme)
+
 	text := utf8.decode(l.text)
+	// hack to wrap the last word too
+	text = append(text, uint32(' '))
 	lineCount := 1
 
+	lines := [][]utf8.Rune{}
+
 	if l.wrapping {
-		maxW := l.g.r.w
-		w := 0.0
-		wordW := 0.0
-		lastSpace := 0
+		limit := l.g.r.w - l.g.theme.borderSize * 2
+		wordStart := 0
+		lineWidth := 0.0
+
 		for i:=0; i < len(text); i++ {
 			if text[i] == uint32(' ') {
-				lastSpace = i
-				step := l.renderer.runeDims(uint32('A')).x * l.scale * 1.1
-				w += step
-				if wordW > maxW {
-					text[i] = uint32('\n')
-					w = 0
+				if lineWidth > limit {
+					lines = append(lines, slice(text, 0, wordStart))
+					text = slice(text, wordStart - 1)
+
+					wordStart = 0
+					lineWidth = 0
+					i = -1
+					continue
 				}
-				wordW = 0
+
+				wordStart = i + 1
+				lineWidth += l.renderer.measure(" ").x * l.scale
+			} else if text[i] == uint32('\n') {
+				lines = append(lines, slice(text, 0, i))
+				text = slice(text, i + 1)
+
+				wordStart = 0
+				lineWidth = 0
+				i = -1
 			} else {
-				step := l.renderer.runeDims(text[i]).x * l.scale * 1.1
-				w += step
-				wordW += step
-			}
-
-			if text[i] == uint32('\n') {
-				w = 0
-			}
- 
-			if w >= maxW && wordW < maxW {
-				i = lastSpace
-				text[i] = uint32('\n')
-				w = 0
-				lineCount++
+				lineWidth += l.renderer.measure(text[i].encode()).x * l.scale
 			}
 		}
+
+		// we have to remove the space again to prevent alignment issues
+		lines = append(lines, slice(text, 0, len(text) - 1))
+	} else {
+		lines = append(lines, text)
 	}
 
-	stext := ""
-	w := 0.0
-	lineH := -1.0
-	origY := l.g.r.y
-	p := l.g.r.getPos()
-
+	x := l.g.r.x + l.g.theme.borderSize
+	y := l.g.r.y
 	if l.center {
-		p.y += (l.g.r.h - l.renderer.runeDims(utf8.Rune('A')).y*lineCount*l.scale)/2
+		y += (l.g.r.h - len(lines) * l.renderer.measure("A").y * l.scale) / 2
 	}
-	
-	for i:=0; true; i++ {
-		if i >= len(text) || text[i] == uint32('\n') {
-			if l.center {
-				p.x = (l.g.r.w - w) / 2
-			}
-			l.renderer.draw(stext, th.Vf2{p.x + l.g.r.x, p.y}, l.g.theme.fg, l.scale)
 
-			stext = ""
-			p.y += lineH * l.scale * 1.6
-			if p.y + lineH*l.scale*1.8 > origY + l.g.r.h {
-				return
-			}
-			w = 0
-			if i >= len(text) { break }
-			continue
+	for i in lines {
+		s := ""
+		for j in lines[i] {
+			s += lines[i][j].encode()
 		}
 
-		if text[i] == uint32(' ') {
-			w += l.renderer.runeDims(uint32('A')).x * l.scale * 1.1
-		} else {
-			dm := l.renderer.runeDims(text[i]).x
-			w += dm * l.scale * 1.1
-			if h := dm; lineH == -1 || h > lineH {
-				lineH = h
-			}
+		p := th.Vf2{
+			x: x,
+			y: y }
+
+		if l.center {
+			p.x += (l.g.r.w - l.renderer.measure(s).x * l.scale) / 2 + l.g.theme.borderSize / 2
 		}
 
-		stext += text[i].encode()
+		l.renderer.draw(s, p, l.g.theme.fg, l.scale)
+
+		y += l.renderer.measure(s).y * l.scale
 	}
 }
 

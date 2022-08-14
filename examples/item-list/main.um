@@ -23,11 +23,11 @@ fn main() {
 				}
 			}},
 		items: []itemlist.Item{
-			itemlist.Item{image.Image{0}, "COPY"},
-			itemlist.Item{image.Image{0}, "CUT"},
-			itemlist.Item{image.Image{0}, "PASTE"},
-			itemlist.Item{image.Image{0}, "PLUMB"},
-			itemlist.Item{image.Image{0}, "SNARF"}},
+			itemlist.Item{image.Image{}, "COPY"},
+			itemlist.Item{image.Image{}, "CUT"},
+			itemlist.Item{image.Image{}, "PASTE"},
+			itemlist.Item{image.Image{}, "PLUMB"},
+			itemlist.Item{image.Image{}, "SNARF"}},
 		limit: 3,
 		renderer: ui.PixelFont{},
 		scrollBarWidth: 10,

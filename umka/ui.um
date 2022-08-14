@@ -53,7 +53,7 @@ type Element* = interface {
 // Interface used anywhere, where text is rendered.
 type TextRenderer* = interface {
 	draw(text: str, pos: th.Vf2, color: uint32, scale: th.fu = 1.0)
-	runeDims(rune: utf8.Rune): th.Vf2
+	measure(text: str): th.Vf2
 }
 
 // Bindings around canvas's font rendering functions to make them usable
@@ -62,8 +62,8 @@ type PixelFont* = struct { }
 fn (pf: ^PixelFont) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu = 1.0) {
 	canvas.drawText(text, pos, color, scale)
 }
-fn (pf: ^PixelFont) runeDims*(rune: utf8.Rune): th.Vf2 {
-	return th.Vf2{5, 5}
+fn (pf: ^PixelFont) measure*(text: str): th.Vf2 {
+	return canvas.textSize(text, 1)
 }
 
 fn mkGeneric*(): Generic {
