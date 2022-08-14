@@ -228,6 +228,10 @@ void th_ent_draw(th_ent *o, th_rect *camera);
 void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
 	uu maxColls, th_coll *colls);
 
+// colour
+uint32_t th_color_rgb(float r, float g, float b, float a);
+uint32_t th_color_hsv2rgb(float h, float s, float v, float a);
+
 // font
 th_font *th_font_load(char *path, double size, uint32_t filter);
 void th_font_draw(th_font *font, const char *s, double x, double y, uint32_t color, double scale);

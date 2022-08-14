@@ -12,7 +12,10 @@
 
 extern th_global thg;
 
+extern char *th_em_modulenames[];
 extern char *th_em_modulesrc[];
+extern char *th_em_misc[];
+extern int th_em_modulenames_count;
 
 // FIXME(skejeton): Using this function is an easy buffer overflow.
 static
@@ -38,10 +41,26 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->ptrVal = f;
 }
 
+///////////////////////////
+// COLOUR
+
+// fn umth_hsv2rgb_uint32((3) h, (2) s, (1) v, (0) a: th.fu): uint32
+static void umth_hsv2rgb_uint32(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->uintVal = th_color_hsv2rgb(p[3].real32Val, p[2].real32Val, p[1].real32Val, p[0].real32Val);
+}
+
+// fn umth_rgb_uint32((3) r, (2) g, (1) b, (0) a: th.fu): uint32
+static void umth_rgb_uint32(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->uintVal = th_color_rgb(p[3].real32Val, p[2].real32Val, p[1].real32Val, p[0].real32Val);
+}
+
+///////////////////////////
+// FONT
+
 // fn cfontload((2) path: str, (1) size: real, (0) filter: uint32) 
 static void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
 	uint32_t filter = p[0].uintVal;
-	double size = p[1].realVal;
+	double size = p[1].real32Val;
 	char path[1024];
 	conv_path(path, p[2].ptrVal);
 
@@ -52,10 +71,10 @@ static void umfontload(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 // fn cfontdraw((5) font: Font, (4) s: str, (3) x: real, (2) y: real, (1) color: uint32, (0) scale: real)
 static void umfontdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	double scale = p[0].realVal;
+	double scale = p[0].real32Val;
 	uint32_t color = p[1].uintVal;
-	double y = p[2].realVal;
-	double x = p[3].realVal;
+	double y = p[2].real32Val;
+	double x = p[3].real32Val;
 	const char *s = p[4].ptrVal;
 	th_font *font = p[5].ptrVal;
 
@@ -544,6 +563,10 @@ void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
 
+	// color
+	umkaAddFunc(umka, "umth_hsv2rgb_uint32", &umth_hsv2rgb_uint32);
+	umkaAddFunc(umka, "umth_rgb_uint32", &umth_rgb_uint32);
+
 	// font
 	umkaAddFunc(umka, "cfontload", &umfontload);
 	umkaAddFunc(umka, "cfontdraw", &umfontdraw);
@@ -620,30 +643,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cgetuniformlocation", umgetuniformlocation);
 
 	int index = 0;
-	umkaAddModule(umka, "anim.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "audio.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "csv.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ent.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "image.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "input.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "misc.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "canvas.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ray.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "rect.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "tilemap.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "window.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ui.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "std.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "particles.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "light.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "lerp.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "utf8.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "font.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "th.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "signal.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "atlas.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ui/label.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ui/grid.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "ui/imagebox.um", th_em_modulesrc[index++]);
-	umkaAddModule(umka, "shader.um", th_em_modulesrc[index++]);
+	for (int i = 0; i < th_em_modulenames_count; i++) {
+		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);
+	}
 }

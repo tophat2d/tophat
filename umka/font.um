@@ -11,11 +11,11 @@ const (
 
 type Font* = struct { _: ^struct{} }
 
-fn cfontload(path: str, size: real, filter: uint32): ^struct{}
-fn cfontdraw(font: Font, s: str, x: real, y: real, color: uint32, scale: th.fu)
+fn cfontload(path: str, size: th.fu, filter: uint32): ^struct{}
+fn cfontdraw(font: Font, s: str, x: th.fu, y: th.fu, color: uint32, scale: th.fu)
 fn cfontmeasure(font: Font, s: str, o: ^th.Vf2)
 
-fn load*(path: str, size: real, filter: uint32 = filterBilinear): Font {
+fn load*(path: str, size: th.fu, filter: uint32 = filterBilinear): Font {
 	return Font{cfontload(path, size, filter)}
 }
 
