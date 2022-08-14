@@ -5,8 +5,12 @@ Visit the [homepage](https://th.mrms.cz/) for more info.
 
 ## screenshots
 
-![space shooter example](https://th.mrms.cz/images/space-shooter.png)
-![logs together jam game](https://th.mrms.cz/images/logs-together.png)
+<p align="center">
+	<img src="https://th.mrms.cz/images/space-shooter.png" alt="space shooter example">
+	<img src="https://th.mrms.cz/images/logs-together.png" alt="logs together jam game">
+	<img src="etc/tetris.png" alt="tetris game">
+	<img src="etc/pomodoro.png" alt="pomodoro app">
+</p>
 
 ## examples
 
