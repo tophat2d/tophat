@@ -1591,11 +1591,6 @@ const char *th_em_modulesrc[] = {
 "\treturn p.x*q.x + p.y*q.y\n"
 "}\n"
 "\n"
-"// Calculates dot product between 2 vectors.\n"
-"fn (p: ^th.Vf2) dot*(q: th.Vf2): fu {\n"
-"\treturn p.x*q.x + p.y*q.y\n"
-"}\n"
-"\n"
 "// Struct defining transformation. Used for example by entities.\n"
 "type Transform* = struct {\n"
 "\tp: Vf2 // position\n"
@@ -2043,7 +2038,7 @@ const char *th_em_modulesrc[] = {
 "// Color operations. Operate on RGBA uint32 values.\n"
 "\n"
 "import (\n"
-"  \"th.um\"\n"
+"\t\"th.um\"\n"
 ")\n"
 "\n"
 "fn umth_hsv2rgb_uint32(h, s, v, a: th.fu): uint32\n"
@@ -2056,22 +2051,22 @@ const char *th_em_modulesrc[] = {
 "// Converts HSV values into RGBA uint32 color.\n"
 "// NOTE: Hue is between 0 and 1\n"
 "fn hsv*(h, s, v: th.fu, a: th.fu = 1.0): uint32 {\n"
-"  return umth_hsv2rgb_uint32(h, s, v, a);\n"
+"\treturn umth_hsv2rgb_uint32(h, s, v, a);\n"
 "}\n"
 "\n"
 "// Sets alpha of the color c to a value in to.\n"
 "fn alpha*(c: uint32, to: th.fu): uint32 {\n"
-"  return (c & 0xFFFFFF00) | (trunc(to * 255) & 0xFF)\n"
+"\treturn (c & 0xFFFFFF00) | (trunc(to * 255) & 0xFF)\n"
 "}\n"
 "\n"
 "// Constructs RGBA uint32 from RGBA of reals.\n"
 "fn rgb*(r, g, b: th.fu, a: th.fu = 1.0): uint32 {\n"
-"  return umth_rgb_uint32(r, g, b, a)\n"
+"\treturn umth_rgb_uint32(r, g, b, a)\n"
 "}\n"
 "\n"
 "",
 };
-const char *th_em_modulenames[] = { "anim.um", "audio.um", "csv.um", "ent.um", "image.um", "input.um", "misc.um", "canvas.um", "ray.um", "rect.um", "tilemap.um", "window.um", "ui.um", "std.um", "particles.um", "light.um", "lerp.um", "utf8.um", "font.um", "th.um", "signal.um", "atlas.um", "label.um", "grid.um", "imagebox.um", "shader.um", "color.um",  };
+const char *th_em_modulenames[] = { "anim.um", "audio.um", "csv.um", "ent.um", "image.um", "input.um", "misc.um", "canvas.um", "ray.um", "rect.um", "tilemap.um", "window.um", "ui.um", "std/std.um", "particles.um", "light.um", "lerp.um", "utf8.um", "font.um", "th.um", "signal.um", "atlas.um", "ui/label.um", "ui/grid.um", "ui/imagebox.um", "shader.um", "color.um",  };
 int th_em_modulenames_count = 27;
 const char *th_em_misc[] = {
 "BSD 3-Clause License\n"

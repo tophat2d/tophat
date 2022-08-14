@@ -14,7 +14,7 @@ UMKA_MODULES = umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um 
 $(EM_TARGET): $(UMKA_MODULES) LICENSE version
 	@echo EM $@
 	$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_modulesrc $(UMKA_MODULES) > $(EM_TARGET)
-	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(notdir $(UMKA_MODULES)) >> $(EM_TARGET)
+	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(UMKA_MODULES:umka/%=%) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_misc LICENSE version >> $(EM_TARGET)
 	rm -f src/bindings.o
 

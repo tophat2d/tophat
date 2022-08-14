@@ -642,7 +642,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cpickimageshader", umpickimageshader);
 	umkaAddFunc(umka, "cgetuniformlocation", umgetuniformlocation);
 
-	int index = 0;
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);
 	}
