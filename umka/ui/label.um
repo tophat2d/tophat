@@ -101,8 +101,12 @@ fn (l: ^Label) draw*() {
 		}
 
 		p := th.Vf2{
-			x: x + (l.g.r.w - l.renderer.measure(s).x * l.scale) / 2 + l.g.theme.borderSize / 2,
+			x: x,
 			y: y }
+
+		if l.center {
+			p.x += (l.g.r.w - l.renderer.measure(s).x * l.scale) / 2 + l.g.theme.borderSize / 2
+		}
 
 		l.renderer.draw(s, p, l.g.theme.fg, l.scale)
 
