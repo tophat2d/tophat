@@ -7,9 +7,7 @@
 #include <umka_api.h>
 #include <GL/gl.h>
 
-#define MAX_SOUNDS 512
-#define MAX_IMAGES 2048
-#define MAX_FONTS 128
+#define INPUT_STRING_SIZE 256
 
 typedef float fu;
 typedef unsigned short uu;
@@ -186,11 +184,11 @@ typedef struct {
 
 	th_playback_item *playbacks;
 
-	th_font *fonts;
-	uu font_count;
-
 	th_shader *shaders;
 	uu shader_count;
+
+	char input_string[INPUT_STRING_SIZE];
+	uu input_string_len;
 } th_global;
 
 // atlas
@@ -309,6 +307,7 @@ th_shader *th_alloc_shader();
 
 // utf8
 size_t th_utf8_decode(uint32_t *out, const char *s);
+size_t th_utf8_encode(char *out, uint32_t r);
 
 // window
 void th_window_setup(char *name, int w, int h);

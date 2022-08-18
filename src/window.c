@@ -6,6 +6,7 @@ extern th_global thg;
 
 #ifdef linux
 #include <X11/Xlib.h>
+#include <X11/XKBlib.h>
 #include <GL/glx.h>
 
 Atom wm_delete_message;
@@ -15,6 +16,8 @@ Window th_root_win;
 XWindowAttributes th_win_attribs;
 GLXContext th_ctx;
 
+static XkbDescPtr desc;
+static XIC xic;
 
 void th_window_deinit() {
 	XDestroyWindow(th_dpy, th_win);
@@ -69,6 +72,22 @@ void th_window_setup(char *name, int w, int h) {
 	glDepthMask(GL_FALSE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	XkbComponentNamesRec names = {};
+	names.symbols = "us";
+	desc = XkbGetKeyboardByName(th_dpy, XkbUseCoreKbd, &names, XkbAllComponentsMask, XkbAllComponentsMask, false);
+
+	XIM xim = XOpenIM(th_dpy, 0, 0, 0);
+	if (!xim) {
+		th_error("Could not open XIM.");
+		return;
+	}
+
+	xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, NULL);
+	if (!xic) {
+		th_error("Could not create XIC");
+		return;
+	}
 }
 
 void th_window_get_dimensions(int *w, int *h) {
@@ -93,9 +112,23 @@ int th_window_handle() {
 			XGetWindowAttributes(th_dpy, th_win, &th_win_attribs);
 			glViewport(0, 0, th_win_attribs.width, th_win_attribs.height);
 			break;
-		case KeyRelease:
-		case KeyPress:
-			th_input_key(XLookupKeysym(&ev.xkey, 0), ev.type == KeyPress);
+		case KeyPress:; // FALLTHROUGH
+			KeySym _;
+			Status status;
+			thg.input_string_len += Xutf8LookupString(xic, &ev.xkey,
+				thg.input_string + thg.input_string_len,
+				INPUT_STRING_SIZE - thg.input_string_len,
+				&_, &status);
+
+		case KeyRelease:;
+			// modifiers are not used for this kind of input
+			unsigned mods = 0;
+			
+			// translate to a qwerty key
+			KeySym sym;
+			XkbTranslateKeyCode(desc, ev.xkey.keycode, mods, &mods, &sym);
+
+			th_input_key(sym, ev.type == KeyPress);
 			break;
 		case ButtonRelease:
 			keyDir = 0;
@@ -128,6 +161,8 @@ void th_window_swap_buffers() {
 	th_input_cycle();
 
 	glXSwapBuffers(th_dpy, th_win);
+
+	thg.input_string_len = 0;
 }
 #elif _WIN32
 #include <windows.h>
@@ -145,6 +180,8 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 		should_close = 1;
 	return DefWindowProc(hwnd, msg, wParam, lParam);
 }
+
+static HKL hkl;
 
 void th_window_setup(char *name, int w, int h) {
 	const char CLASS_NAME[] = "tophat";
@@ -214,6 +251,8 @@ void th_window_setup(char *name, int w, int h) {
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	ShowWindow(th_win, 1);
+
+	hkl = LoadKeyboardLayout("00000409", 0);
 }
 
 void th_window_get_dimensions(int *w, int *h) {
@@ -231,9 +270,20 @@ int th_window_handle() {
 
 		// i found a list of these on the wine website, but not on MSDN -_-
 		switch (msg.message) {
-		case WM_KEYDOWN:
+		case WM_KEYDOWN: // FALLTHROUGH
+			char key_state[256];
+			GetKeyboardState(key_state);
+
+			wchar_t buf[256];
+			int v = ToUnicode(msg.wParam, MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), key_state, buf, 256, 0);
+			if (v == 1) // only supports one character for now
+				thg.input_string_len += th_utf8_encode(thg.input_string + thg.input_string_len, buf[0]);
+
 		case WM_KEYUP:
-			th_input_key(tolower(msg.wParam), msg.message == WM_KEYDOWN);
+			
+			// Virtual scan codes shouldn't be used as ASCII values, but in this case
+			// it shouldn't matter.
+			th_input_key(tolower(MapVirtualKeyEx(MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), MAPVK_VSC_TO_VK, hkl)), msg.message == WM_KEYDOWN);
 			break;
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:
@@ -269,6 +319,8 @@ void th_window_swap_buffers() {
 	th_image_flush();
 	th_input_cycle();
 	SwapBuffers(th_hdc);
+
+	thg.input_string_len = 0;
 }
 
 void th_window_clear_frame() {

@@ -450,6 +450,12 @@ const char *th_em_modulesrc[] = {
 "fn clear*(code: char) {\n"
 "\tcclear(code)\n"
 "}\n"
+"\n"
+"fn cgetinputstring(): str\n"
+"// Returns a string entered by the user in the last cycle.\n"
+"fn getStr*(): str {\n"
+"\treturn cgetinputstring()\n"
+"}\n"
 "",
 "// Misc functions.\n"
 "\n"

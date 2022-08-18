@@ -72,3 +72,9 @@ fn cclear*(code: char)
 fn clear*(code: char) {
 	cclear(code)
 }
+
+fn cgetinputstring(): str
+// Returns a string entered by the user in the last cycle.
+fn getStr*(): str {
+	return cgetinputstring()
+}

@@ -20,6 +20,19 @@ fn main() {
 			y += 5
 		}
 
+		if input.isJustPressed('r') {
+			printf("r was just pressed\n")
+		}
+
+		if input.isPressed('s') {
+			printf("s is pressed\n")
+		}
+
+		s := input.getStr()
+		if len(s) > 0 {
+			printf("%s\n", input.getStr())
+		}
+
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
 	}
 }

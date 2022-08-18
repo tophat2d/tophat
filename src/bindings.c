@@ -269,6 +269,14 @@ void umclear(UmkaStackSlot *p, UmkaStackSlot *r) {
 	thg.pressed[keycode] = 0;
 }
 
+void umgetinputstring(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char *buf = umkaAllocData(thg.umka, thg.input_string_len + 1, NULL);
+	buf[thg.input_string_len] = 0;
+	memcpy(buf, thg.input_string, thg.input_string_len);
+
+	r->ptrVal = buf;
+}
+
 ///////////////////////
 // entities
 // draws an entity
@@ -580,6 +588,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cispressed", &umispressed);
 	umkaAddFunc(umka, "cisjustpressed", &umisjustpressed);
 	umkaAddFunc(umka, "cclear", &umclear);
+	umkaAddFunc(umka, "cgetinputstring", &umgetinputstring);
 
 	// entities
 	umkaAddFunc(umka, "centdraw", &umentdraw);
