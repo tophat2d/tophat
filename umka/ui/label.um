@@ -63,8 +63,8 @@ fn (l: ^Label) draw*() {
 		for i:=0; i < len(text); i++ {
 			if text[i] == uint32(' ') {
 				if lineWidth > limit {
-					lines = append(lines, slice(text, 0, wordStart))
-					text = slice(text, wordStart - 1)
+					lines = append(lines, slice(text, 0, wordStart - 1))
+					text = slice(text, wordStart)
 
 					wordStart = 0
 					lineWidth = 0

@@ -51,8 +51,7 @@ fn init*() {
 
 	maingrid = grid.mk(1, 5)
 	maingrid.g.r.w = global.cam.w
-	maingrid.g.r.h = global.cam.h - 20
-	maingrid.g.r.y += 20
+	maingrid.g.r.h = global.cam.h
 	maingrid.elements = []ui.Element{title, score, playButton, exitButton}
 }
 
