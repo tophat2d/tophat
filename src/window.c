@@ -127,6 +127,8 @@ int th_window_handle() {
 			// translate to a qwerty key
 			KeySym sym;
 			XkbTranslateKeyCode(desc, ev.xkey.keycode, mods, &mods, &sym);
+			if (!sym)
+				sym = XLookupKeysym(&ev.xkey, 0);
 
 			th_input_key(sym, ev.type == KeyPress);
 			break;
