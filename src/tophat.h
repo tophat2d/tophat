@@ -300,13 +300,8 @@ void th_tmap_draw(th_tmap *t, th_rect *cam);
 void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 
 // tophat
-th_font *th_get_font(uu index);
 th_shader *th_get_shader(uu index);
-
-th_font *th_get_font_err(uu index);
 th_shader *th_get_shader_err(uu index);
-
-th_font *th_alloc_font();
 th_shader *th_alloc_shader();
 
 // utf8

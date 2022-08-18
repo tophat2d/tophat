@@ -4,29 +4,25 @@
 
 extern th_global thg;
 
-#define OPAQUE(name, type) \
-\
-type *th_get_##name(uu index) {\
-	if (!index) return NULL; \
-	if (index > thg.name##_count) \
-		return NULL; \
-	return &thg.name##s[index-1]; \
-} \
-\
-type *th_get_##name##_err(uu index) {\
-	type *p = th_get_##name(index); \
-	if (!p) \
-		th_error("Could not find " #name " with index %d.", index); \
-	return p; \
-} \
-\
-type *th_alloc_##name() { \
-	void *p = realloc(thg.name##s, (++thg.name##_count + 1) * sizeof(type)); \
-	if (!p) \
-		return NULL; \
-	thg.name##s = p; \
-	memset(&thg.name##s[thg.name##_count - 1], 0, sizeof(type)); \
-	return &thg.name##s[thg.name##_count - 1]; \
-} \
+th_shader *th_get_shader(uu index) {
+	if (!index) return NULL;
+	if (index > thg.shader_count)
+		return NULL;
+	return &thg.shaders[index-1];
+}
 
-OPAQUE(shader, th_shader)
+th_shader *th_get_shader_err(uu index) {
+	th_shader *p = th_get_shader(index);
+	if (!p)
+		th_error("Could not find shader with index %d.", index);
+	return p;
+}
+
+th_shader *th_alloc_shader() { 
+	void *p = realloc(thg.shaders, (++thg.shader_count + 1) * sizeof(th_shader));
+	if (!p)
+		return NULL;
+	thg.shaders = p;
+	memset(&thg.shaders[thg.shader_count - 1], 0, sizeof(th_shader));
+	return &thg.shaders[thg.shader_count - 1];
+}
