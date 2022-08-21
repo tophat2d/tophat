@@ -1,5 +1,4 @@
 # -*- Makefile -*-
-# author: @prokoprandacek
 # vim: ft=make
 
 UMKA_DIR     ?= ./lib/umka
