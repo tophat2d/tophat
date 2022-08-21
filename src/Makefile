@@ -1,4 +1,3 @@
-# author: @prokoprandacek
 # included from ../Makefile
 _:
 	@echo run make from repository root && false
@@ -39,3 +38,4 @@ clean::
 	$(RM) umkalibs.h
 
 -include $(DEPS)
+
