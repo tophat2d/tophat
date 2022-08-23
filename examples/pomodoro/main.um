@@ -297,17 +297,13 @@ fn formatTime(time: real): str {
   minutes := trunc(time / 60)%60
   seconds := trunc(time)%60
 
-  buf := str(make([]char, 256))
-
   if hours > 0 {
-    sprintf(buf, "%d:%02d:%02d", hours, minutes, seconds)
+    return sprintf("%d:%02d:%02d", hours, minutes, seconds)
   } else if minutes > 0 {
-    sprintf(buf, "%d:%02d", minutes, seconds)
-  } else {
-    sprintf(buf, "0:%02d", seconds)
+    return sprintf("%d:%02d", minutes, seconds)
   }
 
-  return buf
+	return sprintf("0:%02d", seconds)
 }
 
 //
