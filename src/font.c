@@ -105,7 +105,7 @@ static f_iterator f_iterator_begin(th_font *font, const char *string, float x, f
 static bool f_iterator_going(f_iterator *iter) {
 	// FIXME(skejeton): Hack eh?
 	while (*iter->string == '\n') {
-		iter->y += iter->font->ascent*iter->font->scale;
+		iter->y += (iter->font->ascent-iter->font->descent)*iter->font->scale;
 		iter->x = 0;
 		iter->string += 1;
 	}
@@ -135,11 +135,7 @@ static stbtt_aligned_quad f_iterator_next_quad(f_iterator *iter, th_font_atlas_p
 	return quad;
 }
 
-static void f_iterator_measure_next(f_iterator *iter) {
-	stbtt_aligned_quad quad = f_iterator_next_quad(iter, NULL);
-
-	// the quad image data is actually uvs hooray! 
-	th_rect rect = f_get_dest_rect(iter->font, quad);
+static void f_iterator_cap_measurements(f_iterator *iter) {
 	if (iter->x > iter->xMax) {
 		iter->xMax = iter->x;
 	}
@@ -268,8 +264,12 @@ th_vf2 th_font_measure(th_font *font, const char *s) {
 	f_iterator iter = f_iterator_begin(font, s, 0, 0, 1.0);
 
 	while (f_iterator_going(&iter)) {
-		f_iterator_measure_next(&iter);
+		f_iterator_next_quad(&iter, NULL);
+		f_iterator_cap_measurements(&iter);
 	}
+
+	// Account for trailing newlines offseting the Y coordiante, if the text ends with newlines.
+	f_iterator_cap_measurements(&iter);
 
 	return (th_vf2){{iter.xMax, iter.yMax}};
 }
@@ -295,5 +295,5 @@ void th_font_draw(th_font *font, const char *s, double x, double y, uint32_t col
 }
 
 void th_font_deinit() {
-	// NOTE(skejeton): I don't think I need to free anything here, should be automatically freed
+	// NOTE(skejeton): I don't think I need to free anything here, should be automatically freed.
 }
