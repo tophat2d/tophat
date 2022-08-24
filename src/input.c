@@ -3,15 +3,21 @@
 
 extern th_global *thg;
 
-#define LINUX_KEY_SHIFT 65505
-#define LINUX_KEY_BACKSPACE 65288
-#define LINUX_KEY_DELETE 65535
-#define LINUX_KEY_LEFT_ARROW 65361
-#define LINUX_KEY_RIGHT_ARROW 65363
-#define LINUX_KEY_TOP_ARROW 65362
-#define LINUX_KEY_BOTTOM_ARROW 65364
-#define LINUX_KEY_ESCAPE 65307
-#define LINUX_KEY_ENTER 65293
+#ifdef __linux__
+#include <X11/keysym.h>
+
+#define LINUX_KEY_SHIFT XK_Shift_L
+#define LINUX_KEY_BACKSPACE XK_BackSpace
+#define LINUX_KEY_DELETE XK_Delete
+#define LINUX_KEY_LEFT_ARROW XK_Left
+#define LINUX_KEY_RIGHT_ARROW XK_Right
+#define LINUX_KEY_TOP_ARROW XK_Up
+#define LINUX_KEY_BOTTOM_ARROW XK_Down
+#define LINUX_KEY_ESCAPE XK_Escape
+#define LINUX_KEY_ENTER XK_Return
+#define LINUX_KEY_ALT XK_Alt_L
+#define LINUX_KEY_CTRL XK_Control_L
+#endif
 
 #define WIN_KEY_SHIFT (16 + 0x7f)
 #define WIN_KEY_BACKSPACE (8 + 0x7f)
@@ -22,6 +28,8 @@ extern th_global *thg;
 #define WIN_KEY_BOTTOM_ARROW (40 + 0x7f)
 #define WIN_KEY_ESCAPE (27 + 0x7f)
 #define WIN_KEY_ENTER (13 + 0x7f)
+#define WIN_KEY_ALT (0x12 + 0x7f)
+#define WIN_KEY_CTRL (0x11 + 0x7f)
 
 void HandleKey( int keycode, int bDown ) { }
 void HandleButton( int x, int y, int button, int bDown ) { }
@@ -58,6 +66,11 @@ void th_input_key(int keycode, int bDown) {
 	case LINUX_KEY_ENTER:
 		keycode = WIN_KEY_ENTER;
 		break;
+	case LINUX_KEY_ALT:
+		keycode = WIN_KEY_ALT;
+		break;
+	case LINUX_KEY_CTRL:
+		keycode = WIN_KEY_CTRL;
 	}
 #endif
 
