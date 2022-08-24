@@ -24,6 +24,14 @@ fn main() {
 			printf("r was just pressed\n")
 		}
 
+		if input.isJustPressed('\'') {
+			printf("' was just pressed\n")
+		}
+
+		if input.isJustPressed(input.key_right) {
+			printf("key right was just pressed\n")
+		}
+
 		if input.isPressed('s') {
 			printf("s is pressed\n")
 		}

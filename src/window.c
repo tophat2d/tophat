@@ -285,7 +285,12 @@ int th_window_handle() {
 			
 			// Virtual scan codes shouldn't be used as ASCII values, but in this case
 			// it shouldn't matter.
-			th_input_key(tolower(MapVirtualKeyEx(MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), MAPVK_VSC_TO_VK, hkl)), msg.message == WM_KEYDOWN);
+	
+			uint32_t key = tolower(MapVirtualKeyEx(msg.wParam, MAPVK_VK_TO_CHAR, hkl));
+			if (key == 0)
+				key = MapVirtualKeyEx(MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), MAPVK_VSC_TO_VK, hkl) + 0x7f;
+
+			th_input_key(key, msg.message == WM_KEYDOWN);
 			break;
 		case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:

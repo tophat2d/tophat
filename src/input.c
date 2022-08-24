@@ -13,15 +13,15 @@ extern th_global *thg;
 #define LINUX_KEY_ESCAPE 65307
 #define LINUX_KEY_ENTER 65293
 
-#define WIN_KEY_SHIFT 16
-#define WIN_KEY_BACKSPACE 8
-#define WIN_KEY_DELETE 46
-#define WIN_KEY_LEFT_ARROW 37
-#define WIN_KEY_RIGHT_ARROW 39
-#define WIN_KEY_TOP_ARROW 38
-#define WIN_KEY_BOTTOM_ARROW 40
-#define WIN_KEY_ESCAPE 27
-#define WIN_KEY_ENTER 13
+#define WIN_KEY_SHIFT (16 + 0x7f)
+#define WIN_KEY_BACKSPACE (8 + 0x7f)
+#define WIN_KEY_DELETE (46 + 0x7f)
+#define WIN_KEY_LEFT_ARROW (37 + 0x7f)
+#define WIN_KEY_RIGHT_ARROW (39 + 0x7f)
+#define WIN_KEY_TOP_ARROW (38 + 0x7f)
+#define WIN_KEY_BOTTOM_ARROW (40 + 0x7f)
+#define WIN_KEY_ESCAPE (27 + 0x7f)
+#define WIN_KEY_ENTER (13 + 0x7f)
 
 void HandleKey( int keycode, int bDown ) { }
 void HandleButton( int x, int y, int button, int bDown ) { }
