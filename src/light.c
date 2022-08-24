@@ -7,7 +7,7 @@
 
 #define INTERP(x0, y0, x1, y1, x) (y0 + (x - x0) * ((y1 - y0) / (x1 - x0)))
 
-extern th_global thg;
+extern th_global *thg;
 
 void th_lightmask_clear(th_lightmask *d) {
 	for (int i=0; i < d->w * d->h; i++)

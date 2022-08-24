@@ -10,7 +10,7 @@
 
 #include "tophat.h"
 
-extern th_global thg;
+extern th_global *thg;
 
 extern char *th_em_modulenames[];
 extern char *th_em_modulesrc[];
@@ -26,7 +26,7 @@ char *conv_path(char *out, char *path) {
 	if (strncmp(path, RAW_PFX, RAW_PFX_LEN) == 0) {
 		strcpy(out, path + RAW_PFX_LEN);
 	} else {
-		strcpy(out, thg.respath);
+		strcpy(out, thg->respath);
 		strcat(out, path);
 	}
 	return out;
@@ -42,7 +42,7 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umgetglobal(UmkaStackSlot *p, UmkaStackSlot *r) {
-	r->ptrVal = &thg;
+	r->ptrVal = thg;
 }
 
 ///////////////////////////
@@ -269,33 +269,33 @@ void umimggetdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 // gets position of mouse cursor
 void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 *out = (th_vf2 *)p[0].ptrVal;
-	out->x = (thg.mouse.x - thg.offset.x) / thg.scaling;
-	out->y = (thg.mouse.y - thg.offset.y) / thg.scaling;
+	out->x = (thg->mouse.x - thg->offset.x) / thg->scaling;
+	out->y = (thg->mouse.y - thg->offset.y) / thg->scaling;
 }
 
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
-	r[0].intVal = thg.pressed[keycode];
+	r[0].intVal = thg->pressed[keycode];
 }
 
 void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
-	r[0].intVal = thg.just_pressed[keycode];
+	r[0].intVal = thg->just_pressed[keycode];
 }
 
 void umclear(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
-	thg.just_pressed[keycode] = 0;
-	thg.pressed[keycode] = 0;
+	thg->just_pressed[keycode] = 0;
+	thg->pressed[keycode] = 0;
 }
 
 void umgetinputstring(UmkaStackSlot *p, UmkaStackSlot *r) {
-	char *buf = umkaAllocData(thg.umka, thg.input_string_len + 1, NULL);
-	buf[thg.input_string_len] = 0;
-	memcpy(buf, thg.input_string, thg.input_string_len);
+	char *buf = umkaAllocData(thg->umka, thg->input_string_len + 1, NULL);
+	buf[thg->input_string_len] = 0;
+	memcpy(buf, thg->input_string, thg->input_string_len);
 
 	r->ptrVal = buf;
 }
@@ -345,11 +345,11 @@ void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_playback_item *pbi = malloc(sizeof(th_playback_item));
 
-	pbi->next = thg.playbacks;
-	thg.playbacks = pbi;
+	pbi->next = thg->playbacks;
+	thg->playbacks = pbi;
 
-	pbi->pk = umkaAllocData(thg.umka, sizeof(th_playback), th_playback_destructor);
-	umkaIncRef(thg.umka, pbi->pk);
+	pbi->pk = umkaAllocData(thg->umka, sizeof(th_playback), th_playback_destructor);
+	umkaIncRef(thg->umka, pbi->pk);
 
 	*pbi->pk = (th_playback){
 		.decoder = malloc(sizeof(ma_decoder)),
@@ -450,13 +450,13 @@ void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int w = p[3].intVal;
 
 	if ((float)w/camw < (float)h/camh) {
-		thg.scaling = ((float)w/camw);
+		thg->scaling = ((float)w/camw);
 	} else {
-		thg.scaling = ((float)h/camh);
+		thg->scaling = ((float)h/camh);
 	}
 
-	thg.offset.x = (w - camw*thg.scaling)/2;
-	thg.offset.y = (h - camh*thg.scaling)/2;
+	thg->offset.x = (w - camw*thg->scaling)/2;
+	thg->offset.y = (h - camh*thg->scaling)/2;
 }
 
 void umcanvasrect(UmkaStackSlot *p, UmkaStackSlot *r) {

@@ -41,6 +41,3 @@ uint32_t th_color_hsv2rgb(float h, float s, float v, float a) {
 	return th_color_rgb(r, g, b, a);
 }
 
-
-
-

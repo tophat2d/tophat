@@ -8,7 +8,7 @@
 
 #define FRAND (double)rand()/0x7FFFFFFF
 
-extern th_global thg;
+extern th_global *thg;
 
 static
 int interp(int start, int start_val, int end, int end_val, int t) {
@@ -87,8 +87,8 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 				{ .x = px, .y = py + size}};
 			for (int i=0; i < 4; i++) {
 				th_rotate_point(&p[i], (th_vf2){{px + size/2, py+size/2}}, rot);
-				p[i].x = (p[i].x - camx) * thg.scaling;
-				p[i].y = (p[i].y - camy) * thg.scaling;
+				p[i].x = (p[i].x - camx) * thg->scaling;
+				p[i].y = (p[i].y - camy) * thg->scaling;
 			}
       
 			th_canvas_triangle(col, p[0], p[1], p[2]);

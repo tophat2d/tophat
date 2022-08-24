@@ -10,7 +10,7 @@
 #define PACK_CHARSPERPAGE TH_FONTPLATFORM_CHARSPERPAGE
 #define PACK_PAGECOUNT TH_FONTPLATFORM_PAGECOUNT 
 
-extern th_global thg;
+extern th_global *thg;
 
 // NOTE(skejeton): Initializes out_page->pc
 static bool f_pack_attempt(th_font *font, uint32_t char_offset, th_font_atlas_page *out_page, uint8_t *out_buffer, uint32_t out_buffer_size) {
@@ -219,7 +219,7 @@ static void free_font(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 th_font *th_font_alloc() {
-	return umkaAllocData(thg.umka, sizeof(th_font), free_font);
+	return umkaAllocData(thg->umka, sizeof(th_font), free_font);
 }
 
 th_font *th_font_load(char *path, double size, uint32_t filter) {

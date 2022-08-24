@@ -9,7 +9,7 @@
 #define UMPROF_IMPL
 #include <umprof.h>
 
-th_global thg = {0};
+th_global *thg;
 int destroyfunc;
 int dead = 0;
 
@@ -30,18 +30,20 @@ static void die() {
 	th_image_deinit();
 	th_shader_deinit();
 	if (destroyfunc) {
-		umkaCall(thg.umka, destroyfunc, 0, NULL, NULL);
+		umkaCall(thg->umka, destroyfunc, 0, NULL, NULL);
 	}
 
-
-	umkaFree(thg.umka);
+	umkaFree(thg->umka);
 	dead = 1;
 }
 
 int main(int argc, char *argv[]) {
-	thg.umka = umkaAlloc();
+	th_global thg_ = {0};
+	thg = &thg_;
+
+	thg->umka = umkaAlloc();
 	int umkaOK;
-	strcpy(thg.respath, "");
+	strcpy(thg->respath, "");
 	const char *scriptpath = "main.um";
 	bool check = false;
 	bool prof = false;
@@ -90,7 +92,7 @@ int main(int argc, char *argv[]) {
 				return 1;
 			}
 
-			strcpy(thg.respath, argv[argOffset+1]);
+			strcpy(thg->respath, argv[argOffset+1]);
 			argOffset += 2;
 		} else if (strcmp(argv[argOffset], "help") == 0) {
 			printf(
@@ -125,9 +127,9 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	
-	umkaOK = umkaInit(thg.umka, scriptpath, NULL, 1024 * 1024, NULL,
+	umkaOK = umkaInit(thg->umka, scriptpath, NULL, 1024 * 1024, NULL,
 		argc - argOffset, argv + argOffset, true, true, silent ? NULL : warning);
-	if (prof) umprofInit(thg.umka);
+	if (prof) umprofInit(thg->umka);
 
 	th_audio_init();
 
@@ -136,12 +138,12 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 
-	_th_umka_bind(thg.umka);
-	umkaOK = umkaCompile(thg.umka);
+	_th_umka_bind(thg->umka);
+	umkaOK = umkaCompile(thg->umka);
 
 	if (!umkaOK) {
 		UmkaError error;
-		umkaGetError(thg.umka, &error);
+		umkaGetError(thg->umka, &error);
 		th_error("%s (%d, %d): %s\n", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}
@@ -151,13 +153,13 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	destroyfunc = umkaGetFunc(thg.umka, NULL, "windowdestroy");
-	thg.scaling = 1;
+	destroyfunc = umkaGetFunc(thg->umka, NULL, "windowdestroy");
+	thg->scaling = 1;
 
-	umkaOK = umkaRun(thg.umka);
+	umkaOK = umkaRun(thg->umka);
 	if (!umkaOK) {
 		UmkaError error;
-		umkaGetError(thg.umka, &error);
+		umkaGetError(thg->umka, &error);
 		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
 		fprintf(stderr, "\tStack trace:\n");
 
@@ -165,7 +167,7 @@ int main(int argc, char *argv[]) {
 			char fnName[UMKA_MSG_LEN + 1];
 			int fnOffset;
 
-			if (!umkaGetCallStack(thg.umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1)) {
+			if (!umkaGetCallStack(thg->umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1)) {
 				break;
 				fprintf(stderr, "\t\t...\n");
 			}

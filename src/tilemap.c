@@ -7,19 +7,7 @@
 #include <GL/gl.h>
 #include <chew.h>
 
-extern th_global thg;
-
-extern GLuint gRDShaderProg;
-extern GLuint gRDBlitProg;
-extern GLuint gRDShaderProgUX;
-extern GLuint gRDBlitProgUX;
-extern GLuint gRDBlitProgUT;
-extern GLuint gRDBlitProgTex;
-extern GLuint gRDLastResizeW;
-extern GLuint gRDLastResizeH;
-#ifdef _WIN32
-#define glActiveTexture glActiveTextureCHEW
-#endif
+extern th_global *thg;
 
 void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	th_image *a = t->a.i;

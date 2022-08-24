@@ -14,7 +14,7 @@ static GLuint vbo;
 static int cur_batch = 0;
 static float batch_verts[BATCH * 3 * 6];
 
-extern th_global thg;
+extern th_global *thg;
 
 int th_canvas_compile_shader(char *frag, char *vert) {
 	const char *attribs[] = { "th_pos", "th_color" };
@@ -89,9 +89,9 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	sh /= 2;
 
 	const float verts[] = {
-		(a.x + thg.offset.x) / sw - 1, (a.y + thg.offset.y) / sh + 1,
-	 	(b.x + thg.offset.x) / sw - 1, (b.y + thg.offset.y) / sh + 1,
-		(c.x + thg.offset.x) / sw - 1, (c.y + thg.offset.y) / sh + 1,
+		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + 1,
+	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + 1,
+		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + 1,
 	};
 
 	float *base = &batch_verts[cur_batch * 3 * 6];
@@ -108,10 +108,10 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 }
 
 void th_canvas_rect(uint32_t color, th_rect r) {
-	r.x *= thg.scaling;
-	r.y *= thg.scaling;
-	r.w *= thg.scaling;
-	r.h *= thg.scaling;
+	r.x *= thg->scaling;
+	r.y *= thg->scaling;
+	r.w *= thg->scaling;
+	r.h *= thg->scaling;
 	th_canvas_triangle(color,
 		(th_vf2){{r.x, r.y}},
 		(th_vf2){{r.x + r.w, r.y}},
@@ -124,11 +124,11 @@ void th_canvas_rect(uint32_t color, th_rect r) {
 
 // stolen from here: stackoverflow.com/questions/1936934/turn-a-line-into-a-rectangle
 void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness) {
-	f.x *= thg.scaling;
-	f.y *= thg.scaling;
-	t.x *= thg.scaling;
-	t.y *= thg.scaling;
-	thickness *= thg.scaling;
+	f.x *= thg->scaling;
+	f.y *= thg->scaling;
+	t.x *= thg->scaling;
+	t.y *= thg->scaling;
+	thickness *= thg->scaling;
 
 	th_vf2 d = { .x = t.x - f.x, .y = t.y - f.y};
 	fu mag = sqrt(d.x*d.x + d.y*d.y);

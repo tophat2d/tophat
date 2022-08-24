@@ -1,6 +1,6 @@
 #include "tophat.h"
 
-extern th_global thg;
+extern th_global *thg;
 
 th_vf2 th_atlas_nth_coords(th_atlas *a, uu n) {
 	return (th_vf2){.x = n % (int)a->dm.w, .y = (n - n%(int)a->dm.w) / (int)a->dm.w};

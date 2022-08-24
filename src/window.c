@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-extern th_global thg;
+extern th_global *thg;
 
 #ifdef linux
 #include <X11/Xlib.h>
@@ -115,9 +115,9 @@ int th_window_handle() {
 		case KeyPress:; // FALLTHROUGH
 			KeySym _;
 			Status status;
-			thg.input_string_len += Xutf8LookupString(xic, &ev.xkey,
-				thg.input_string + thg.input_string_len,
-				INPUT_STRING_SIZE - thg.input_string_len,
+			thg->input_string_len += Xutf8LookupString(xic, &ev.xkey,
+				thg->input_string + thg->input_string_len,
+				INPUT_STRING_SIZE - thg->input_string_len,
 				&_, &status);
 
 		case KeyRelease:;
@@ -139,7 +139,7 @@ int th_window_handle() {
 			th_input_key(ev.xbutton.button, keyDir);
 			break;
 		case MotionNotify:
-			thg.mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
+			thg->mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
 			break;
 		case ClientMessage:
 			if (ev.xclient.data.l[0] == wm_delete_message) {
@@ -164,7 +164,7 @@ void th_window_swap_buffers() {
 
 	glXSwapBuffers(th_dpy, th_win);
 
-	thg.input_string_len = 0;
+	thg->input_string_len = 0;
 }
 #elif _WIN32
 #include <windows.h>
@@ -279,7 +279,7 @@ int th_window_handle() {
 			wchar_t buf[256];
 			int v = ToUnicode(msg.wParam, MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), key_state, buf, 256, 0);
 			if (v == 1) // only supports one character for now
-				thg.input_string_len += th_utf8_encode(thg.input_string + thg.input_string_len, buf[0]);
+				thg->input_string_len += th_utf8_encode(thg->input_string + thg->input_string_len, buf[0]);
 
 		case WM_KEYUP:
 			
@@ -300,7 +300,7 @@ int th_window_handle() {
 			th_input_key(3, msg.message == WM_RBUTTONDOWN);
 			break;
 		case WM_MOUSEMOVE:
-			thg.mouse = (th_vf2){ .x = GET_X_LPARAM(msg.lParam), .y = GET_Y_LPARAM(msg.lParam) };
+			thg->mouse = (th_vf2){ .x = GET_X_LPARAM(msg.lParam), .y = GET_Y_LPARAM(msg.lParam) };
 			break;
 		case WM_MOUSEWHEEL:
 			th_input_key(GET_WHEEL_DELTA_WPARAM(msg.wParam) < 0 ? 5 : 4, 1);
@@ -322,7 +322,7 @@ void th_window_swap_buffers() {
 	th_input_cycle();
 	SwapBuffers(th_hdc);
 
-	thg.input_string_len = 0;
+	thg->input_string_len = 0;
 }
 
 void th_window_clear_frame() {
@@ -340,14 +340,14 @@ void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
 	th_canvas_flush();
 	th_image_flush();
 
-	x *= thg.scaling;
-	y *= thg.scaling;
-	w *= thg.scaling;
-	h *= thg.scaling;
+	x *= thg->scaling;
+	y *= thg->scaling;
+	w *= thg->scaling;
+	h *= thg->scaling;
 	glEnable(GL_SCISSOR_TEST);
 	int dimX, dimY;
 	th_window_get_dimensions(&dimX, &dimY);
-	glScissor(x+thg.offset.x, (dimY-(int)h)-y-thg.offset.y, w, h);
+	glScissor(x+thg->offset.x, (dimY-(int)h)-y-thg->offset.y, w, h);
 }
 
 void th_window_end_scissor() {

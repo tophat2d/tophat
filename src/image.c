@@ -22,7 +22,7 @@ static float batch_base[BATCH_SIZE * 6 * (2 + 2 + 4)];
 static float *batch_ptr = batch_base;
 static GLuint batch_tex = 0;
 
-extern th_global thg;
+extern th_global *thg;
 
 void th_image_free(th_image *img) {
 	glDeleteTextures(1, &img->gltexture);
@@ -34,7 +34,7 @@ void th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 th_image *th_image_alloc() {
-	return umkaAllocData(thg.umka, sizeof(th_image), th_image_free_umka);
+	return umkaAllocData(thg->umka, sizeof(th_image), th_image_free_umka);
 }
 
 th_image *th_load_image(char *path) {
@@ -133,10 +133,10 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	batch_tex = img->gltexture;
 
 	for (uu i=0; i < 4; i++) {
-		q.v[i].x *= thg.scaling;
-		q.v[i].x += thg.offset.x;
-		q.v[i].y *= thg.scaling;
-		q.v[i].y += thg.offset.y;
+		q.v[i].x *= thg->scaling;
+		q.v[i].x += thg->offset.x;
+		q.v[i].y *= thg->scaling;
+		q.v[i].y += thg->offset.y;
 	}
 
 	int sw, sh;

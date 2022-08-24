@@ -3,7 +3,7 @@
 
 #include "tophat.h"
 
-extern th_global thg;
+extern th_global *thg;
 
 th_quad th_ent_transform(th_ent *e) {
 	th_quad q;
@@ -37,8 +37,8 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 
 	if (!o->img) {
 		for (uu i=0; i < 4; i++) {
-			q.v[i].x *= thg.scaling;
-			q.v[i].y *= thg.scaling;
+			q.v[i].x *= thg->scaling;
+			q.v[i].y *= thg->scaling;
 		}
 		th_canvas_triangle(o->color, q.v[0], q.v[1], q.v[2]);
 		th_canvas_triangle(o->color, q.v[0], q.v[2], q.v[3]);

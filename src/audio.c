@@ -17,7 +17,7 @@ ma_device_config auconf;
 ma_device audev;
 ma_decoder_config decodercfg;
 
-extern th_global thg;
+extern th_global *thg;
 
 ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32, ma_uint32 frameCount, float volume) {
 	float temp[4096];
@@ -57,7 +57,7 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
 void _th_audio_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
 	th_playback_item *prev = NULL;
 
-	for (th_playback_item *pbi = thg.playbacks; pbi; pbi = pbi->next) {
+	for (th_playback_item *pbi = thg->playbacks; pbi; pbi = pbi->next) {
 		th_playback *pk = pbi->pk;
 		if (pk->paused) continue;
 
@@ -77,14 +77,14 @@ void _th_audio_data_callback(ma_device *pDevice, void *pOutput, const void *pInp
 			if (pk->looping) continue;
 
 			pk->playing = 0;
-			umkaDecRef(thg.umka, pk);
+			umkaDecRef(thg->umka, pk);
 			if (prev)
 				prev->next = pbi->next;
 			else
-				thg.playbacks = pbi->next;
+				thg->playbacks = pbi->next;
 
 			free(pbi);
-			pbi = prev ? prev->next : thg.playbacks;
+			pbi = prev ? prev->next : thg->playbacks;
 
 			if (!pbi) break;
 		}
@@ -115,8 +115,8 @@ void th_audio_init(){
 void th_audio_deinit() {
 	ma_device_uninit(&audev);
 
-	for (th_playback_item *pbi = thg.playbacks; pbi;) {
-		umkaDecRef(thg.umka, pbi->pk);
+	for (th_playback_item *pbi = thg->playbacks; pbi;) {
+		umkaDecRef(thg->umka, pbi->pk);
 		th_playback_item *tmp = pbi;
 
 		pbi = pbi->next;
