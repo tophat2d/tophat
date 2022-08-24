@@ -153,6 +153,12 @@ fn mkTransform*(p: Vf2, s: Vf2 = Vf2{1, 1}, o: Vf2 = Vf2{0, 0}, r: fu = 0.0): Tr
 	return Transform{p: p, s: s, o: o, r: r}
 }
 
+fn cgetglobal(): ^struct{}
+// returns a pointer to the th_global.
+fn getGlobal*(): ^struct{} {
+	return cgetglobal()
+}
+
 const (
 	black* = 0xff
 	white* = 0xffffffff

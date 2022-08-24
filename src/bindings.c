@@ -41,6 +41,10 @@ void umfopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->ptrVal = f;
 }
 
+void umgetglobal(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->ptrVal = &thg;
+}
+
 ///////////////////////////
 // COLOUR
 
@@ -570,6 +574,7 @@ void umsetuniformvf2(UmkaStackSlot *p, UmkaStackSlot *r) {
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
+	umkaAddFunc(umka, "cgetglobal", &umgetglobal);
 
 	// color
 	umkaAddFunc(umka, "umth_hsv2rgb_uint32", &umth_hsv2rgb_uint32);
