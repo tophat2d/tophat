@@ -103,6 +103,8 @@ fn (g: ^Generic) handle*() {
 	g.onEvent(eventHover, g.ctx)
 	
 	if input.isPressed(input.mouse1) {
+		input.clear(input.mouse1)
+
 		if !g.pressed {
 			g.onEvent(eventJustPress, g.ctx)
 		}

@@ -889,6 +889,8 @@ const char *th_em_modulesrc[] = {
 "\tg.onEvent(eventHover, g.ctx)\n"
 "\t\n"
 "\tif input.isPressed(input.mouse1) {\n"
+"\t\tinput.clear(input.mouse1)\n"
+"\n"
 "\t\tif !g.pressed {\n"
 "\t\t\tg.onEvent(eventJustPress, g.ctx)\n"
 "\t\t}\n"

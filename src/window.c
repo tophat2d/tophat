@@ -272,7 +272,7 @@ int th_window_handle() {
 
 		// i found a list of these on the wine website, but not on MSDN -_-
 		switch (msg.message) {
-		case WM_KEYDOWN: // FALLTHROUGH
+		case WM_KEYDOWN:; // FALLTHROUGH
 			char key_state[256];
 			GetKeyboardState(key_state);
 
@@ -281,11 +281,7 @@ int th_window_handle() {
 			if (v == 1) // only supports one character for now
 				thg->input_string_len += th_utf8_encode(thg->input_string + thg->input_string_len, buf[0]);
 
-		case WM_KEYUP:
-			
-			// Virtual scan codes shouldn't be used as ASCII values, but in this case
-			// it shouldn't matter.
-	
+		case WM_KEYUP:;
 			uint32_t key = tolower(MapVirtualKeyEx(msg.wParam, MAPVK_VK_TO_CHAR, hkl));
 			if (key == 0)
 				key = MapVirtualKeyEx(MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), MAPVK_VSC_TO_VK, hkl) + 0x7f;
