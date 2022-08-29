@@ -209,7 +209,17 @@ void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 tl = *(th_vf2 *)&p[1];
 	th_vf2 br = *(th_vf2 *)&p[0];
 
-	img->crop = (th_rect){tl.x, tl.y, br.x, br.y};
+	img->crop = (th_quad){
+		(th_vf2){{tl.x, tl.y}}, (th_vf2){{br.x, tl.y}},
+		(th_vf2){{br.x, br.y}}, (th_vf2){{tl.x, br.y}}};
+}
+
+void umimgcropquad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *img = p[1].ptrVal;
+	if (!img) return;
+	th_quad *q = p[0].ptrVal;
+
+	img->crop = *q;
 }
 
 // returns a pointer to an image from data
@@ -480,10 +490,12 @@ void umimagedraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_transform *t = (th_transform *)p[1].ptrVal;
 	uint32_t c = p[0].uintVal;
 
-	th_quad q = {0};
-	th_transform_rect(&q, *t, (th_rect){
-		.w = (img->crop.w - img->crop.x) * img->dm.x,
-		.h = (img->crop.h - img->crop.y) * img->dm.y});
+	th_quad q = img->crop;
+	for (int i=0; i < 4; i++) {
+		q.v[i].x *= img->dm.x;
+		q.v[i].y *= img->dm.y;
+	}
+	th_transform_quad(&q, *t);
 	th_blit_tex(img, q, c);
 }
 
@@ -604,6 +616,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "fliphimg", &umimgfliph);
 	umkaAddFunc(umka, "imggetdims", &umimggetdims);
 	umkaAddFunc(umka, "imgcrop", &umimgcrop);
+	umkaAddFunc(umka, "imgcropquad", &umimgcropquad);
 	umkaAddFunc(umka, "imgfromdata", &umimgfromdata);
 	umkaAddFunc(umka, "imgcopy", &umimgcopy);
 	umkaAddFunc(umka, "imgsetfilter", &umimgsetfilter);

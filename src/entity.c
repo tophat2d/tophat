@@ -13,20 +13,23 @@ th_quad th_ent_transform(th_ent *e) {
 }
 
 void th_ent_draw(th_ent *o, th_rect *camera) {
-	int camx, camy;
-	camx = camera->x - (camera->w / 2);
-	camy = camera->y - (camera->h / 2);
+	const int camx = camera->x - (camera->w / 2);
+	const int camy = camera->y - (camera->h / 2);
 	th_transform t = o->t;
 	t.pos.x -= camx;
 	t.pos.y -= camy;
 
-	th_rect r = o->rect;
-	if (o->img)
-		r = (th_rect){
-		.w = (o->img->crop.w - o->img->crop.x) * o->img->dm.x,
-		.h = (o->img->crop.h - o->img->crop.y) * o->img->dm.y};
-	th_quad q = {0};
-	th_transform_rect(&q, t, r);
+	th_quad q;
+	if (o->img) {
+		q = o->img->crop;
+		for (int i=0; i < 4; i++) {
+			q.v[i].x *= o->img->dm.x;
+			q.v[i].y *= o->img->dm.y;
+		}
+		th_transform_quad(&q, t);
+	} else {
+		th_transform_rect(&q, t, o->rect);
+	}
 	
 	// this logic is incorrect
 	/*if (q.br.x < 0 || q.br.y < 0)

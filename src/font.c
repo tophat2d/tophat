@@ -148,7 +148,9 @@ static f_glyph f_iterator_next_glyph(f_iterator *iter) {
 	stbtt_aligned_quad quad = f_iterator_next_quad(iter, &page);
 
 	// the quad image data is actually uvs hooray! 
-	page->img.crop = (th_rect){quad.s0, quad.t0, quad.s1, quad.t1};
+	page->img.crop = (th_quad){
+		(th_vf2){{quad.s0, quad.t0}}, (th_vf2){{quad.s1, quad.t0}},
+		(th_vf2){{quad.s1, quad.t1}}, (th_vf2){{quad.s0, quad.t1}}};
 	th_rect rect = f_get_dest_rect(iter->font, quad);
 
 	// NOTE(skejeton): This is to scale font, it's bad but it works ish

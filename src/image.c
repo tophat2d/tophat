@@ -51,7 +51,9 @@ th_image *th_load_image(char *path) {
 	img->dm.h = h;
 	img->channels = c;
 	img->filter = 1;
-	img->crop = (th_rect){0, 0, 1, 1};
+	img->crop = (th_quad){
+		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
+		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
 	img->flipv = 0;
 	img->fliph = 0;
 
@@ -69,7 +71,9 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 	img->dm = dm;
 	img->flipv = 0;
 	img->fliph = 0;
-	img->crop = (th_rect){0, 0, 1, 1};
+	img->crop = (th_quad){
+		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
+		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
 	img->channels = 4;
 	img->filter = 1;
 
@@ -148,18 +152,23 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	for (int i=0; i < 4; ++i)
 		colors[i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
-	th_rect bounds = img->crop;
-	if (img->flipv)
-		SWAP_VARS(bounds.y, bounds.h, fu);
-	if (img->fliph)
-		SWAP_VARS(bounds.x, bounds.w, fu);
+	th_quad bounds = img->crop;
+	if (img->flipv) {
+		SWAP(bounds.tl, bounds.bl);
+		SWAP(bounds.tr, bounds.br);
+	}
+
+	if (img->fliph) {
+		SWAP(bounds.tl, bounds.tr);
+		SWAP(bounds.bl, bounds.br);
+	}
 	const float verts[] = {
-		q.tl.x / sw - 1.0, q.tl.y / sh + 1.0, bounds.x, bounds.y,
-		q.tr.x / sw - 1.0, q.tr.y / sh + 1.0, bounds.w, bounds.y,
-		q.br.x / sw - 1.0, q.br.y / sh + 1.0, bounds.w, bounds.h,
-		q.tl.x / sw - 1.0, q.tl.y / sh + 1.0, bounds.x, bounds.y,
-		q.br.x / sw - 1.0, q.br.y / sh + 1.0, bounds.w, bounds.h,
-		q.bl.x / sw - 1.0, q.bl.y / sh + 1.0, bounds.x, bounds.h};
+		q.tl.x / sw - 1.0, q.tl.y / sh + 1.0, bounds.tl.x, bounds.tl.y,
+		q.tr.x / sw - 1.0, q.tr.y / sh + 1.0, bounds.tr.x, bounds.tr.y,
+		q.br.x / sw - 1.0, q.br.y / sh + 1.0, bounds.br.x, bounds.br.y,
+		q.tl.x / sw - 1.0, q.tl.y / sh + 1.0, bounds.tl.x, bounds.tl.y,
+		q.br.x / sw - 1.0, q.br.y / sh + 1.0, bounds.br.x, bounds.br.y,
+		q.bl.x / sw - 1.0, q.bl.y / sh + 1.0, bounds.bl.x, bounds.bl.y};
 
 	for (uu i=0; i < 6; i++) {
 		memcpy(batch_ptr, &verts[i * (2 + 2)], (2 + 2) * sizeof(float));

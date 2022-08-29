@@ -13,8 +13,8 @@ typedef float fu;
 typedef unsigned short uu;
 typedef short iu;
 
-#define SWAP_VARS(v1, v2, type) { type tmp = v1; v1 = v2; v2 = tmp; }
-#define LEN(a) (sizeof(a) / sizeof(a[0]))
+#define SWAP(v1, v2) do { typeof(v1) tmp = v1; v1 = v2; v2 = tmp; } while (0)
+#define LEN(a) (sizeof(a) / sizeof((a)[0]))
 
 typedef union {
 	struct {fu w, h;};
@@ -63,7 +63,7 @@ typedef struct {
 	uint32_t *data;
 	unsigned int gltexture;
 	uu filter;
-	th_rect crop;
+	th_quad crop;
 	char flipv;
 	char fliph;
 } th_image;
@@ -280,6 +280,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t);
 // quad/transform
 th_vf2 th_quad_min(th_quad q);
 void th_transform_rect(th_quad *q, th_transform t, th_rect r);
+void th_transform_quad(th_quad *q, th_transform t);
 
 // vector
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);

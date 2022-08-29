@@ -55,9 +55,10 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 		tt.pos = (th_vf2){{ x, y }};
 		tt.scale = (th_vf2){{ t->scale, t->scale}};
 		th_vf2 p = th_atlas_nth_coords(&t->a, cell - 1);
-		a->crop = th_atlas_get_cell(&t->a, p);
-		a->crop.w += a->crop.x;
-		a->crop.h += a->crop.y;
+		th_rect r = th_atlas_get_cell(&t->a, p);
+		a->crop = (th_quad){
+			(th_vf2){{r.x,       r.y      }}, (th_vf2){{r.x + r.w, r.y      }},
+			(th_vf2){{r.x + r.w, r.y + r.h}}, (th_vf2){{r.x,       r.y + r.h}}};
 
 		th_quad q = {0};
 		th_transform_rect(&q, tt, (th_rect){

@@ -14,10 +14,11 @@ fn fliphimg(i: Image, f: bool)
 fn cdrawimage(img: Image, t: ^th.Transform, color: uint32)
 fn imggetdims(dm: ^th.Vf2, i: Image)
 fn imgcrop(img: Image, tl, br: th.Vf2)
+fn imgcropquad(img: Image, q: ^th.Quad)
 fn imgfromdata(ret: ^Image, data: ^uint32, dm: th.Vf2)
 fn imgcopy(ret: ^Image, data: Image)
 fn imgsetfilter(data: Image, filter: int)
-fn imgdrawonquad(img: Image, color: uint32, q: [4]th.Vf2)
+fn imgdrawonquad(img: Image, color: uint32, q: th.Quad)
 fn imgupdatedata(img: Image, data: ^uint32, dm: th.Vf2)
 fn imggetdata(img: Image, data: ^uint32)
 
@@ -46,7 +47,7 @@ fn (i: ^Image) draw*(t: th.Transform, color: uint32 = th.white) {
 
 // Draws the image on top of a quad with corners of the image positioned
 // on the verticies of the quad.
-fn (i: ^Image) drawOnQuad*(q: [4]th.Vf2, color: uint32 = th.white) {
+fn (i: ^Image) drawOnQuad*(q: th.Quad, color: uint32 = th.white) {
 	imgdrawonquad(i^, color, q)
 }
 
@@ -67,6 +68,11 @@ fn (i: ^Image) getDims*(): th.Vf2 {
 // 1, 1 (bottom right)
 fn (i: ^Image) crop*(tl, br: th.Vf2) {
 	imgcrop(i^, tl, br)
+}
+
+// Crop an image using a quad.
+fn (i: ^Image) cropQuad*(q: th.Quad) {
+	imgcropquad(i^, &q)
 }
 
 // Creates an image from raw data.

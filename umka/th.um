@@ -18,6 +18,8 @@ type Vf2* = struct {
 	x, y: fu
 }
 
+type Quad* = [4]th.Vf2
+
 // Vf2 constructor
 fn mkVf2*(x: fu = 0, y: fu = 0): Vf2 {
 	return Vf2{x, y}
