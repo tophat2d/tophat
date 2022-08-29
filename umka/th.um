@@ -159,7 +159,7 @@ fn ctransformvf2(v: ^Vf2, t: ^Transform)
 //	1. scale
 //  2. rotation
 //  3. position
-//
+// 
 // This allows conversion from a relative to an absolute vf2.
 fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
 	ret := v^
@@ -175,7 +175,7 @@ fn ctransformquad(q: ^Quad, t: ^Transform)
 // 	1. scale
 // 	2. rotation
 // 	3. position
-fn (q: ^Quad) transformed(t: Transform): Quad {
+fn (q: ^Quad) transformed*(t: Transform): Quad {
 	ret := q^
 	ctransformquad(&ret, &t)
 	return ret
