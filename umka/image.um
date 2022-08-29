@@ -15,6 +15,7 @@ fn cdrawimage(img: Image, t: ^th.Transform, color: uint32)
 fn imggetdims(dm: ^th.Vf2, i: Image)
 fn imgcrop(img: Image, tl, br: th.Vf2)
 fn imgcropquad(img: Image, q: ^th.Quad)
+fn imggetcropquad(img: Image, q: ^th.Quad)
 fn imgfromdata(ret: ^Image, data: ^uint32, dm: th.Vf2)
 fn imgcopy(ret: ^Image, data: Image)
 fn imgsetfilter(data: Image, filter: int)
@@ -73,6 +74,13 @@ fn (i: ^Image) crop*(tl, br: th.Vf2) {
 // Crop an image using a quad.
 fn (i: ^Image) cropQuad*(q: th.Quad) {
 	imgcropquad(i^, &q)
+}
+
+// Crop an image using a quad.
+fn (i: ^Image) getCropQuad*(): th.Quad {
+	var (q: th.Quad)
+	imggetcropquad(i^, &q)
+	return q
 }
 
 // Creates an image from raw data.
