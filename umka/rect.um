@@ -36,3 +36,16 @@ fn (r: ^rect.Rect) getPos*(): th.Vf2 {
 fn (r: ^rect.Rect) getDims*(): th.Vf2 {
 	return th.Vf2{r.w, r.h}
 }
+
+fn ctransformrect(ret: ^th.Quad, r: ^rect.Rect, t: ^th.Transform)
+// Transforms a rect into a quad.
+// Order:
+// 	1. scale
+// 	2. rotation
+// 	3. position
+fn (r: ^rect.Rect) transformed*(t: th.Transform): th.Quad {
+	var ret: th.Quad
+	ctransformrect(&ret, r, &t)
+
+	return ret
+}

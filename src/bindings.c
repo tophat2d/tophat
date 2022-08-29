@@ -583,6 +583,28 @@ void umsetuniformvf2(UmkaStackSlot *p, UmkaStackSlot *r) {
 	glUniform2f(p[1].intVal, v->x / sw + 1.f, v->y / sh + 1.f);
 }
 
+void umtransformrect(UmkaStackSlot *p, UmkaStackSlot *_) {
+	th_quad *ret = p[2].ptrVal;
+	th_rect *r = p[1].ptrVal;
+	th_transform *t = p[0].ptrVal;
+
+	th_transform_rect(ret, *t, *r);
+}
+
+void umtransformquad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_quad *q = p[1].ptrVal;
+	th_transform *t = p[0].ptrVal;
+
+	th_transform_quad(q, *t);
+}
+
+void umtransformvf2(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *v = p[1].ptrVal;
+	th_transform *t = p[0].ptrVal;
+
+	th_transform_vf2(v, *t);
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
@@ -668,6 +690,11 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cpickcanvasshader", umpickcanvasshader);
 	umkaAddFunc(umka, "cpickimageshader", umpickimageshader);
 	umkaAddFunc(umka, "cgetuniformlocation", umgetuniformlocation);
+
+	// transform
+	umkaAddFunc(umka, "ctransformrect", &umtransformrect);
+	umkaAddFunc(umka, "ctransformquad", &umtransformquad);
+	umkaAddFunc(umka, "ctransformvf2", &umtransformvf2);
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);

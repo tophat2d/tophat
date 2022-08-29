@@ -18,8 +18,6 @@ type Vf2* = struct {
 	x, y: fu
 }
 
-type Quad* = [4]th.Vf2
-
 // Vf2 constructor
 fn mkVf2*(x: fu = 0, y: fu = 0): Vf2 {
 	return Vf2{x, y}
@@ -153,6 +151,34 @@ type Transform* = struct {
 // Transform constructor
 fn mkTransform*(p: Vf2, s: Vf2 = Vf2{1, 1}, o: Vf2 = Vf2{0, 0}, r: fu = 0.0): Transform {
 	return Transform{p: p, s: s, o: o, r: r}
+}
+
+fn ctransformvf2(v: ^Vf2, t: ^Transform)
+// Transforms a vf2 to another vf2.
+// Order:
+//	1. scale
+//  2. rotation
+//  3. position
+//
+// This allows conversion from a relative to an absolute vf2.
+fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
+	ret := v^
+	ctransformvf2(&ret, &t)
+	return ret
+}
+
+type Quad* = [4]th.Vf2
+
+fn ctransformquad(q: ^Quad, t: ^Transform)
+// Transforms a quad into another quad.
+// Order:
+// 	1. scale
+// 	2. rotation
+// 	3. position
+fn (q: ^Quad) transformed(t: Transform): Quad {
+	ret := q^
+	ctransformquad(&ret, &t)
+	return ret
 }
 
 fn cgetglobal(): ^struct{}

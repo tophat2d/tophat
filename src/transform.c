@@ -22,3 +22,11 @@ void th_transform_rect(th_quad *q, th_transform t, th_rect r) {
 
 	th_transform_quad(q, t);
 }
+
+void th_transform_vf2(th_vf2 *v, th_transform t) {
+	v->x *= t.scale.x;
+	v->y *= t.scale.y;
+	th_rotate_point(v, t.origin, t.rot);
+	v->x += t.pos.x;
+	v->y += t.pos.y;
+}
