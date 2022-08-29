@@ -23,6 +23,8 @@ import (
 	"ui.um"
 	"utf8.um"
 	"window.um"
+	"color.um"
+	"coll.um"
 )
 
 fn main() { }

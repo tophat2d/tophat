@@ -215,6 +215,7 @@ void th_canvas_flush();
 // collisions
 int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
 uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
+uu th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic);
 uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
 uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
 uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);

@@ -620,6 +620,41 @@ void umtransformvf2(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_transform_vf2(v, *t);
 }
 
+void umcolllinetoline(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *b1 = p[4].ptrVal;
+	th_vf2 *e1 = p[3].ptrVal;
+	th_vf2 *b2 = p[2].ptrVal;
+	th_vf2 *e2 = p[1].ptrVal;
+	th_vf2 *ic = p[0].ptrVal;
+
+	r->intVal = th_line_to_line(*b1, *e1, *b2, *e2, ic);
+}
+
+void umcollpointtoquad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *v = p[2].ptrVal;
+	th_quad *q = p[1].ptrVal;
+	th_vf2 *ic = p[0].ptrVal;
+
+	r->intVal = th_point_to_quad(*v, q, ic);
+}
+
+void umcolllinetoquad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *b = p[3].ptrVal;
+	th_vf2 *e = p[2].ptrVal;
+	th_quad *q = p[1].ptrVal;
+	th_vf2 *ic = p[0].ptrVal;
+
+	r->intVal = th_line_to_quad(*b, *e, q, ic);
+}
+
+void umcollquadtoquad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_quad *q1 = p[2].ptrVal;
+	th_quad *q2 = p[1].ptrVal;
+	th_vf2 *ic = p[0].ptrVal;
+
+	r->intVal = th_quad_to_quad(q1, q2, ic);
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
@@ -711,6 +746,12 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "ctransformrect", &umtransformrect);
 	umkaAddFunc(umka, "ctransformquad", &umtransformquad);
 	umkaAddFunc(umka, "ctransformvf2", &umtransformvf2);
+
+	// colisions
+	umkaAddFunc(umka, "ccolllinetoline", &umcolllinetoline);
+	umkaAddFunc(umka, "ccollpointtoquad", &umcollpointtoquad);
+	umkaAddFunc(umka, "ccolllinetoquad", &umcolllinetoquad);
+	umkaAddFunc(umka, "ccollquadtoquad", &umcollquadtoquad);
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);
