@@ -156,9 +156,9 @@ fn mkTransform*(p: Vf2, s: Vf2 = Vf2{1, 1}, o: Vf2 = Vf2{0, 0}, r: fu = 0.0): Tr
 fn ctransformvf2(v: ^Vf2, t: ^Transform)
 // Transforms a vf2 to another vf2.
 // Order:
-//	1. scale
-//  2. rotation
-//  3. position
+// 	1. scale
+// 	2. rotation
+// 	3. position
 // 
 // This allows conversion from a relative to an absolute vf2.
 fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
