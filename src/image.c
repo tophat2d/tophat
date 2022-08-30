@@ -130,6 +130,31 @@ unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
 	return (unsigned int)tex;
 }
 
+void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br) {
+	img->crop = (th_quad){
+		(th_vf2){{tl.x, tl.y}}, (th_vf2){{br.x, tl.y}},
+		(th_vf2){{br.x, br.y}}, (th_vf2){{tl.x, br.y}}};
+}
+
+void th_image_render_transformed(th_image *img, th_transform trans, uint32_t color) {
+	if (!img) return;
+
+	th_quad q = img->crop;
+	th_vf2 min = {{1e8, 1e8}};
+
+	for (int i=0; i < 4; i++) {
+		q.v[i].x *= img->dm.x;
+		q.v[i].y *= img->dm.y;
+		if (min.x > q.v[i].x) min.x = q.v[i].x;
+		if (min.y > q.v[i].y) min.y = q.v[i].y;
+	}
+
+	trans.pos.x -= min.x*trans.scale.x;
+	trans.pos.y -= min.y*trans.scale.y;
+	th_transform_quad(&q, trans);
+	th_blit_tex(img, q, color);
+}
+
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	th_canvas_flush();
 	if (img->gltexture != batch_tex || cur_batch_size >= BATCH_SIZE - 1)

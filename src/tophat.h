@@ -251,6 +251,8 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(th_image *img, th_quad q, uint32_t color);
+void th_image_render_transformed(th_image *img, th_transform trans, uint32_t color);
+void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
 void _th_rdimg(th_image *img, unsigned char *data);
 
 void th_image_set_filter(th_image *img, int filter);
