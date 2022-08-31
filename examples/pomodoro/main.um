@@ -306,62 +306,10 @@ fn formatTime(time: real): str {
 	return sprintf("0:%02d", seconds)
 }
 
-//
-// Draws nine-patch rectangle
-//
-// img: Source image
-// outer: Outer rectangle of source
-// inner: Inner rectangle of source (Positioned relative to outer)
-// dest: Destination rectangle
-//
-fn drawRectNinepatch*(img: th_image.Image, outer, inner, dest: th_rect.Rect, tint: uint32 = th.white) {
-  if dest.w < 0 {
-    dest.x += dest.w
-    dest.w = -dest.w
-  }
-
-  if dest.h < 0 {
-    dest.y += dest.h
-    dest.h = -dest.h
-  }
-
-  stepSrc := [3]th.Vf2{th.Vf2{inner.x, inner.y}, th.Vf2{inner.w, inner.h}, th.Vf2{outer.w-(inner.x+inner.w), outer.h-(inner.y+inner.h)}}
-  stepDst := [3]th.Vf2{th.Vf2{stepSrc[0].x, stepSrc[0].y}, th.Vf2{dest.w-stepSrc[0].x-stepSrc[2].x, dest.h-stepSrc[0].y-stepSrc[2].y}, th.Vf2{stepSrc[2].x, stepSrc[2].y}}
-
-  src := th.Vf2{outer.x, outer.y}
-  dst := th.Vf2{dest.x, dest.y}
-
-  imgDims := img.getDims()
-
-  // failsafe
-  if imgDims.x == 0 || imgDims.y == 0 {
-    return
-  }
-
-  for x := 0; x < 3; x++ {
-    ssX := stepSrc[x].x
-    sdX := stepDst[x].x
-    for y := 0; y < 3; y++ {
-      ssY := stepSrc[y].y
-      sdY := stepDst[y].y
-
-      img.crop(th.Vf2{src.x/imgDims.x, src.y/imgDims.y}, th.Vf2{(src.x+ssX)/imgDims.x, (src.y+ssY)/imgDims.y})
-      img.draw(th.Transform{p: th.Vf2{dst.x, dst.y}, s: th.Vf2{sdX/ssX, sdY/ssY}}, tint)
-
-      src.y += ssY
-      dst.y += sdY
-    }
-    src.x += ssX
-    dst.x += sdX
-    src.y = outer.y
-    dst.y = dest.y
-  }
-}
-
 fn putGuiRect(gui: ^Gui) {
   props := guiGetProperties(gui)
 
-  drawRectNinepatch(v_rectBase, th_rect.mk(0, 0, 16, 16), th_rect.mk(5, 5, 5, 5), props.rect, props.color)
+  v_rectBase.drawNinepatch(th_rect.mk(0, 0, 16, 16), th_rect.mk(5, 5, 5, 5), props.rect, props.color)
 }
 
 fn putGuiCountdown(id: str, gui: ^Gui, cd: Countdown) {
