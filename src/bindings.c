@@ -209,9 +209,7 @@ void umimgcrop(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 tl = *(th_vf2 *)&p[1];
 	th_vf2 br = *(th_vf2 *)&p[0];
 
-	img->crop = (th_quad){
-		(th_vf2){{tl.x, tl.y}}, (th_vf2){{br.x, tl.y}},
-		(th_vf2){{br.x, br.y}}, (th_vf2){{tl.x, br.y}}};
+	th_image_crop(img, tl, br);
 }
 
 void umimgcropquad(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -493,25 +491,11 @@ void umcanvasline(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimagedraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = p[2].ptrVal;
-	if (!img) return;
-	th_transform *t = (th_transform *)p[1].ptrVal;
-	uint32_t c = p[0].uintVal;
-
-	th_quad q = img->crop;
-	th_vf2 min = {{1e8, 1e8}};
-
-	for (int i=0; i < 4; i++) {
-		q.v[i].x *= img->dm.x;
-		q.v[i].y *= img->dm.y;
-		if (min.x > q.v[i].x) min.x = q.v[i].x;
-		if (min.y > q.v[i].y) min.y = q.v[i].y;
-	}
-
-	t->pos.x -= min.x*t->scale.x;
-	t->pos.y -= min.y*t->scale.y;
-	th_transform_quad(&q, *t);
-	th_blit_tex(img, q, c);
+	th_image_render_transformed(
+		(th_image*)      p[2].ptrVal,
+		*(th_transform*) p[1].ptrVal,
+		(uint32_t) 			 p[0].uintVal
+	);
 }
 
 void umimgdrawonquad(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -521,6 +505,60 @@ void umimgdrawonquad(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = p[5].ptrVal;	
 
 	th_blit_tex(img, q, filter);
+}
+
+void umimgdrawninepatch(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *img = p[4].ptrVal;
+	if (!img) return;
+	
+	th_rect
+		outer = *(th_rect*)p[3].ptrVal,
+		inner = *(th_rect*)p[2].ptrVal,
+		dest  = *(th_rect*)p[1].ptrVal;
+
+	uint32_t tint = p[0].uintVal;
+
+	if (dest.w < 0) {
+    dest.x += dest.w;
+    dest.w *= -1;
+  }
+
+  if (dest.h < 0) {
+    dest.y += dest.h;
+    dest.h *= -1;
+  }
+
+  th_vf2 stepSrc[3] = {{{inner.x, inner.y}}, {{inner.w, inner.h}}, {{outer.w-(inner.x+inner.w), outer.h-(inner.y+inner.h)}}};
+  th_vf2 stepDst[3] = {{{stepSrc[0].x, stepSrc[0].y}}, {{dest.w-stepSrc[0].x-stepSrc[2].x, dest.h-stepSrc[0].y-stepSrc[2].y}}, {{stepSrc[2].x, stepSrc[2].y}}};
+
+  th_vf2 src = {{outer.x, outer.y}};
+  th_vf2 dst = {{dest.x, dest.y}};
+
+  th_vf2 imgDims = img->dm;
+
+  // failsafe
+  if (imgDims.x == 0 || imgDims.y == 0) {
+    return;
+  }
+
+  for (int x = 0; x < 3; x++) {
+    float ssX = stepSrc[x].x;
+    float sdX = stepDst[x].x;
+    for (int y = 0; y < 3; y++) {
+      float ssY = stepSrc[y].y;
+      float sdY = stepDst[y].y;
+
+      th_image_crop(img, (th_vf2){{src.x/imgDims.x, src.y/imgDims.y}}, (th_vf2){{(src.x+ssX)/imgDims.x, (src.y+ssY)/imgDims.y}});
+      th_image_render_transformed(img, (th_transform){.scale = {{sdX/ssX, sdY/ssY}}, .pos = {{dst.x, dst.y}}}, tint);
+
+      src.y += ssY;
+      dst.y += sdY;
+    }
+    src.x += ssX;
+    dst.x += sdX;
+    src.y = outer.y;
+    dst.y = dest.y;
+  }
 }
 
 void umutf8getnextrune(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -694,6 +732,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "imgcopy", &umimgcopy);
 	umkaAddFunc(umka, "imgsetfilter", &umimgsetfilter);
 	umkaAddFunc(umka, "imgdrawonquad", &umimgdrawonquad);
+	umkaAddFunc(umka, "imgdrawninepatch", &umimgdrawninepatch);
 	umkaAddFunc(umka, "imgupdatedata", &umimgupdatedata);
 	umkaAddFunc(umka, "imggetdata", &umimggetdata);
 

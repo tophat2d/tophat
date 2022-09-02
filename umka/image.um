@@ -1,5 +1,5 @@
-
 import (
+	"rect.um"
 	"th.um"
 )
 
@@ -20,6 +20,7 @@ fn imgfromdata(ret: ^Image, data: ^uint32, dm: th.Vf2)
 fn imgcopy(ret: ^Image, data: Image)
 fn imgsetfilter(data: Image, filter: int)
 fn imgdrawonquad(img: Image, color: uint32, q: th.Quad)
+fn imgdrawninepatch(img: Image, outer, inner, dest: ^rect.Rect, color: uint32)
 fn imgupdatedata(img: Image, data: ^uint32, dm: th.Vf2)
 fn imggetdata(img: Image, data: ^uint32)
 
@@ -44,6 +45,14 @@ fn (i: ^Image) fliph*(flip: bool) {
 // applies color as a color filter.
 fn (i: ^Image) draw*(t: th.Transform, color: uint32 = th.white) {
 	cdrawimage(i^, &t, color)
+}
+
+// Draws "nine-patch" image. 
+// `outer` specifies the texture coordinates of the outer rect of source image,
+// `inner` specifies coordinates of inner rect of source image, positioned relative to `outer`.
+// You can tint with `color`.
+fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect.Rect, color: uint32 = th.white) {
+	imgdrawninepatch(i^, &outer, &inner, &dest, color)
 }
 
 // Draws the image on top of a quad with corners of the image positioned
