@@ -57,7 +57,7 @@ ma_uint32 __read_and_mix_pcm_frames_f32(ma_decoder* pDecoder, float* pOutputF32,
 void _th_audio_data_callback(ma_device *pDevice, void *pOutput, const void *pInput, ma_uint32 frameCount) {
 	th_playback_item *prev = NULL;
 
-	for (th_playback_item *pbi = thg->playbacks; pbi; pbi = pbi->next) {
+	for (th_playback_item *pbi = thg->playbacks; pbi; prev = pbi, pbi = pbi->next) {
 		th_playback *pk = pbi->pk;
 		if (pk->paused) continue;
 
