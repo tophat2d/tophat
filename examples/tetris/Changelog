@@ -2,7 +2,7 @@
   
 * Fix score not being counted for rows of 1, 2 or 3.
 * Combo is now reset when you lose.
-* Make input snappier with a better heuristic.
+* Make input snappier with a better heuristic. #88
 * Fix crazy text going too crazy. #88
-* Don't allow to hold piece around for more than 5 seconds on the ground.
+* Don't allow to hold piece around for more than 5 seconds on the ground. #88
 * Show next piece.
