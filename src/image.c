@@ -11,17 +11,6 @@
 #define glActiveTexture glActiveTextureCHEW
 #endif
 
-GLuint th_blit_prog = -1;
-GLuint th_blit_prog_tex = -1;
-static GLuint vao;
-static GLuint vbo;
-
-#define BATCH_SIZE 1024
-static int cur_batch_size = 0;
-static float batch_base[BATCH_SIZE * 6 * (2 + 2 + 4)];
-static float *batch_ptr = batch_base;
-static GLuint batch_tex = 0;
-
 extern th_global *thg;
 
 void th_image_free(th_image *img) {
@@ -29,7 +18,7 @@ void th_image_free(th_image *img) {
 	free(img->data);
 }
 
-void th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r) {
+static void th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image_free(p[0].ptrVal);
 }
 
@@ -157,9 +146,9 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	th_canvas_flush();
-	if (img->gltexture != batch_tex || cur_batch_size >= BATCH_SIZE - 1)
+	if (img->gltexture != thg->batch_tex || thg->blit_batch_size >= BATCH_SIZE - 1)
 		th_image_flush();
-	batch_tex = img->gltexture;
+	thg->batch_tex = img->gltexture;
 
 	for (uu i=0; i < 4; i++) {
 		q.v[i].x *= thg->scaling;
@@ -196,32 +185,29 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		q.bl.x / sw - 1.0, q.bl.y / sh + 1.0, bounds.bl.x, bounds.bl.y};
 
 	for (uu i=0; i < 6; i++) {
-		memcpy(batch_ptr, &verts[i * (2 + 2)], (2 + 2) * sizeof(float));
-		batch_ptr += 2 + 2;
-		memcpy(batch_ptr, colors, 4 * sizeof(float));
-		batch_ptr += 4;
+		memcpy(&thg->blit_batch[thg->blit_batch_size], &verts[i * (2 + 2)], (2 + 2) * sizeof(float));
+		memcpy(&thg->blit_batch[thg->blit_batch_size] + 2 + 2, colors, 4 * sizeof(float));
 	}
 
-	++cur_batch_size;
+	++thg->blit_batch_size;
 }
 
 void th_image_flush() {
-	if (!cur_batch_size) return;
+	if (!thg->blit_batch_size) return;
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, cur_batch_size * 6 * (4 + 2 + 2) * sizeof(float), batch_base);
+	glBindBuffer(GL_ARRAY_BUFFER, thg->blit_vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, thg->blit_batch_size * 6 * (4 + 2 + 2) * sizeof(float), thg->blit_batch);
 
-	glUniform1i(th_blit_prog_tex, 0);
-	glBindTexture(GL_TEXTURE_2D, batch_tex);
+	glUniform1i(thg->blit_prog_tex, 0);
+	glBindTexture(GL_TEXTURE_2D, thg->batch_tex);
 
-	glUseProgram(th_blit_prog);
-	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES, 0, cur_batch_size * 6);
+	glUseProgram(thg->blit_prog);
+	glBindVertexArray(thg->blit_vao);
+	glDrawArrays(GL_TRIANGLES, 0, thg->blit_batch_size * 6);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 
-	batch_ptr = batch_base;
-	cur_batch_size = 0;
+	thg->blit_batch_size = 0;
 }
 
 void _th_rdimg(th_image *img, unsigned char *data) {
@@ -275,19 +261,19 @@ int th_image_compile_shader(char *frag, char *vert) {
 }
 
 void th_image_init() {
-	th_blit_prog = *th_get_shader_err(th_image_compile_shader(
+	thg->blit_prog = *th_get_shader_err(th_image_compile_shader(
 		"vec2 th_vertex(vec2 vert) { return vert; }",
 		"vec4 th_fragment(sampler2D tex, vec2 coord) { return texture2D(tex, coord).abgr; }"));
 
-	th_blit_prog_tex = glGetUniformLocation(th_blit_prog, "th_tex");
+	thg->blit_prog_tex = glGetUniformLocation(thg->blit_prog, "th_tex");
 
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
+	glGenVertexArrays(1, &thg->blit_vao);
+	glGenBuffers(1, &thg->blit_vbo);
 
-	glBindVertexArray(vao);
+	glBindVertexArray(thg->blit_vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(batch_base), batch_base, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, thg->blit_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(thg->blit_batch), thg->blit_batch, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), NULL);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(2 * sizeof(float)));
 	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));

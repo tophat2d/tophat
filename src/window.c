@@ -9,17 +9,17 @@ extern th_global *thg;
 #include <X11/XKBlib.h>
 #include <GL/glx.h>
 
-Atom wm_delete_message;
-Display *th_dpy;
-Window th_win;
-Window th_root_win;
-XWindowAttributes th_win_attribs;
-GLXContext th_ctx;
+static Atom wm_delete_message;
+static Display *th_dpy;
+static Window th_win;
+static Window th_root_win;
+static XWindowAttributes th_win_attribs;
+static GLXContext th_ctx;
 
 static XkbDescPtr desc;
 static XIC xic;
 
-void th_window_deinit() {
+static void th_window_deinit() {
 	XDestroyWindow(th_dpy, th_win);
 	XCloseDisplay(th_dpy);
 }

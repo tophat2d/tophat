@@ -8,6 +8,7 @@ import (
 	"global.um"
 )
 
+fn init(thg, funcs: ^struct{})
 fn printHello()
 fn add(a, b: int): int
 
@@ -16,7 +17,8 @@ fn main() {
 
 	global.cam = rect.mk(0, 0, 192, 108)
 
-	printHello()
+	init(th.getGlobal(), th.getFuncs())
+
 	printf("result from c: %d\n", add(1, 3))
 
 	for window.cycle(global.cam) {
@@ -26,5 +28,6 @@ fn main() {
 		}
 
 		canvas.drawText("hello world", th.Vf2{2, 2}, th.black, 2)
+	printHello()
 	}
 }

@@ -8,6 +8,7 @@
 #include <GL/gl.h>
 
 #define INPUT_STRING_SIZE 256
+#define BATCH_SIZE 1024
 
 typedef float fu;
 typedef unsigned short uu;
@@ -189,7 +190,23 @@ typedef struct {
 
 	char input_string[INPUT_STRING_SIZE];
 	uu input_string_len;
+
+	GLuint canvas_vao;
+	GLuint canvas_vbo;
+	GLuint canvas_prog;
+	int canvas_batch_size;
+	float canvas_batch[BATCH_SIZE * 3 * 6];
+
+	GLuint blit_prog;
+	GLuint blit_prog_tex;
+	GLuint blit_vao;
+	GLuint blit_vbo;
+	int blit_batch_size;
+	float blit_batch[BATCH_SIZE * 6 * (2 + 2 + 4)];
+	GLuint batch_tex;
 } th_global;
+
+#ifndef THEXT
 
 // atlas
 th_vf2 th_atlas_nth_coords(th_atlas *a, uu n);
@@ -244,7 +261,6 @@ GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char 
 void th_gl_free_prog(GLuint prog);
 
 // image
-th_image *th_image_alloc();
 th_image *th_load_image(char *path);
 void th_image_free(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
@@ -257,6 +273,7 @@ void _th_rdimg(th_image *img, unsigned char *data);
 
 void th_image_set_filter(th_image *img, int filter);
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
+th_image *th_image_alloc();
 
 void th_image_init();
 void th_image_deinit();
@@ -321,5 +338,7 @@ void th_window_swap_buffers();
 void th_window_clear_frame();
 void th_window_begin_scissor(int x, int y, size_t w, size_t h);
 void th_window_end_scissor();
+
+#endif
 
 #endif

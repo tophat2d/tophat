@@ -1,0 +1,16 @@
+
+import (
+	"th.um"
+	"rect.um"
+	"input.um"
+	"canvas.um"
+	"window.um"
+)
+
+fn main() {
+	window.setup("input test", 400, 400)
+
+	for window.cycle(rect.mk(0, 0, 400, 400)) {
+	
+	}
+}

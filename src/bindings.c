@@ -45,6 +45,21 @@ void umgetglobal(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->ptrVal = thg;
 }
 
+void umgetfuncs(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int count = 0;
+#define THEXT(ret, name, ...) ++count
+#include "ext/thextdata.h"
+#undef THEXT
+
+	void **arr = malloc(sizeof(void *) * count);
+
+	int idx = 0;
+#define THEXT(ret, name, ...) arr[idx++] = &name
+#include "ext/thextdata.h"
+#undef THEXT
+	r->ptrVal = arr;
+}
+
 ///////////////////////////
 // COLOUR
 
@@ -589,8 +604,7 @@ void umpickcanvasshader(UmkaStackSlot *p, UmkaStackSlot *r) {
 	if (!s) return;
 
 	th_canvas_flush();
-	extern GLuint th_canvas_prog;
-	th_canvas_prog = *s;
+	thg->canvas_prog = *s;
 }
 
 void umpickimageshader(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -598,8 +612,7 @@ void umpickimageshader(UmkaStackSlot *p, UmkaStackSlot *r) {
 	if (!s) return;
 
 	th_image_flush();
-	extern GLuint th_blit_prog;
-	th_blit_prog = *s;
+	thg->blit_prog = *s;
 }
 
 void umgetuniformlocation(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -697,6 +710,7 @@ void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
 	umkaAddFunc(umka, "cgetglobal", &umgetglobal);
+	umkaAddFunc(umka, "cgetfuncs", &umgetfuncs);
 
 	// color
 	umkaAddFunc(umka, "umth_hsv2rgb_uint32", &umth_hsv2rgb_uint32);

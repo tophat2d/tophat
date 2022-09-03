@@ -5,15 +5,6 @@
 #include <math.h>
 #include "pixelfont.h"
 
-GLuint th_canvas_prog;
-
-static GLuint vao;
-static GLuint vbo;
-
-#define BATCH 1024
-static int cur_batch = 0;
-static float batch_verts[BATCH * 3 * 6];
-
 extern th_global *thg;
 
 int th_canvas_compile_shader(char *frag, char *vert) {
@@ -40,17 +31,17 @@ int th_canvas_compile_shader(char *frag, char *vert) {
 }
 
 void th_canvas_init() {
-	th_canvas_prog = *th_get_shader_err(th_canvas_compile_shader(
+	thg->canvas_prog = *th_get_shader_err(th_canvas_compile_shader(
 		"vec2 th_vertex(vec2 vert) { return vert; }\n",
 		"vec4 th_fragment(vec4 color) { return color; }\n"));
 
-	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
+	glGenVertexArrays(1, &thg->canvas_vao);
+	glGenBuffers(1, &thg->canvas_vbo);
 
-	glBindVertexArray(vao);
+	glBindVertexArray(thg->canvas_vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(batch_verts), batch_verts, GL_DYNAMIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, thg->canvas_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(thg->canvas_batch), thg->canvas_batch, GL_DYNAMIC_DRAW);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), NULL);
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(2 * sizeof(float)));
 
@@ -62,15 +53,15 @@ void th_canvas_init() {
 }
 
 void th_canvas_flush() {
-	if (!cur_batch) return;
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	if (!thg->canvas_batch_size) return;
+	glBindBuffer(GL_ARRAY_BUFFER, thg->canvas_vbo);
 	glBufferSubData(GL_ARRAY_BUFFER,
-		0, cur_batch * 3 * 6 * sizeof(float), batch_verts);
+		0, thg->canvas_batch_size * 3 * 6 * sizeof(float), thg->canvas_batch);
 
-	glUseProgram(th_canvas_prog);
-	glBindVertexArray(vao);
-	glDrawArrays(GL_TRIANGLES, 0, cur_batch * 3);
-	cur_batch = 0;
+	glUseProgram(thg->canvas_prog);
+	glBindVertexArray(thg->canvas_vao);
+	glDrawArrays(GL_TRIANGLES, 0, thg->canvas_batch_size * 3);
+	thg->canvas_batch_size = 0;
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
 }
@@ -94,7 +85,7 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + 1,
 	};
 
-	float *base = &batch_verts[cur_batch * 3 * 6];
+	float *base = &thg->canvas_batch[thg->canvas_batch_size * 3 * 6];
 	for (int i=0; i < 3; ++i) {
 		memcpy(base, &verts[i * 2], sizeof(float) * 2);
 		base += 2;
@@ -102,8 +93,8 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 		base += 4;
 	}
 
-	++cur_batch;
-	if (cur_batch >= BATCH)
+	++thg->canvas_batch_size;
+	if (thg->canvas_batch_size >= BATCH_SIZE)
 		th_canvas_flush();
 }
 

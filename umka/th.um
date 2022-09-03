@@ -182,9 +182,15 @@ fn (q: ^Quad) transformed*(t: Transform): Quad {
 }
 
 fn cgetglobal(): ^struct{}
-// returns a pointer to the th_global.
+// returns a pointer to the th_global. Set this as your extensions thg.
 fn getGlobal*(): ^struct{} {
 	return cgetglobal()
+}
+
+fn cgetfuncs(): ^struct{}
+// returns pointer to tophat functions. Pass this to th_ext_set.
+fn getFuncs*(): ^struct{} {
+	return cgetfuncs()
 }
 
 const (
