@@ -71,6 +71,9 @@ fn draw*(x, y: real) {
     canvas.drawText(entry.text, th.Vf2{x+xOffset, y+entry.y}.add(rotation), color, fontSize*scale)
 
     // Slerp the entry.y to making approach the wanted y
+    if dt > 0.01 {
+      dt = 0.01
+    }
     entry.y += (py-entry.y)*dt*100
 
     py += (5*fontSize+padding)*(1.0-fading)

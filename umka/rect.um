@@ -37,6 +37,11 @@ fn (r: ^rect.Rect) getDims*(): th.Vf2 {
 	return th.Vf2{r.w, r.h}
 }
 
+// returns where the second point of the rectangle lies.
+fn (r: ^rect.Rect) getEnd*(): th.Vf2 {
+	return th.Vf2{r.x+r.w, r.y+r.h}
+}
+
 fn ctransformrect(ret: ^th.Quad, r: ^rect.Rect, t: ^th.Transform)
 // Transforms a rect into a quad.
 // Order:

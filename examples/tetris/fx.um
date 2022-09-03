@@ -28,12 +28,24 @@ type Effect = struct {
 }
 
 var (
+	fallingPiecePos: th.Vf2
 	offset_x : real = 0
 	offset_y : real = 0
 	effects: []Effect
 )
 
+fn getNextPiecePos(): th.Vf2 {
+	return th.Vf2{trunc(offset_x)-16*5, trunc(offset_y)+32+trunc(sin(th.time/1000.0)*5)}
+}
+
+fn getStashPos(): th.Vf2 {
+	return th.Vf2{16*11+trunc(offset_x), 1*16+trunc(offset_y)}
+}
+
 fn init*() {
+	offset_x = (global.cam.w-reference_frame.w)/2
+	offset_y = (global.cam.h-reference_frame.h)/2
+	fallingPiecePos = getNextPiecePos()
 	effects = make([]Effect, 0)
 }
 
@@ -105,10 +117,19 @@ fn drawStash() {
 	if gameplay.stash < 0 {
 		return 
 	}
-	drawPiece(presets.pieceValue(gameplay.stash, 0), 16*11+trunc(offset_x), 1*16+trunc(offset_y), 0xFFFFFFFF)
+
+	pos := getStashPos()
+	drawPiece(presets.pieceValue(gameplay.stash, 0), round(pos.x), round(pos.y), 0xFFFFFFFF)
 }
 
 fn drawFallingPiece() {
+
+	targetPos := th.Vf2{trunc(falling_piece.x)*16+trunc(offset_x), trunc(falling_piece.y)*16+trunc(offset_y)}
+	mul := th.delta/30.0
+	if mul > 1.0 {
+		mul = 1.0
+	}
+	fallingPiecePos = fallingPiecePos.add(targetPos.sub(fallingPiecePos).mulf(mul))
 	val := falling_piece.pieceValue(falling_piece.rotation)
 
 	// draw ghost
@@ -119,7 +140,14 @@ fn drawFallingPiece() {
 	falling_piece.y = prev
 	falling_piece.placeTimer = timerPrev
 
-	drawPiece(val, trunc(falling_piece.x)*16+trunc(offset_x), trunc(falling_piece.y)*16+trunc(offset_y), 0xFFFFFFFF)
+	drawPiece(val, round(fallingPiecePos.x), round(fallingPiecePos.y), 0xFFFFFFFF)
+}
+
+fn drawNextPiece() {
+	canvas.drawText("NEXT:", th.Vf2{trunc(offset_x)-16*5, trunc(offset_y)}, th.white, 2)
+	val := presets.pieceValue(gameplay.bag.getNextPiece(), 0)
+	pos := getNextPiecePos()
+	drawPiece(val, trunc(pos.x), trunc(pos.y), 0xFFFFFFFF)
 }
 
 fn draw*() {
@@ -130,11 +158,19 @@ fn draw*() {
 	field_rect := rect.Rect { offset_x-1, offset_y-1, field.FieldWidth * 16+1, field.FieldHeight * 16+1 }
 	canvas.drawRect(0xFFFFFF11, field_rect)
 	
+	if gameplay.hasPlaced {
+		fallingPiecePos = getNextPiecePos()
+	}
+	if gameplay.hasUsedStash {
+		fallingPiecePos = getStashPos()
+	}
+
 	for i := 0; i < field.FieldWidth; i += 1 {
 		for j := 0; j < field.FieldHeight; j += 1 {
 			cellRec(i, j)
 		}
 	}
+	drawNextPiece()
 	drawFallingPiece()
 	processFx()
 
