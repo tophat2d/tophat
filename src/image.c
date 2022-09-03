@@ -184,9 +184,12 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		q.br.x / sw - 1.0, q.br.y / sh + 1.0, bounds.br.x, bounds.br.y,
 		q.bl.x / sw - 1.0, q.bl.y / sh + 1.0, bounds.bl.x, bounds.bl.y};
 
+	float *ptr = &thg->blit_batch[thg->blit_batch_size * 6 * (2 + 2 + 4)];
 	for (uu i=0; i < 6; i++) {
-		memcpy(&thg->blit_batch[thg->blit_batch_size], &verts[i * (2 + 2)], (2 + 2) * sizeof(float));
-		memcpy(&thg->blit_batch[thg->blit_batch_size] + 2 + 2, colors, 4 * sizeof(float));
+		memcpy(ptr, &verts[i * (2 + 2)], (2 + 2) * sizeof(float));
+		ptr += 2 + 2;
+		memcpy(ptr, colors, 4 * sizeof(float));
+		ptr += 4;
 	}
 
 	++thg->blit_batch_size;
