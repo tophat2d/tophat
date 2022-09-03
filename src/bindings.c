@@ -48,14 +48,14 @@ void umgetglobal(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umgetfuncs(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int count = 0;
 #define THEXT(ret, name, ...) ++count
-#include "ext/thextdata.h"
+#include "thextdata.h"
 #undef THEXT
 
 	void **arr = malloc(sizeof(void *) * count);
 
 	int idx = 0;
 #define THEXT(ret, name, ...) arr[idx++] = &name
-#include "ext/thextdata.h"
+#include "thextdata.h"
 #undef THEXT
 	r->ptrVal = arr;
 }

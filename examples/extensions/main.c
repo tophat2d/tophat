@@ -1,7 +1,8 @@
 // include umka api for UmkaStackSlot.
-#include "../../lib/umka/src/umka_api.h"
+#include <umka_api.h>
 #include <stdio.h>
-#include "../../src/ext/thext.h"
+#define THEXT
+#include "../../src/tophat.h"
 
 /* Funcation names are automatically matched to function prototyppes in c.
  * Be aware that this might produce unexpected results with colliding fucntions.
