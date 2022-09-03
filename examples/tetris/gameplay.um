@@ -28,7 +28,7 @@ fn nextTetromino() {
 }
 
 fn init*() {
-	std.srand(trunc(th.time*3000))
+	std.srand(std.time())
 	bag = m_bag.init()
 	falling_piece.init()
 	falling_piece.reset(kind())
