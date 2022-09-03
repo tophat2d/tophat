@@ -6,7 +6,6 @@ import (
 	"field.um"
 	"fx.um"
 	"input.um"
-	"audio.um"
 	"falling_piece.um"
 	"background.um"
 	"crazytext.um"
@@ -21,7 +20,7 @@ fn main() {
 
 	background.init()
 	fx.init()
-  field.setClearCallback(fx.clearEffect)
+	field.setClearCallback(fx.clearEffect)
 	gameplay.init()
 	crazytext.init()
 	scoreText := crazytext.putText("SCORE: 0", crazytext.lifetimeForever)
@@ -30,7 +29,7 @@ fn main() {
 	crazytext.putText("M - MUTE", crazytext.lifetimeForever, false)
 
 	for window.cycle(global.cam) {
-				global.playbackBackground.frame = 0
+		global.playbackBackground.frame = 0
 		if input.isJustPressed('m') {
 			if bgPlaying {
 				global.playbackBackground.frame = 0

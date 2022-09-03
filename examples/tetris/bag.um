@@ -1,0 +1,57 @@
+/*
+// The bag system from tetris.
+//
+// It's randomly arranging all 7 possible pieces, which allows to ensure
+//
+// * That there isn't several of same piece in a row.
+// * That there isn't a piece missing for a long time.
+*/
+
+import ("std.um")
+
+type Bag* = struct {
+  pieces: []int
+  index: int
+}
+
+fn makeBag(): [7]int {
+  b := [7]int{0,1,2,3,4,5,6}
+  // Shuffle
+  for i := 0; i < 7; i += 1 {
+    temp := b[i]
+    dest := (i+std.rand())%7
+    b[i] = b[dest]
+    b[dest] = temp
+  }
+
+  return b
+}
+
+fn init*(): Bag {
+  return Bag{pieces: append(append([]int{}, makeBag()), makeBag())}
+}
+
+fn (b: ^Bag) getCurrentPiece*(): int {
+  return b.pieces[b.index]
+}
+
+fn (b: ^Bag) getNextPiece*(): int {
+  return b.pieces[b.index+1]
+}
+
+fn (b: ^Bag) nextPiece*() {
+  np := b.getNextPiece()
+  if b.index == 6 {
+    b.pieces = slice(b.pieces, 7)
+    if len(b.pieces) != 7 {
+      error(sprintf("ASSERT FAIL. %d", len(b.pieces)))
+    }
+    b.pieces = append(b.pieces, makeBag())
+    b.index = 0
+  } else {
+    b.index += 1
+  }
+  if np != b.getCurrentPiece() {
+    error("ASSERT FAIL.")
+  }
+}
