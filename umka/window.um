@@ -1,5 +1,6 @@
-// Module for interacting with tophat. w and h variables store the size of the
-// window.
+// variables:
+// w and h: the dimensions of the window
+// fpsLimit: the fpsLimit
 
 import (
 	"th.um"
@@ -11,6 +12,7 @@ import (
 var (
 	start, end, clockOffset: real
 	w*, h*: int32
+	fpsLimit*: int = 60
 )
 
 fn wsetup(title: str, w, h: int)
@@ -19,6 +21,7 @@ fn getdimensions(w, h: ^int32)
 fn swapbuffers()
 fn handleinput(): bool
 fn updatescaling(w, h, camw, camh: int32)
+fn sleep(ms: int)
 
 // Sets up the engine and opens a window.
 fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
@@ -48,8 +51,10 @@ fn cycle*(cam: rect.Rect): bool {
 
 	end = std.clock()*1000
 	th.delta = round(end - start)
-	// zero delta may cause incorrect behaviour
-	if th.delta == 0 { th.delta = 1 }
+	if 1000/fpsLimit - th.delta > 0 {
+		sleep(1000/fpsLimit - th.delta)
+		th.delta = 1000/fpsLimit
+	}
 
 	start = std.clock()*1000
 	th.time = round(start - clockOffset)

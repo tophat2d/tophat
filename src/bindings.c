@@ -10,6 +10,12 @@
 
 #include "tophat.h"
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
+
 extern th_global *thg;
 
 extern char *th_em_modulenames[];
@@ -473,6 +479,16 @@ void umwindowhandle(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = th_window_handle();
 }
 
+void umwindowsleep(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int ms = p[0].intVal;
+
+#ifdef _WIN32
+	Sleep(ms);
+#else
+	usleep(ms * 1000);
+#endif
+}
+
 // calculates scaling
 void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int camh = p[0].intVal;
@@ -779,6 +795,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "swapbuffers", &umwindowswapbuffers);
 	umkaAddFunc(umka, "handleinput", &umwindowhandle);
 	umkaAddFunc(umka, "updatescaling", &umgetscaling);
+	umkaAddFunc(umka, "sleep", &umwindowsleep);
 	umkaAddFunc(umka, "drawRect", &umcanvasrect);
 	umkaAddFunc(umka, "drawLine", &umcanvasline);
 	umkaAddFunc(umka, "cdrawimage", &umimagedraw);
