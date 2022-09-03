@@ -1,0 +1,45 @@
+/*
+// For snappy input. It's just a heuristic.
+//
+// When you first press a button, it will emit a signal immediately.
+// It has a "first timeout" which after it's passed, will trigger a signal
+// repeatedly and more faster the more you hold.
+// 
+// You can tweak the values of firstTimeout and sequentTimeout to your liking.
+*/
+import ("th.um")
+
+const (
+  firstTimeout = 0.2
+  sequentTimeout = 0.04
+)
+
+type Latch* = struct {
+  time: real
+  pressNumber: int
+  timeout: real
+}
+
+fn initLatch*(): Latch {
+  return Latch{timeout: firstTimeout}
+}
+
+fn (l: ^Latch) pass*(pushed: bool): bool {
+  l.timeout -= th.delta/1000.0
+  if pushed {
+    l.time += th.delta/1000.0
+    if l.pressNumber == 0 {
+      l.pressNumber += 1
+      return true
+    }
+    if l.timeout < 0.0 {
+      l.timeout = sequentTimeout/l.time
+      return true
+    }
+  } else {
+    l.time = 0
+    l.pressNumber = 0
+    l.timeout = firstTimeout
+  }
+  return false
+}

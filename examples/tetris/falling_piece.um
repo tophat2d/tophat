@@ -5,21 +5,27 @@ import (
 	"global.um"
 	"input.um"
 	"field.um"
+	"latch.um"
 )
 
 var (
 	x*: real = 0.0
 	y*: real = 0.0
+	groundTouchTimer*: real = 0.0
 	placeTimer*: real = 0.0
 	isTspin*: bool = false
 	rotation*: int = 0
 	kind*: int = 0
+
+	leftBtnLatch: latch.Latch
+	rightBtnLatch: latch.Latch
 )
 
 fn reset*(_kind: int) {
 	x = 4
 	kind = _kind
 	y = 0
+	groundTouchTimer = 0
 	placeTimer = 0
 	rotation = 0
 	isTspin = false
@@ -132,31 +138,59 @@ fn push*() {
 	y -= 1
 }
 
+fn movePiece(dx, dy: real) {
+	{
+		prev := x
+		x += dx;
+		if invalid() {
+			x = prev
+		}
+	}
+
+	{
+		prev := y
+		y += dy;
+		if invalid() {
+			y = prev
+		}
+	}
+}
+
+fn init*() {
+	x = 0.0
+	y = 0.0
+	placeTimer = 0.0
+	isTspin = false
+	rotation = 0
+	kind = 0
+
+  leftBtnLatch = latch.initLatch()
+  rightBtnLatch = latch.initLatch()
+}
+
 fn update*() {
 	prev := y
 	y += 0.001*th.delta;
 	if invalid() {
 		y = prev
 		placeTimer += th.delta/1000.0
+		groundTouchTimer += th.delta/1000.0
 	} else {
+		groundTouchTimer = 0
 		placeTimer = 0
 	}
-	if (input.isPressed(input.key_left)) {
+
+	
+	if (leftBtnLatch.pass(input.isPressed(input.key_left))) {
 		placeTimer = 0
-		prev := x
-		x -= 0.01*th.delta;
-		if invalid() {
-			x = prev
-		}
+		movePiece(-1, 0)
 	}
-	if (input.isPressed(input.key_right)) {
+
+	if (rightBtnLatch.pass(input.isPressed(input.key_right))) {
 		placeTimer = 0
-		prev := x
-		x += 0.01*th.delta;
-		if invalid() {
-			x = prev
-		}
+		movePiece(1, 0)
 	}
+
 	if (input.isPressed(input.key_down)) {
 		placeTimer += th.delta/1000.0
 		prev := y
@@ -165,6 +199,7 @@ fn update*() {
 			y = prev
 		}
 	}
+
 	if (input.isJustPressed('x')) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
