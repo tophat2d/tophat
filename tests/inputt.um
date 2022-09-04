@@ -36,9 +36,13 @@ fn main() {
 			printf("s is pressed\n")
 		}
 
+		if input.isJustReleased('t') {
+			printf("t was just released\n")
+		}
+
 		s := input.getStr()
 		if len(s) > 0 {
-			printf("%s\n", input.getStr())
+			printf("input string: %s\n", input.getStr())
 		}
 
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))

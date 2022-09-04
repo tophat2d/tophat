@@ -78,6 +78,8 @@ void th_input_key(int keycode, int bDown) {
 		return;
 
 	if (!bDown) {
+		if (thg->pressed[keycode])
+			thg->just_released[keycode] = 1;
 		thg->pressed[keycode] = 0;
 		thg->just_pressed[keycode] = 0;
 		return;
@@ -94,4 +96,5 @@ void th_input_key(int keycode, int bDown) {
 
 void th_input_cycle() {
 	memset(thg->just_pressed, 0, 255 * sizeof(uu));
+	memset(thg->just_released, 0, 255 * sizeof(uu));
 }

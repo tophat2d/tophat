@@ -12,6 +12,9 @@
 //   key_down
 //   key_escape
 //   key_enter
+// 
+// is* functions return info based on a us QWERTY layout. They are supposed to
+// be used for game controls. For text input use getStr.
 
 import (
 	"th.um"
@@ -52,21 +55,24 @@ fn getGlobalMousePos*(cam: rect.Rect): th.Vf2 {
 }
 
 fn cispressed(keycode: char): int32
-
 fn cisjustpressed(key: char): int32
+fn cisjustreleased(key: char): int32
 
-// Returns true if key is pressed. Either use
-// codes defined in the file above, or
-// pass lower case char/number.
+// Returns true if key is pressed. Either use codes defined in the file above,
+// or pass lower case char/number.
 fn isPressed*(code: char): bool {
 	val := bool(cispressed(code))
 	return val
 }
 
-// Returns, whether code was just pressed
-// this loop.
+// Returns, whether code was just pressed this loop.
 fn isJustPressed*(code: char): bool {
 	return bool(cisjustpressed(code))
+}
+
+// Returns true if a key was just released.
+fn isJustReleased*(code: char): bool {
+	return bool(cisjustreleased(code))
 }
 
 fn cclear*(code: char)

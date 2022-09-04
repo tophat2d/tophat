@@ -313,19 +313,26 @@ void umgetmouse(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umispressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
-	r[0].intVal = thg->pressed[keycode];
+	r->intVal = thg->pressed[keycode];
 }
 
 void umisjustpressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
-	r[0].intVal = thg->just_pressed[keycode];
+	r->intVal = thg->just_pressed[keycode];
+}
+
+void umisjustreleased(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int keycode = p[0].intVal;
+
+	r->intVal = thg->just_released[keycode];
 }
 
 void umclear(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
 	thg->just_pressed[keycode] = 0;
+	thg->just_released[keycode] = 0;
 	thg->pressed[keycode] = 0;
 }
 
@@ -770,6 +777,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);
 	umkaAddFunc(umka, "cispressed", &umispressed);
 	umkaAddFunc(umka, "cisjustpressed", &umisjustpressed);
+	umkaAddFunc(umka, "cisjustreleased", &umisjustreleased);
 	umkaAddFunc(umka, "cclear", &umclear);
 	umkaAddFunc(umka, "cgetinputstring", &umgetinputstring);
 

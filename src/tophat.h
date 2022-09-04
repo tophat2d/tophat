@@ -181,6 +181,7 @@ typedef struct {
 
 	uu pressed[255];
 	uu just_pressed[255];
+	uu just_released[255];
 	th_vf2 mouse;
 
 	th_playback_item *playbacks;
