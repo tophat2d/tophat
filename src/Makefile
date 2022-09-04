@@ -15,7 +15,6 @@ $(EM_TARGET): $(UMKA_MODULES) LICENSE version
 	$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_modulesrc $(UMKA_MODULES) > $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(UMKA_MODULES:umka/%=%) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_misc LICENSE version >> $(EM_TARGET)
-	rm -f src/bindings.o
 
 %.o: %.c
 	@echo CC $@
