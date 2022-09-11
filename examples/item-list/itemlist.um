@@ -45,7 +45,7 @@ fn (il: ^ItemList) get*(): ^ui.Generic {
 }
 
 fn (il: ^ItemList) itemWidth(): th.fu {
-	return (il.renderer.runeDims(int32('A')).y + 2) * il.fontSize
+	return (il.renderer.measure("A").y + 2) * il.fontSize
 }
 
 fn (il: ^ItemList) doesHover(): bool {
