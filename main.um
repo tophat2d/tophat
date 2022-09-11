@@ -5,26 +5,6 @@ import (
 	"window.um"	
 )
 
-fn skewQuadX(q: th.Quad): th.Quad {
-	q[0].x -= 10
-	q[1].x -= 10
-	q[2].x += 10
-	q[3].x += 10
-	return q
-}
-
 fn main() {
-	window.setup()
-
-	i := image.load("etc/test.png")
-	printf("%s\n", repr(i))
-
-	for window.cycle(rect.mk(0, 0, 100, 100)) {
-		i.draw(th.mkTransform(th.Vf2{10, 10}))
-		i.drawOnQuad(skewQuadX(th.Quad{th.Vf2{20, 20}, th.Vf2{40, 20}, th.Vf2{40, 40}, th.Vf2{20, 40}}))
-		i.cropQuad(th.Quad{th.Vf2{0.5, 0}, th.Vf2{1, 0.5}, th.Vf2{0.5, 1}, th.Vf2{0, 0.5}})
-		i.draw(th.mkTransform(th.Vf2{50, 50}))
-		i.drawOnQuad(th.Quad{th.Vf2{80, 80}, th.Vf2{100, 80}, th.Vf2{100, 100}, th.Vf2{80, 100}})
-		i.crop(th.Vf2{0, 0}, th.Vf2{1, 1})
-	}
+	for window.cycle(rect.mk(0, 0, 100, 100)) { }
 }

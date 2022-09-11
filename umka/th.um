@@ -9,9 +9,9 @@ import (
 // standard type for real values
 type fu* = real32
 // standard type for integer values
-type iu* = int16
+type iu* = int32
 // standard type for unsigned values
-type uu* = uint16
+type uu* = uint32
 
 // vector 2
 type Vf2* = struct {

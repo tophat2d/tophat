@@ -4,13 +4,15 @@
 
 extern th_global *thg;
 
+static bool window_active = false;
+
 #ifdef linux
 #include <X11/Xlib.h>
 #include <X11/XKBlib.h>
 #include <GL/glx.h>
 
 static Atom wm_delete_message;
-static Display *th_dpy;
+static Display *th_dpy = NULL;
 static Window th_win;
 static Window th_root_win;
 static XWindowAttributes th_win_attribs;
@@ -25,6 +27,11 @@ static void th_window_deinit() {
 }
 
 void th_window_setup(char *name, int w, int h) {
+	if (window_active) {
+		th_error("Window already created.");
+		return;
+	}
+
 	th_dpy = XOpenDisplay(NULL);
 	if (!th_dpy) {
 		th_error("Could not open X display.");
@@ -88,6 +95,8 @@ void th_window_setup(char *name, int w, int h) {
 		th_error("Could not create XIC");
 		return;
 	}
+
+	window_active = true;
 }
 
 void th_window_get_dimensions(int *w, int *h) {
@@ -96,8 +105,10 @@ void th_window_get_dimensions(int *w, int *h) {
 }
 
 int th_window_handle() {
-	if (!th_win)
+	if (!window_active) {
+		th_error("No window was created.");
 		return 0;
+	}
 
 	th_input_key(4, 0);
 	th_input_key(5, 0);
@@ -186,6 +197,11 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 static HKL hkl;
 
 void th_window_setup(char *name, int w, int h) {
+	if (window_active) {
+		th_error("Window already created.");
+		return;
+	}
+
 	const char CLASS_NAME[] = "tophat";
 
 	HINSTANCE hInstance = GetModuleHandle(NULL);
@@ -255,6 +271,8 @@ void th_window_setup(char *name, int w, int h) {
 	ShowWindow(th_win, 1);
 
 	hkl = LoadKeyboardLayout("00000409", 0);
+
+	window_active = true;
 }
 
 void th_window_get_dimensions(int *w, int *h) {
@@ -263,6 +281,11 @@ void th_window_get_dimensions(int *w, int *h) {
 }
 
 int th_window_handle() {
+	if (!window_active) {
+		th_error("No window was created.");
+		return 0;
+	}
+
 	MSG msg;
 	th_input_key(4, 0);
 	th_input_key(5, 0);

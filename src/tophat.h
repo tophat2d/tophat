@@ -8,11 +8,12 @@
 #include <GL/gl.h>
 
 #define INPUT_STRING_SIZE 256
+#define MAX_SCISSORS 1024
 #define BATCH_SIZE 1024
 
 typedef float fu;
-typedef unsigned short uu;
-typedef short iu;
+typedef uint32_t uu;
+typedef int32_t iu;
 
 #define SWAP(v1, v2) do { typeof(v1) tmp = v1; v1 = v2; v2 = tmp; } while (0)
 #define LEN(a) (sizeof(a) / sizeof((a)[0]))
@@ -205,6 +206,9 @@ typedef struct {
 	int blit_batch_size;
 	float blit_batch[BATCH_SIZE * 6 * (2 + 2 + 4)];
 	GLuint batch_tex;
+
+	th_rect scissors[MAX_SCISSORS];
+	uu scissor;
 } th_global;
 
 #ifdef THEXT
