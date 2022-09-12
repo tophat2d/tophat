@@ -8,7 +8,7 @@ import (
 // of each pixel with the filter.
 type Image* = struct{ _: ^struct{} }
 
-fn loadimg(ret: ^Image, path: ^char)
+fn loadimg(ret: ^Image, path: str)
 fn flipvimg(i: Image, f: bool)
 fn fliphimg(i: Image, f: bool)
 fn cdrawimage(img: Image, t: ^th.Transform, color: uint32)
@@ -27,7 +27,7 @@ fn imggetdata(img: Image, data: ^uint32)
 // Loads an image at path.
 fn load*(path: str): Image {
 	img := Image{}
-	loadimg(&img, &path[0])
+	loadimg(&img, path)
 	return img
 }
 
