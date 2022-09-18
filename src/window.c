@@ -306,7 +306,7 @@ int th_window_handle() {
 
 		case WM_KEYUP:;
 			uint32_t key = tolower(MapVirtualKeyEx(msg.wParam, MAPVK_VK_TO_CHAR, hkl));
-			if (key == 0)
+			if (key == 0 || iscntrl(key))
 				key = MapVirtualKeyEx(MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), MAPVK_VSC_TO_VK, hkl) + 0x7f;
 
 			th_input_key(key, msg.message == WM_KEYDOWN);

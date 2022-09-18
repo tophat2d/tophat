@@ -130,11 +130,14 @@ fn chartoupper(inp: char): char {
 
 // returns the same string, but characters are upper case
 fn toupper*(inp: str): str {
-	for i:=0; i < len(inp); i++ {
-		inp[i] = chartoupper(inp[i])
+	l := len(inp)
+	b := make([]char, l)
+
+	for i:=0; i < l; i++ {
+		b[i] = chartoupper(inp[i])
 	}
 
-	return inp
+	return str(b)
 }
 
 fn chartolower(inp: char): char {
@@ -147,11 +150,14 @@ fn chartolower(inp: char): char {
 
 // returns the same string, but all characters are lower case
 fn tolower*(inp: str): str {
-	for i:=0; i < len(inp); i++ {
-		inp[i] = chartolower(inp[i])
+	l := len(inp)
+	b := make([]char, l)
+
+	for i:=0; i < l; i++ {
+		b[i] = chartolower(inp[i])
 	}
 
-	return inp
+	return str(b)
 }
 
 // repeats string count number of times

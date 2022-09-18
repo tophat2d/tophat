@@ -42,7 +42,7 @@ fn main() {
 
 		s := input.getStr()
 		if len(s) > 0 {
-			printf("input string: %s\n", input.getStr())
+			printf("input string: %s %s\n", input.getStr(), repr([]char(input.getStr())))
 		}
 
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
