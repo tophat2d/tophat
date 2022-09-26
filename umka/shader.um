@@ -8,19 +8,33 @@ import (
 //  
 // In tophat, instead of a main function, shaders provide th_vertex and
 // th_fragment. The signature of th_vertex is:
+// 
+// ```
 // vec2 th_vertex(vec2 vert);
+// ```
+// 
 // where vert is the position of the vertex taken from the vertex buffer.
 // The output is the vertex shader output.
 //  
 // As for fragment shaders, there are two types of them. One for canvas
 // and one for images. In canvas shaders, the fragment function is very simple:
+// 
+// ```
 // vec4 th_fragment(vec4 color);
+// ```
 //  
 // Image fragment function looks like this:
+//  
+// ```
 // vec4 th_fragment(sampler2D tex, vec2 coord);
+// ```
+//  
 // where tex is the texture and coord are the texture coordinates. Be aware to
-// swap the output of the texture2D function. Example:
+// swap the output of the `texture2D` function. Example:
+// 
+// ```
 // texture2D(tex, coord).abgr
+// ```
 type Shader* = struct {
 	handle: int
 }
