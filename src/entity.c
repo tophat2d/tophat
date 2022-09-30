@@ -26,6 +26,7 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 			q.v[i].x *= o->img->dm.x;
 			q.v[i].y *= o->img->dm.y;
 		}
+
 		th_transform_quad(&q, t);
 	} else {
 		th_transform_rect(&q, t, o->rect);
@@ -48,7 +49,7 @@ void th_ent_draw(th_ent *o, th_rect *camera) {
 		return;
 	}
 
-	th_blit_tex(o->img, q, o->color);
+	th_image_render_transformed(o->img, t, o->color);
 }
 
 void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
