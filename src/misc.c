@@ -4,6 +4,22 @@
 
 #include "tophat.h"
 
+extern th_global *thg;
+
+void th_calculate_scaling(float camw, float camh) {
+	int w, h;
+	th_window_get_dimensions(&w, &h);
+
+	if ((float)w/camw < (float)h/camh) {
+		thg->scaling = ((float)w/camw);
+	} else {
+		thg->scaling = ((float)h/camh);
+	}
+
+	thg->offset.x = (w - camw*thg->scaling)/2;
+	thg->offset.y = (h - camh*thg->scaling)/2;
+}
+
 float th_get_scaling(int w, int h, int camw, int camh) {
 	if ((float)w/camw < (float)h/camh)
 		return (float)w/camw;

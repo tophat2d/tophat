@@ -10,6 +10,7 @@
 #define INPUT_STRING_SIZE 256
 #define MAX_SCISSORS 1024
 #define BATCH_SIZE 1024
+#define RENDER_TARGET_MAX_SIZE 1024
 
 typedef float fu;
 typedef uint32_t uu;
@@ -207,6 +208,9 @@ typedef struct {
 	float blit_batch[BATCH_SIZE * 6 * (2 + 2 + 4)];
 	GLuint batch_tex;
 
+	GLuint framebuffer;
+	GLuint depthbuffer;
+
 	th_rect scissors[MAX_SCISSORS];
 	uu scissor;
 } th_global;
@@ -305,11 +309,13 @@ void _th_rdimg(th_image *img, unsigned char *data);
 void th_image_set_filter(th_image *img, int filter);
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
 th_image *th_image_alloc();
-
 void th_image_init();
 void th_image_deinit();
 void th_image_flush();
 int th_image_compile_shader(char *frag, char *vert);
+
+void th_image_set_as_render_target(th_image *img);
+void th_image_remove_render_target(th_rect *cam);
 
 // input
 void th_input_key(int keycode, int bDown);
@@ -322,8 +328,8 @@ void th_spotlight_stamp(th_spotlight *l, th_lightmask *d);
 void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color);
 
 // misc
-float th_get_scaling(int w, int h, int camw, int camh);
 void th_error(char *text, ...);
+void th_calculate_scaling(float camw, float camh);
 
 // particles
 void th_particles_draw(th_particles *p, th_rect cam, int t);

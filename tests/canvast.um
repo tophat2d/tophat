@@ -17,6 +17,7 @@ fn main() {
 		canvas.drawRect(0x0022ff88, rect.mk(10, 10, 10, 10))
 		canvas.drawLine(th.red, th.Vf2{10, 10}, th.Vf2{20, 20}, 1)
 		canvas.drawText("HELLO world\nhello WORLD", th.Vf2{20, 30}, th.cyan, 2)
+		canvas.drawText("lorem ipsum dolor sit amet", th.Vf2{20, 62}, th.cyan, 1)
 
 		img.draw(th.Transform{p: th.Vf2{10, 40}, s: th.Vf2{1, 1}}, th.white)
 	}

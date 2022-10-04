@@ -301,6 +301,19 @@ void umimggetdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	memcpy(data, img->data, sizeof(uint32_t) * img->dm.w * img->dm.h);
 }
 
+void umimgmakerendertarget(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *img = p[0].ptrVal;
+	if (!img) return;
+
+	th_image_set_as_render_target(img);
+}
+
+void umimgremoverendertarget(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_rect *cam = p[0].ptrVal;
+
+	th_image_remove_render_target(cam);
+}
+
 ///////////////////////
 // input
 // gets position of mouse cursor
@@ -500,17 +513,10 @@ void umwindowsleep(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int camh = p[0].intVal;
 	int camw = p[1].intVal;
-	int h = p[2].intVal;
-	int w = p[3].intVal;
+	//int h = p[2].intVal;
+	//int w = p[3].intVal;
 
-	if ((float)w/camw < (float)h/camh) {
-		thg->scaling = ((float)w/camw);
-	} else {
-		thg->scaling = ((float)h/camh);
-	}
-
-	thg->offset.x = (w - camw*thg->scaling)/2;
-	thg->offset.y = (h - camh*thg->scaling)/2;
+	th_calculate_scaling(camw, camh);
 }
 
 void umcanvasrect(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -772,6 +778,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "imgdrawninepatch", &umimgdrawninepatch);
 	umkaAddFunc(umka, "imgupdatedata", &umimgupdatedata);
 	umkaAddFunc(umka, "imggetdata", &umimggetdata);
+	umkaAddFunc(umka, "imgmakerendertarget", &umimgmakerendertarget);
+	umkaAddFunc(umka, "imgremoverendertarget", &umimgremoverendertarget);
 
 	// input
 	umkaAddFunc(umka, "cgetmouse", &umgetmouse);

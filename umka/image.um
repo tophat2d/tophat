@@ -23,6 +23,8 @@ fn imgdrawonquad(img: Image, color: uint32, q: th.Quad)
 fn imgdrawninepatch(img: Image, outer, inner, dest: ^rect.Rect, color: uint32)
 fn imgupdatedata(img: Image, data: ^uint32, dm: th.Vf2)
 fn imggetdata(img: Image, data: ^uint32)
+fn imgmakerendertarget(img: Image)
+fn imgremoverendertarget(cam: ^rect.Rect)
 
 // Loads an image at path.
 fn load*(path: str): Image {
@@ -145,4 +147,12 @@ fn (i: ^Image) getData*(): []uint32 {
 	imggetdata(i^, &buf[0])
 
 	return buf
+}
+
+fn (i: ^Image) makeRenderTarget*() {
+	imgmakerendertarget(i^)
+}
+
+fn removeRenderTarget*(cam: rect.Rect) {
+	imgremoverendertarget(&cam)
 }

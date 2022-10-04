@@ -213,6 +213,44 @@ void th_image_flush() {
 	thg->blit_batch_size = 0;
 }
 
+void th_image_set_as_render_target(th_image *img) {
+	if (img->dm.w >= RENDER_TARGET_MAX_SIZE || img->dm.h >= RENDER_TARGET_MAX_SIZE) {
+		th_error("Render target can be atmost %dx%d big.",
+			RENDER_TARGET_MAX_SIZE, RENDER_TARGET_MAX_SIZE);
+		return;
+	}
+
+	th_image_flush();
+	th_canvas_flush();
+
+	th_calculate_scaling(img->dm.w, img->dm.h);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, thg->framebuffer);
+	
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, img->gltexture, 0);
+
+	GLenum drawBuffer = GL_COLOR_ATTACHMENT0;
+	glDrawBuffers(1, &drawBuffer);
+
+	glViewport(0, 0, img->dm.w, img->dm.h);
+
+	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+		th_error("Could not setup image render target %x, %x.", glGetError(), glCheckFramebufferStatus(GL_FRAMEBUFFER));
+}
+
+void th_image_remove_render_target(th_rect *cam) {
+	th_image_flush();
+	th_image_flush();
+
+	th_calculate_scaling(cam->w, cam->h);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	int w,h;
+	th_window_get_dimensions(&w, &h);
+	glViewport(0, 0, w, h);
+}
+
 void _th_rdimg(th_image *img, unsigned char *data) {
 	uint32_t *rd = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
 
@@ -286,6 +324,22 @@ void th_image_init() {
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+
+	glGenFramebuffers(1, &thg->framebuffer);
+	glBindFramebuffer(GL_FRAMEBUFFER, thg->framebuffer);
+		glGenRenderbuffers(1, &thg->depthbuffer);
+		glBindRenderbuffer(GL_RENDERBUFFER, thg->depthbuffer);
+			glRenderbufferStorage(
+				GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
+				RENDER_TARGET_MAX_SIZE, RENDER_TARGET_MAX_SIZE
+			);
+
+			glFramebufferRenderbuffer(
+				GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+				GL_RENDERBUFFER, thg->depthbuffer
+			);
+		glBindRenderbuffer(GL_RENDERBUFFER, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void th_image_deinit() { }

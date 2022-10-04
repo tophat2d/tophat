@@ -4,6 +4,7 @@ import (
 	"rect.um"
 	"image.um"
 	"input.um"
+	"canvas.um"
 	"window.um"
 )
 
@@ -35,6 +36,8 @@ fn main() {
 	//img2 := image.mk(data, dm)
 	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
 
+	target := image.mk(make([]uint32, 50 * 50), th.Vf2{50, 50})
+
 	for window.cycle(cam) {
 		img.draw(th.Transform{
 			s: th.Vf2{4, 8},
@@ -50,6 +53,15 @@ fn main() {
 		img2.draw(th.Transform{
 			s: th.Vf2{10, 10},
 			p: th.Vf2{400, 400}})
+
+		target.makeRenderTarget()
+			img.draw(th.Transform{
+				s: th.Vf2{2, 2},
+				p: th.Vf2{0, 0}})
+			canvas.drawText("hello", th.Vf2{0, 0}, th.red, 1)
+			canvas.drawLine(th.cyan, th.Vf2{0, 0}, th.Vf2{50, 50}, 1)
+		image.removeRenderTarget(cam)
+		target.draw(th.Transform{s: th.Vf2{1, 1}, p: th.Vf2{50, 50}})
 
 		if input.isJustPressed('q') { break }
 	}

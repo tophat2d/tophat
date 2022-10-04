@@ -35,8 +35,11 @@ THEXT(void, th_image_render_transformed, th_image *, th_transform trans, uint32_
 THEXT(void, th_image_set_filter, th_image *, int);
 THEXT(void, th_image_update_data, th_image *, uint32_t *, th_vf2);
 THEXT(void, th_image_compile_shader, char *, char *);
+THEXT(void, th_image_set_as_render_target, th_image *);
+THEXT(void, th_image_remove_render_target, th_rect *);
 
 THEXT(void, th_error);
+THEXT(void, th_calculate_scaling, float, float);
 
 THEXT(void, th_particles_draw, th_particles *, th_rect, int);
 

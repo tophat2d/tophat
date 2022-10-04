@@ -1,18 +1,12 @@
 [submodule "lib/umka"]
 	path = lib/umka
 	url = https://github.com/vtereshkov/umka-lang.git
-[submodule "lib/rawdraw"]
-	path = lib/rawdraw
-	url = https://github.com/cntools/rawdraw.git
 [submodule "lib/stb"]
 	path = lib/stb
 	url = https://github.com/nothings/stb.git
 [submodule "lib/miniaudio"]
 	path = lib/miniaudio
 	url = https://github.com/mackron/miniaudio.git
-[submodule "lib/sokol"]
-	path = lib/sokol
-	url = https://github.com/floooh/sokol.git
 [submodule "lib/umprof"]
 	path = lib/umprof
 	url = https://github.com/marekmaskarinec/umprof.git
