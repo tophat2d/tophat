@@ -239,7 +239,7 @@ void th_image_set_as_render_target(th_image *img) {
 }
 
 void th_image_remove_render_target(th_rect *cam) {
-	th_image_flush();
+	th_canvas_flush();
 	th_image_flush();
 
 	th_calculate_scaling(cam->w, cam->h);

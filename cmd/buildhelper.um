@@ -2,6 +2,55 @@ import (
 	"std.um"								
 )
 
+fn peekstr(f: std.File, next: int): str {
+        tr := "" 
+        var c: char
+        for i:=0; i < next; i++ {
+                fscanf(f, "%c", &c)
+                tr += str(c)
+        }
+
+        return tr
+}
+
+fn peekn(f: std.File, next: int): int {
+        tr := 0
+        var c: char 
+        for i:=0; i < next; i++ {
+                fscanf(f, "%c", &c)
+                ic := int(c)
+                if ic < 0 { ic += 256 }
+                tr += ic << (8 * (next - i - 1))
+        }
+
+        return tr
+}
+
+fn loadFF*(path: str): ([]uint32, int, int, int) {
+        f := std.fopen(path, "r")
+        if f == null { return []uint32{}, -1, -1, 1 }
+        var w, h: int
+        var tr: []uint32
+
+        if val := peekstr(f, 8); val != "farbfeld" { return []uint32{}, -1, -1, 2 }
+        w = peekn(f, 4)
+        h = peekn(f, 4)
+        tr = make([]uint32, w * h)
+        var c: char 
+        for j:=0; j < w * h; j++ {
+                for h:=0; h < 4; h++ {
+                        fscanf(f, "%c", &c)
+                        fscanf(f, "%c", &c)
+                        ic := int(c)
+                        if ic < 0 { ic += 256 }
+                        tr[j] += ic << (8 * (3 - h))
+                }
+        }
+
+        std.fclose(f)
+        return tr, w, h, 0
+}
+
 fn readall(f: std.File): str {
     const blockSize = 16
     res := ""
@@ -73,5 +122,31 @@ fn main() {
 
 		printf(" };\n")
 		printf("int %s_count = %d;\n", std.argv(2), std.argc() - 3)
+	} else if mode == "umimg" {
+		decl := "import(\"image.um\"; \"th.um\")\nvar (\n"
+		init := "fn init*() {\n"
+
+		for i:=2; i < std.argc(); i += 2 {
+			fname := std.argv(i)
+			name := std.argv(i + 1)
+
+			data, w, h, err := loadFF(fname)
+			if err > 0 { continue }
+			
+			decl += sprintf("\t%s*: image.Image\n", name)
+
+			datas := ""
+			for i in data {
+				datas += sprintf("0x%x", data[i])
+				if i < len(data) - 1 { datas += ", " }
+			}
+
+			init += sprintf("\t%s = image.mk([]uint32{ %s }, th.Vf2{ %d, %d })\n", name, datas, w, h)
+		}
+
+		decl += ")"
+		init += "}"
+
+		printf("%s\n%s\n", decl, init)
 	}
 }

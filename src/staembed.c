@@ -790,6 +790,7 @@ const char *th_em_modulesrc[] = {
 "\t\"canvas.um\"\n"
 "\t\"rect.um\"\n"
 "\t\"std.um\"\n"
+"\t\"images.um\"\n"
 ")\n"
 "\n"
 "var (\n"
@@ -817,6 +818,8 @@ const char *th_em_modulesrc[] = {
 "\t}\n"
 "\n"
 "\tupdatescaling(width, height, width, height)\n"
+"\n"
+"\timages.init()\n"
 "\n"
 "\tclockOffset = std.clock() * 1000\n"
 "\tstart = std.clock() * 1000\n"
@@ -2239,9 +2242,17 @@ const char *th_em_modulesrc[] = {
 "}\n"
 "\n"
 "",
+"import(\"image.um\"; \"th.um\")\n"
+"var (\n"
+"\ttest*: image.Image\n"
+")\n"
+"fn init*() {\n"
+"\ttest = image.mk([]uint32{ 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xd0350aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff, 0xf80c3fff, 0xf80c3fff, 0xf80cefff, 0xf80cefff, 0x200ad0ff, 0x200ad0ff, 0xad0d0ff, 0xad0d0ff, 0xad03dff, 0xad03dff, 0xd0c00aff, 0xd0c00aff }, th.Vf2{ 12, 12 })\n"
+"}\n"
+"",
 };
-const char *th_em_modulenames[] = { "anim.um", "audio.um", "csv.um", "ent.um", "image.um", "input.um", "misc.um", "canvas.um", "ray.um", "rect.um", "tilemap.um", "window.um", "ui.um", "std/std.um", "particles.um", "light.um", "lerp.um", "utf8.um", "font.um", "th.um", "signal.um", "atlas.um", "ui/label.um", "ui/grid.um", "ui/imagebox.um", "shader.um", "color.um", "coll.um",  };
-int th_em_modulenames_count = 28;
+const char *th_em_modulenames[] = { "anim.um", "audio.um", "csv.um", "ent.um", "image.um", "input.um", "misc.um", "canvas.um", "ray.um", "rect.um", "tilemap.um", "window.um", "ui.um", "std/std.um", "particles.um", "light.um", "lerp.um", "utf8.um", "font.um", "th.um", "signal.um", "atlas.um", "ui/label.um", "ui/grid.um", "ui/imagebox.um", "shader.um", "color.um", "coll.um", "images.um",  };
+int th_em_modulenames_count = 29;
 const char *th_em_misc[] = {
 "BSD 3-Clause License\n"
 "\n"
