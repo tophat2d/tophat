@@ -250,7 +250,7 @@ void th_image_set_as_render_target(th_image *img) {
 }
 
 void th_image_remove_render_target(th_image *img, th_rect *cam) {
-	if (thg->has_framebuffer) {
+	if (!thg->has_framebuffer) {
 		th_error("No render target is set.");
 		return;
 	}
