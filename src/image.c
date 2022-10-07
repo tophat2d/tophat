@@ -157,10 +157,8 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		q.v[i].y += thg->offset.y;
 	}
 
-	int sw, sh;
-	th_window_get_dimensions(&sw, &sh);
-	sh *= -0.5;
-	sw *= 0.5;
+	const int sw = thg->viewport.w * 0.5;
+	const int sh = thg->viewport.h * -0.5;
 
 	float colors[4];
 	for (int i=0; i < 4; ++i)
@@ -224,6 +222,7 @@ void th_image_set_as_render_target(th_image *img) {
 	th_canvas_flush();
 
 	th_calculate_scaling(img->dm.w, img->dm.h);
+	thg->viewport = img->dm;
 
 	glBindFramebuffer(GL_FRAMEBUFFER, thg->framebuffer);
 	
@@ -238,17 +237,38 @@ void th_image_set_as_render_target(th_image *img) {
 		th_error("Could not setup image render target %x, %x.", glGetError(), glCheckFramebufferStatus(GL_FRAMEBUFFER));
 }
 
-void th_image_remove_render_target(th_rect *cam) {
+void th_image_remove_render_target(th_image *img, th_rect *cam) {
 	th_canvas_flush();
 	th_image_flush();
 
 	th_calculate_scaling(cam->w, cam->h);
+
+	glBindTexture(GL_TEXTURE_2D, img->gltexture);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->data);
+	
+	for (int i=0; i < img->dm.w * img->dm.h; ++i) {
+		const uint32_t c = img->data[i];
+		img->data[i] =
+			(((c >> (3 * 8)) & 0xff) << (0 * 8)) |
+			(((c >> (2 * 8)) & 0xff) << (1 * 8)) |
+			(((c >> (1 * 8)) & 0xff) << (2 * 8)) |
+			(((c >> (0 * 8)) & 0xff) << (3 * 8));
+
+		printf("%.*x ", 8, c);
+		if ((i + 1) % (int)img->dm.w == 0) printf("\n");
+	}
+	printf("\n\n");
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->dm.w, img->dm.h, 0, GL_RGBA,
+		GL_UNSIGNED_BYTE, img->data);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
 	int w,h;
 	th_window_get_dimensions(&w, &h);
 	glViewport(0, 0, w, h);
+	thg->viewport.w = w;
+	thg->viewport.h = h;
 }
 
 void _th_rdimg(th_image *img, unsigned char *data) {

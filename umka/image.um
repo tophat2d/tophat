@@ -24,7 +24,7 @@ fn imgdrawninepatch(img: Image, outer, inner, dest: ^rect.Rect, color: uint32)
 fn imgupdatedata(img: Image, data: ^uint32, dm: th.Vf2)
 fn imggetdata(img: Image, data: ^uint32)
 fn imgmakerendertarget(img: Image)
-fn imgremoverendertarget(cam: ^rect.Rect)
+fn imgremoverendertarget(img: Image, cam: ^rect.Rect)
 
 // Loads an image at path.
 fn load*(path: str): Image {
@@ -153,6 +153,6 @@ fn (i: ^Image) makeRenderTarget*() {
 	imgmakerendertarget(i^)
 }
 
-fn removeRenderTarget*(cam: rect.Rect) {
-	imgremoverendertarget(&cam)
+fn (i: ^Image) removeRenderTarget*(cam: rect.Rect) {
+	imgremoverendertarget(i^, &cam)
 }

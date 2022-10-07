@@ -38,37 +38,66 @@ fn main() {
 	//img2 := image.mk(data, dm)
 	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
 
-	target := image.mk(make([]uint32, 50 * 50), th.Vf2{50, 50})
+	target := image.mk(make([]uint32, 10 * 10), th.Vf2{10, 10})
 
 	for window.cycle(cam) {
+		p := th.Vf2{1, 1}
+
+		canvas.drawText("drawOnQuad:", p, th.black, 2)
+		p.y += 12
+
+		img.drawOnQuad([4]th.Vf2{
+			p.add(th.Vf2{10, 10}),
+			p.add(th.Vf2{20, 15}),
+			p.add(th.Vf2{20, 30}),
+			p.add(th.Vf2{0, 35})})
+
+		p.y += 36
+
+		canvas.drawText("draw:", p, th.black, 2)
+		p.y += 12
+
+		dig := sqrt(
+			img.getDims().x * img.getDims().x * 16 +
+			img.getDims().y * img.getDims().y * 64)
+
 		img.draw(th.Transform{
 			s: th.Vf2{4, 8},
-			p: th.Vf2{100, 100},
+			p: th.Vf2{p.x + dig, p.y},
 			r: 45}, 0xaaaaffaa)
+
+		p.y += dig + 1
+
+		canvas.drawText("placeholders:", p, th.black, 2)
+		p.y += 12
 
 		images.test.draw(th.Transform{
 			s: th.Vf2{4, 4},
-			p: th.Vf2{150, 150},
+			p: p,
 			r: 0})
 
-		img.drawOnQuad([4]th.Vf2{
-			th.Vf2{10, 10},
-			th.Vf2{20, 15},
-			th.Vf2{20, 30},
-			th.Vf2{0, 35}})
+		p.y += img.getDims().mulf(4).y
 
+		canvas.drawText("copy, setData:", p, th.black, 2)
+		p.y += 12
 		img2.draw(th.Transform{
 			s: th.Vf2{10, 10},
-			p: th.Vf2{400, 400}})
+			p: p})
+		
+		p.y += img2.getDims().y * 10 + 1
+
+		canvas.drawText("render target:", p, th.black, 2)
+		p.y += 12
 
 		target.makeRenderTarget()
-			img.draw(th.Transform{
-				s: th.Vf2{2, 2},
-				p: th.Vf2{0, 0}})
-			canvas.drawText("hello", th.Vf2{0, 0}, th.red, 1)
-			canvas.drawLine(th.cyan, th.Vf2{0, 0}, th.Vf2{50, 50}, 1)
-		image.removeRenderTarget(cam)
-		target.draw(th.Transform{s: th.Vf2{1, 1}, p: th.Vf2{50, 50}})
+			/*img.draw(th.Transform{
+				s: th.Vf2{0.5, 0.5},
+				p: th.Vf2{0, 0}})*/
+			canvas.drawRect(th.cyan, rect.mk(2, 2, 4, 4))
+			//canvas.drawText("hello", th.Vf2{0, 0}, th.red, 1)
+			//canvas.drawLine(th.cyan, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
+		target.removeRenderTarget(cam)
+		target.draw(th.Transform{s: th.Vf2{10, 10}, p: p})
 
 		if input.isJustPressed('q') { break }
 	}

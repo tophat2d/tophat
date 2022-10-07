@@ -309,9 +309,10 @@ void umimgmakerendertarget(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umimgremoverendertarget(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *img = p[1].ptrVal;
 	th_rect *cam = p[0].ptrVal;
 
-	th_image_remove_render_target(cam);
+	th_image_remove_render_target(img, cam);
 }
 
 ///////////////////////

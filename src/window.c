@@ -97,6 +97,10 @@ void th_window_setup(char *name, int w, int h) {
 	}
 
 	window_active = true;
+	XGetWindowAttributes(th_dpy, th_win, &th_win_attribs);
+	glViewport(0, 0, th_win_attribs.width, th_win_attribs.height);
+	thg->viewport.w = th_win_attribs.width;
+	thg->viewport.h = th_win_attribs.height;
 }
 
 void th_window_get_dimensions(int *w, int *h) {
@@ -122,6 +126,9 @@ int th_window_handle() {
 		case Expose:
 			XGetWindowAttributes(th_dpy, th_win, &th_win_attribs);
 			glViewport(0, 0, th_win_attribs.width, th_win_attribs.height);
+
+			thg->viewport.w = th_win_attribs.width;
+			thg->viewport.h = th_win_attribs.height;
 			break;
 		case KeyPress:; // FALLTHROUGH
 			KeySym _;
@@ -273,6 +280,8 @@ void th_window_setup(char *name, int w, int h) {
 	hkl = LoadKeyboardLayout("00000409", 0);
 
 	window_active = true;
+	thg->viewport.w = w;
+	thg->viewport.h = h;
 }
 
 void th_window_get_dimensions(int *w, int *h) {
@@ -336,6 +345,8 @@ int th_window_handle() {
 	}
 	GetClientRect(th_win, &th_win_rect);
 	glViewport(0, 0, th_win_rect.right, th_win_rect.bottom);
+	thg->viewport.w = th_win_rect.right - th_win_rect.left;
+	thg->viewport.h = th_win_rect.bottom - th_win_rect.top;
 
 	return !should_close;
 }
