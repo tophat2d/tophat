@@ -211,6 +211,7 @@ typedef struct {
 
 	GLuint framebuffer;
 	GLuint depthbuffer;
+	bool has_framebuffer;
 
 	th_rect scissors[MAX_SCISSORS];
 	uu scissor;
@@ -295,6 +296,7 @@ void th_gl_init();
 GLuint th_gl_compile_shader(const char **src, GLenum type);
 GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char **attribs, int nattribs);
 void th_gl_free_prog(GLuint prog);
+void th_gl_get_viewport_max(int *w, int *h);
 
 // image
 th_image *th_load_image(char *path);

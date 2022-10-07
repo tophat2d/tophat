@@ -390,3 +390,4 @@ void th_window_end_scissor() {
 	th_image_flush();
 	glDisable(GL_SCISSOR_TEST);
 }
+

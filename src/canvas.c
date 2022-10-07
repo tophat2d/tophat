@@ -73,13 +73,14 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	for (int i=0; i < 4; ++i)
 		colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
-	const int sw = thg->viewport.w * 0.5;
-	const int sh = thg->viewport.h * -0.5;
+	int sw, sh;
+	th_gl_get_viewport_max(&sw, &sh);
 
+	const float yoff = thg->has_framebuffer ? -1.0 : 1.0;
 	const float verts[] = {
-		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + 1,
-	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + 1,
-		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + 1,
+		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + yoff,
+	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + yoff,
+		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + yoff,
 	};
 
 	float *base = &thg->canvas_batch[thg->canvas_batch_size * 3 * 6];

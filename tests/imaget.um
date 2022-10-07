@@ -90,12 +90,10 @@ fn main() {
 		p.y += 12
 
 		target.makeRenderTarget()
-			/*img.draw(th.Transform{
+			canvas.drawLine(th.cyan, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
+			img.draw(th.Transform{
 				s: th.Vf2{0.5, 0.5},
-				p: th.Vf2{0, 0}})*/
-			canvas.drawRect(th.cyan, rect.mk(2, 2, 4, 4))
-			//canvas.drawText("hello", th.Vf2{0, 0}, th.red, 1)
-			//canvas.drawLine(th.cyan, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
+				p: th.Vf2{0, 0}})
 		target.removeRenderTarget(cam)
 		target.draw(th.Transform{s: th.Vf2{10, 10}, p: p})
 

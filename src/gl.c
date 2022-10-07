@@ -6,6 +6,8 @@
 #include <GL/gl.h>
 #include <chew.h>
 
+extern th_global *thg;
+
 void th_gl_init() {
 #ifdef _WIN32
 	chewInit();
@@ -102,4 +104,12 @@ fail:
 
 void th_gl_free_prog(GLuint prog) {
 	glDeleteShader(prog);
+}
+
+void th_gl_get_viewport_max(int *w, int *h) {
+	*w = thg->viewport.w * 0.5;
+	*h = thg->viewport.h * 0.5;
+
+	if (!thg->has_framebuffer)
+		*h *= -1;
 }
