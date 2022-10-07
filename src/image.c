@@ -140,6 +140,8 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 
 	trans.pos.x -= min.x*trans.scale.x;
 	trans.pos.y -= min.y*trans.scale.y;
+	trans.origin.x += min.x * trans.scale.x;
+	trans.origin.y += min.y * trans.scale.y;
 	th_transform_quad(&q, trans);
 	th_blit_tex(img, q, color);
 }
@@ -214,6 +216,11 @@ void th_image_flush() {
 }
 
 void th_image_set_as_render_target(th_image *img) {
+	if (thg->has_framebuffer) {
+		th_error("Another image is alredy selected as the render target.");
+		return;
+	}
+		
 	if (img->dm.w >= RENDER_TARGET_MAX_SIZE || img->dm.h >= RENDER_TARGET_MAX_SIZE) {
 		th_error("Render target can be atmost %dx%d big.",
 			RENDER_TARGET_MAX_SIZE, RENDER_TARGET_MAX_SIZE);
@@ -243,6 +250,11 @@ void th_image_set_as_render_target(th_image *img) {
 }
 
 void th_image_remove_render_target(th_image *img, th_rect *cam) {
+	if (thg->has_framebuffer) {
+		th_error("No render target is set.");
+		return;
+	}
+
 	th_canvas_flush();
 	th_image_flush();
 
