@@ -84,19 +84,6 @@ typedef struct {
 } th_coll;
 
 typedef struct {
-	uint32_t *dots;
-	uu w, h;
-	fu rect_size;
-	uint32_t color;
-} th_lightmask;
-
-typedef struct {
-	th_vf2 pos;
-	uu radius;
-	uint32_t tint;
-} th_spotlight;
-
-typedef struct {
 	uint64_t start_time;
 	int seed;
 } _th_particle;
@@ -323,12 +310,6 @@ void th_image_remove_render_target(th_image *img, th_rect *cam);
 // input
 void th_input_key(int keycode, int bDown);
 void th_input_cycle();
-
-// light
-void th_lightmask_clear(th_lightmask *d);
-void th_lightmask_draw(th_lightmask *d, th_rect *cam);
-void th_spotlight_stamp(th_spotlight *l, th_lightmask *d);
-void _th_lightmask_stamp_point(th_lightmask *d, int x, int y, uint32_t color);
 
 // misc
 void th_error(char *text, ...);

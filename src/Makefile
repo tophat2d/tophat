@@ -8,7 +8,7 @@ DEPS = $(OBJS:.o=.d)
 
 HELPER_SCRIPT = cmd/buildhelper.um
 EM_TARGET = src/staembed.c
-UMKA_MODULES = umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um umka/input.um umka/misc.um umka/canvas.um umka/ray.um umka/rect.um umka/tilemap.um umka/window.um umka/ui.um umka/std/std.um umka/particles.um umka/light.um umka/lerp.um umka/utf8.um umka/font.um umka/th.um umka/signal.um umka/atlas.um umka/ui/label.um umka/ui/grid.um umka/ui/imagebox.um umka/shader.um umka/color.um umka/coll.um umka/images.um
+UMKA_MODULES = umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um umka/input.um umka/misc.um umka/canvas.um umka/ray.um umka/rect.um umka/tilemap.um umka/window.um umka/ui.um umka/std/std.um umka/particles.um umka/lerp.um umka/utf8.um umka/font.um umka/th.um umka/signal.um umka/atlas.um umka/ui/label.um umka/ui/grid.um umka/ui/imagebox.um umka/shader.um umka/color.um umka/coll.um umka/images.um
 IMAGES_MOD = umka/images.um
 IMAGES = etc/test.ff
 
@@ -21,6 +21,12 @@ $(EM_TARGET): $(UMKA_MODULES) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_modulesrc $(UMKA_MODULES) > $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(UMKA_MODULES:umka/%=%) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_misc LICENSE version >> $(EM_TARGET)
+
+UMKA_RUNTIME_SRC_DEST = lib/umka/src/umka_runtime_src.h
+UMKA_RUNTIME_SRC_SRC = lib/umka/import/embed/umka_runtime_src.h
+
+$(UMKA_RUNTIME_SRC_DEST): $(UMKA_RUNTIME_SRC_SRC)
+	cp $(UMKA_RUNTIME_SRC_SRC) $(UMKA_RUNTIME_SRC_DEST)
 
 %.o: %.c
 	@echo CC $@

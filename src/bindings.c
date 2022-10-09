@@ -114,37 +114,6 @@ static void umfontmeasure(UmkaStackSlot *p, UmkaStackSlot *r) {
 	*((th_vf2*)p[0].ptrVal) = th_font_measure(font, s);
 }
 
-// sets values of all dots to lightmask's color
-void umlightmaskclear(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_lightmask *l = (th_lightmask *)p[0].ptrVal;
-
-	th_lightmask_clear(l);
-}
-
-// draws the lightmask
-void umlightmaskdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_lightmask *l = (th_lightmask *)p[1].ptrVal;
-	th_rect *cam = (th_rect *)p[0].ptrVal;
-
-	th_lightmask_draw(l, cam);
-}
-
-// "stamps" the spotlight on the mask
-void umspotlightstamp(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_rect *cam = (th_rect *)p[0].ptrVal;
-	th_lightmask *l = (th_lightmask *)p[1].ptrVal;
-	th_spotlight *s = (th_spotlight *)p[2].ptrVal;
-
-	int x = s->pos.x, y = s->pos.x;
-	s->pos.x -= (cam->x - cam->w/2);
-	s->pos.y -= (cam->y - cam->h/2);
-
-	th_spotlight_stamp(s, l);
-
-	s->pos.x = x;
-	s->pos.y = y;
-}
-
 ///////////////////////
 // particles
 void umparticlesdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -750,11 +719,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "cfontload", &umfontload);
 	umkaAddFunc(umka, "cfontdraw", &umfontdraw);
 	umkaAddFunc(umka, "cfontmeasure", &umfontmeasure);
-
-	// light
-	umkaAddFunc(umka, "clightmaskclear", &umlightmaskclear);
-	umkaAddFunc(umka, "clightmaskdraw", &umlightmaskdraw);
-	umkaAddFunc(umka, "cspotlightstamp", &umspotlightstamp);
 
 	// particles
 	umkaAddFunc(umka, "c_particles_draw", &umparticlesdraw);
