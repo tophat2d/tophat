@@ -1,0 +1,14 @@
+name: Tophat workflow
+on: [push]
+jobs:
+  Auto-Package:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: make
+      run: |
+        sudo apt-get install gcc zip make libx11-dev libgl-dev gcc-mingw-w64-x86-64
+        git submodule init
+        git submodule update --remote
+        make
+        make cross

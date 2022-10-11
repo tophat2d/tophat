@@ -165,9 +165,10 @@ int main(int argc, char *argv[]) {
 
 		for (int depth = 0; depth < 10; depth++) {
 			char fnName[UMKA_MSG_LEN + 1];
-			int fnOffset;
+			char file[UMKA_MSG_LEN + 1];
+			int line, offset;
 
-			if (!umkaGetCallStack(thg->umka, depth, &fnOffset, fnName, UMKA_MSG_LEN + 1)) {
+			if (!umkaGetCallStack(thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
 				break;
 				fprintf(stderr, "\t\t...\n");
 			}
@@ -175,7 +176,7 @@ int main(int argc, char *argv[]) {
 #ifndef _WIN32
 			fprintf(stderr, "\033[34m");
 #endif
-			fprintf(stderr, "\t\t%08d: ", fnOffset);
+			fprintf(stderr, "\t\t%s:%06d: ", file, line);
 #ifndef _WIN32
 			fprintf(stderr, "\033[0m");
 #endif

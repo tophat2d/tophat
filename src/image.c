@@ -7,6 +7,10 @@
 
 #include "tophat.h"
 
+#ifndef GL_UNSIGNED_INT_8_8_8_8 
+#define GL_UNSIGNED_INT_8_8_8_8 0x8035
+#endif
+
 #ifdef _WIN32
 #define glActiveTexture glActiveTextureCHEW
 #endif
