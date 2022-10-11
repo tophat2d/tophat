@@ -9,6 +9,7 @@
 
 #ifdef _WIN32
 #define glActiveTexture glActiveTextureCHEW
+#define GL_UNSIGNED_INT_8_8_8_8 0x8035
 #endif
 
 extern th_global *thg;
