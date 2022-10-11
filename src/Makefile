@@ -41,7 +41,7 @@ src/thextdata.h:
 
 UMKA_SRC=lib/umka/src/umka_common.c lib/umka/src/umka_const.c lib/umka/src/umka_expr.c lib/umka/src/umka_ident.c lib/umka/src/umka_runtime.c lib/umka/src/umka_types.c lib/umka/src/umka_api.c lib/umka/src/umka_compiler.c lib/umka/src/umka_decl.c lib/umka/src/umka_gen.c lib/umka/src/umka_lexer.c lib/umka/src/umka_stmt.c lib/umka/src/umka_vm.c
 cross: $(UMKA_LIB)
-	$(CROSS_CC) -o tophat.exe -static $(SRCS) $(UMKA_SRC) lib/rawdraw/chew.c $(CFLAGS) $(CROSS_FLAGS)
+	$(CROSS_CC) -o tophat.exe -static $(SRCS) $(UMKA_SRC) lib/chew.c $(CFLAGS) $(CROSS_FLAGS)
 
 bulk: $(UMKA_LIB) $(UMKA_LIBRARY)
 	$(CC) -o $(TARGET) $(CFLAGS) $(SRCS) $(LDFLAGS) $(LDLIBS)
