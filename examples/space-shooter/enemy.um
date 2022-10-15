@@ -67,7 +67,7 @@ fn handle*() {
 			i--
 			effects.damage()
 			global.hp--
-			sound.dmg.play()
+			sound.dmg.start()
 
 			if global.hp == 0 {
 				if global.score > global.hi {

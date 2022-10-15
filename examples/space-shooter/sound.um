@@ -9,9 +9,9 @@ var (
 
 fn init*() {
 	dmg = audio.load("sfx/dmgsound.wav")
-	dmg.volume = 0.7
+	dmg.setVol(0.7)
 	explosion = audio.load("sfx/explosion.wav")
-	explosion.volume = 0.7
+	explosion.setVol(0.7)
 	shoot = audio.load("sfx/shoot.wav")
-	shoot.volume = 0.7
+	shoot.setVol(0.7)
 }

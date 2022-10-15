@@ -5,6 +5,7 @@ import (
 	"image.um"
 	"input.um"
 	"canvas.um"
+	"color.um"
 	"window.um"
 
 	"images.um"
@@ -90,7 +91,7 @@ fn main() {
 		p.y += 12
 
 		target.makeRenderTarget()
-			canvas.drawLine(th.cyan, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
+			canvas.drawLine(th.red, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
 			img.draw(th.Transform{
 				s: th.Vf2{0.5, 0.5},
 				p: th.Vf2{0, 0}})
@@ -98,5 +99,13 @@ fn main() {
 		target.draw(th.Transform{s: th.Vf2{10, 10}, p: p})
 
 		if input.isJustPressed('q') { break }
+	}
+
+	data = target.getData()
+	for i in data {
+		printf("%x ", data[i])
+		if (i + 1) % trunc(target.getDims().x) == 0 {
+			printf("\n")
+		}
 	}
 }

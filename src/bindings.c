@@ -238,12 +238,17 @@ void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_image *img2 = th_image_alloc();
 	if (!img2) return;
-	th_image_from_data(img2, img1->data, img1->dm);
+	
+	uint32_t *data = th_image_get_data(img1);
+
+	th_image_from_data(img2, data, img1->dm);
 	img2->flipv = img1->flipv;
 	img2->fliph = img1->fliph;
 	img2->crop = img1->crop;
 
 	*ret = img2;
+
+	free(data);
 }
 
 void umimgsetfilter(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -267,7 +272,9 @@ void umimggetdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = p[1].ptrVal;
 	if (!img) return;
 	uint32_t *data = p[0].ptrVal;
-	memcpy(data, img->data, sizeof(uint32_t) * img->dm.w * img->dm.h);
+
+	glBindTexture(GL_TEXTURE_2D, img->gltexture);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 }
 
 void umimgmakerendertarget(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -360,40 +367,75 @@ void umentysort(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 ///////////////////////
 // audio
-void th_playback_destructor(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_playback *pk = p[0].ptrVal;
+void umth_sound_load(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char *path = (char *)p[0].ptrVal;
 
-	ma_decoder_uninit(pk->decoder);
-	free(pk->decoder);
+	r->ptrVal = th_audio_load(path);
 }
 
-void umsoundplay(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umth_sound_copy(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_sound *s = p[0].ptrVal;
 
-	th_playback_item *pbi = malloc(sizeof(th_playback_item));
+	r->ptrVal = th_sound_copy(s);
+}
 
-	pbi->next = thg->playbacks;
-	thg->playbacks = pbi;
+void umth_sound_is_playing(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[0].ptrVal;
 
-	pbi->pk = umkaAllocData(thg->umka, sizeof(th_playback), th_playback_destructor);
-	umkaIncRef(thg->umka, pbi->pk);
+	r->intVal = ma_sound_is_playing(&s->inst);
+}
 
-	*pbi->pk = (th_playback){
-		.decoder = malloc(sizeof(ma_decoder)),
-		.playing = 1,
-		.paused  = 0,
-		.looping = s->looping,
-		.volume  = s->volume,
-		.frame   = -1
-	};
+void umth_sound_play(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[0].ptrVal;
 
-	extern ma_decoder_config decodercfg;
-	ma_result res;
-	res = ma_decoder_init_file(s->path, &decodercfg, pbi->pk->decoder);
-	if (res != MA_SUCCESS)
-		th_error("Couldn't load sound at path %s", s->path);
+	ma_sound_start(&s->inst);
+}
 
-	r->ptrVal = pbi->pk;
+void umth_sound_set_volume(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[1].ptrVal;
+	float vol = p[0].real32Val;
+
+	ma_sound_set_volume(&s->inst, vol);
+}
+
+void umth_sound_set_pan(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[1].ptrVal;
+	float pan = p[0].real32Val;
+
+	ma_sound_set_pan(&s->inst, pan);
+}
+
+void umth_sound_set_pitch(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[1].ptrVal;
+	float pitch = p[0].real32Val;
+
+	ma_sound_set_pitch(&s->inst, pitch);
+}
+
+void umth_sound_set_looping(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[1].ptrVal;
+	int looping = p[0].intVal;
+
+	ma_sound_set_looping(&s->inst, looping);
+}
+
+void umth_sound_stop(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[0].ptrVal;
+
+	ma_sound_stop(&s->inst);
+}
+
+void umth_sound_seek_to_frame(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[1].ptrVal;
+	int frame = p[0].intVal;
+
+	ma_sound_seek_to_pcm_frame(&s->inst, frame);
+}
+
+void umth_sound_frame_count(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[0].ptrVal;
+
+	ma_sound_get_length_in_pcm_frames(&s->inst, (ma_uint64 *)&r->uintVal);
 }
 
 ///////////////////////
@@ -764,7 +806,18 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "craygettmapcoll", &umraygettmapcoll);
 
 	// audio
-	umkaAddFunc(umka, "csoundplay", &umsoundplay);
+	umkaAddFunc(umka, "umth_sound_load", &umth_sound_load);
+	umkaAddFunc(umka, "umth_sound_copy", &umth_sound_copy);
+	umkaAddFunc(umka, "umth_sound_is_playing", &umth_sound_is_playing);
+	umkaAddFunc(umka, "umth_sound_play", &umth_sound_play);
+	umkaAddFunc(umka, "umth_sound_set_volume", &umth_sound_set_volume);
+	umkaAddFunc(umka, "umth_sound_set_pan", &umth_sound_set_pan);
+	umkaAddFunc(umka, "umth_sound_set_pitch", &umth_sound_set_pitch);
+	umkaAddFunc(umka, "umth_sound_set_looping", &umth_sound_set_looping);
+	umkaAddFunc(umka, "umth_sound_stop", &umth_sound_stop);
+	umkaAddFunc(umka, "umth_sound_seek_to_frame", &umth_sound_seek_to_frame);
+	umkaAddFunc(umka, "umth_sound_frame_count", &umth_sound_frame_count);
+
 
 	// canvas
 	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);

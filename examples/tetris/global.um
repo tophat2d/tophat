@@ -8,7 +8,6 @@ var (
 	score*: int
 
 	audioBackground*: audio.Sound
-	playbackBackground*: ^audio.Playback
 
 	audioRotate*: audio.Sound
 	audioPush*: audio.Sound
@@ -18,10 +17,8 @@ var (
 
 fn initAudio*() {
 	audioBackground = audio.load("IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
-	audioBackground.looping = true
-	audioBackground.volume = 0.05
-	playbackBackground = audioBackground.play()
-	playbackBackground.paused = true
+	audioBackground.setLooping(true)
+	audioBackground.setVol(0.05)
 
 	audioRotate = audio.load("Rotation.wav")
 	audioPush = audio.load("Placement.wav")
@@ -30,7 +27,7 @@ fn initAudio*() {
 }
 
 fn playSound*(sound: ^audio.Sound) {
-	sound.play()
+	sound.start()
 }
 
 // stolen :)

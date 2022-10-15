@@ -19,7 +19,6 @@ extern th_global *thg;
 
 void th_image_free(th_image *img) {
 	glDeleteTextures(1, &img->gltexture);
-	free(img->data);
 }
 
 static void th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -28,6 +27,35 @@ static void th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 th_image *th_image_alloc() {
 	return umkaAllocData(thg->umka, sizeof(th_image), th_image_free_umka);
+}
+
+static
+uint32_t *th_rdimg(th_image *img, unsigned char *data) {
+	uint32_t *rd = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
+
+	for (int x=0; x < img->dm.w; x++) {
+		for (int y=0; y < img->dm.h; y++) {
+			int rd_index = (y * img->dm.w) + x;
+			int data_index = ((y * img->dm.w) + x) * img->channels;
+			rd[rd_index] = 0;
+
+			for (int poff=0; poff < img->channels; poff++)
+				rd[rd_index] += data[data_index + poff] << ((3 - poff) * 8);
+
+			if (img->channels == 3)
+				rd[rd_index] += 0xff;
+		}
+	}
+
+	return rd;
+}
+
+uint32_t *th_image_get_data(th_image *img) {
+	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
+	glBindTexture(GL_TEXTURE_2D, img->gltexture);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	return data;
 }
 
 th_image *th_load_image(char *path) {
@@ -50,17 +78,16 @@ th_image *th_load_image(char *path) {
 	img->flipv = 0;
 	img->fliph = 0;
 
-	_th_rdimg(img, data);
+	uint32_t *udata = th_rdimg(img, data);
 	stbi_image_free(data);
 
-	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
+	img->gltexture = th_gen_texture(udata, img->dm, img->filter);
+	free(udata);
 
 	return img;
 }
 
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
-	img->data = malloc(sizeof(uint32_t) * dm.w * dm.h);
-	memcpy(img->data, data, sizeof(uint32_t) * dm.w * dm.h);
 	img->dm = dm;
 	img->flipv = 0;
 	img->fliph = 0;
@@ -70,30 +97,25 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 	img->channels = 4;
 	img->filter = 1;
 
-	img->gltexture = th_gen_texture(img->data, dm, img->filter);
+	img->gltexture = th_gen_texture(data, dm, img->filter);
 }
 
 void th_image_set_filter(th_image *img, int filter) {
+	uint32_t *data = th_image_get_data(img);
+
 	img->filter = filter;
 	glDeleteTextures(1, &img->gltexture);
-	img->gltexture = th_gen_texture(img->data, img->dm, img->filter);
+	img->gltexture = th_gen_texture(data, img->dm, img->filter);
+
+	free(data);
 }
 
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm) {
-	uint32_t *b = NULL;
-	if ((b = realloc(img->data, sizeof(uint32_t) * dm.x * dm.y)) == NULL) {
-		th_error("th_image_update_data: could not allocate\n");
-		return;
-	}
-
-	img->data = b;
-	memcpy(img->data, data, sizeof(uint32_t) * dm.x * dm.y);
-
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D, img->gltexture);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dm.w, dm.h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, img->data);
+		GL_UNSIGNED_BYTE, data);
 
 	img->dm = dm;
 }
@@ -167,8 +189,12 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	th_gl_get_viewport_max(&sw, &sh);
 
 	float colors[4];
-	for (int i=0; i < 4; ++i)
-		colors[i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
+	if (thg->has_framebuffer)
+		for (int i=0; i < 4; ++i)
+			colors[i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
+	else
+		for (int i=0; i < 4; ++i)
+			colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
 	th_quad bounds = img->crop;
 	if (img->flipv) {
@@ -249,6 +275,9 @@ void th_image_set_as_render_target(th_image *img) {
 
 	glViewport(0, 0, img->dm.w, img->dm.h);
 
+	glUseProgram(thg->blit_prog);
+	glUniform1i(thg->framebuffer_uniform, 1);
+
 	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		th_error("Could not setup image render target %x, %x.", glGetError(), glCheckFramebufferStatus(GL_FRAMEBUFFER));
 }
@@ -264,12 +293,15 @@ void th_image_remove_render_target(th_image *img, th_rect *cam) {
 
 	th_calculate_scaling(cam->w, cam->h);
 
-	glBindTexture(GL_TEXTURE_2D, img->gltexture);
+	/*glBindTexture(GL_TEXTURE_2D, img->gltexture);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->data);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->dm.w, img->dm.h, 0, GL_RGBA,
-		GL_UNSIGNED_INT_8_8_8_8, img->data);
+		GL_UNSIGNED_INT_8_8_8_8, img->data);*/
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	glUseProgram(thg->blit_prog);
+	glUniform1i(thg->framebuffer_uniform, 0);
 
 	int w,h;
 	th_window_get_dimensions(&w, &h);
@@ -277,26 +309,6 @@ void th_image_remove_render_target(th_image *img, th_rect *cam) {
 	thg->viewport.w = w;
 	thg->viewport.h = h;
 	thg->has_framebuffer = 0;
-}
-
-void _th_rdimg(th_image *img, unsigned char *data) {
-	uint32_t *rd = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-
-	for (int x=0; x < img->dm.w; x++) {
-		for (int y=0; y < img->dm.h; y++) {
-			int rd_index = (y * img->dm.w) + x;
-			int data_index = ((y * img->dm.w) + x) * img->channels;
-			rd[rd_index] = 0;
-
-			for (int poff=0; poff < img->channels; poff++)
-				rd[rd_index] += data[data_index + poff] << ((3 - poff) * 8);
-
-			if (img->channels == 3)
-				rd[rd_index] += 0xff;
-		}
-	}
-
-	img->data = rd;
 }
 
 int th_image_compile_shader(char *frag, char *vert) {
@@ -319,13 +331,17 @@ int th_image_compile_shader(char *frag, char *vert) {
 		"  th_tc = th_tex_vert;\n"
 		"}\n",
 
+		"uniform int th_has_framebuffer;\n"
 		"uniform sampler2D th_tex;\n"
 		"varying vec2 th_tc;\n"
 		"varying vec4 th_vcolor;\n"
 
 		"vec4 th_fragment(sampler2D tex, vec2 coord);\n"
 
-		"void main() { gl_FragColor = th_fragment(th_tex, th_tc) * th_vcolor.abgr;}\n",
+		"void main() {\n"
+		"  gl_FragColor = th_fragment(th_tex, th_tc) * th_vcolor; \n"
+		"  if (th_has_framebuffer != 0) gl_FragColor = gl_FragColor.abgr;\n"
+		"}\n",
 		attribs, 3);
 }
 
@@ -335,6 +351,7 @@ void th_image_init() {
 		"vec4 th_fragment(sampler2D tex, vec2 coord) { return texture2D(tex, coord).abgr; }"));
 
 	thg->blit_prog_tex = glGetUniformLocation(thg->blit_prog, "th_tex");
+	thg->framebuffer_uniform = glGetUniformLocation(thg->blit_prog, "th_has_framebuffer");
 
 	glGenVertexArrays(1, &thg->blit_vao);
 	glGenBuffers(1, &thg->blit_vbo);

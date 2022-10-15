@@ -59,7 +59,7 @@ fn handle*() {
 	e.animate(4, &frames, th.time)
 
 	if input.isJustPressed(' ') && th.time - lastShot >= shootTimeout {
-		sound.shoot.play()
+		sound.shoot.start()
 		b := bulletPrefab
 		b.t.p = th.Vf2{e.t.p.x + 1, e.t.p.y - bulletPrefab.r.h}
 
@@ -88,7 +88,7 @@ fn handle*() {
 			enemy.enemies = delete(enemy.enemies, colls[0].index)
 			enemies = enemy.getEnts()
 			global.score++
-			sound.explosion.play()
+			sound.explosion.start()
 			i--
 			continue
 		}

@@ -1,0 +1,32 @@
+
+import (
+	"audio.um"
+	"input.um"
+	"rect.um"
+	"th.um"
+	"window.um"
+)
+
+fn main() {
+	window.setup("audio test")
+
+	s := audio.load("examples/tetris/IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
+	s.play()
+
+	s.setVol(0.5)
+	s.setPitch(0.5)
+
+	s2 := audio.load("examples/tetris/ClearMega.wav")
+	s2.play()
+
+	for window.cycle(rect.mk(0, 0, 400, 400)) {
+		if input.isJustPressed('s') {
+			s.stop()
+			s.seekToFrame(0)
+		}
+
+		if input.isJustPressed(' ') {
+			s.play()
+		}
+	}
+}

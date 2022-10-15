@@ -3,6 +3,7 @@ import (
 	"canvas.um"
 	"gameplay.um"
 	"global.um"
+	"std.um"
 	"field.um"
 	"fx.um"
 	"input.um"
@@ -29,13 +30,12 @@ fn main() {
 	crazytext.putText("M - MUTE", crazytext.lifetimeForever, false)
 
 	for window.cycle(global.cam) {
-		global.playbackBackground.frame = 0
 		if input.isJustPressed('m') {
 			if bgPlaying {
-				global.playbackBackground.frame = 0
-				global.playbackBackground.paused = true
+				global.audioBackground.seekToFrame(std.rand() % global.audioBackground.frameCount())
+				global.audioBackground.play()
 			} else {
-				global.playbackBackground.paused = false
+				global.audioBackground.stop()
 			}
 			bgPlaying = !bgPlaying
 		}

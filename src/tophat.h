@@ -41,35 +41,18 @@ typedef struct {
 } th_transform;
 
 typedef struct {
-	bool looping;
-	fu volume;
-	char *path;
-} th_sound;
-
-typedef struct {
-	ma_decoder *decoder;
-	bool playing;
-	bool paused;
-	bool looping;
-	fu volume;
-	int64_t frame;
-} th_playback;
-
-typedef struct th_playback_item {
-	th_playback *pk;
-	struct th_playback_item *next;
-} th_playback_item;
-
-typedef struct {
 	th_vf2 dm;
 	uu channels;
-	uint32_t *data;
 	unsigned int gltexture;
 	uu filter;
 	th_quad crop;
 	char flipv;
 	char fliph;
 } th_image;
+
+typedef struct {
+	ma_sound inst;
+} th_sound;
 
 typedef struct {
 	th_rect rect;
@@ -137,7 +120,6 @@ typedef struct {
 	fu scale;
 } th_tmap;
 
-
 #define TH_FONTPLATFORM_PAGECOUNT 1024
 #define TH_FONTPLATFORM_CHARSPERPAGE 256
 
@@ -174,8 +156,6 @@ typedef struct {
 	uu just_released[255];
 	th_vf2 mouse;
 
-	th_playback_item *playbacks;
-
 	th_shader *shaders;
 	uu shader_count;
 
@@ -199,9 +179,12 @@ typedef struct {
 	GLuint framebuffer;
 	GLuint depthbuffer;
 	bool has_framebuffer;
+	GLuint framebuffer_uniform;
 
 	th_rect scissors[MAX_SCISSORS];
 	uu scissor;
+
+	ma_engine audio_engine;
 } th_global;
 
 #ifdef THEXT
@@ -239,7 +222,8 @@ th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell);
 // audio
 void th_audio_init();
 void th_audio_deinit();
-void _th_audio_data_callback(ma_device* pDevice, void* pOutput, const void* pInput, ma_uint32 frameCount);
+th_sound *th_audio_load(char *path);
+th_sound *th_sound_copy(th_sound *s);
 
 // bindings
 void _th_umka_bind(void *umka);
@@ -289,12 +273,12 @@ void th_gl_get_viewport_max(int *w, int *h);
 th_image *th_load_image(char *path);
 void th_image_free(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
+uint32_t *th_image_get_data(th_image *img);
 
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(th_image *img, th_quad q, uint32_t color);
 void th_image_render_transformed(th_image *img, th_transform trans, uint32_t color);
 void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
-void _th_rdimg(th_image *img, unsigned char *data);
 
 void th_image_set_filter(th_image *img, int filter);
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
