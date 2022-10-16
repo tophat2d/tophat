@@ -11,7 +11,7 @@ var pool: []^Sound
 
 fn umth_sound_load(path: str): ^struct{}
 // Loads a sounds at path, if there is an error, the underlying pointer
-// will be `NULL`.
+// will be `NULL` and `validate` will return false.
 fn load*(path: str): Sound {
 	return Sound{umth_sound_load(path)}
 }
@@ -21,6 +21,11 @@ fn umth_sound_copy(s: Sound): ^struct{}
 // and played independently from the original sound.
 fn (s: ^Sound) copy*(): Sound {
 	return Sound{umth_sound_copy(s^)}
+}
+
+// Returns `true` if `s` loaded correctly.
+fn (s: ^Sound) validate*(): bool {
+	return s._ != null
 }
 
 fn umth_sound_is_playing(s: Sound): bool
@@ -91,13 +96,23 @@ fn (s: ^Sound) frameCount*(): uint {
 	return umth_sound_frame_count(s^)
 }
 
+fn umth_sound_set_start_time_ms(s: Sound, t: uint)
+fn (s: ^Sound) setStartTimeMs(t: uint) {
+	umth_sound_set_start_time_ms(s^, t)
+}
+
+fn umth_sound_set_stop_time_ms(s: Sound, t: uint)
+fn (s: ^Sound) setStopTimeMs(t: uint) {
+	umth_sound_set_stop_time_ms(s^, t)
+}
+
 // **INTERNAL**
-fn setup*() {
+fn __setup*() {
 	pool = []^Sound{}
 }
 
 // **INTERNAL**
-fn cycle*() {
+fn __cycle*() {
 	for i:=0; i >= 0 && i < len(pool); i++ {
 		if !pool[i].isPlaying() {
 			pool = delete(pool, i)

@@ -37,7 +37,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 
 	updatescaling(width, height, width, height)
 
-	audio.setup()
+	audio.__setup()
 	images.init()
 
 	clockOffset = std.clock() * 1000
@@ -68,7 +68,7 @@ fn cycle*(cam: rect.Rect): bool {
 	clearframe()
 	getdimensions(&w, &h)
 
-	audio.cycle()
+	audio.__cycle()
 
 	updatescaling(w, h, round(cam.w), round(cam.h))
 	return running

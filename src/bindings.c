@@ -438,6 +438,20 @@ void umth_sound_frame_count(UmkaStackSlot *p, UmkaStackSlot *r) {
 	ma_sound_get_length_in_pcm_frames(&s->inst, (ma_uint64 *)&r->uintVal);
 }
 
+void umth_sound_set_start_time_ms(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[1].ptrVal;
+	uint64_t t = p[0].uintVal;
+
+	ma_sound_set_start_time_in_milliseconds(&s->inst, t);
+}
+
+void umth_sound_set_stop_time_ms(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[1].ptrVal;
+	uint64_t t = p[0].uintVal;
+
+	ma_sound_set_stop_time_in_milliseconds(&s->inst, t);
+}
+
 ///////////////////////
 // raycast
 void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -817,6 +831,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_sound_stop", &umth_sound_stop);
 	umkaAddFunc(umka, "umth_sound_seek_to_frame", &umth_sound_seek_to_frame);
 	umkaAddFunc(umka, "umth_sound_frame_count", &umth_sound_frame_count);
+	umkaAddFunc(umka, "umth_sound_set_start_time_ms", &umth_sound_set_start_time_ms);
+	umkaAddFunc(umka, "umth_sound_set_stop_time_ms", &umth_sound_set_stop_time_ms);
 
 
 	// canvas
