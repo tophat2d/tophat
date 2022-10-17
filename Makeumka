@@ -10,7 +10,7 @@ $(UMKA_LIBRARY):
 	cd $(UMKA_DIR)/ && $(MAKE) -j$(shell nproc)
 
 deepclean::
-	cd $(UMKA_DIR)/ && $(MAKE) clean && $(RM) src/umka_runtime_src.h
+	cd $(UMKA_DIR)/ && $(MAKE) clean && $(RM)
 
 LDLIBS += $(UMKA_LIBRARY)
 CFLAGS += -I$(UMKA_DIR)/src/
