@@ -18,7 +18,7 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 
 	int
 		tw = t->w,
-		th = t->cells.len / t->w; 
+		th = umkaGetDynArrayLen(&t->cells) / t->w; 
 
 	if (camx > t->pos.x + tw*t->scale * t->a.cs.x)
 		return;

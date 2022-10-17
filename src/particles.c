@@ -17,7 +17,7 @@ int interp(int start, int start_val, int end, int end_val, int t) {
 
 static
 uint32_t get_particle_color(th_particles *p, _th_particle pa, int t) {
-	int n = (t - pa.start_time) / (p->lifetime / p->colors.len);
+	int n = (t - pa.start_time) / (p->lifetime / umkaGetDynArrayLen(&p->colors));
 	return p->colors.data[n];
 }
 
@@ -37,7 +37,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 	int camx = cam.x - cam.w/2, camy = cam.y - cam.h/2;
 	p->active = false;
 
-	for (int i=0; i < p->particles.len; i++) {
+	for (int i=0; i < umkaGetDynArrayLen(&p->particles); i++) {
 		p->active = true;
 		if (t < p->particles.data[i].start_time)
 			continue;
@@ -70,7 +70,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 		size += FRAND * (p->size * p->size_randomness);
 
 		uint32_t col = 0xff;
-		if (p->colors.len > 0)
+		if (umkaGetDynArrayLen(&p->colors) > 0)
 			col = get_particle_color(p, p->particles.data[i], t);
 
 		if (p->max_rotation) {

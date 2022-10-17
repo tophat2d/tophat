@@ -76,7 +76,7 @@ bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic) {
 
 	int
 		tw = t->w,
-		th = t->cells.len / t->w;
+		th = umkaGetDynArrayLen(&t->cells) / t->w;
 
 	float
 		mx = e.x - b.x,
@@ -119,7 +119,7 @@ uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc) {
 
 	int
 		tw = t->w,
-		th = t->cells.len / t->w;
+		th = umkaGetDynArrayLen(&t->cells) / t->w;
 
 	for (uu i=0; i < 4; i++) {
 		const iu tx = (q.v[i].x - t->pos.x) / (t->scale * t->a.cs.x);
