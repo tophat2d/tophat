@@ -8,7 +8,7 @@ import (
 	"canvas.um"
 	"rect.um"
 	"std.um"
-	"images.um"
+	"placeholders.um"
 )
 
 var (
@@ -38,7 +38,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	updatescaling(width, height, width, height)
 
 	audio.__setup()
-	images.init()
+	placeholders.__setup()
 
 	clockOffset = std.clock() * 1000
 	start = std.clock() * 1000

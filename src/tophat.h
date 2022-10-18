@@ -273,7 +273,7 @@ void th_gl_get_viewport_max(int *w, int *h);
 th_image *th_load_image(char *path);
 void th_image_free(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
-uint32_t *th_image_get_data(th_image *img);
+uint32_t *th_image_get_data(th_image *img, bool rgba);
 
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(th_image *img, th_quad q, uint32_t color);

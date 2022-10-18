@@ -124,7 +124,7 @@ fn main() {
 		printf("int %s_count = %d;\n", std.argv(2), std.argc() - 3)
 	} else if mode == "umimg" {
 		decl := "import(\"image.um\"; \"th.um\")\nvar (\n"
-		init := "fn init*() {\n"
+		init := "// **INTERNAL**\nfn __setup*() {\n"
 
 		for i:=2; i < std.argc(); i += 2 {
 			fname := std.argv(i)
@@ -137,6 +137,11 @@ fn main() {
 
 			datas := ""
 			for i in data {
+				data[i] =
+					(data[i] >> (0*8) & 0xff) << (3*8) |
+					(data[i] >> (1*8) & 0xff) << (2*8) |
+					(data[i] >> (2*8) & 0xff) << (1*8) |
+					(data[i] >> (3*8) & 0xff) << (0*8)
 				datas += sprintf("0x%x", data[i])
 				if i < len(data) - 1 { datas += ", " }
 			}

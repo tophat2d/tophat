@@ -133,7 +133,8 @@ fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
 	imgupdatedata(i^, &data[0], dm)
 }
 
-// Gets the image data.
+// Gets the image data. This downloads the data from the GPU on **each call**.
+// Don't use in performance critical sections.
 fn (i: ^Image) getData*(): []uint32 {
 	if i._ == null {
 		return []uint32{}

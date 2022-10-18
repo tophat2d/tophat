@@ -239,7 +239,7 @@ void umimgcopy(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img2 = th_image_alloc();
 	if (!img2) return;
 	
-	uint32_t *data = th_image_get_data(img1);
+	uint32_t *data = th_image_get_data(img1, false);
 
 	th_image_from_data(img2, data, img1->dm);
 	img2->flipv = img1->flipv;
@@ -271,10 +271,12 @@ void umimgupdatedata(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umimggetdata(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = p[1].ptrVal;
 	if (!img) return;
-	uint32_t *data = p[0].ptrVal;
+	uint32_t *o = p[0].ptrVal;
 
-	glBindTexture(GL_TEXTURE_2D, img->gltexture);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	uint32_t *data = th_image_get_data(img, true);
+	memcpy(o, data, img->dm.w * img->dm.h * sizeof(uint32_t));
+
+	free(data);
 }
 
 void umimgmakerendertarget(UmkaStackSlot *p, UmkaStackSlot *r) {

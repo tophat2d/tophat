@@ -33,27 +33,44 @@ static
 uint32_t *th_rdimg(th_image *img, unsigned char *data) {
 	uint32_t *rd = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
 
-	for (int x=0; x < img->dm.w; x++) {
-		for (int y=0; y < img->dm.h; y++) {
-			int rd_index = (y * img->dm.w) + x;
-			int data_index = ((y * img->dm.w) + x) * img->channels;
-			rd[rd_index] = 0;
-
-			for (int poff=0; poff < img->channels; poff++)
-				rd[rd_index] += data[data_index + poff] << ((3 - poff) * 8);
-
-			if (img->channels == 3)
-				rd[rd_index] += 0xff;
+	for (int i=0; i < img->dm.w * img->dm.h; i++) {
+		switch (img->channels) {
+		case 3:
+			rd[i] = 0;
+			for (int j=0; j < 3; j++) {
+				rd[i] |= data[i*3 + j] << j*8;
+			}
+			rd[i] |= 0xff << 3*8;
+			break;
+		case 4:
+			rd[i] = 0;
+			for (int j=0; j < 4; j++)
+				rd[i] |= data[i*4 + j] << j*8;
+			break;
+		default:
+			th_error("tophat can't load this image.");
+			break;
 		}
 	}
 
 	return rd;
 }
 
-uint32_t *th_image_get_data(th_image *img) {
+uint32_t *th_image_get_data(th_image *img, bool rgba) {
 	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
 	glBindTexture(GL_TEXTURE_2D, img->gltexture);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	if (rgba)
+		for (int i=0; i < img->dm.w * img->dm.h; ++i) {
+			uint32_t c = data[i];
+			data[i] = 
+				(c >> 0*8 & 0xff) << 3*8 |
+				(c >> 1*8 & 0xff) << 2*8 |
+				(c >> 2*8 & 0xff) << 1*8 |
+				(c >> 3*8 & 0xff) << 0*8;
+		}
+			
 
 	return data;
 }
@@ -101,7 +118,7 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 }
 
 void th_image_set_filter(th_image *img, int filter) {
-	uint32_t *data = th_image_get_data(img);
+	uint32_t *data = th_image_get_data(img, false);
 
 	img->filter = filter;
 	glDeleteTextures(1, &img->gltexture);
@@ -111,6 +128,15 @@ void th_image_set_filter(th_image *img, int filter) {
 }
 
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm) {
+	for (int i=0; i < img->dm.w * img->dm.h; ++i) {
+		uint32_t c = data[i];
+		data[i] = 
+			(c >> 0*8 & 0xff) << 3*8 |
+			(c >> 1*8 & 0xff) << 2*8 |
+			(c >> 2*8 & 0xff) << 1*8 |
+			(c >> 3*8 & 0xff) << 0*8;
+	}
+
 	glEnable(GL_TEXTURE_2D);
 	glActiveTexture(0);
 	glBindTexture(GL_TEXTURE_2D, img->gltexture);
@@ -189,12 +215,8 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	th_gl_get_viewport_max(&sw, &sh);
 
 	float colors[4];
-	if (thg->has_framebuffer)
 		for (int i=0; i < 4; ++i)
 			colors[i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
-	else
-		for (int i=0; i < 4; ++i)
-			colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
 	th_quad bounds = img->crop;
 	if (img->flipv) {
@@ -340,7 +362,6 @@ int th_image_compile_shader(char *frag, char *vert) {
 
 		"void main() {\n"
 		"  gl_FragColor = th_fragment(th_tex, th_tc) * th_vcolor; \n"
-		"  if (th_has_framebuffer != 0) gl_FragColor = gl_FragColor.abgr;\n"
 		"}\n",
 		attribs, 3);
 }
@@ -348,7 +369,7 @@ int th_image_compile_shader(char *frag, char *vert) {
 void th_image_init() {
 	thg->blit_prog = *th_get_shader_err(th_image_compile_shader(
 		"vec2 th_vertex(vec2 vert) { return vert; }",
-		"vec4 th_fragment(sampler2D tex, vec2 coord) { return texture2D(tex, coord).abgr; }"));
+		"vec4 th_fragment(sampler2D tex, vec2 coord) { return texture2D(tex, coord); }"));
 
 	thg->blit_prog_tex = glGetUniformLocation(thg->blit_prog, "th_tex");
 	thg->framebuffer_uniform = glGetUniformLocation(thg->blit_prog, "th_has_framebuffer");

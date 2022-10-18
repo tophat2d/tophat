@@ -32,7 +32,7 @@ THEXT(th_vf2, th_font_measure, th_font *, const char *);
 THEXT(th_image *, th_load_image, char *);
 THEXT(void, th_image_free, th_image *);
 THEXT(void, th_image_from_data, th_image *, uint32_t *, th_vf2);
-THEXT(uint32_t *, th_image_get_data, th_image *);
+THEXT(uint32_t *, th_image_get_data, th_image *, bool);
 THEXT(void, th_blit_tex, th_image *, th_quad, uint32_t);
 THEXT(void, th_image_render_transformed, th_image *, th_transform trans, uint32_t);
 THEXT(void, th_image_set_filter, th_image *, int);
