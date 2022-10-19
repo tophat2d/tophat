@@ -105,6 +105,15 @@ th_image *th_load_image(char *path) {
 }
 
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
+	for (int i=0; i < dm.w * dm.h; ++i) {
+		uint32_t c = data[i];
+		data[i] = 
+			(c >> 0*8 & 0xff) << 3*8 |
+			(c >> 1*8 & 0xff) << 2*8 |
+			(c >> 2*8 & 0xff) << 1*8 |
+			(c >> 3*8 & 0xff) << 0*8;
+	}
+
 	img->dm = dm;
 	img->flipv = 0;
 	img->fliph = 0;
