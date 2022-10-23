@@ -162,13 +162,6 @@ static f_glyph f_iterator_next_glyph(f_iterator *iter) {
 	rect.x += iter->initX;
 	rect.y += iter->initY;
 
-	// NOTE(skejeton): Fixes wonkiness in nearest neighbour scale,
-	//								 I highly doubt this would be desired in cases of precision however..
-	rect.x = floor(rect.x);
-	rect.y = floor(rect.y);
-	rect.w = floor(rect.w);
-	rect.h = floor(rect.h);
-
 	th_quad q = {0};
 	q.v[0] = (th_vf2){{rect.x, rect.y}};
 	q.v[1] = (th_vf2){{rect.x+rect.w, rect.y}};
@@ -246,7 +239,7 @@ th_font *th_font_load(char *path, double size, uint32_t filter) {
 
 		font->scale = scale;   // scale
 		font->ascent = ascent; // ascent
-		font->descent = descent; // ascent
+		font->descent = descent; // descent 
 	}
 
 	return font;
