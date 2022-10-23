@@ -7,7 +7,6 @@ import (
 	"image.um"
 	"input.um"
 	"lerp.um"
-	"light.um"
 	"misc.um"
 	"particles.um"
 	"canvas.um"

@@ -225,7 +225,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 
 	float colors[4];
 		for (int i=0; i < 4; ++i)
-			colors[i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
+			colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
 	th_quad bounds = img->crop;
 	if (img->flipv) {
