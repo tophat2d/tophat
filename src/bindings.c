@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <string.h>
-#include <GL/gl.h>
+#include "openglapi.h"
 
-#include <chew.h>
 #include <umka_api.h>
 #include <stb_image.h>
 
@@ -503,7 +502,6 @@ void umwindowsetup(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_window_setup(title, w, h);
 
-	th_gl_init();
 	th_image_init();
 	th_canvas_init();
 }

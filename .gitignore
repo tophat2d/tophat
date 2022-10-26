@@ -11,3 +11,10 @@ tophat-win.zip
 src/*.o
 src/*.d
 **/gmon.out
+
+# Windows:
+.obj
+.pdb
+
+# For now windows:
+bin

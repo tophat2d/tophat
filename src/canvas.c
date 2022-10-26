@@ -1,6 +1,5 @@
 #include "tophat.h"
-#include <chew.h>
-#include <GL/gl.h>
+#include "openglapi.h"
 #include <string.h>
 #include <math.h>
 #include "pixelfont.h"

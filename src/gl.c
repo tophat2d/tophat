@@ -3,15 +3,19 @@
 
 #include "tophat.h"
 
-#include <GL/gl.h>
-#include <chew.h>
+#include "openglapi.h"
 
 extern th_global *thg;
 
 void th_gl_init() {
+	printf("Starting to init opengl!\n");
 #ifdef _WIN32
-	chewInit();
+	if (gladLoadGL(GetProcAddress) == 0) {
+		th_error("Failed to initialize opengl!");
+		exit(-1);
+	}
 #endif
+	printf("Initialized opengl!\n");
 }
 
 GLuint th_gl_compile_shader(const char **src, GLenum type) {

@@ -270,6 +270,7 @@ void th_window_setup(char *name, int w, int h) {
 		exit(1);
 	}
 	wglMakeCurrent(th_hdc, ctx);
+	th_gl_init();
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);

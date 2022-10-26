@@ -156,7 +156,10 @@ int main(int argc, char *argv[]) {
 	destroyfunc = umkaGetFunc(thg->umka, NULL, "windowdestroy");
 	thg->scaling = 1;
 
+	printf("Starting up the game baby!\n");
 	umkaOK = umkaRun(thg->umka);
+	printf("Ending the game!\n");
+
 	if (!umkaOK) {
 		UmkaError error;
 		umkaGetError(thg->umka, &error);

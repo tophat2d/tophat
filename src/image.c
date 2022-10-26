@@ -1,18 +1,13 @@
 #include <string.h>
 #include <stdint.h>
 
-#include <GL/gl.h>
+#include "openglapi.h"
 #include <stb_image.h>
-#include <chew.h>
 
 #include "tophat.h"
 
 #ifndef GL_UNSIGNED_INT_8_8_8_8 
 #define GL_UNSIGNED_INT_8_8_8_8 0x8035
-#endif
-
-#ifdef _WIN32
-#define glActiveTexture glActiveTextureCHEW
 #endif
 
 extern th_global *thg;
@@ -206,6 +201,8 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 	th_transform_quad(&q, trans);
 	th_blit_tex(img, q, color);
 }
+
+#define SWAP(a, b) { th_vf2 t = a; b = a; a = t; }
 
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	th_canvas_flush();
