@@ -203,6 +203,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 static HKL hkl;
 
+void w32_get_client_window_size(int *w, int *h) {
+	RECT rect = {0};
+	rect.right = *w;
+	rect.bottom = *h;
+	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+	*w = rect.right-rect.left;
+	*h = rect.bottom-rect.top;
+}
+
 void th_window_setup(char *name, int w, int h) {
 	if (window_active) {
 		th_error("Window already created.");
@@ -222,16 +231,22 @@ void th_window_setup(char *name, int w, int h) {
 
 	RegisterClass(&wc);
 
+	// NOTE(skejeton): Set window size to w/h, because in CreateWindow the window size also includes the titlebar/decoraion size,
+	//				   that makes the actual content window size incorrect.
+	int window_w = w, window_h = h;
+	w32_get_client_window_size(&window_w, &window_h);
+
 	th_win = CreateWindow(
 		CLASS_NAME,
 		name,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		w, h,
+		window_w, window_h,
 		NULL, NULL,
 		hInstance, NULL);
 	GetWindowRect(th_win, &th_win_rect);
+
 	win_size.x = th_win_rect.right;
 	win_size.y = th_win_rect.bottom;
 

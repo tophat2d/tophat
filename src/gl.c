@@ -8,14 +8,12 @@
 extern th_global *thg;
 
 void th_gl_init() {
-	printf("Starting to init opengl!\n");
 #ifdef _WIN32
-	if (gladLoadGL(GetProcAddress) == 0) {
+	if (gladLoadGL() == 0) {
 		th_error("Failed to initialize opengl!");
 		exit(-1);
 	}
 #endif
-	printf("Initialized opengl!\n");
 }
 
 GLuint th_gl_compile_shader(const char **src, GLenum type) {
