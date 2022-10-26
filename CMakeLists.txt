@@ -1,10 +1,9 @@
 cmake_minimum_required(VERSION 2.8.12.)
 project(tophat)
 
-set(umka_lib_path  ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka/umka_windows_msvc/libumka_static.lib)
 
 if(MSVC)
-    # TODO(skejeton): Build umka here.....
+    set(umka_lib_path  ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka/umka_windows_msvc/libumka_static.lib)
 
     file( GLOB th_sources
         "src/*.c"
@@ -18,7 +17,7 @@ if(MSVC)
 
     add_executable(tophat ${th_sources})
     
-    # NOTE(skejeton): _USE_MATH_DEFINITIONS flag for M_PI and so on.
+    # NOTE(skejeton): _USE_MATH_DEFINES flag for M_PI and so on.
     # NOTE(skejeton): UMKA_STATIC flag for we are linking umka statically not as a DLL. 
     target_compile_definitions(tophat PUBLIC UMKA_STATIC _USE_MATH_DEFINES)
 
