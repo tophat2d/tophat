@@ -117,8 +117,9 @@ int th_window_handle() {
 	th_input_key(4, 0);
 	th_input_key(5, 0);
 
-	XEvent ev;
+	XEvent ev = {0}, prev_ev;
 	while (XPending(th_dpy)) {
+		prev_ev = ev;
 		XNextEvent(th_dpy, &ev);
 
 		int keyDir = 1;
@@ -141,6 +142,11 @@ int th_window_handle() {
 		case KeyRelease:;
 			// modifiers are not used for this kind of input
 			unsigned mods = 0;
+
+			if (prev_ev.type == KeyRelease &&
+			    prev_ev.xkey.time == ev.xkey.time &&
+			    prev_ev.xkey.keycode == ev.xkey.keycode)
+				break;
 			
 			// translate to a qwerty key
 			KeySym sym;
