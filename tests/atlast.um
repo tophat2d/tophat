@@ -1,0 +1,37 @@
+
+import (
+	"atlas.um"
+	"canvas.um"
+	"image.um"
+	"rect.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+
+fn main() {
+	window.setup("atlas test")
+
+	img := image.load("etc/atlas.png")
+	atl := atlas.mk(img, th.Vf2{4, 4})
+
+	const ts = 0.5
+
+	for window.cycle(rect.mk(0, 0, 200, 200)) {
+		p := th.vf2f(1)
+
+		canvas.drawText(
+			std.sprintf("atl.coords(6) = %s", repr(atl.coords(6))),
+			p, th.black, ts)
+		p.y += 5 * ts + 1
+
+		canvas.drawText("animate:", p, th.black, ts)
+		p.y += 5 * ts + 1
+
+		atl.animate(2, th.time)
+		atl.i.draw(th.Transform{
+			p: p,
+			s: th.vf2f(4) })
+	}
+}

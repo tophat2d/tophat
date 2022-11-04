@@ -4,15 +4,22 @@ import (
 	"image.um"
 )
 
-// Atlas is an image containing tiles in a square grid.
+// Atlas is an image containing tiles in a square grid. Direct creation is
+// not allowed.
 type Atlas* = struct {
-	i: image.Image // source image
-	cs: th.Vf2 // size of a cell in pixels
-	dm: th.Vf2 // amount of cells in image
+	// source image
+	i: image.Image
+	// size of a cell in pixels
+	cs: th.Vf2
+	// dimensions of the atlas in cells
+	dm: th.Vf2
 }
 
-// i: source image
-// dm: amount of cells
+// Creates an atlas.
+// * `i` - source image
+// * `dm` - amount of cells
+//
+// * returns: the created atlas
 fn mk*(i: image.Image, dm: th.Vf2): Atlas {
 	a := atlas.Atlas{}
 
@@ -23,12 +30,15 @@ fn mk*(i: image.Image, dm: th.Vf2): Atlas {
 	return a
 }
 
-// returns the coordinates of the nth tile
+// Returns the coordinates of the nth tile.
+// * `n` - the index of the tile (top-left to bottom-right)
+// * returns: position of the tile (in cells)
 fn (a: ^Atlas) coords*(n: int): th.Vf2 {
 	return th.Vf2{ n % trunc(a.dm.x), (n - n % trunc(a.dm.x)) / a.dm.x }
 }
 
-// Crops the sourse image to only show a wanted tile
+// Crops the sourse image to only show a wanted tile.
+// * `at` - position of the tile
 fn (a: ^Atlas) cropSource*(at: th.Vf2) {
 	if (at.x > a.dm.x || at.y > a.dm.y || at.x * at.y < 0) {
 		return
@@ -39,7 +49,25 @@ fn (a: ^Atlas) cropSource*(at: th.Vf2) {
 		th.Vf2{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})
 }
 
-// Draws the tile at `at`
+// Uses the atlas as an animation sheet.
+// * `fps` - frames per second for the animation
+// * `time` - the current time
+// * `s` - the first cell of the animation (optional)
+// * `e` - the last cell of the animation (optional). If `e` is less than 0,
+//         the last cell of the atlas is used instead.
+fn (a: ^Atlas) animate*(fps: th.fu, time: uint, s: th.iu = 0, e: th.iu = -1) {
+	if e < 0 {
+		e = trunc(a.dm.x * a.dm.y)
+	}
+
+	c := e - s
+	f := (time / trunc(1000.0/fps)) % c + s
+	a.cropSource(a.coords(f))
+}
+
+// Draws a tile from the atlas.
+// * `at` - the tile which should be drawn
+// * `t` - the transform used for drawing
 fn (a: ^Atlas) draw*(at: th.Vf2, t: th.Transform) {
 	a.cropSource(at)
 	a.i.draw(t, th.white)
