@@ -3,7 +3,6 @@ import (
 	"audio.um"
 	"input.um"
 	"rect.um"
-	"th.um"
 	"window.um"
 )
 
