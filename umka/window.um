@@ -48,10 +48,10 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 // i used to calculate tophat's scaling. It returns true, if the window is
 // still running.
 fn cycle*(cam: rect.Rect): bool {
-	canvas.drawRect(th.black, rect.Rect{0, -h, w, h})
-	canvas.drawRect(th.black, rect.Rect{-w, 0, w, h})
-	canvas.drawRect(th.black, rect.Rect{0, cam.h, w, h})
-	canvas.drawRect(th.black, rect.Rect{cam.w, 0, w, h})
+	canvas.drawRect(th.black, rect.Rect{-cam.w * 2, 0, cam.w * 2, cam.h})
+	canvas.drawRect(th.black, rect.Rect{0, -cam.h * 2, cam.w, cam.h * 2})
+	canvas.drawRect(th.black, rect.Rect{0, cam.h, cam.w, cam.h * 2})
+	canvas.drawRect(th.black, rect.Rect{cam.w, 0, cam.w * 2, cam.h})
 	swapbuffers()
 
 	end = std.clock()*1000

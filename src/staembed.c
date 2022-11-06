@@ -913,10 +913,10 @@ const char *th_em_modulesrc[] = {
 "// i used to calculate tophat\'s scaling. It returns true, if the window is\n"
 "// still running.\n"
 "fn cycle*(cam: rect.Rect): bool {\n"
-"\tcanvas.drawRect(th.black, rect.Rect{0, -h, w, h})\n"
-"\tcanvas.drawRect(th.black, rect.Rect{-w, 0, w, h})\n"
-"\tcanvas.drawRect(th.black, rect.Rect{0, cam.h, w, h})\n"
-"\tcanvas.drawRect(th.black, rect.Rect{cam.w, 0, w, h})\n"
+"\tcanvas.drawRect(th.black, rect.Rect{-cam.w * 2, 0, cam.w * 2, cam.h})\n"
+"\tcanvas.drawRect(th.black, rect.Rect{0, -cam.h * 2, cam.w, cam.h * 2})\n"
+"\tcanvas.drawRect(th.black, rect.Rect{0, cam.h, cam.w, cam.h * 2})\n"
+"\tcanvas.drawRect(th.black, rect.Rect{cam.w, 0, cam.w * 2, cam.h})\n"
 "\tswapbuffers()\n"
 "\n"
 "\tend = std.clock()*1000\n"
@@ -2289,6 +2289,6 @@ const char *th_em_misc[] = {
 "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n"
 "OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
 "",
-"v0.7\n"
+"v0.8\n"
 "",
 };

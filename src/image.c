@@ -211,10 +211,8 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	thg->batch_tex = img->gltexture;
 
 	for (uu i=0; i < 4; i++) {
-		q.v[i].x *= thg->scaling;
-		q.v[i].x += thg->offset.x;
-		q.v[i].y *= thg->scaling;
-		q.v[i].y += thg->offset.y;
+		q.v[i].x = trunc(q.v[i].x * thg->scaling + thg->offset.x);
+		q.v[i].y = trunc(q.v[i].y * thg->scaling + thg->offset.y);
 	}
 
 	int sw, sh;
