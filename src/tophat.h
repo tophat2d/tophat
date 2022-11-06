@@ -218,6 +218,7 @@ static void th_ext_set(void **arr) {
 // atlas
 th_vf2 th_atlas_nth_coords(th_atlas *a, uu n);
 th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell);
+void th_atlas_draw_matrix(th_atlas *atl, void/*[]iu*/ *_m, uu w, th_transform *t);
 
 // audio
 void th_audio_init();
@@ -243,8 +244,9 @@ uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
 uu th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic);
 uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
 uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
-uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
-bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
+uu th_point_to_matrix(th_vf2 p, void/*^[]iu*/ *_m, uu w, void/*^[]bool*/ *_c,
+	th_transform *t, th_vf2 *ic
+);
 
 // entity
 th_quad th_ent_transform(th_ent *e);
@@ -311,6 +313,7 @@ void th_transform_vf2(th_vf2 *v, th_transform t);
 // vector
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
 void th_vector_normalize(float *x, float *y);
+void th_util_autotile(void/*^[]iu*/ *_m, void/*^[]iu*/ *_cfg, uu w, iu mask);
 
 // raycast
 void th_ray_getcoll(th_ray *ra, th_coll *colls, int maxColls,
@@ -321,10 +324,6 @@ int th_shader_compile(
 	char *vertf, char *fragf, char *vertb, char *fragb,
 	const char **verta, int vertac);
 void th_shader_deinit();
-
-// tilemap
-void th_tmap_draw(th_tmap *t, th_rect *cam);
-void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 
 // tophat
 th_shader *th_get_shader(uu index);

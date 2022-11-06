@@ -29,3 +29,17 @@ fn quadToQuad*(q1, q2: th.Quad, ic: ^th.Vf2): bool {
 	return ccollquadtoquad(&q1, &q2, ic)
 }
 
+fn umth_coll_point_to_matrix(p: th.Vf2, m: ^[]th.iu, w: th.uu, c: ^[]bool,
+	t:^th.Transform, ic: ^th.Vf2): bool
+// Check for a collision of a point on a matrix.
+// `p` - the point to be checked
+// `m` - the matrix to be checked on
+// `w` - width of the matrix
+// `c` - collision mask. c[tile] is true if tile should have collisions
+//       enabled.
+// `t` - transform of the matrix. If you use this with an atlas, you should
+//       multiply the scale by atl.cs.
+// `ic` - on collision p will be stored in that pointer.
+fn pointToMatrix*(p: th.Vf2, m: []th.iu, w: th.uu, c: []bool, t: th.Transform, ic: ^th.Vf2): bool {
+	return umth_coll_point_to_matrix(p, &m, w, &c, &t, ic)
+}

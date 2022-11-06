@@ -35,6 +35,10 @@ uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic) {
 			p.x < (n.x-v.x)*(p.y - v.y) / (n.y - v.y) + v.x)
 			coll = !coll;
 	}
+
+	if (coll)
+		*ic = p;
+
 	return coll;
 }
 
@@ -66,81 +70,31 @@ uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic) {
 	return th_quad_to_quad(&q1, &q2, ic);
 }
 
-bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic) {
-	th_vf2
-		b = ra->pos,
-		e = ra->pos;
-	e.y += ra->l;
+uu th_point_to_matrix(th_vf2 p, void/*^[]iu*/ *_m, uu w, void/*^[]bool*/ *_c,
+	th_transform *t, th_vf2 *ic
+) {
+	UmkaDynArray(iu) *m = _m;
+	UmkaDynArray(bool) *c = _c;
 
-	th_rotate_point(&e, ra->pos, ra->r);
+	// We need to remove the trasform from the point. This way we get coordinates
+	// into the matrix.
+	p.x -= t->pos.x;
+	p.y -= t->pos.y;
 
-	int
-		tw = t->w,
-		th = umkaGetDynArrayLen(&t->cells) / t->w;
+	p.x /= t->scale.x;
+	p.y /= t->scale.y;
 
-	float
-		mx = e.x - b.x,
-		my = e.y - b.y;
-	th_vector_normalize(&mx, &my);
+	th_rotate_point(&p, t->origin, -t->rot);
 
-	float
-		x = b.x,
-		y = b.y,
-		minlen = -1;
-	bool coll = false;
-	float len = 0;
-	while (len < ra->l) {
-		int tx = (x - t->pos.x) / (t->scale * t->a.cs.x);
-		int ty = (y - t->pos.y) / (t->scale * t->a.cs.y);
+	if (p.x < 0 || p.y < 0 || p.x >= w || p.y >= umkaGetDynArrayLen(m) / w)
+		return 0;
 
-		int tile = t->cells.data[(int)(ty * t->w + tx)] - 1;
-		if (x >= t->pos.x && y >= t->pos.y && tx < tw && ty < th &&
-			tile >= 0 && t->collmask.data[tile]) {
-			coll = true;
-			if (minlen == -1 || len < minlen)
-				minlen = len;
-		}
+	const iu tile = m->data[(uu)p.x + (uu)p.y * w];
+	if (tile < 0) return 0;
+	if (umkaGetDynArrayLen(c) <= tile)
+		return 0;
 
-		x += mx;
-		y += my;
-		len += sqrt(mx * mx + my * my);
-	}	
-
-	*ic = ra->pos;
-	ic->y += minlen;
-	th_rotate_point(ic, ra->pos, ra->r);
-
-	return coll;
+	if (c->data[tile])
+		*ic = p;
+	return c->data[tile];
 }
-
-// This can fail if entity is bigger than a tile. TODO
-uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc) {
-	th_quad q = th_ent_transform(e);
-
-	int
-		tw = t->w,
-		th = umkaGetDynArrayLen(&t->cells) / t->w;
-
-	for (uu i=0; i < 4; i++) {
-		const iu tx = (q.v[i].x - t->pos.x) / (t->scale * t->a.cs.x);
-		const iu ty = (q.v[i].y - t->pos.y) / (t->scale * t->a.cs.y);
-
-		if (q.v[i].x < t->pos.x || q.v[i].y < t->pos.x) continue;
-		if (tx < 0 || ty < 0) continue;
-		if (tx >= tw || ty >= th) continue;
-
-		const int tile = t->cells.data[(tw * ty) + tx];
-		if (!tile)
-			continue;
-
-		if (t->collmask.data[tile - 1]) {
-			*vert = i;
-			tc->x = tx;
-			tc->y = ty;
-			return 1;
-		}
-	}
-
-	return 0;
-}
-

@@ -73,3 +73,13 @@ fn (a: ^Atlas) draw*(at: th.Vf2, t: th.Transform) {
 	a.i.draw(t, th.white)
 	a.i.crop(th.Vf2{}, th.Vf2{1, 1})
 }
+
+fn umth_atlas_draw_matrix(atl: ^Atlas, m: ^[]th.iu, w: th.uu, t: ^th.Transform)
+// Draws a matrix of tiles with the atlas as a source.
+// * `m` - the matrix to be drawn. Value in the matrix is an index of a tile
+//         in the atlas. If less than 0, nothing is drawn.
+// * `w` - width of the matrix
+// * `t` - transform applied to drawing
+fn (a: ^Atlas) drawMatrix*(m: []th.iu, w: th.uu, t: th.Transform) {
+	umth_atlas_draw_matrix(a, &m, w, &t)
+}

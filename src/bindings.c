@@ -125,34 +125,33 @@ void umparticlesdraw(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 ///////////////////////
-// tilemaps
-// draws a tilemap takes a rectangle as a camera and the tilemap itself
-void umdrawtmap(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_rect *cam = (th_rect *)p[0].ptrVal;
-	th_tmap *t = (th_tmap *)p[1].ptrVal;
-	th_tmap_draw(t, cam);
+// atlas
+
+// fn umth_atlas_draw_matrix(atl: ^Atlas (3),
+//                           m: ^[]th.iu (2),
+//                           w: th.uu (1),
+//                           t: ^th.Tranform (0))
+void umth_atlas_draw_matrix(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_atlas *atl = p[3].ptrVal;
+	UmkaDynArray(iu) *m = p[2].ptrVal;
+	uu w = p[1].uintVal;
+	th_transform *t = p[0].ptrVal;
+
+	th_atlas_draw_matrix(atl, m, w, t);
 }
 
-// checks, if tilemap collides with entity.
-// ent - entity to collide with, t - tilemap, x and y - pointers to ints used to return, where the collision occured
-void umtmapgetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_ent *ent = (th_ent *)p[0].ptrVal;
-	th_tmap *t = (th_tmap *)p[1].ptrVal;
-	uu *vert = (uu *)p[2].ptrVal;
-	th_vf2 *tc = (th_vf2 *)p[3].ptrVal;
 
-	r->intVal = _th_coll_on_tilemap(ent, t, vert, tc);
-}
+///////////////////////
+// util
 
-void umtmapautotile(UmkaStackSlot *p, UmkaStackSlot *r) {
-	uu tile = p[0].intVal;
-	uu *cfg = (uu *)p[1].ptrVal;
-	uu *src = (uu *)p[2].ptrVal;
-	uu h = p[3].intVal;
-	uu w = p[4].intVal;
-	uu *tgt = (uu *)p[5].ptrVal;
+// umth_util_autotile(m (3), cfg: ^[]th.iu (2), w: th.uu (1), mask: th.iu (0))
+void umth_util_autotile(UmkaStackSlot *p, UmkaStackSlot *r) {
+	UmkaDynArray(iu) *m = p[3].ptrVal;
+	UmkaDynArray(iu) *cfg = p[2].ptrVal;
+	uu w = p[1].uintVal;
+	iu mask = p[0].intVal;
 
-	th_tmap_autotile(tgt, src, w, h, cfg, tile);
+	th_util_autotile(m, cfg, w, mask);
 }
 
 ///////////////////////
@@ -467,14 +466,6 @@ void umraygetcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_ray_getcoll(ra, colls, maxColls, count, scene, sceneLen);
 }
 
-void umraygettmapcoll(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_ray *ra = (th_ray *)p[2].ptrVal;
-	th_tmap *t = (th_tmap *)p[1].ptrVal;
-	th_vf2 *ic = (th_vf2 *)p[0].ptrVal;
-
-	r->intVal = th_ray_to_tilemap(ra, t, ic);
-}
-
 ///////////////////////
 // misc
 
@@ -763,6 +754,19 @@ void umcollquadtoquad(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = th_quad_to_quad(q1, q2, ic);
 }
 
+// umth_coll_point_to_matrix(p: th.Vf2 (5), m: ^[]th.iu (4), w: uu (3),
+// c: ^[]bool (2), t: ^th.Transform (1), ic: ^th.Vf2 (0))
+void umth_coll_point_to_matrix(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 pt = *(th_vf2 *)&p[5];
+	UmkaDynArray(iu) *m = p[4].ptrVal;
+	uu w = p[3].uintVal;
+	UmkaDynArray(bool) *c = p[2].ptrVal;
+	th_transform *t = p[1].ptrVal;
+	th_vf2 *ic = p[0].ptrVal;
+
+	r->intVal = th_point_to_matrix(pt, m, w, c, t, ic);
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "cfopen", &umfopen);
@@ -781,10 +785,11 @@ void _th_umka_bind(void *umka) {
 	// particles
 	umkaAddFunc(umka, "c_particles_draw", &umparticlesdraw);
 
-	// tilemaps
-	umkaAddFunc(umka, "cdrawtmap", &umdrawtmap);
-	umkaAddFunc(umka, "ctmapgetcoll", &umtmapgetcoll);
-	umkaAddFunc(umka, "cautotile", &umtmapautotile);
+	// atlas
+	umkaAddFunc(umka, "umth_atlas_draw_matrix", &umth_atlas_draw_matrix);
+
+	// util
+	umkaAddFunc(umka, "umth_util_autotile", &umth_util_autotile);
 
 	// images
 	umkaAddFunc(umka, "loadimg", &umimgload);
@@ -819,7 +824,6 @@ void _th_umka_bind(void *umka) {
 
 	// rays
 	umkaAddFunc(umka, "craygetcoll", &umraygetcoll);
-	umkaAddFunc(umka, "craygettmapcoll", &umraygettmapcoll);
 
 	// audio
 	umkaAddFunc(umka, "umth_sound_load", &umth_sound_load);
@@ -874,6 +878,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "ccollpointtoquad", &umcollpointtoquad);
 	umkaAddFunc(umka, "ccolllinetoquad", &umcolllinetoquad);
 	umkaAddFunc(umka, "ccollquadtoquad", &umcollquadtoquad);
+	umkaAddFunc(umka, "umth_coll_point_to_matrix", &umth_coll_point_to_matrix);
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);

@@ -18,6 +18,8 @@ THEXT(uu, th_point_to_quad, th_vf2, th_quad *, th_vf2 *);
 THEXT(uu, th_quad_to_quad, th_quad *, th_quad *, th_vf2 *);
 THEXT(uu, th_ent_to_ent, th_ent *, th_ent *, th_vf2 *);
 THEXT(uu, th_line_to_quad, th_vf2, th_vf2, th_quad *q, th_vf2 *);
+THEXT(uu, th_point_to_matrix, th_vf2, void *, uu, void *, th_transform *,
+th_vf2 *);
 
 THEXT(void, th_ent_draw, th_ent *, th_rect *);
 THEXT(void, th_ent_getcoll, th_ent *, th_ent **, uu, uu, uu, th_coll *);
@@ -53,11 +55,9 @@ THEXT(void, th_transform_vf2, th_vf2 *, th_transform);
 
 THEXT(void, th_rotate_point, th_vf2 *, th_vf2 *, fu);
 THEXT(void, th_vector_normalize, float *, float *);
+THEXT(void, th_util_autotile, void *, void *, uu, iu);
 
 THEXT(void, th_ray_getcoll, th_ray *, th_coll *, int, int *, th_ent **, int);
-
-THEXT(void, th_tmap_draw, th_tmap *, th_rect *);
-THEXT(void, th_tmap_autotile, uu *, uu *, uu, uu, uu *, uu);
 
 THEXT(void, th_utf8_decode, uint32_t *, const char *);
 THEXT(void, th_utf8_encode, char *, uint32_t);

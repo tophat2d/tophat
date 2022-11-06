@@ -1,0 +1,55 @@
+// Misc functions.
+
+import (
+	"th.um"
+	"std.um"							
+)
+
+// Reads file content into a string.
+// `path` - path to the file
+// returns - the file's contents or an empty string
+fn readall*(path: str): str {
+	f := std.fopen(path, "r")
+	if f == null { return "" }
+	const blockSize = 16
+	res := ""
+
+	for ok := true; ok {
+	  var buff: [blockSize + 1]char
+	  ok = std.fread(f, ^[blockSize]char(&buff)) == 1
+	  res += str([]char(buff))
+	}
+
+	std.fclose(f)
+	return res
+}
+
+// Snaps a value to a step.
+// `val` - the value
+// `step` - the step
+// returns: the snapped value
+// Example:
+// ```
+// snap(2.4, 0.5) => 2.5
+fn snap*(val, step: th.fu): th.fu {
+	if step != 0 {
+		val = trunc(val / step + 0.5) * step
+	}
+	return val
+}
+
+const (
+	autotile_top* = 1
+	autotile_right* = 2
+	autotile_bot* = 4
+	autotile_left* = 8
+)
+
+fn umth_util_autotile(m: ^[]th.iu, cfg: ^[]th.iu, w: th.uu, mask: th.iu)
+fn autotile*(m, cfg: []th.iu, w: th.uu, mask: th.iu = 1) {
+	if len(cfg) != 16 {
+		error("The cfg array needs to be 16 elements long.")
+	}
+
+	umth_util_autotile(&m, &cfg, w, mask)
+}

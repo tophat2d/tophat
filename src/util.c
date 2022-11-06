@@ -1,6 +1,8 @@
-#include <stdio.h>
-#include <stdarg.h>
 #include <math.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "tophat.h"
 
@@ -67,4 +69,40 @@ void th_vector_normalize(float *x, float *y) {
 		*x /= fabs(*y);
 		*y /= fabs(*y);
 	}
+}
+
+static inline
+iu safe_get(iu *src, uu w, uu h, uu x, uu y) {
+	if (x > w || y > h)
+		return -1;
+
+	return src[w * y + x]; 
+}
+
+enum {
+	top = 1,
+	right = 2,
+	bot = 4,
+	left = 8
+};
+
+void th_util_autotile(void/*^[]iu*/ *_m, void/*^[]iu*/ *_cfg, uu w, iu mask) {
+	UmkaDynArray(iu) *m = _m;
+	UmkaDynArray(iu) *cfg = _cfg;
+	const uu h = umkaGetDynArrayLen(m);
+
+	iu *orig = malloc(sizeof(uu) * w * h);
+	memcpy(orig, m->data, sizeof(uu) * w * h);
+
+	for (int x=0; x < w; x++) for (int y=0; y < h; y++) {
+		if (orig[x + y * w] != mask) continue;
+		int sum = 0;
+		sum += top   * (safe_get(orig, w, h, x, y-1) == mask);
+		sum += bot   * (safe_get(orig, w, h, x, y+1) == mask);
+		sum += right * (safe_get(orig, w, h, x+1, y) == mask);
+		sum += left  * (safe_get(orig, w, h, x-1, y) == mask);
+		m->data[x + y * w] = cfg->data[sum];
+	}
+
+	free(orig);
 }

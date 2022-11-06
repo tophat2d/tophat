@@ -2,13 +2,15 @@
 import (
 	"atlas.um"
 	"canvas.um"
+	"coll.um"
 	"image.um"
+	"input.um"
 	"rect.um"
 	"std.um"
 	"th.um"
+	"util.um"
 	"window.um"
 )
-
 
 fn main() {
 	window.setup("atlas test")
@@ -17,6 +19,36 @@ fn main() {
 	atl := atlas.mk(img, th.Vf2{4, 4})
 
 	const ts = 0.5
+
+	mat := []th.iu{
+		-1,  1,  1, -1,
+		 1,  1, -1, -1,
+		 1, -1, -1, -1,
+		 1,  1,  1, -1,
+    -1, -1,  1, -1 }
+	matw := 4
+
+	cfg := make([]th.iu, 16)
+	cfg[util.autotile_top | util.autotile_bot] = 0
+	cfg[util.autotile_left | util.autotile_right] = 1
+	cfg[util.autotile_left | util.autotile_top] = 2
+	cfg[util.autotile_right | util.autotile_top] = 3
+	cfg[util.autotile_left | util.autotile_bot] = 4
+	cfg[util.autotile_right | util.autotile_bot] = 5
+	cfg[util.autotile_left | util.autotile_right | util.autotile_top] = 6
+	cfg[util.autotile_left | util.autotile_right | util.autotile_bot] = 7
+	cfg[util.autotile_top | util.autotile_right | util.autotile_bot] = 8
+	cfg[util.autotile_top | util.autotile_left | util.autotile_bot] = 9
+	cfg[util.autotile_right] = 10
+	cfg[util.autotile_left] = 11
+	cfg[util.autotile_top] = 12
+	cfg[util.autotile_bot] = 13
+	cfg[util.autotile_bot | util.autotile_top | util.autotile_left | util.autotile_right] = 14
+	cfg[0] = 15
+
+	util.autotile(mat, cfg, matw)
+
+	c := false
 
 	for window.cycle(rect.mk(0, 0, 200, 200)) {
 		p := th.vf2f(1)
@@ -33,5 +65,36 @@ fn main() {
 		atl.i.draw(th.Transform{
 			p: p,
 			s: th.vf2f(4) })
+		p.y += atl.cs.y * 4 + 1
+
+		canvas.drawText("draw matrix:", p, th.black, ts)
+		p.y += 5 * ts + 1
+
+		ms := 2 * fabs(sin(th.time/1000.0))
+		atl.drawMatrix(mat, matw, th.Transform{
+			s: th.vf2f(ms),
+			p: p.add(th.Vf2{12, 12}),
+			r: sin(th.time/ 1000.0) * 180})
+
+		p.y += 36
+
+		color := th.black
+		if c { color = th.cyan }
+		canvas.drawText("coll.pointToMatrix", p, color, ts)
+		p.y += 5 * ts + 1
+	
+		c = false
+		t := th.Transform{
+			p: p,
+			s: th.vf2f(2)}
+		atl.drawMatrix(mat, matw, t)
+		collMask := make([]bool, 16)
+		for i in collMask {
+			collMask[i] = true
+		}
+
+		t.s = t.s.mul(atl.cs)
+		ic := th.Vf2{}
+		c = coll.pointToMatrix(input.getMousePos(), mat, matw, collMask, t, &ic)
 	}
 }
