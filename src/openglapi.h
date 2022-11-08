@@ -3,5 +3,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #include <glad.h>
+#else
+#include <chew.h>
 #endif
 #include <GL/gl.h>
