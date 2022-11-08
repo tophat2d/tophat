@@ -12,3 +12,10 @@ jobs:
         git submodule update --remote
         make
         make cross
+  MakePkg-Msbuild:
+    steps:
+    - uses: actions/checkout@v2
+    - uses: ilammy/msvc-dev-cmd@v1
+    - name: Build with CMake+MSbuild
+      run: |
+        ./msbuild.bat
