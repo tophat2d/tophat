@@ -11,6 +11,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <timeapi.h>
 #else
 #include <unistd.h>
 #endif
@@ -529,7 +530,13 @@ void umwindowsleep(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int ms = p[0].intVal;
 
 #ifdef _WIN32
-	Sleep(ms);
+  double sec = ms/1000.0;
+  double time_start = timeGetTime();
+  double time = time_start;
+  while ((time - time_start) < sec) {
+    Sleep(0);
+    time = timeGetTime();
+  }
 #else
 	usleep(ms * 1000);
 #endif

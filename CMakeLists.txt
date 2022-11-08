@@ -30,7 +30,7 @@ if(MSVC)
         ${CMAKE_CURRENT_SOURCE_DIR}/lib
     )
 
-    target_link_libraries(tophat gdi32 opengl32 user32 ${umka_lib_path})
+    target_link_libraries(tophat winmm gdi32 opengl32 user32 ${umka_lib_path})
 else()
     message("TODO(skejeton): This script only works with MSVC. If you are on Linux or WSL/MSYS2 run `make` instead.")
 endif()
