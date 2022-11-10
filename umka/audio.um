@@ -1,9 +1,5 @@
 // Module for audio loading and playback.
 
-import (
-	"th.um"
-)
-
 // Represents an instance of a playable sound. It is an opaque structure.
 type Sound* = struct { _: ^struct{} }
 
@@ -97,12 +93,12 @@ fn (s: ^Sound) frameCount*(): uint {
 }
 
 fn umth_sound_set_start_time_ms(s: Sound, t: uint)
-fn (s: ^Sound) setStartTimeMs(t: uint) {
+fn (s: ^Sound) setStartTimeMs*(t: uint) {
 	umth_sound_set_start_time_ms(s^, t)
 }
 
 fn umth_sound_set_stop_time_ms(s: Sound, t: uint)
-fn (s: ^Sound) setStopTimeMs(t: uint) {
+fn (s: ^Sound) setStopTimeMs*(t: uint) {
 	umth_sound_set_stop_time_ms(s^, t)
 }
 
