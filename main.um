@@ -6,5 +6,5 @@ import (
 )
 
 fn main() {
-	for window.cycle(rect.mk(0, 0, 100, 100)) { }
+	for window.cycle() { }
 }

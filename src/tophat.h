@@ -289,7 +289,7 @@ void th_image_flush();
 int th_image_compile_shader(char *frag, char *vert);
 
 void th_image_set_as_render_target(th_image *img);
-void th_image_remove_render_target(th_image *img, th_rect *cam);
+void th_image_remove_render_target(th_image *img, th_vf2 wp);
 
 // input
 void th_input_key(int keycode, int bDown);

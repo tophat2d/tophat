@@ -6,6 +6,7 @@ import (
 	"input.um"
 	"sound.um"
 	"image.um"
+	"window.um"
 	"enemy.um"
 	"global.um"
 	"effects.um"
@@ -32,7 +33,7 @@ fn init*() {
 
 	e = ent.mk(
 		frames[0],
-		th.Transform{p: th.Vf2{y: global.cam.h/3}, s: th.Vf2{1, 1}})
+		th.Transform{p: th.Vf2{y: window.wp.y/3}, s: th.Vf2{1, 1}})
 
 	bulletPrefab.t.s = th.Vf2{1, 1}
 	bulletPrefab.r.w = 1
@@ -45,14 +46,14 @@ fn init*() {
 fn handle*() {
 	if input.isPressed('a') {
 		e.t.p.x -= speed * th.delta
-		if e.t.p.x < -global.cam.w/2 - e.r.w {
-			e.t.p.x = global.cam.w/2
+		if e.t.p.x < -window.wp.x/2 - e.r.w {
+			e.t.p.x = window.wp.x/2
 		}
 	}
 	if input.isPressed('d') {
 		e.t.p.x += speed * th.delta
-		if e.t.p.x > global.cam.w/2 {
-			e.t.p.x = -global.cam.w/2 - e.r.w
+		if e.t.p.x > window.wp.x/2 {
+			e.t.p.x = -window.wp.x/2 - e.r.w
 		}
 	}
 
@@ -75,7 +76,7 @@ fn handle*() {
 	for i:=0; i >= 0 && i < len(bullets); i++ {
 		bullets[i].t.p.y -= bulletSpeed * th.delta
 
-		if bullets[i].t.p.y < -global.cam.h/2 {
+		if bullets[i].t.p.y < -window.wp.y {
 			bullets = delete(bullets, i)
 			i--
 			continue

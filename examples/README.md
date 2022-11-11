@@ -6,5 +6,4 @@
 - tetris - a block stacking game
 - pomodoro - a pomodoro time tracking app, font rendering, advanced canvas usage
 - item-list - a custom ui element
-- Conway's game of life - tilemaps
 - extensions - C FFI

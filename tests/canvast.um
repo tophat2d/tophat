@@ -8,11 +8,11 @@ import (
 
 fn main() {
 	window.setup("my title", 400, 400)
-	cam := rect.mk(0, 0, 192, 168)
+	window.setViewport(th.Vf2{192, 168})
 
 	img := image.load("etc/test.png")
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		canvas.drawRect(th.red, rect.mk(10, 10, 20, 5))
 		canvas.drawRect(0x0022ff88, rect.mk(10, 10, 10, 10))
 		canvas.drawLine(th.red, th.Vf2{10, 10}, th.Vf2{20, 20}, 1)

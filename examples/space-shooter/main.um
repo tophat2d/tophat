@@ -1,5 +1,6 @@
 
 import (
+	"th.um"
 	"std.um"
 	"rect.um"
 	"window.um"
@@ -15,6 +16,7 @@ import (
 fn main() {
 	window.setup("title", 1280, 720)
 
+	window.setViewport(th.Vf2{92, 168})
 	global.cam = rect.mk(0, 0, 92, 168)
 	global.scene = global.MENU
 
@@ -30,7 +32,7 @@ fn main() {
 		std.fclose(f)
 	}
 
-	for window.cycle(global.cam) {
+	for window.cycle() {
 		canvas.drawRect(0x000022ff, global.cam)
 		
 		star.handle()

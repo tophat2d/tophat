@@ -2,6 +2,7 @@ import (
 	"canvas.um"
 	"rect.um"
 	"th.um"
+	"window.um"
 	"gameplay.um"
 	"presets.um"
 	"global.um"
@@ -35,7 +36,9 @@ var (
 )
 
 fn getNextPiecePos(): th.Vf2 {
-	return th.Vf2{trunc(offset_x)-16*5, trunc(offset_y)+32+trunc(sin(th.time/1000.0)*5)}
+	return th.Vf2{
+		trunc(offset_x)-16*5,
+		trunc(offset_y)+32+trunc(sin(th.time/1000.0)*5)}
 }
 
 fn getStashPos(): th.Vf2 {
@@ -43,8 +46,8 @@ fn getStashPos(): th.Vf2 {
 }
 
 fn init*() {
-	offset_x = (global.cam.w-reference_frame.w)/2
-	offset_y = (global.cam.h-reference_frame.h)/2
+	offset_x = (window.wp.x-reference_frame.w)/2
+	offset_y = (window.wp.y-reference_frame.h)/2
 	fallingPiecePos = getNextPiecePos()
 	effects = make([]Effect, 0)
 }
@@ -57,7 +60,10 @@ fn drawEffect(effect: Effect) {
 	opacity := trunc(effect.life * effect.life * 255);
 	switch effect.kind {
 	case EffectClearRow:
-		canvas.drawRect(0xFFFFFF00|opacity, rect.Rect{offset_x, offset_y + effect.int_data*16, field.FieldWidth*16, 16})
+		canvas.drawRect(0xFFFFFF00|opacity,
+			rect.Rect{
+				offset_x, offset_y + effect.int_data*16,
+				field.FieldWidth*16, 16})
 	}
 }
 
@@ -151,8 +157,8 @@ fn drawNextPiece() {
 }
 
 fn draw*() {
-	offset_x = (global.cam.w-reference_frame.w)/2
-	offset_y = (global.cam.h-reference_frame.h)/2
+	offset_x = (window.wp.x-reference_frame.w)/2
+	offset_y = (window.wp.y-reference_frame.h)/2
 
 	drawStash()
 	field_rect := rect.Rect { offset_x-1, offset_y-1, field.FieldWidth * 16+1, field.FieldHeight * 16+1 }

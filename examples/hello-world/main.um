@@ -8,10 +8,10 @@ import (
 
 fn main() {
 	window.setup("title", 400, 400)
-
+	window.setViewport(th.Vf2{400, 400})
 	cam := rect.mk(0, 0, 400, 400)
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		canvas.drawRect(th.blue, rect.mk(0, 0, cam.w, cam.h))
 
 		canvas.drawText("hello world", th.Vf2{2, 2}, th.white, 4)

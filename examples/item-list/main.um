@@ -34,8 +34,9 @@ fn main() {
 		fontSize: 1.5}
 
 	cam := rect.mk(0, 0, 400, 400)
+	window.setViewport(th.Vf2{400, 400})
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		canvas.drawRect(th.blue, rect.mk(0, 0, 400, 400))
 
 		if il.g.r.x != 0 && il.g.r.y != 0 {

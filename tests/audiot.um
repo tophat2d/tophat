@@ -3,11 +3,13 @@ import (
 	"audio.um"
 	"input.um"
 	"rect.um"
+	"th.um"
 	"window.um"
 )
 
 fn main() {
 	window.setup("audio test")
+	window.setViewport(th.Vf2{400, 400})
 
 	s := audio.load("examples/tetris/IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
 	s.play()
@@ -18,7 +20,7 @@ fn main() {
 	s2 := audio.load("examples/tetris/ClearMega.wav")
 	s2.play()
 
-	for window.cycle(rect.mk(0, 0, 400, 400)) {
+	for window.cycle() {
 		if input.isJustPressed('s') {
 			s.stop()
 			s.seekToFrame(0)

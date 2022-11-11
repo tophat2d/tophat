@@ -312,7 +312,7 @@ void th_image_set_as_render_target(th_image *img) {
 		th_error("Could not setup image render target %x, %x.", glGetError(), glCheckFramebufferStatus(GL_FRAMEBUFFER));
 }
 
-void th_image_remove_render_target(th_image *img, th_rect *cam) {
+void th_image_remove_render_target(th_image *img, th_vf2 wp) {
 	if (!thg->has_framebuffer) {
 		th_error("No render target is set.");
 		return;
@@ -321,7 +321,7 @@ void th_image_remove_render_target(th_image *img, th_rect *cam) {
 	th_canvas_flush();
 	th_image_flush();
 
-	th_calculate_scaling(cam->w, cam->h);
+	th_calculate_scaling(wp.w, wp.h);
 
 	/*glBindTexture(GL_TEXTURE_2D, img->gltexture);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->data);

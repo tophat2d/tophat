@@ -288,9 +288,9 @@ void umimgmakerendertarget(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 void umimgremoverendertarget(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = p[1].ptrVal;
-	th_rect *cam = p[0].ptrVal;
+	th_vf2 wp = *(th_vf2 *)&p[0];
 
-	th_image_remove_render_target(img, cam);
+	th_image_remove_render_target(img, wp);
 }
 
 ///////////////////////
@@ -537,14 +537,10 @@ void umwindowsleep(UmkaStackSlot *p, UmkaStackSlot *r) {
 #endif
 }
 
-// calculates scaling
-void umgetscaling(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int camh = p[0].intVal;
-	int camw = p[1].intVal;
-	//int h = p[2].intVal;
-	//int w = p[3].intVal;
-
-	th_calculate_scaling(camw, camh);
+// fn umth_window_set_viewport(dm: th.Vf2)
+void umth_window_set_viewport(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 dm = *(th_vf2 *)&p[0];
+	th_calculate_scaling(dm.w, dm.h);
 }
 
 void umcanvasrect(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -833,21 +829,25 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_sound_stop", &umth_sound_stop);
 	umkaAddFunc(umka, "umth_sound_seek_to_frame", &umth_sound_seek_to_frame);
 	umkaAddFunc(umka, "umth_sound_frame_count", &umth_sound_frame_count);
-	umkaAddFunc(umka, "umth_sound_set_start_time_ms", &umth_sound_set_start_time_ms);
-	umkaAddFunc(umka, "umth_sound_set_stop_time_ms", &umth_sound_set_stop_time_ms);
+	umkaAddFunc(umka, "umth_sound_set_start_time_ms",
+		&umth_sound_set_start_time_ms);
+	umkaAddFunc(umka, "umth_sound_set_stop_time_ms",
+		&umth_sound_set_stop_time_ms);
 
-
-	// canvas
+	// window
 	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
 	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
-	umkaAddFunc(umka, "drawText", &umdrawtext);
 	umkaAddFunc(umka, "wsetup", &umwindowsetup);
 	umkaAddFunc(umka, "clearframe", &umwindowclearframe);
 	umkaAddFunc(umka, "getdimensions", &umwindowgetdimensions);
 	umkaAddFunc(umka, "swapbuffers", &umwindowswapbuffers);
 	umkaAddFunc(umka, "handleinput", &umwindowhandle);
-	umkaAddFunc(umka, "updatescaling", &umgetscaling);
 	umkaAddFunc(umka, "sleep", &umwindowsleep);
+	umkaAddFunc(umka, "umth_window_set_viewport", &umth_window_set_viewport);
+
+
+	// canvas
+	umkaAddFunc(umka, "drawText", &umdrawtext);
 	umkaAddFunc(umka, "drawRect", &umcanvasrect);
 	umkaAddFunc(umka, "drawLine", &umcanvasline);
 	umkaAddFunc(umka, "cdrawimage", &umimagedraw);

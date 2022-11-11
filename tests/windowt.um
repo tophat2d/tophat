@@ -9,8 +9,9 @@ import (
 
 fn main() {
 	window.setup("input test", 400, 400)
+	window.setViewport(th.Vf2{100, 100})
 
-	for window.cycle(rect.mk(0, 0, 400, 400)) {
-	
+	for window.cycle() {
+		canvas.drawLine(th.black, th.Vf2{0, 0}, th.Vf2{100, 100}, 1)
 	}
 }

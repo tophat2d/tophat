@@ -16,13 +16,13 @@ fn drawTextRect(text: str, pos: th.Vf2, scale: real = 1.0) {
 
 fn main() {
 	window.setup("my title", 400, 400)
-	cam := rect.mk(0, 0, 400, 400)
+	window.setViewport(th.Vf2{400, 400})
 	f = font.load("etc/roboto.ttf", 16, 0)
 	if f.validate() == false {
 		error("Invalid font.");
 	}
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		drawTextRect("Awesome\nSkip", th.Vf2{0, 0})
 		drawTextRect("Reset\nTest", th.Vf2{50, 50}, 2.0)
 		drawTextRect("|||||||", th.Vf2{100, 0})

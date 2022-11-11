@@ -1,6 +1,3 @@
-// variables:
-// w and h: the dimensions of the window
-// fpsLimit: the fpsLimit
 
 import (
 	"audio.um"
@@ -14,7 +11,9 @@ import (
 var (
 	start, end, clockOffset: real
 	w*, h*: int32
-	fpsLimit*: int = 60
+	fpsLimit: int = 60
+
+	wp*: th.Vf2
 )
 
 fn wsetup(title: str, w, h: int)
@@ -22,8 +21,17 @@ fn clearframe()
 fn getdimensions(w, h: ^int32)
 fn swapbuffers()
 fn handleinput(): bool
-fn updatescaling(w, h, camw, camh: int32)
 fn sleep(ms: int)
+
+fn umth_window_set_viewport(dm: th.Vf2)
+// Sets the dimensions of the viewport. The dimensions are saved in the `wp`
+// variable.
+// `dm`
+// : dimension of the viewport
+fn setViewport*(dm: th.Vf2) {
+	wp = dm
+	umth_window_set_viewport(dm)
+}
 
 // Sets up the engine and opens a window.
 fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
@@ -35,23 +43,24 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 		th.platform = "windows"
 	}
 
-	updatescaling(width, height, width, height)
-
 	audio.__setup()
 	placeholders.__setup()
 
 	clockOffset = std.clock() * 1000
 	start = std.clock() * 1000
+
+	setViewport(th.Vf2{width, height})
 }
 
-// Cycle needs to be called every cycle. Pass the currently used camera, which
-// i used to calculate tophat's scaling. It returns true, if the window is
-// still running.
-fn cycle*(cam: rect.Rect): bool {
-	canvas.drawRect(th.black, rect.Rect{-cam.w * 2, 0, cam.w * 2, cam.h})
-	canvas.drawRect(th.black, rect.Rect{0, -cam.h * 2, cam.w, cam.h * 2})
-	canvas.drawRect(th.black, rect.Rect{0, cam.h, cam.w, cam.h * 2})
-	canvas.drawRect(th.black, rect.Rect{cam.w, 0, cam.w * 2, cam.h})
+// Cycle needs to be called every cycle for the window to work. If the window
+// was closed, it returns false.
+fn cycle*(): bool {
+	umth_window_set_viewport(wp)
+	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
+	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
+
 	swapbuffers()
 
 	end = std.clock()*1000
@@ -69,8 +78,6 @@ fn cycle*(cam: rect.Rect): bool {
 	getdimensions(&w, &h)
 
 	audio.__cycle()
-
-	updatescaling(w, h, round(cam.w), round(cam.h))
 	return running
 }
 
@@ -84,4 +91,16 @@ fn beginScissorRect*(r: rect.Rect) {
 // Stops cropping
 fn endScissor*() {
 	umth_window_end_scissor();
+}
+
+// Returns dimensions of the window in screen pixels.
+fn getDims*(): th.Vf2 {
+	return th.Vf2{w, h}
+}
+
+// Sets the fps limit.
+// `fps`
+// : amount of fps the limit should be set to
+fn setTargetFps*(fps: int) {
+	fpsLimit = fps
 }

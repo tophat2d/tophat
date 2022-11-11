@@ -24,7 +24,7 @@ fn imgdrawninepatch(img: Image, outer, inner, dest: ^rect.Rect, color: uint32)
 fn imgupdatedata(img: Image, data: ^uint32, dm: th.Vf2)
 fn imggetdata(img: Image, data: ^uint32)
 fn imgmakerendertarget(img: Image)
-fn imgremoverendertarget(img: Image, cam: ^rect.Rect)
+fn imgremoverendertarget(img: Image, wp: th.Vf2)
 
 // Loads an image at path.
 fn load*(path: str): Image {
@@ -158,6 +158,8 @@ fn (i: ^Image) makeRenderTarget*() {
 }
 
 // Returns to rendering onto the screen.
-fn (i: ^Image) removeRenderTarget*(cam: rect.Rect) {
-	imgremoverendertarget(i^, &cam)
+// `wp`
+// : viewport to be set
+fn (i: ^Image) removeRenderTarget*(wp: th.Vf2) {
+	imgremoverendertarget(i^, wp)
 }
