@@ -1,3 +1,4 @@
+ 
 const char *th_em_modulesrc[] = {
 "// Module for frame based image animation.\n"
 "// TODO: Rework this module to use atlases.\n"
