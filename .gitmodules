@@ -9,4 +9,4 @@
 	url = https://github.com/mackron/miniaudio.git
 [submodule "lib/umprof"]
 	path = lib/umprof
-	url = https://github.com/marekmaskarinec/umprof.git
+	url = https://git.sr.ht/~mrms/umprof
