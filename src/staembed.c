@@ -889,6 +889,7 @@ const char *th_em_modulesrc[] = {
 "fn umth_window_set_viewport(dm: th.Vf2)\n"
 "// Sets the dimensions of the viewport. The dimensions are saved in the `wp`\n"
 "// variable.\n"
+"// \n"
 "// `dm`\n"
 "// : dimension of the viewport\n"
 "fn setViewport*(dm: th.Vf2) {\n"

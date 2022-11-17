@@ -9,8 +9,8 @@ You can browse the documentation on the [wiki](https://github.com/marekmaskarine
 <p align="center">
 	<img src="https://th.mrms.cz/images/space-shooter.png" alt="space shooter example">
 	<img src="https://th.mrms.cz/images/logs-together.png" alt="logs together jam game">
-	<img src="etc/tetris.png" alt="tetris game">
-	<img src="etc/pomodoro.png" alt="pomodoro app">
+	<img src="https://th.mrms.cz/images/tetris.png" alt="tetris game">
+	<img src="https://th.mrms.cz/images/pomodoro.png" alt="pomodoro app">
 </p>
 
 ## examples
