@@ -1,16 +1,29 @@
 # tophat
 
-Tophat is a friendly 2d game library for the [Umka](https://github.com/vtereshkov/umka-lang) programming language.
-Visit the [homepage](https://th.mrms.cz/) for more info.
-You can browse the documentation on the [wiki](https://github.com/marekmaskarinec/tophat/wiki).
+Tophat is a friendly 2d game library for the
+[Umka](https://github.com/vtereshkov/umka-lang) programming language.  Visit
+the [homepage](https://th.mrms.cz/) for more info.  You can browse the API
+reference [here](https://th.mrms.cz/thdocs)
 
 ## screenshots
 
 <p align="center">
-	<img src="https://th.mrms.cz/images/space-shooter.png" alt="space shooter example">
-	<img src="https://th.mrms.cz/images/logs-together.png" alt="logs together jam game">
-	<img src="https://th.mrms.cz/images/tetris.png" alt="tetris game">
-	<img src="https://th.mrms.cz/images/pomodoro.png" alt="pomodoro app">
+	<img
+		src="https://th.mrms.cz/images/space-shooter.png"
+		alt="space shooter example"
+	>
+	<img
+		src="https://th.mrms.cz/images/logs-together.png"
+		alt="logs together jam game"
+	>
+	<img
+		src="https://th.mrms.cz/images/tetris.png"
+		alt="tetris game"
+	>
+	<img
+		src="https://th.mrms.cz/images/pomodoro.png"
+		alt="pomodoro app"
+	>
 </p>
 
 ## examples
@@ -48,7 +61,8 @@ fn main() {
 }
 ```
 
-You can look at more complex examples in the [`examples/`](https://github.com/marekmaskarinec/tophat/tree/main/examples) folder.
+You can look at more complex examples in the
+[`examples/`](https://git.sr.ht/~mrms/tophat/tree/main/item/examples) folder.
 
 ## license
 
