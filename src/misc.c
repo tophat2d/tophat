@@ -10,6 +10,9 @@ void th_calculate_scaling(float camw, float camh) {
 	int w, h;
 	th_window_get_dimensions(&w, &h);
 
+	if (w * h * camw * camh == 0)
+		return;
+
 	if ((float)w/camw < (float)h/camh) {
 		thg->scaling = ((float)w/camw);
 	} else {
