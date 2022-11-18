@@ -41,13 +41,12 @@ type Emitter* = struct {
 	particles: []Particle // list of particles
 }
 
-fn c_particles_draw(p: ^Emitter, cam: ^rect.Rect, t: int32)
-
+fn umth_particles_draw(p: ^Emitter, cam: ^rect.Rect, t: int32)
 // Draws and updates the particles.
 fn (e: ^Emitter) draw*(cam: rect.Rect, t: int32) {
 	if len(e.colors) <= 0 || len(e.particles) <= 0 {
 		return
 	}
 
-	c_particles_draw(e, &cam, t)
+	umth_particles_draw(e, &cam, t)
 }

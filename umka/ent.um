@@ -27,14 +27,11 @@ type Coll* = struct {
 	pos: th.Vf2
 }
 
-fn centdraw(e: ^Ent, c: ^rect.Rect)
-
+fn umth_ent_draw(e: ^Ent, c: ^rect.Rect)
 // Draws the entity onto the screen in relaction to camera c.
 fn (e: ^Ent) draw*(c: rect.Rect) {
-	centdraw(e, &c)
+	umth_ent_draw(e, &c)
 }
-
-fn cgetcoll(coll: ^Coll, collC: ^int, maxCount: th.uu, count: int32, e: ^Ent, s: ^^Ent)
 
 // ent's constructor
 fn mk*(img: image.Image = image.Image{}, t: th.Transform = th.Transform{ s: th.Vf2{1, 1} }): Ent {
@@ -55,6 +52,8 @@ fn mk*(img: image.Image = image.Image{}, t: th.Transform = th.Transform{ s: th.V
 	return e
 }
 
+fn umth_ent_getcoll(coll: ^Coll, collC: ^int, maxCount: th.uu, count: int32,
+	e: ^Ent, s: ^^Ent)
 // Checks collisions of e with entities in s. Checks at max maxColl collisions.
 // If s contains e, the collision won't be returned.
 fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
@@ -72,7 +71,7 @@ fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
 
 	colls := make([]Coll, maxColls)
 	count := 0
-	cgetcoll(&colls[0], &count, maxColls, len(s), e, &s[0])
+	umth_ent_getcoll(&colls[0], &count, maxColls, len(s), e, &s[0])
 
 	return slice(colls, 0, count)
 }
@@ -83,11 +82,10 @@ fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
 	e.i = frames^[(round(real(t)/(1000/fps)) % len(frames^))]
 }
 
-fn centysort(e: ^ent.Ent, count: int)
-
+fn umth_ent_ysort(e: ^ent.Ent, count: int)
 // Performs an y sort on entities.
 fn ysort*(ents: ^[]ent.Ent) {
 	if len(ents^) > 0 {
-		centysort(&ents[0], len(ents^))
+		umth_ent_ysort(&ents[0], len(ents^))
 	}
 }

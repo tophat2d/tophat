@@ -42,7 +42,7 @@ fn (r: ^rect.Rect) getEnd*(): th.Vf2 {
 	return th.Vf2{r.x+r.w, r.y+r.h}
 }
 
-fn ctransformrect(ret: ^th.Quad, r: ^rect.Rect, t: ^th.Transform)
+fn umth_transform_rect(ret: ^th.Quad, r: ^rect.Rect, t: ^th.Transform)
 // Transforms a rect into a quad.
 // Order:
 // 	1. scale
@@ -50,7 +50,7 @@ fn ctransformrect(ret: ^th.Quad, r: ^rect.Rect, t: ^th.Transform)
 // 	3. position
 fn (r: ^rect.Rect) transformed*(t: th.Transform): th.Quad {
 	var ret: th.Quad
-	ctransformrect(&ret, r, &t)
+	umth_transform_rect(&ret, r, &t)
 
 	return ret
 }

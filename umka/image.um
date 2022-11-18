@@ -8,59 +8,49 @@ import (
 // of each pixel with the filter.
 type Image* = struct{ _: ^struct{} }
 
-fn loadimg(ret: ^Image, path: str)
-fn flipvimg(i: Image, f: bool)
-fn fliphimg(i: Image, f: bool)
-fn cdrawimage(img: Image, t: ^th.Transform, color: uint32)
-fn imggetdims(dm: ^th.Vf2, i: Image)
-fn imgcrop(img: Image, tl, br: th.Vf2)
-fn imgcropquad(img: Image, q: ^th.Quad)
-fn imggetcropquad(img: Image, q: ^th.Quad)
-fn imgfromdata(ret: ^Image, data: ^uint32, dm: th.Vf2)
-fn imgcopy(ret: ^Image, data: Image)
-fn imgsetfilter(data: Image, filter: int)
-fn imgdrawonquad(img: Image, color: uint32, q: th.Quad)
-fn imgdrawninepatch(img: Image, outer, inner, dest: ^rect.Rect, color: uint32)
-fn imgupdatedata(img: Image, data: ^uint32, dm: th.Vf2)
-fn imggetdata(img: Image, data: ^uint32)
-fn imgmakerendertarget(img: Image)
-fn imgremoverendertarget(img: Image, wp: th.Vf2)
 
+fn umth_image_load(ret: ^Image, path: str)
 // Loads an image at path.
 fn load*(path: str): Image {
 	img := Image{}
-	loadimg(&img, path)
+	umth_image_load(&img, path)
 	return img
 }
 
+fn umth_image_flipv(i: Image, f: bool)
 // Flips image on it's vertical axis.
 fn (i: ^Image) flipv*(flip: bool) {
-	flipvimg(i^, flip)
+	umth_image_flipv(i^, flip)
 }
 
+fn umth_image_fliph(i: Image, f: bool)
 // Flips image on it's horizontal axis.
 fn (i: ^Image) fliph*(flip: bool) {
-	fliphimg(i^, flip)
+	umth_image_fliph(i^, flip)
 }
 
+fn umth_image_draw(img: Image, t: ^th.Transform, color: uint32)
 // Draws the image in screen coordinates. It transforms it with t and
 // applies color as a color filter.
 fn (i: ^Image) draw*(t: th.Transform, color: uint32 = th.white) {
-	cdrawimage(i^, &t, color)
+	umth_image_draw(i^, &t, color)
 }
 
+fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: ^rect.Rect,
+	color: uint32)
 // Draws "nine-patch" image. 
 // `outer` specifies the texture coordinates of the outer rect of source image,
 // `inner` specifies coordinates of inner rect of source image, positioned relative to `outer`.
 // You can tint with `color`.
 fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect.Rect, color: uint32 = th.white) {
-	imgdrawninepatch(i^, &outer, &inner, &dest, color)
+	umth_image_draw_nine_patch(i^, &outer, &inner, &dest, color)
 }
 
+fn umth_image_draw_on_quad(img: Image, color: uint32, q: th.Quad)
 // Draws the image on top of a quad with corners of the image positioned
 // on the verticies of the quad.
 fn (i: ^Image) drawOnQuad*(q: th.Quad, color: uint32 = th.white) {
-	imgdrawonquad(i^, color, q)
+	umth_image_draw_on_quad(i^, color, q)
 }
 
 // Returns true, if i's handle points to an image.
@@ -68,57 +58,65 @@ fn (i: ^Image) validate*(): bool {
 	return i._ != null
 }
 
+fn umth_image_get_dims(dm: ^th.Vf2, i: Image)
 // Returns width and heigth.
 fn (i: ^Image) getDims*(): th.Vf2 {
 	out := th.Vf2{}
-	imggetdims(&out, i^)
+	umth_image_get_dims(&out, i^)
 
 	return out
 }
 
+fn umth_image_crop(img: Image, tl, br: th.Vf2)
 // Crops an image. Coordinates are between 0, 0 (top left) and
 // 1, 1 (bottom right)
 fn (i: ^Image) crop*(tl, br: th.Vf2) {
-	imgcrop(i^, tl, br)
+	umth_image_crop(i^, tl, br)
 }
 
+fn umth_image_crop_quad(img: Image, q: ^th.Quad)
 // Crop an image using a quad.
 fn (i: ^Image) cropQuad*(q: th.Quad) {
-	imgcropquad(i^, &q)
+	umth_image_crop_quad(i^, &q)
 }
 
+fn umth_image_get_crop_quad(img: Image, q: ^th.Quad)
 // Crop an image using a quad.
 fn (i: ^Image) getCropQuad*(): th.Quad {
 	var (q: th.Quad)
-	imggetcropquad(i^, &q)
+	umth_image_get_crop_quad(i^, &q)
 	return q
 }
 
+fn umth_image_from_data(ret: ^Image, data: ^uint32, dm: th.Vf2)
 // Creates an image from raw data.
 fn mk*(data: []uint32, dm: th.Vf2): Image {
 	img := Image{}
-	imgfromdata(&img, &data[0], dm)
+	umth_image_from_data(&img, &data[0], dm)
 
 	return img
 }
 
+fn umth_image_copy(ret: ^Image, data: Image)
 // Copies image into a new one.
 fn (i: ^Image) copy*(): Image {
 	img := Image{}
-	imgcopy(&img, i^)
+	umth_image_copy(&img, i^)
 	
 	return img
 }
 
+fn umth_image_set_filter(data: Image, filter: int)
 // Sets a mag/min filter. 0 is linear, others are nearest.
 // This function will regenerate the texture. This means it shouldn't be
 // used in a loop.
 // https://learnopengl.com/img/getting-started/texture_filtering.png
 // left is nearest, right is linear.
 fn (i: ^Image) setfilter*(filter: int) {
-	imgsetfilter(i^, filter)
+	umth_image_set_filter(i^, filter)
 }
 
+fn umth_image_update_data(img: Image, data: ^uint32, dm: th.Vf2)
 // Updates the image data. dm are the dimensions of the new image.
 // The new image doesn't have to be the same size as the old one.
 fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
@@ -130,9 +128,10 @@ fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
 		error("setData: can't set empty image")
 	}
 
-	imgupdatedata(i^, &data[0], dm)
+	umth_image_update_data(i^, &data[0], dm)
 }
 
+fn umth_image_get_data(img: Image, data: ^uint32)
 // Gets the image data. This downloads the data from the GPU on **each call**.
 // Don't use in performance critical sections.
 fn (i: ^Image) getData*(): []uint32 {
@@ -145,21 +144,23 @@ fn (i: ^Image) getData*(): []uint32 {
 		return buf
 	}
 
-	imggetdata(i^, &buf[0])
+	umth_image_get_data(i^, &buf[0])
 
 	return buf
 }
 
+fn umth_image_make_render_target(img: Image)
 // Sets the image a the render target. This means stuff won't be drawn onto the
 // screen, but into the image. In this mode, the scaling is always 1. An the
 // resolution of the screen are the image's dimensions.
 fn (i: ^Image) makeRenderTarget*() {
-	imgmakerendertarget(i^)
+	umth_image_make_render_target(i^)
 }
 
+fn umth_image_remove_render_target(img: Image, wp: th.Vf2)
 // Returns to rendering onto the screen.
 // `wp`
 // : viewport to be set
 fn (i: ^Image) removeRenderTarget*(wp: th.Vf2) {
-	imgremoverendertarget(i^, wp)
+	umth_image_remove_render_target(i^, wp)
 }

@@ -16,12 +16,12 @@ var (
 	wp*: th.Vf2
 )
 
-fn wsetup(title: str, w, h: int)
-fn clearframe()
-fn getdimensions(w, h: ^int32)
-fn swapbuffers()
-fn handleinput(): bool
-fn sleep(ms: int)
+fn umth_window_setup(title: str, w, h: int)
+fn umth_window_clear_frame()
+fn umth_window_get_dimensions(w, h: ^int32)
+fn umth_window_swap_buffers()
+fn umth_window_handle(): bool
+fn umth_window_sleep(ms: int)
 
 fn umth_window_set_viewport(dm: th.Vf2)
 // Sets the dimensions of the viewport. The dimensions are saved in the `wp`
@@ -37,8 +37,8 @@ fn setViewport*(dm: th.Vf2) {
 // Sets up the engine and opens a window.
 fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	w, h = width, height
-	wsetup(title, width, height)
-	clearframe()
+	umth_window_setup(title, width, height)
+	umth_window_clear_frame()
 
 	if std.getenv("HOME") == "" {
 		th.platform = "windows"
@@ -62,21 +62,21 @@ fn cycle*(): bool {
 	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
 
-	swapbuffers()
+	umth_window_swap_buffers()
 
 	end = std.clock()*1000
 	th.delta = round(end - start)
 	if 1000/fpsLimit - th.delta > 0 {
-		sleep(1000/fpsLimit - th.delta)
+		umth_window_sleep(1000/fpsLimit - th.delta)
 		th.delta = round(std.clock()*1000 - start)
 	}
 
 	start = std.clock()*1000
 	th.time = round(start - clockOffset)
 
-	running := handleinput()
-	clearframe()
-	getdimensions(&w, &h)
+	running := umth_window_handle()
+	umth_window_clear_frame()
+	umth_window_get_dimensions(&w, &h)
 
 	audio.__cycle()
 	return running

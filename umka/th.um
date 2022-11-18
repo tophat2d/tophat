@@ -153,7 +153,7 @@ fn mkTransform*(p: Vf2, s: Vf2 = Vf2{1, 1}, o: Vf2 = Vf2{0, 0}, r: fu = 0.0): Tr
 	return Transform{p: p, s: s, o: o, r: r}
 }
 
-fn ctransformvf2(v: ^Vf2, t: ^Transform)
+fn umth_transform_vf2(v: ^Vf2, t: ^Transform)
 // Transforms a vf2 to another vf2.
 // Order:
 // 	1. scale
@@ -163,13 +163,13 @@ fn ctransformvf2(v: ^Vf2, t: ^Transform)
 // This allows conversion from a relative to an absolute vf2.
 fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
 	ret := v^
-	ctransformvf2(&ret, &t)
+	umth_transform_vf2(&ret, &t)
 	return ret
 }
 
 type Quad* = [4]th.Vf2
 
-fn ctransformquad(q: ^Quad, t: ^Transform)
+fn umth_transform_quad(q: ^Quad, t: ^Transform)
 // Transforms a quad into another quad.
 // Order:
 // 	1. scale
@@ -177,20 +177,20 @@ fn ctransformquad(q: ^Quad, t: ^Transform)
 // 	3. position
 fn (q: ^Quad) transformed*(t: Transform): Quad {
 	ret := q^
-	ctransformquad(&ret, &t)
+	umth_transform_quad(&ret, &t)
 	return ret
 }
 
-fn cgetglobal(): ^struct{}
+fn umth_th_getglobal(): ^struct{}
 // returns a pointer to the th_global. Set this as your extensions thg.
 fn getGlobal*(): ^struct{} {
-	return cgetglobal()
+	return umth_th_getglobal()
 }
 
-fn cgetfuncs(): ^struct{}
+fn umth_th_getfuncs(): ^struct{}
 // returns pointer to tophat functions. Pass this to th_ext_set.
 fn getFuncs*(): ^struct{} {
-	return cgetfuncs()
+	return umth_th_getfuncs()
 }
 
 const (

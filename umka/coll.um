@@ -5,27 +5,27 @@ import (
 	"rect.um"
 )
 
-fn ccolllinetoline(b1, e1, b2, e2, ic: ^th.Vf2): bool
+fn umth_coll_line_to_line(b1, e1, b2, e2, ic: ^th.Vf2): bool
 // Checks for a collision between 2 lines specified by their end points.
 fn lineToLine*(b1, e1, b2, e2: th.Vf2, ic: ^th.Vf2): bool {
-	return ccolllinetoline(&b1, &e1, &b2, &e2, ic)
+	return umth_coll_line_to_line(&b1, &e1, &b2, &e2, ic)
 }
 
-fn ccollpointtoquad(p: ^th.Vf2, q: ^th.Quad, ic: ^th.Vf2): bool
+fn umth_coll_point_to_quad(p: ^th.Vf2, q: ^th.Quad, ic: ^th.Vf2): bool
 // Checks for a collision between a vf2 and a quad.
 fn vf2ToQuad*(p: th.Vf2, q: th.Quad, ic: ^th.Vf2): bool {
-	return ccollpointtoquad(&p, &q, ic)
+	return umth_coll_point_to_quad(&p, &q, ic)
 }
 
-fn ccolllinetoquad(b, e: ^th.Vf2, q: ^th.Quad, ic: ^th.Vf2): bool
+fn umth_coll_line_to_quad(b, e: ^th.Vf2, q: ^th.Quad, ic: ^th.Vf2): bool
 // Check for a collision between a line and quad edges.
 fn lineToQuad*(b, e: th.Vf2, q: th.Quad, ic: ^th.Vf2): bool {
-	return ccolllinetoquad(&b, &e, &q, ic)
+	return umth_coll_line_to_quad(&b, &e, &q, ic)
 }
 
-fn ccollquadtoquad(q1, q2: ^th.Quad, ic: ^th.Vf2): bool
+fn umth_coll_quad_to_quad(q1, q2: ^th.Quad, ic: ^th.Vf2): bool
 // Check for a collision between two quads.
 fn quadToQuad*(q1, q2: th.Quad, ic: ^th.Vf2): bool {
-	return ccollquadtoquad(&q1, &q2, ic)
+	return umth_coll_quad_to_quad(&q1, &q2, ic)
 }
 
