@@ -85,3 +85,16 @@ fn beginScissorRect*(r: rect.Rect) {
 fn endScissor*() {
 	umth_window_end_scissor();
 }
+
+fn umth_window_set_fullscreen(fullscreen: bool)
+fn umth_window_get_fullscreen(): bool
+
+// Makes window go full screen
+fn setFullscreen*(fullscreen: bool) {
+	umth_window_set_fullscreen(fullscreen)
+}
+
+// Returns true if window is fullscreen 
+fn isFullscreen*(): bool {
+	return umth_window_get_fullscreen()
+}

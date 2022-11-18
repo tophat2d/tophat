@@ -305,6 +305,32 @@ void th_window_get_dimensions(int *w, int *h) {
 	*h = th_win_rect.bottom - th_win_rect.top;
 }
 
+// NOTE(skejeton):
+// whether the window is fullscreen or not can be detected if we check if window has a WS_POPUP style
+
+bool th_window_is_fullscreen() {
+	return GetWindowLongPtr(th_win, GWL_STYLE) & WS_POPUP;
+}
+
+void th_window_set_fullscreen(bool fullscreen) {
+	if (th_window_is_fullscreen() == fullscreen) {
+		// no change required
+		return
+	}
+
+	int w = GetSystemMetrics(SM_CXSCREEN), h = GetSystemMetrics(SM_CYSCREEN);
+
+	if (fullscreen) {
+		SetWindowLongPtr(th_win, GWL_STYLE, WS_VISIBLE | WS_OVERLAPPEDWINDOW)
+		SetWindowPos(th_win, HWND_TOP, (w-win_size.x)/2, (h-win_size.y)/2, win_size.x, win_size.y, SWP_FRAMECHANGED)
+	} else {
+		SetWindowLongPtr(th_win, GWL_STYLE, WS_VISIBLE | WS_POPUP)
+		SetWindowPos(th_win, HWND_TOP, 0, 0, w, h, SWP_FRAMECHANGED)
+	}
+
+ 	return GetWindowLongPtr(th_win, GWL_STYLE) & WS_POPUP;
+}
+
 int th_window_handle() {
 	if (!window_active) {
 		th_error("No window was created.");
