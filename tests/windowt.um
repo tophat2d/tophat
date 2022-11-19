@@ -5,11 +5,15 @@ import (
 	"input.um"
 	"canvas.um"
 	"window.um"
+	"placeholders.um"
 )
 
 fn main() {
 	window.setup("input test", 400, 400)
 	window.setViewport(th.Vf2{100, 100})
+
+	window.setDims(th.Vf2{500, 400})
+	window.setIcon(placeholders.test)
 
 	for window.cycle() {
 		canvas.drawLine(th.black, th.Vf2{0, 0}, th.Vf2{100, 100}, 1)

@@ -605,6 +605,17 @@ void umth_window_set_viewport(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_calculate_scaling(dm.w, dm.h);
 }
 
+void umth_window_set_dims(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 dm = *(th_vf2 *)&p[0];
+	th_window_set_dims(dm);
+}
+
+void umth_window_set_icon(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_image *img = (th_image *)p[0].ptrVal;
+
+	th_window_set_icon(img);
+}
+
 // draws text
 void umth_canvas_draw_text(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fu size = p[0].real32Val;
@@ -848,6 +859,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_window_handle", &umth_window_handle);
 	umkaAddFunc(umka, "umth_window_sleep", &umth_window_sleep);
 	umkaAddFunc(umka, "umth_window_set_viewport", &umth_window_set_viewport);
+	umkaAddFunc(umka, "umth_window_set_dims", &umth_window_set_dims);
+	umkaAddFunc(umka, "umth_window_set_icon", &umth_window_set_icon);
 
 	// canvas
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);

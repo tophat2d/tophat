@@ -184,6 +184,21 @@ void th_window_swap_buffers() {
 
 	thg->input_string_len = 0;
 }
+
+void th_window_set_dims(th_vf2 dm) {
+	XResizeWindow(th_dpy, th_win, dm.x, dm.y);
+}
+
+void th_window_set_icon(th_image *img) {
+	Atom net_wm_icon = XInternAtom(th_dpy, "_NEW_WM_ICON", False);
+	Atom cardinal = XInternAtom(th_dpy, "CARDINAL", False);
+
+	uint32_t *data = th_image_get_data(img, true);
+	XChangeProperty(th_dpy, th_win, net_wm_icon, cardinal, 32, PropModeReplace,
+		(const unsigned char *)data, img->dm.x * img->dm.y);
+	free(data);
+}
+
 #elif _WIN32
 #include <windows.h>
 #include <wingdi.h>
@@ -365,6 +380,10 @@ void th_window_clear_frame() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+void th_window_set_dims(th_vf2 dm) { }
+
+void th_window_set_icon(th_image *img) { }
+
 #else
 #error tophat cant create a window on this platform yet
 #endif
@@ -390,4 +409,5 @@ void th_window_end_scissor() {
 	th_image_flush();
 	glDisable(GL_SCISSOR_TEST);
 }
+
 

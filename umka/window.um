@@ -1,11 +1,12 @@
 
 import (
 	"audio.um"
-	"th.um"
 	"canvas.um"
+	"image.um"
+	"placeholders.um"
 	"rect.um"
 	"std.um"
-	"placeholders.um"
+	"th.um"
 )
 
 var (
@@ -100,8 +101,24 @@ fn getDims*(): th.Vf2 {
 }
 
 // Sets the fps limit.
+// 
 // `fps`
 // : amount of fps the limit should be set to
 fn setTargetFps*(fps: int) {
 	fpsLimit = fps
+}
+
+fn umth_window_set_dims(dm: th.Vf2)
+// Sets the dimensions of the window.
+// 
+// `dm`
+// : the target dimensions in screen pixels
+fn setDims*(dm: th.Vf2) {
+	umth_window_set_dims(dm)
+}
+
+fn umth_window_set_icon(img: image.Image)
+// Sets the window icon.
+fn setIcon*(img: image.Image) {
+	umth_window_set_icon(img)
 }

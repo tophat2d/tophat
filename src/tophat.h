@@ -341,6 +341,8 @@ void th_window_get_dimensions(int *w, int *h);
 int th_window_handle();
 void th_window_swap_buffers();
 void th_window_clear_frame();
+void th_window_set_dims(th_vf2 dm);
+void th_window_set_icon(th_image *img);
 void th_window_begin_scissor(int x, int y, size_t w, size_t h);
 void th_window_end_scissor();
 
