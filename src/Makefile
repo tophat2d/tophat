@@ -12,11 +12,11 @@ UMKA_MODULES = umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um 
 IMAGES_MOD = umka/placeholders.um
 IMAGES = etc/test.ff
 
-$(IMAGES_MOD): $(IMAGES) $(HELPER_SCRIPT)
+$(IMAGES_MOD): $(IMAGES) $(HELPER_SCRIPT) $(UMKA_BIN)
 	@echo EM $@
 	@$(UMKA_BIN) $(HELPER_SCRIPT) umimg etc/test.ff test > $@
 
-$(EM_TARGET): $(UMKA_MODULES) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT)
+$(EM_TARGET): $(UMKA_MODULES) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(UMKA_BIN)
 	@echo EM $@
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_modulesrc $(UMKA_MODULES) > $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(UMKA_MODULES:umka/%=%) >> $(EM_TARGET)
