@@ -736,6 +736,12 @@ void umth_transform_vf2(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_transform_vf2(v, *t);
 }
 
+void umth_transform_transform(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_transform *o = (th_transform *)p[1].ptrVal;
+	th_transform *t = p[0].ptrVal;
+	th_transform_transform(o, *t);
+}
+
 void umth_coll_line_to_line(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_vf2 *b1 = p[4].ptrVal;
 	th_vf2 *e1 = p[3].ptrVal;
@@ -884,6 +890,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_transform_rect", &umth_transform_rect);
 	umkaAddFunc(umka, "umth_transform_quad", &umth_transform_quad);
 	umkaAddFunc(umka, "umth_transform_vf2", &umth_transform_vf2);
+	umkaAddFunc(umka, "umth_transform_transform", &umth_transform_transform);
 
 	// colisions
 	umkaAddFunc(umka, "umth_coll_line_to_line", &umth_coll_line_to_line);

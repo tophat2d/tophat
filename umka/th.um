@@ -153,6 +153,15 @@ fn mkTransform*(p: Vf2, s: Vf2 = Vf2{1, 1}, o: Vf2 = Vf2{0, 0}, r: fu = 0.0): Tr
 	return Transform{p: p, s: s, o: o, r: r}
 }
 
+fn umth_transform_transform(o, t: ^Transform)
+// Transforms a transform with another transform.
+fn (o: ^Transform) transformed*(t: Transform): Transform {
+	ret := o^
+	umth_transform_transform(&ret, &t)
+
+	return ret
+}
+
 fn umth_transform_vf2(v: ^Vf2, t: ^Transform)
 // Transforms a vf2 to another vf2.
 // Order:

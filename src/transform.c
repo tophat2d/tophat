@@ -30,3 +30,15 @@ void th_transform_vf2(th_vf2 *v, th_transform t) {
 	v->x += t.pos.x;
 	v->y += t.pos.y;
 }
+
+void th_transform_transform(th_transform *o, th_transform t) {
+	th_vf2 to = t.origin;
+	to.x += t.pos.x;
+	to.y += t.pos.y;
+
+	th_transform_vf2(&o->pos, t);
+	o->scale.x *= t.scale.x;
+	o->scale.y *= t.scale.y;
+	th_transform_vf2(&o->origin, t);
+	o->rot += t.rot;
+}

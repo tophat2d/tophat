@@ -307,6 +307,7 @@ th_vf2 th_quad_min(th_quad q);
 void th_transform_rect(th_quad *q, th_transform t, th_rect r);
 void th_transform_quad(th_quad *q, th_transform t);
 void th_transform_vf2(th_vf2 *v, th_transform t);
+void th_transform_transform(th_transform *o, th_transform t);
 
 // vector
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
