@@ -617,7 +617,7 @@ const char *th_em_modulesrc[] = {
 "// Snaps a value to step.\n"
 "fn stepify*(val, step: th.fu): th.fu {\n"
 "\tif step != 0 {\n"
-"\t\tval = trunc(val / step + 0.5) * step\n"
+"\t\tval = floor(val / step + 0.5) * step\n"
 "\t}\n"
 "\treturn val\n"
 "}\n"

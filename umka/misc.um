@@ -24,7 +24,7 @@ fn readall*(path: str): str {
 // Snaps a value to step.
 fn stepify*(val, step: th.fu): th.fu {
 	if step != 0 {
-		val = trunc(val / step + 0.5) * step
+		val = floor(val / step + 0.5) * step
 	}
 	return val
 }
