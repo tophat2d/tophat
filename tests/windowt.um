@@ -15,7 +15,14 @@ fn main() {
 	window.setDims(th.Vf2{500, 400})
 	window.setIcon(placeholders.test)
 
+	cursorShow := true
+
 	for window.cycle() {
 		canvas.drawLine(th.black, th.Vf2{0, 0}, th.Vf2{100, 100}, 1)
+
+		if input.isJustPressed('c') {
+			cursorShow = !cursorShow
+			window.showCursor(cursorShow)
+		}
 	}
 }

@@ -616,6 +616,11 @@ void umth_window_set_icon(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_window_set_icon(img);
 }
 
+void umth_window_show_cursor(UmkaStackSlot *p, UmkaStackSlot *r) {
+	bool show = p[0].intVal;
+	th_window_show_cursor(show);
+}
+
 // draws text
 void umth_canvas_draw_text(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fu size = p[0].real32Val;
@@ -867,6 +872,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_window_set_viewport", &umth_window_set_viewport);
 	umkaAddFunc(umka, "umth_window_set_dims", &umth_window_set_dims);
 	umkaAddFunc(umka, "umth_window_set_icon", &umth_window_set_icon);
+	umkaAddFunc(umka, "umth_window_show_cursor", &umth_window_show_cursor);
 
 	// canvas
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);

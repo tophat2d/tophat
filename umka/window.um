@@ -109,7 +109,7 @@ fn setTargetFps*(fps: int) {
 }
 
 fn umth_window_set_dims(dm: th.Vf2)
-// Sets the dimensions of the window.
+// Sets the dimensions of the window, linux only.
 // 
 // `dm`
 // : the target dimensions in screen pixels
@@ -118,7 +118,13 @@ fn setDims*(dm: th.Vf2) {
 }
 
 fn umth_window_set_icon(img: image.Image)
-// Sets the window icon.
+// Sets the window icon, linux only.
 fn setIcon*(img: image.Image) {
 	umth_window_set_icon(img)
+}
+
+fn umth_window_show_cursor(show: bool)
+// Show or hide the cursor, linux only.
+fn showCursor*(show: bool) {
+	umth_window_show_cursor(show)
 }
