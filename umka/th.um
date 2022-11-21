@@ -24,7 +24,7 @@ fn mkVf2*(x: fu = 0, y: fu = 0): Vf2 {
 }
 
 // rotates `p` around `origin` with `rot` in degrees
-fn (p: ^th.Vf2) rotated*(origin: th.Vf2, rot: th.fu): th.Vf2 {
+fn (p: ^Vf2) rotated*(origin: Vf2, rot: fu): Vf2 {
 	angle := (rot * std.pi) / 180
 
 	pos := p^
@@ -41,93 +41,93 @@ fn (p: ^th.Vf2) rotated*(origin: th.Vf2, rot: th.fu): th.Vf2 {
 }
 
 // distance between p1 and p2
-fn (p1: ^th.Vf2) distanceTo*(p2: th.Vf2): th.fu {
+fn (p1: ^Vf2) distanceTo*(p2: Vf2): fu {
 	return std.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 }
 
 // Angle between p1 and p2
-fn (p1: ^th.Vf2) angleTo*(p2: th.Vf2): real {
+fn (p1: ^Vf2) angleTo*(p2: Vf2): real {
 	if p1.x == p2.x && p1.y == p2.y { return 0 }
 	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std.pi + 180
 }
 
 // Absolute value of a vector.
-fn (p: ^th.Vf2) abs*(): th.Vf2 {
-	return th.Vf2{fabs(p.x), fabs(p.y)}
+fn (p: ^Vf2) abs*(): Vf2 {
+	return Vf2{fabs(p.x), fabs(p.y)}
 }
 
 // Rounds a vector.
-fn (p: ^th.Vf2) round*(): th.Vf2 {
-	return th.Vf2{round(p.x), round(p.y)}
+fn (p: ^Vf2) round*(): Vf2 {
+	return Vf2{round(p.x), round(p.y)}
 }
 
 // Truncates a vector.
-fn (p: ^th.Vf2) trunc*(): th.Vf2 {
-	return th.Vf2{trunc(p.x), trunc(p.y)}
+fn (p: ^Vf2) trunc*(): Vf2 {
+	return Vf2{trunc(p.x), trunc(p.y)}
 }
 
 // Floors a vector.
-fn (p: ^th.Vf2) floor*(): th.Vf2 {
-	return th.Vf2{floor(p.x), floor(p.y)}
+fn (p: ^Vf2) floor*(): Vf2 {
+	return Vf2{floor(p.x), floor(p.y)}
 }
 
 // Ceils a vector.
-fn (p: ^th.Vf2) ceil*(): th.Vf2 {
-	return th.Vf2{ceil(p.x), ceil(p.y)}
+fn (p: ^Vf2) ceil*(): Vf2 {
+	return Vf2{ceil(p.x), ceil(p.y)}
 }
 
 // Creates a vector with both x and y set to f
-fn vf2f*(f: th.fu): th.Vf2 {
-	return th.Vf2{f, f}
+fn vf2f*(f: fu): Vf2 {
+	return Vf2{f, f}
 }
 
 // Subtracts a vector from another one.
-fn (p: ^th.Vf2) sub*(p2: th.Vf2): th.Vf2 {
-	return th.Vf2{p.x - p2.x, p.y - p2.y}
+fn (p: ^Vf2) sub*(p2: Vf2): Vf2 {
+	return Vf2{p.x - p2.x, p.y - p2.y}
 }
 
 // Subtracts a fu from a vector.
-fn (p: ^th.Vf2) subf*(f: th.fu): th.Vf2 {
-	return th.Vf2{p.x - f, p.y - f}
+fn (p: ^Vf2) subf*(f: fu): Vf2 {
+	return Vf2{p.x - f, p.y - f}
 }
 
 // Adds a vector to another one.
-fn (p: ^th.Vf2) add*(p2: th.Vf2): th.Vf2 {
-	return th.Vf2{p.x + p2.x, p.y + p2.y}
+fn (p: ^Vf2) add*(p2: Vf2): Vf2 {
+	return Vf2{p.x + p2.x, p.y + p2.y}
 }
 
 // Adds a fu to a vector.
-fn (p: ^th.Vf2) addf*(f: th.fu): th.Vf2 {
-	return th.Vf2{p.x + f, p.y + f}
+fn (p: ^Vf2) addf*(f: fu): Vf2 {
+	return Vf2{p.x + f, p.y + f}
 }
 
 // Divides a vector by another one.
-fn (p: ^th.Vf2) div*(p2: th.Vf2): th.Vf2 {
-	return th.Vf2{p.x / p2.x, p.y / p2.y}
+fn (p: ^Vf2) div*(p2: Vf2): Vf2 {
+	return Vf2{p.x / p2.x, p.y / p2.y}
 }
 
 // Divides a vector by a fu.
-fn (p: ^th.Vf2) divf*(f: th.fu): th.Vf2 {
-	return th.Vf2{p.x / f, p.y / f}
+fn (p: ^Vf2) divf*(f: fu): Vf2 {
+	return Vf2{p.x / f, p.y / f}
 }
 
 // Multiplies a vector by another one.
-fn (p: ^th.Vf2) mul*(p2: th.Vf2): th.Vf2 {
-	return th.Vf2{p.x * p2.x, p.y * p2.y}
+fn (p: ^Vf2) mul*(p2: Vf2): Vf2 {
+	return Vf2{p.x * p2.x, p.y * p2.y}
 }
 
 // Multiplies a vector by a fu.
-fn (p: ^th.Vf2) mulf*(f: th.fu): th.Vf2 {
-	return th.Vf2{p.x * f, p.y * f}
+fn (p: ^Vf2) mulf*(f: fu): Vf2 {
+	return Vf2{p.x * f, p.y * f}
 }
 
 // Returns the magnitude of a vector p.
-fn (p: ^th.Vf2) mag*(): th.fu {
+fn (p: ^Vf2) mag*(): fu {
 	return sqrt(p.x * p.x + p.y * p.y)
 }
 
 // Normalizes a vector.
-fn (p: ^th.Vf2) norm*(): th.Vf2 {
+fn (p: ^Vf2) norm*(): Vf2 {
 	if p.x == 0 && p.y == 0 {
 		return p^
 	}
@@ -136,7 +136,7 @@ fn (p: ^th.Vf2) norm*(): th.Vf2 {
 }
 
 // Calculates dot product between 2 vectors.
-fn (p: ^th.Vf2) dot*(q: th.Vf2): fu {
+fn (p: ^Vf2) dot*(q: Vf2): fu {
 	return p.x*q.x + p.y*q.y
 }
 
@@ -176,7 +176,7 @@ fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
 	return ret
 }
 
-type Quad* = [4]th.Vf2
+type Quad* = [4]Vf2
 
 fn umth_transform_quad(q: ^Quad, t: ^Transform)
 // Transforms a quad into another quad.

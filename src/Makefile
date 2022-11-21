@@ -22,12 +22,6 @@ $(EM_TARGET): $(UMKA_MODULES) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(U
 	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(UMKA_MODULES:umka/%=%) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_misc LICENSE version >> $(EM_TARGET)
 
-UMKA_RUNTIME_SRC_DEST = lib/umka/src/umka_runtime_src.h
-UMKA_RUNTIME_SRC_SRC = lib/umka/import/embed/umka_runtime_src.h
-
-$(UMKA_RUNTIME_SRC_DEST): $(UMKA_RUNTIME_SRC_SRC)
-	cp $(UMKA_RUNTIME_SRC_SRC) $(UMKA_RUNTIME_SRC_DEST)
-
 %.o: %.c
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MD -o $@ -c $<

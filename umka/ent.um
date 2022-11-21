@@ -82,9 +82,9 @@ fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
 	e.i = frames^[(round(real(t)/(1000/fps)) % len(frames^))]
 }
 
-fn umth_ent_ysort(e: ^ent.Ent, count: int)
+fn umth_ent_ysort(e: ^Ent, count: int)
 // Performs an y sort on entities.
-fn ysort*(ents: ^[]ent.Ent) {
+fn ysort*(ents: ^[]Ent) {
 	if len(ents^) > 0 {
 		umth_ent_ysort(&ents[0], len(ents^))
 	}
