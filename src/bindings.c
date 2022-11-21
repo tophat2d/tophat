@@ -407,6 +407,12 @@ void umth_input_get_str(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->ptrVal = buf;
 }
 
+void umth_input_get_mouse_delta(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *o = (th_vf2 *)p[0].ptrVal;
+	o->x = thg->mouse_delta.x / thg->scaling;
+	o->y = thg->mouse_delta.y / thg->scaling;
+}
+
 ///////////////////////
 // entities
 // draws an entity
@@ -621,6 +627,11 @@ void umth_window_show_cursor(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_window_show_cursor(show);
 }
 
+void umth_window_freeze_cursor(UmkaStackSlot *p, UmkaStackSlot *r) {
+	bool freeze = p[0].intVal;
+	th_window_freeze_cursor(freeze);
+}
+
 // draws text
 void umth_canvas_draw_text(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fu size = p[0].real32Val;
@@ -833,6 +844,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_input_is_just_released", &umth_input_is_just_released);
 	umkaAddFunc(umka, "umth_input_clear", &umth_input_clear);
 	umkaAddFunc(umka, "umth_input_get_str", &umth_input_get_str);
+	umkaAddFunc(umka, "umth_input_get_mouse_delta", &umth_input_get_mouse_delta);
 
 	// entities
 	umkaAddFunc(umka, "umth_ent_draw", &umth_ent_draw);
@@ -873,6 +885,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_window_set_dims", &umth_window_set_dims);
 	umkaAddFunc(umka, "umth_window_set_icon", &umth_window_set_icon);
 	umkaAddFunc(umka, "umth_window_show_cursor", &umth_window_show_cursor);
+	umkaAddFunc(umka, "umth_window_freeze_cursor", &umth_window_freeze_cursor);
 
 	// canvas
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);

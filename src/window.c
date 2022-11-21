@@ -18,7 +18,9 @@ static Window th_win;
 static Window th_root_win;
 static XWindowAttributes th_win_attribs;
 static GLXContext th_ctx;
+
 static Cursor blank_cursor;
+static bool cursor_frozen = false;
 
 static XkbDescPtr desc;
 static XIC xic;
@@ -167,7 +169,17 @@ int th_window_handle() {
 			th_input_key(ev.xbutton.button, keyDir);
 			break;
 		case MotionNotify:
-			thg->mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
+			thg->mouse_delta = (th_vf2){
+				.x = thg->mouse.x - ev.xmotion.x,
+				.y = thg->mouse.y - ev.xmotion.y
+			};
+
+			if (cursor_frozen)
+				XWarpPointer(th_dpy, None, th_win, None, None, None, None,
+					thg->mouse.x, thg->mouse.y
+				);
+			else
+				thg->mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
 			break;
 		case ClientMessage:
 			if (ev.xclient.data.l[0] == wm_delete_message) {
@@ -214,6 +226,10 @@ void th_window_show_cursor(bool show) {
 		XUndefineCursor(th_dpy, th_win);
 	else
 		XDefineCursor(th_dpy, th_win, blank_cursor);
+}
+
+void th_window_freeze_cursor(bool freeze) {
+	cursor_frozen = freeze;
 }
 
 #elif _WIN32
@@ -405,6 +421,8 @@ void th_window_set_dims(th_vf2 dm) { }
 void th_window_set_icon(th_image *img) { }
 
 void th_window_show_cursor(bool show) { }
+
+void th_window_freeze_cursor(bool freeze) { }
 
 #else
 #error tophat cant create a window on this platform yet

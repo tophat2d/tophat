@@ -155,6 +155,7 @@ typedef struct {
 	uu just_pressed[255];
 	uu just_released[255];
 	th_vf2 mouse;
+	th_vf2 mouse_delta;
 
 	th_shader *shaders;
 	uu shader_count;
@@ -345,6 +346,7 @@ void th_window_clear_frame();
 void th_window_set_dims(th_vf2 dm);
 void th_window_set_icon(th_image *img);
 void th_window_show_cursor(bool show);
+void th_window_freeze_cursor(bool freeze);
 void th_window_begin_scissor(int x, int y, size_t w, size_t h);
 void th_window_end_scissor();
 

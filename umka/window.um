@@ -128,3 +128,10 @@ fn umth_window_show_cursor(show: bool)
 fn showCursor*(show: bool) {
 	umth_window_show_cursor(show)
 }
+
+fn umth_window_freeze_cursor(freeze: bool)
+// Freezes the cursor in place. `input.getMouseDelta` will still report mouse
+// movements. Linux only.
+fn freezeCursor*(freeze: bool) {
+	umth_window_freeze_cursor(freeze)
+}

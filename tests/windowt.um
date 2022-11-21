@@ -16,13 +16,21 @@ fn main() {
 	window.setIcon(placeholders.test)
 
 	cursorShow := true
+	cursorFreeze := false
 
 	for window.cycle() {
 		canvas.drawLine(th.black, th.Vf2{0, 0}, th.Vf2{100, 100}, 1)
+		canvas.drawLine(th.red, input.getMousePos(),
+			input.getMousePos().sub(input.getMouseDelta()), 1)
 
 		if input.isJustPressed('c') {
 			cursorShow = !cursorShow
 			window.showCursor(cursorShow)
+		}
+
+		if input.isJustPressed('f') {
+			cursorFreeze = !cursorFreeze
+			window.freezeCursor(cursorFreeze)
 		}
 	}
 }

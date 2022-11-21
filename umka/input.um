@@ -84,3 +84,12 @@ fn umth_input_get_str(): str
 fn getStr*(): str {
 	return umth_input_get_str()
 }
+
+fn umth_input_get_mouse_delta(o: ^th.Vf2)
+// Returns the difference between mouse positions in the last cycle. Will work
+// even if `window.freezeCursor` is enabled.
+fn getMouseDelta*(): th.Vf2 {
+	o := th.Vf2{}
+	umth_input_get_mouse_delta(&o)
+	return o
+}
