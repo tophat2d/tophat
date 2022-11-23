@@ -29,3 +29,8 @@ fn quadToQuad*(q1, q2: th.Quad, ic: ^th.Vf2): bool {
 	return umth_coll_quad_to_quad(&q1, &q2, ic)
 }
 
+fn umth_coll_point_to_rect(p: th.Vf2, r: ^rect.Rect): bool
+// Check for a collision between a vf2 and a rectangle.
+fn vf2ToRect*(p: th.Vf2, r: rect.Rect): bool {
+	return umth_coll_point_to_rect(p, &r)
+}

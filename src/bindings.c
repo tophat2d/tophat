@@ -793,6 +793,13 @@ void umth_coll_quad_to_quad(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = th_quad_to_quad(q1, q2, ic);
 }
 
+void umth_coll_point_to_rect(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 v = *(th_vf2 *)&p[1];
+	th_rect *re = p[0].ptrVal;
+
+	r->intVal = th_coll_point_on_rect(v, re);
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "umth_fopen", &umth_fopen);
@@ -916,6 +923,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_coll_point_to_quad", &umth_coll_point_to_quad);
 	umkaAddFunc(umka, "umth_coll_line_to_quad", &umth_coll_line_to_quad);
 	umkaAddFunc(umka, "umth_coll_quad_to_quad", &umth_coll_quad_to_quad);
+	umkaAddFunc(umka, "umth_coll_point_to_rect", &umth_coll_point_to_rect);
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);

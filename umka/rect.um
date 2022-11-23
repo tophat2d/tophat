@@ -54,3 +54,7 @@ fn (r: ^Rect) transformed*(t: th.Transform): th.Quad {
 
 	return ret
 }
+
+fn (r: ^Rect) shrink*(p: th.Vf2): Rect {
+	return Rect{ r.x + p.x, r.y + p.y, r.w - 2*p.x, r.h - 2*p.y }
+}

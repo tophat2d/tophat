@@ -38,6 +38,7 @@ const (
 	key_enter* =     char(13   + 0x7f)	
 	key_alt* =       char(0x12 + 0x7f)
 	key_ctrl* =      char(0x11 + 0x7f)
+	key_tab* =       char(0x09 + 0x7f)
 )
 
 fn umth_input_get_mouse(out: ^th.Vf2)
