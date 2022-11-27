@@ -4,7 +4,6 @@ import (
 )
 
 var (
-	cam*: rect.Rect = rect.Rect { 0, 0, 640, 480 }
 	score*: int
 
 	audioBackground*: audio.Sound

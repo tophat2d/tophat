@@ -1,76 +1,85 @@
-// variables:
-// w and h: the dimensions of the window
-// fpsLimit: the fpsLimit
 
 import (
 	"audio.um"
-	"th.um"
 	"canvas.um"
+	"image.um"
+	"placeholders.um"
 	"rect.um"
 	"std.um"
-	"placeholders.um"
+	"th.um"
 )
 
 var (
 	start, end, clockOffset: real
 	w*, h*: int32
-	fpsLimit*: int = 60
+	fpsLimit: int = 60
+
+	wp*: th.Vf2
 )
 
-fn wsetup(title: str, w, h: int)
-fn clearframe()
-fn getdimensions(w, h: ^int32)
-fn swapbuffers()
-fn handleinput(): bool
-fn updatescaling(w, h, camw, camh: int32)
-fn sleep(ms: int)
+fn umth_window_setup(title: str, w, h: int)
+fn umth_window_clear_frame()
+fn umth_window_get_dimensions(w, h: ^int32)
+fn umth_window_swap_buffers()
+fn umth_window_handle(): bool
+fn umth_window_sleep(ms: int)
+
+fn umth_window_set_viewport(dm: th.Vf2)
+// Sets the dimensions of the viewport. The dimensions are saved in the `wp`
+// variable.
+// 
+// `dm`
+// : dimension of the viewport
+fn setViewport*(dm: th.Vf2) {
+	wp = dm
+	umth_window_set_viewport(dm)
+}
 
 // Sets up the engine and opens a window.
 fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	w, h = width, height
-	wsetup(title, width, height)
-	clearframe()
+	umth_window_setup(title, width, height)
+	umth_window_clear_frame()
 
 	if std.getenv("HOME") == "" {
 		th.platform = "windows"
 	}
-
-	updatescaling(width, height, width, height)
 
 	audio.__setup()
 	placeholders.__setup()
 
 	clockOffset = std.clock() * 1000
 	start = std.clock() * 1000
+
+	setViewport(th.Vf2{width, height})
 }
 
-// Cycle needs to be called every cycle. Pass the currently used camera, which
-// i used to calculate tophat's scaling. It returns true, if the window is
-// still running.
-fn cycle*(cam: rect.Rect): bool {
-	canvas.drawRect(th.black, rect.Rect{-cam.w * 2, 0, cam.w * 2, cam.h})
-	canvas.drawRect(th.black, rect.Rect{0, -cam.h * 2, cam.w, cam.h * 2})
-	canvas.drawRect(th.black, rect.Rect{0, cam.h, cam.w, cam.h * 2})
-	canvas.drawRect(th.black, rect.Rect{cam.w, 0, cam.w * 2, cam.h})
-	swapbuffers()
+// Cycle needs to be called every cycle for the window to work. If the window
+// was closed, it returns false.
+fn cycle*(): bool {
+	umth_window_set_viewport(wp)
+	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
+	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
+
+	umth_window_swap_buffers()
 
 	end = std.clock()*1000
 	th.delta = round(end - start)
 	if 1000/fpsLimit - th.delta > 0 {
-		sleep(1000/fpsLimit - th.delta)
+		umth_window_sleep(1000/fpsLimit - th.delta)
 		th.delta = round(std.clock()*1000 - start)
 	}
 
 	start = std.clock()*1000
 	th.time = round(start - clockOffset)
 
-	running := handleinput()
-	clearframe()
-	getdimensions(&w, &h)
+	running := umth_window_handle()
+	umth_window_clear_frame()
+	umth_window_get_dimensions(&w, &h)
 
 	audio.__cycle()
-
-	updatescaling(w, h, round(cam.w), round(cam.h))
 	return running
 }
 
@@ -97,4 +106,45 @@ fn setFullscreen*(fullscreen: bool) {
 // Returns true if window is fullscreen 
 fn isFullscreen*(): bool {
 	return umth_window_get_fullscreen()
+}
+
+// Returns dimensions of the window in screen pixels.
+fn getDims*(): th.Vf2 {
+	return th.Vf2{w, h}
+}
+
+// Sets the fps limit.
+// 
+// `fps`
+// : amount of fps the limit should be set to
+fn setTargetFps*(fps: int) {
+	fpsLimit = fps
+}
+
+fn umth_window_set_dims(dm: th.Vf2)
+// Sets the dimensions of the window, linux only.
+// 
+// `dm`
+// : the target dimensions in screen pixels
+fn setDims*(dm: th.Vf2) {
+	umth_window_set_dims(dm)
+}
+
+fn umth_window_set_icon(img: image.Image)
+// Sets the window icon, linux only.
+fn setIcon*(img: image.Image) {
+	umth_window_set_icon(img)
+}
+
+fn umth_window_show_cursor(show: bool)
+// Show or hide the cursor, linux only.
+fn showCursor*(show: bool) {
+	umth_window_show_cursor(show)
+}
+
+fn umth_window_freeze_cursor(freeze: bool)
+// Freezes the cursor in place. `input.getMouseDelta` will still report mouse
+// movements. Linux only.
+fn freezeCursor*(freeze: bool) {
+	umth_window_freeze_cursor(freeze)
 }

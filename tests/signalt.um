@@ -10,13 +10,13 @@ import (
 
 fn main() {
 	window.setup("title", 1280, 720)
-	cam := rect.mk(0, 0, 192, 108)
+	window.setViewport(th.Vf2{192, 108})
 
 	signal.register("spacePress", signal.Callback{
 		printf("%s\n", repr(ctx))
 	})
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		if input.isPressed(' ') {
 			signal.emit("spacePress", th.time)
 		}

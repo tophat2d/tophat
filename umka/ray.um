@@ -20,10 +20,8 @@ fn mk*(pos: th.Vf2, l: th.fu, r: th.fu = 0.0): Ray {
 	return Ray{pos, l, r}
 }
 
-fn craygetcoll(colls: ^ent.Coll, count: ^int, maxCount,
+fn umth_ray_getcoll(colls: ^ent.Coll, count: ^int, maxCount,
 	sceneLen: int, r: ^Ray, scene: ^^ent.Ent)
-fn craygettmapcoll(r: ^Ray, t: ^tilemap.Tilemap, ic: ^th.Vf2): bool
-
 // Same as ent.getcoll. Same changes will apply.
 fn (r: ^Ray) getColl*(s: []^ent.Ent, maxColls: th.uu): []ent.Coll {
 	if len(s) == 0 {
@@ -36,13 +34,14 @@ fn (r: ^Ray) getColl*(s: []^ent.Ent, maxColls: th.uu): []ent.Coll {
 
 	colls := make([]ent.Coll, maxColls)
 	count := 0
-	craygetcoll(&colls[0], &count, maxColls, len(s), r, &s[0])
+	umth_ray_getcoll(&colls[0], &count, maxColls, len(s), r, &s[0])
 	return slice(colls, 0, count)
 }
 
+fn umth_ray_get_tilemap_coll(r: ^Ray, t: ^tilemap.Tilemap, ic: ^th.Vf2): bool
 // Gets ray's collision to a tilemap.
 fn (r: ^Ray) getTilemapColl*(t: tilemap.Tilemap, ic: ^th.Vf2): bool {
-	return craygettmapcoll(r, &t, ic)
+	return umth_ray_get_tilemap_coll(r, &t, ic)
 }
 
 fn (r: ^Ray) draw*(cam: rect.Rect, color: uint32, thickness: th.fu) {

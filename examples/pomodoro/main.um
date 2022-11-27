@@ -390,6 +390,7 @@ fn updateCountdown() {
 fn main() {
   screen := th_rect.mk(0, 0, 512, 512)
   th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
+	th_window.setViewport(th.Vf2{screen.w, screen.h})
   v_mainFont = th_font.load("Font.ttf", 32, 1)
   v_mainFontSmall = th_font.load("Font.ttf", 20, 1)
   v_countdown = getCountdown(0)
@@ -402,7 +403,7 @@ fn main() {
   gui.padding = 2
   var (state: ^ElemState)
 
-  for th_window.cycle(screen) {
+  for th_window.cycle() {
     if isDark {
       v_colorscheme = c_colorschemeDark
     } else {
@@ -417,8 +418,10 @@ fn main() {
       updateCountdown()
     }
 
+		
     screen.w = th_window.w
     screen.h = th_window.h
+	th_window.setViewport(th.Vf2{screen.w, screen.h})
 
 	th_canvas.drawRect(v_colorscheme.background, screen)
 

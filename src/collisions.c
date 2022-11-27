@@ -144,3 +144,7 @@ uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc) {
 	return 0;
 }
 
+
+uu th_coll_point_on_rect(th_vf2 p, th_rect *r) {
+	return p.x >= r->x && p.y >= r->y && p.x <= r->x+r->w && p.y <= r->y+r->h;
+}

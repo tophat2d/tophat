@@ -50,7 +50,10 @@ fn (r: ^Rune) encode*(): str {
 	return str(out)
 }
 
-fn getNextRune*(a: str, pos: int): Rune
+fn umth_utf8_get_next_rune*(a: str, pos: int): Rune
+fn getNextRune*(a: str, pos: int): Rune {
+	return umth_utf8_get_next_rune(a, pos)
+}
 
 fn decode*(s: str): []Rune {
 	runes := make([]Rune, len(s))

@@ -6,8 +6,11 @@ import (
 	"rect.um"
 )
 
+fn umth_canvas_draw_text(text: str, pos: th.Vf2, color: uint32, size: th.fu)
 // Draws a basic pixel text. Only ascii is supported.
-fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu)
+fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu) {
+	umth_canvas_draw_text(text, pos, color, size)
+}
 
 // Returns the size of text taken by an equivalent drawText call.
 fn textSize*(text: str, scale: th.fu): th.Vf2 {
@@ -36,8 +39,14 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	return th.Vf2{maxw * scale * 6 - scale, h * 6 * scale}
 }
 
+fn umth_canvas_draw_rect*(color: uint32, r: rect.Rect)
 // Draws a Rectangle.
-fn drawRect*(color: uint32, r: rect.Rect)
+fn drawRect*(color: uint32, r: rect.Rect) {
+	umth_canvas_draw_rect(color, r)
+}
 
+fn umth_canvas_draw_line*(color: uint32, b, e: th.Vf2, thickness: th.fu)
 // Draws a line.
-fn drawLine*(color: uint32, b, e: th.Vf2, thickness: th.fu)
+fn drawLine*(color: uint32, b, e: th.Vf2, thickness: th.fu) {
+	umth_canvas_draw_line(color, b, e, thickness)
+}

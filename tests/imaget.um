@@ -21,7 +21,7 @@ fn pixelmerge(r, g, b, a: uint8): uint32 { return r << 24 | g << 16 | b << 8 | a
 
 fn main() {
 	window.setup("image test", 600, 600)
-	cam := rect.mk(0, 0, 600, 600)
+	window.setViewport(th.Vf2{600, 600})
 
 	img := image.load("etc/test.png")
 	printf("etc/test.png: %s\n", repr(img.validate()))
@@ -41,7 +41,7 @@ fn main() {
 
 	target := image.mk(make([]uint32, 10 * 10), th.Vf2{10, 10})
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		p := th.Vf2{1, 1}
 
 		canvas.drawText("drawOnQuad:", p, th.black, 2)
@@ -95,7 +95,7 @@ fn main() {
 			img.draw(th.Transform{
 				s: th.Vf2{0.5, 0.5},
 				p: th.Vf2{0, 0}})
-		target.removeRenderTarget(cam)
+		target.removeRenderTarget(window.wp)
 		target.draw(th.Transform{s: th.Vf2{10, 10}, p: p})
 
 		if input.isJustPressed('q') { break }

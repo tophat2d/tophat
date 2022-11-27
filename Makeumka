@@ -3,10 +3,15 @@
 
 UMKA_DIR     ?= ./lib/umka
 UMKA_LIBRARY ?= $(UMKA_DIR)/build/libumka.a
+UMKA_BINARY  ?= $(UMKA_DIR)/build/umka
+UMKA_RUNTIME_SRC = $(UMKA_DIR)/src/umka_runtime_src.h
 
 umka: $(UMKA_LIBRARY)
 
-$(UMKA_LIBRARY):
+$(UMKA_RUNTIME_SRC):
+	cp $(UMKA_DIR)/import/embed/umka_runtime_src.h $(UMKA_RUNTIME_SRC)
+
+$(UMKA_LIBRARY) $(UMKA_BINARY): $(UMKA_RUNTIME_SRC)
 	cd $(UMKA_DIR)/ && $(MAKE) -j$(shell nproc)
 
 deepclean::

@@ -11,6 +11,7 @@ import (
 
 fn main() {
 	window.setup("title", 1280, 720)
+	window.setViewport(th.Vf2{192, 108})
 	cam := rect.mk(0, 0, 192, 108)
 
 	atl := atlas.mk(image.load("etc/atlas.png"), th.Vf2{4, 4})
@@ -45,7 +46,7 @@ fn main() {
 
 	t.autotile(src, cfg, 1)
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		canvas.drawRect(th.white, cam)
 
 		t.draw(cam)	

@@ -155,6 +155,7 @@ typedef struct {
 	uu just_pressed[255];
 	uu just_released[255];
 	th_vf2 mouse;
+	th_vf2 mouse_delta;
 
 	th_shader *shaders;
 	uu shader_count;
@@ -245,6 +246,7 @@ uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
 uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
 uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
 bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
+uu th_coll_point_on_rect(th_vf2 p, th_rect *r);
 
 // entity
 th_quad th_ent_transform(th_ent *e);
@@ -289,7 +291,7 @@ void th_image_flush();
 int th_image_compile_shader(char *frag, char *vert);
 
 void th_image_set_as_render_target(th_image *img);
-void th_image_remove_render_target(th_image *img, th_rect *cam);
+void th_image_remove_render_target(th_image *img, th_vf2 wp);
 
 // input
 void th_input_key(int keycode, int bDown);
@@ -307,6 +309,7 @@ th_vf2 th_quad_min(th_quad q);
 void th_transform_rect(th_quad *q, th_transform t, th_rect r);
 void th_transform_quad(th_quad *q, th_transform t);
 void th_transform_vf2(th_vf2 *v, th_transform t);
+void th_transform_transform(th_transform *o, th_transform t);
 
 // vector
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
@@ -341,6 +344,10 @@ void th_window_get_dimensions(int *w, int *h);
 int th_window_handle();
 void th_window_swap_buffers();
 void th_window_clear_frame();
+void th_window_set_dims(th_vf2 dm);
+void th_window_set_icon(th_image *img);
+void th_window_show_cursor(bool show);
+void th_window_freeze_cursor(bool freeze);
 void th_window_begin_scissor(int x, int y, size_t w, size_t h);
 void th_window_end_scissor();
 bool th_window_is_fullscreen();

@@ -12,7 +12,7 @@ fn main() {
 
 	y := 200
 
-	for window.cycle(rect.mk(0, 0, 400, 400)) {
+	for window.cycle() {
 		if input.isJustPressed(input.mouse_up) {
 			y -= 5
 		}

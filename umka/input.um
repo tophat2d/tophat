@@ -38,14 +38,14 @@ const (
 	key_enter* =     char(13   + 0x7f)	
 	key_alt* =       char(0x12 + 0x7f)
 	key_ctrl* =      char(0x11 + 0x7f)
+	key_tab* =       char(0x09 + 0x7f)
 )
 
-fn cgetmouse(out: ^th.Vf2)
-
+fn umth_input_get_mouse(out: ^th.Vf2)
 // Returns the position of mouse cursor in relation to the screen.
 fn getMousePos*(): th.Vf2 {
 	out := th.Vf2{}
-	cgetmouse(&out)
+	umth_input_get_mouse(&out)
 	return out
 }
 
@@ -54,35 +54,43 @@ fn getGlobalMousePos*(cam: rect.Rect): th.Vf2 {
 	return cam.toWorld(getMousePos())
 }
 
-fn cispressed(keycode: char): int32
-fn cisjustpressed(key: char): int32
-fn cisjustreleased(key: char): int32
-
+fn umth_input_is_pressed(keycode: char): int32
 // Returns true if key is pressed. Either use codes defined in the file above,
 // or pass lower case char/number.
 fn isPressed*(code: char): bool {
-	val := bool(cispressed(code))
+	val := bool(umth_input_is_pressed(code))
 	return val
 }
 
+fn umth_input_is_just_pressed(key: char): int32
 // Returns, whether code was just pressed this loop.
 fn isJustPressed*(code: char): bool {
-	return bool(cisjustpressed(code))
+	return bool(umth_input_is_just_pressed(code))
 }
 
+fn umth_input_is_just_released(key: char): int32
 // Returns true if a key was just released.
 fn isJustReleased*(code: char): bool {
-	return bool(cisjustreleased(code))
+	return bool(umth_input_is_just_released(code))
 }
 
-fn cclear*(code: char)
+fn umth_input_clear*(code: char)
 // Clears both the pressed and justPressed state of a code.
 fn clear*(code: char) {
-	cclear(code)
+	umth_input_clear(code)
 }
 
-fn cgetinputstring(): str
+fn umth_input_get_str(): str
 // Returns a string entered by the user in the last cycle.
 fn getStr*(): str {
-	return cgetinputstring()
+	return umth_input_get_str()
+}
+
+fn umth_input_get_mouse_delta(o: ^th.Vf2)
+// Returns the difference between mouse positions in the last cycle. Will work
+// even if `window.freezeCursor` is enabled.
+fn getMouseDelta*(): th.Vf2 {
+	o := th.Vf2{}
+	umth_input_get_mouse_delta(&o)
+	return o
 }

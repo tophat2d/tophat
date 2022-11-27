@@ -11,11 +11,11 @@ import (
 
 fn main() {
 	window.setup("my title", 400, 400)
-	cam := rect.mk(0, 0, 200, 200)
+	window.setViewport(th.Vf2{200, 200})
 
 	img := image.load("etc/test.png")
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		mpos := input.getMousePos()
 
 		window.beginScissorRect(rect.Rect{mpos.x-32, mpos.y-32, 64, 64})

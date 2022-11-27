@@ -11,24 +11,24 @@ const (
 
 type Font* = struct { _: ^struct{} }
 
-fn cfontload(path: str, size: th.fu, filter: uint32): ^struct{}
-fn cfontdraw(font: Font, s: str, x: th.fu, y: th.fu, color: uint32, scale: th.fu)
-fn cfontmeasure(font: Font, s: str, o: ^th.Vf2)
 
+fn umth_font_load(path: str, size: th.fu, filter: uint32): ^struct{}
 fn load*(path: str, size: th.fu, filter: uint32 = filterBilinear): Font {
-	return Font{cfontload(path, size, filter)}
+	return Font{umth_font_load(path, size, filter)}
 }
 
+fn umth_font_draw(font: Font, s: str, x: th.fu, y: th.fu, color: uint32, scale: th.fu)
 fn (f: ^Font) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu = 1.0) {
-	cfontdraw(f^, text, pos.x, pos.y, color, scale)
+	umth_font_draw(f^, text, pos.x, pos.y, color, scale)
 }
 
 fn (f: ^Font) validate*(): bool {
 	return f._ != null
 }
 
+fn umth_font_measure(font: Font, s: str, o: ^th.Vf2)
 fn (f: ^Font) measure*(text: str): th.Vf2 {
 	var size: th.Vf2
-	cfontmeasure(f^, text, &size)
+	umth_font_measure(f^, text, &size)
 	return size
 }

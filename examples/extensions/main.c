@@ -8,7 +8,8 @@
  * Be aware that this might produce unexpected results with colliding fucntions.
  * It's a good practice to prefix the c functions.
  *
- * Compile with: cc -shared -o main.umi main.c
+ * Compile with: cc -fPIC -shared -o main.umi main.c \
+ *   -I../../lib/umka/src -I../../lib/miniaudio -I../../lib/stb
  *
  * p is an array of parameters, indexed from the last.
  * r is a pointer to the return value.

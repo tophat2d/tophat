@@ -3,7 +3,7 @@ import ("window.um"; "rect.um"; "canvas.um"; "input.um"; "th.um")
 fn main() {
 	window.setup("fullscreen test", 640, 480)
 
-	for window.cycle(rect.mk(0, 0, 640, 480)) {
+	for window.cycle() {
 		canvas.drawText("[ALT + ENTER] TO ENTER FULLSCREEN", th.Vf2{0, 0}, th.black, 2)
 		canvas.drawText("[ESC] TO EXIT FULLSCREEN", th.Vf2{0, 11}, th.black, 2)
 		canvas.drawText("NOTE: THE FULLSCREEN HOTKEYS ARE CONFIGURED MANUALLY", th.Vf2{0, 22}, th.black, 2)

@@ -41,17 +41,15 @@ fn (t: ^Tilemap) edit*(x, y, tile: int) {
 	t.cells[y*t.w + x] = tile
 }
 
-fn cdrawtmap(ct: ^Tilemap, cam: ^rect.Rect)
-
+fn umth_tilemap_draw(ct: ^Tilemap, cam: ^rect.Rect)
 // Draws the tilemap.
 fn (t: ^Tilemap) draw*(cam: rect.Rect) {
 	if len(t.cells) == 0 { return }
 
-	cdrawtmap(t, &cam)
+	umth_tilemap_draw(t, &cam)
 }
 
-fn ctmapgetcoll(pos: ^th.Vf2, vert: ^th.uu, t: ^Tilemap, e: ^ent.Ent): int32
-
+fn umth_tilemap_getcoll(pos: ^th.Vf2, vert: ^th.uu, t: ^Tilemap, e: ^ent.Ent): int32
 // Checks, if t collides with e.
 // pos is the tile index where the collision happened
 // vert is which index collided
@@ -59,13 +57,12 @@ fn ctmapgetcoll(pos: ^th.Vf2, vert: ^th.uu, t: ^Tilemap, e: ^ent.Ent): int32
 fn (t: ^Tilemap) getColl*(e: ent.Ent, vert: ^th.uu, pos: ^th.Vf2): bool {
 	if len(t.cells) == 0 { return false }
 
-	c := ctmapgetcoll(pos, vert, t, &e)
+	c := umth_tilemap_getcoll(pos, vert, t, &e)
 
 	return bool(c)
 }
 
-fn cautotile(tgt: ^th.uu, w, h: th.uu, src, cfg: ^th.uu, tile: th.uu)
-
+fn umth_tilemap_autotile(tgt: ^th.uu, w, h: th.uu, src, cfg: ^th.uu, tile: th.uu)
 // Autotile turns all `tile` tiles in `src` into tiles in `tileCfg`, so they
 // follow up correctly. `tileCfg` is an array of 16 tiles. They are placed in
 // a way where OR of all the places where the tile continues (top, right bot,
@@ -77,5 +74,5 @@ fn (t: ^Tilemap) autotile*(src, tileCfg: []th.uu, tile: th.uu) {
 		error("autotile: tileCfg len isn't 16'")
 	}
 
-	cautotile(&t.cells[0], t.w, len(t.cells)/t.w, &src[0], &tileCfg[0], tile)
+	umth_tilemap_autotile(&t.cells[0], t.w, len(t.cells)/t.w, &src[0], &tileCfg[0], tile)
 }

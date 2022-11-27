@@ -1,6 +1,7 @@
 #include "tophat.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 extern th_global *thg;
 
@@ -17,6 +18,9 @@ static Window th_win;
 static Window th_root_win;
 static XWindowAttributes th_win_attribs;
 static GLXContext th_ctx;
+
+static Cursor blank_cursor;
+static bool cursor_frozen = false;
 
 static XkbDescPtr desc;
 static XIC xic;
@@ -101,6 +105,14 @@ void th_window_setup(char *name, int w, int h) {
 	glViewport(0, 0, th_win_attribs.width, th_win_attribs.height);
 	thg->viewport.w = th_win_attribs.width;
 	thg->viewport.h = th_win_attribs.height;
+
+	char bm[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	Pixmap pix = XCreateBitmapFromData(th_dpy, th_win, bm, 1, 1);
+	XColor black;
+	memset(&black, 0, sizeof(XColor));
+	black.flags = DoRed | DoGreen | DoBlue;
+	blank_cursor = XCreatePixmapCursor(th_dpy, pix, pix, &black, &black, 0, 0);
+	XFreePixmap(th_dpy, pix);
 }
 
 void th_window_get_dimensions(int *w, int *h) {
@@ -167,7 +179,17 @@ int th_window_handle() {
 			th_input_key(ev.xbutton.button, keyDir);
 			break;
 		case MotionNotify:
-			thg->mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
+			thg->mouse_delta = (th_vf2){
+				.x = thg->mouse.x - ev.xmotion.x,
+				.y = thg->mouse.y - ev.xmotion.y
+			};
+
+			if (cursor_frozen)
+				XWarpPointer(th_dpy, None, th_win, None, None, None, None,
+					thg->mouse.x, thg->mouse.y
+				);
+			else
+				thg->mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
 			break;
 		case ClientMessage:
 			if (ev.xclient.data.l[0] == wm_delete_message) {
@@ -194,6 +216,32 @@ void th_window_swap_buffers() {
 
 	thg->input_string_len = 0;
 }
+
+void th_window_set_dims(th_vf2 dm) {
+	XResizeWindow(th_dpy, th_win, dm.x, dm.y);
+}
+
+void th_window_set_icon(th_image *img) {
+	Atom net_wm_icon = XInternAtom(th_dpy, "_NEW_WM_ICON", False);
+	Atom cardinal = XInternAtom(th_dpy, "CARDINAL", False);
+
+	uint32_t *data = th_image_get_data(img, true);
+	XChangeProperty(th_dpy, th_win, net_wm_icon, cardinal, 32, PropModeReplace,
+		(const unsigned char *)data, img->dm.x * img->dm.y);
+	free(data);
+}
+
+void th_window_show_cursor(bool show) {
+	if (show)
+		XUndefineCursor(th_dpy, th_win);
+	else
+		XDefineCursor(th_dpy, th_win, blank_cursor);
+}
+
+void th_window_freeze_cursor(bool freeze) {
+	cursor_frozen = freeze;
+}
+
 #elif _WIN32
 #include <windows.h>
 #include <wingdi.h>
@@ -444,6 +492,17 @@ void th_window_clear_frame() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
+// CC: ~ske
+// After implementing these functions, please remove the "linux only" note in
+// their umka docs.
+void th_window_set_dims(th_vf2 dm) { }
+
+void th_window_set_icon(th_image *img) { }
+
+void th_window_show_cursor(bool show) { }
+
+void th_window_freeze_cursor(bool freeze) { }
+
 #else
 #error tophat cant create a window on this platform yet
 #endif
@@ -469,4 +528,5 @@ void th_window_end_scissor() {
 	th_image_flush();
 	glDisable(GL_SCISSOR_TEST);
 }
+
 

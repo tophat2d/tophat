@@ -1,0 +1,9 @@
+image: archlinux
+sources:
+    - https://git.sr.ht/~mrms/tophat
+secrets:
+    - 09e2cbc4-14d3-473d-9855-d14a906bda1e
+tasks:
+    - event:
+        ssh -o 'StrictHostKeyChecking no' marek@mrms.cz /home/marek/on-tophat-push
+
