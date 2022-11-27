@@ -486,6 +486,14 @@ void umth_window_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_window_end_scissor();
 }
 
+void umth_window_get_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->uintVal = th_window_is_fullscreen();
+}
+
+void umth_window_set_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_window_set_fullscreen(p->uintVal);
+}
+
 // draws text
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fu size = p[0].real32Val;
@@ -841,18 +849,21 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_sound_set_start_time_ms", &umth_sound_set_start_time_ms);
 	umkaAddFunc(umka, "umth_sound_set_stop_time_ms", &umth_sound_set_stop_time_ms);
 
-
-	// canvas
+	// window
+	umkaAddFunc(umka, "umth_window_get_fullscreen", &umth_window_get_fullscreen);
+	umkaAddFunc(umka, "umth_window_set_fullscreen", &umth_window_set_fullscreen);
 	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
 	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
-	umkaAddFunc(umka, "drawText", &umdrawtext);
 	umkaAddFunc(umka, "wsetup", &umwindowsetup);
-	umkaAddFunc(umka, "clearframe", &umwindowclearframe);
 	umkaAddFunc(umka, "getdimensions", &umwindowgetdimensions);
 	umkaAddFunc(umka, "swapbuffers", &umwindowswapbuffers);
 	umkaAddFunc(umka, "handleinput", &umwindowhandle);
-	umkaAddFunc(umka, "updatescaling", &umgetscaling);
 	umkaAddFunc(umka, "sleep", &umwindowsleep);
+
+	// canvas
+	umkaAddFunc(umka, "drawText", &umdrawtext);
+	umkaAddFunc(umka, "clearframe", &umwindowclearframe);
+	umkaAddFunc(umka, "updatescaling", &umgetscaling);
 	umkaAddFunc(umka, "drawRect", &umcanvasrect);
 	umkaAddFunc(umka, "drawLine", &umcanvasline);
 	umkaAddFunc(umka, "cdrawimage", &umimagedraw);

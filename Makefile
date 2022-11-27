@@ -25,6 +25,13 @@ CFLAGS += -Ilib/stb/ \
 		-Ilib/chew \
 		-Ilib/glad
 
+# NOTE(skejeton): @vtereshkov here you might need to fix the flags
+# 								try adding -mwin32 and -municode, or removing them in permutations
+#									for more info: https://gcc.gnu.org/onlinedocs/gcc/x86-Windows-Options.html
+ifeq ($(SHORT_PLATFORM), MINGW64_NT)
+	CFLAGS += -mwindows
+endif
+
 DEFS += -DUMKA_STATIC -DUMKA_EXT_LIBS
 WARNS = -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
 	-Wno-old-style-declaration -Wno-implicit-fallthrough

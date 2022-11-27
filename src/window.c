@@ -108,6 +108,16 @@ void th_window_get_dimensions(int *w, int *h) {
 	*h = th_win_attribs.height;
 }
 
+bool th_window_is_fullscreen() {
+	// TODO(skejeton): ~mrms this is for you
+	return false;
+}
+
+void th_window_set_fullscreen(bool fullscreen) {
+	// TODO(skejeton): ~mrms this is for you
+	(void)fullscreen;
+}
+
 int th_window_handle() {
 	if (!window_active) {
 		th_error("No window was created.");
@@ -194,14 +204,71 @@ static HDC th_hdc;
 static RECT th_win_rect;
 static int should_close = 0;
 static th_vf2 win_size;
-
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	if (msg == WM_DESTROY)
-		should_close = 1;
-	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
+// NOTE(skejeton): this is the position of the window prior to going fullscreen
+static struct { int x, y, w, h; } win_prior;
 
 static HKL hkl;
+
+static void KeyProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+	uint32_t key = tolower(MapVirtualKeyEx(wParam, MAPVK_VK_TO_CHAR, hkl));
+	if (key == 0 || iscntrl(key))
+		key = MapVirtualKeyEx(MapVirtualKey(wParam, MAPVK_VK_TO_VSC), MAPVK_VSC_TO_VK, hkl) + 0x7f;
+
+	th_input_key(key, (msg == WM_SYSKEYDOWN) || (msg == WM_KEYDOWN));
+}
+
+static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
+
+	// i found a list of these on the wine website, but not on MSDN -_-
+
+	switch (msg) {
+		case WM_MENUCHAR:
+			// NOTE(skejeton): disable the ding sound when pressing an alt shortcut
+			return MNC_CLOSE << 16;
+		case WM_SYSKEYDOWN:
+		case WM_SYSKEYUP:
+			KeyProc(hwnd, msg, wParam, lParam);
+
+			// NOTE(skejeton): disable the ding sound when pressing an alt shortcut
+			return MNC_CLOSE << 16;
+			break;
+		case WM_KEYDOWN: 
+			char key_state[256];
+			GetKeyboardState(key_state);
+
+			wchar_t buf[256];
+			int v = ToUnicode(wParam, MapVirtualKey(wParam, MAPVK_VK_TO_VSC), key_state, buf, 256, 0);
+			if (v == 1) // only supports one character for now
+				thg->input_string_len += th_utf8_encode(thg->input_string + thg->input_string_len, buf[0]);
+			// FALLTHROUGH
+		case WM_KEYUP:
+			KeyProc(hwnd, msg, wParam, lParam);
+			break;
+		case WM_LBUTTONDOWN:
+		case WM_LBUTTONUP:
+			th_input_key(1, msg == WM_LBUTTONDOWN);
+			break;
+		case WM_MBUTTONDOWN:
+		case WM_MBUTTONUP:
+			th_input_key(2, msg == WM_MBUTTONDOWN);
+			break;
+		case WM_RBUTTONDOWN:
+		case WM_RBUTTONUP:
+			th_input_key(3, msg == WM_RBUTTONDOWN);
+			break;
+		case WM_MOUSEMOVE:
+			thg->mouse = (th_vf2){ .x = GET_X_LPARAM(lParam), .y = GET_Y_LPARAM(lParam) };
+			break;
+		case WM_MOUSEWHEEL:
+			th_input_key(GET_WHEEL_DELTA_WPARAM(wParam) < 0 ? 5 : 4, 1);
+			break;
+		case WM_DESTROY:
+			should_close = 1;
+		default:
+			return DefWindowProc(hwnd, msg, wParam, lParam);
+	}
+	return 0;
+}
 
 void w32_get_client_window_size(int *w, int *h) {
 	RECT rect = {0};
@@ -307,28 +374,35 @@ void th_window_get_dimensions(int *w, int *h) {
 
 // NOTE(skejeton):
 // whether the window is fullscreen or not can be detected if we check if window has a WS_POPUP style
-
 bool th_window_is_fullscreen() {
 	return GetWindowLongPtr(th_win, GWL_STYLE) & WS_POPUP;
+}
+
+static void set_window_prior_to_rect(RECT r) {
+	win_prior.x = r.left;
+	win_prior.y = r.top;
+	win_prior.w = r.right-r.left;
+	win_prior.h = r.bottom-r.top;
 }
 
 void th_window_set_fullscreen(bool fullscreen) {
 	if (th_window_is_fullscreen() == fullscreen) {
 		// no change required
-		return
+		return;
 	}
 
 	int w = GetSystemMetrics(SM_CXSCREEN), h = GetSystemMetrics(SM_CYSCREEN);
 
 	if (fullscreen) {
-		SetWindowLongPtr(th_win, GWL_STYLE, WS_VISIBLE | WS_OVERLAPPEDWINDOW)
-		SetWindowPos(th_win, HWND_TOP, (w-win_size.x)/2, (h-win_size.y)/2, win_size.x, win_size.y, SWP_FRAMECHANGED)
+		SetWindowLongPtr(th_win, GWL_STYLE, WS_VISIBLE | WS_POPUP);
+		RECT r;
+		GetWindowRect(th_win, &r);
+		set_window_prior_to_rect(r);
+		SetWindowPos(th_win, HWND_TOP, 0, 0, w, h, SWP_FRAMECHANGED);
 	} else {
-		SetWindowLongPtr(th_win, GWL_STYLE, WS_VISIBLE | WS_POPUP)
-		SetWindowPos(th_win, HWND_TOP, 0, 0, w, h, SWP_FRAMECHANGED)
+		SetWindowLongPtr(th_win, GWL_STYLE, WS_VISIBLE | WS_OVERLAPPEDWINDOW);
+		SetWindowPos(th_win, HWND_TOP, win_prior.x, win_prior.y, win_prior.w, win_prior.h, SWP_FRAMECHANGED);
 	}
-
- 	return GetWindowLongPtr(th_win, GWL_STYLE) & WS_POPUP;
 }
 
 int th_window_handle() {
@@ -337,53 +411,16 @@ int th_window_handle() {
 		return 0;
 	}
 
+	// NOTE(skejeton): prevent stale alt
+	th_input_key(VK_MENU+0x7F, GetAsyncKeyState(VK_MENU));
+	
 	MSG msg;
 	th_input_key(4, 0);
 	th_input_key(5, 0);
 
 	while (PeekMessage(&msg, NULL, 0, 0, 1)) {
 		TranslateMessage(&msg);
-
-		// i found a list of these on the wine website, but not on MSDN -_-
-		switch (msg.message) {
-		case WM_KEYDOWN:; // FALLTHROUGH
-			char key_state[256];
-			GetKeyboardState(key_state);
-
-			wchar_t buf[256];
-			int v = ToUnicode(msg.wParam, MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), key_state, buf, 256, 0);
-			if (v == 1) // only supports one character for now
-				thg->input_string_len += th_utf8_encode(thg->input_string + thg->input_string_len, buf[0]);
-
-		case WM_KEYUP:;
-			uint32_t key = tolower(MapVirtualKeyEx(msg.wParam, MAPVK_VK_TO_CHAR, hkl));
-			if (key == 0 || iscntrl(key))
-				key = MapVirtualKeyEx(MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), MAPVK_VSC_TO_VK, hkl) + 0x7f;
-
-			th_input_key(key, msg.message == WM_KEYDOWN);
-			break;
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-			th_input_key(1, msg.message == WM_LBUTTONDOWN);
-			break;
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-			th_input_key(2, msg.message == WM_MBUTTONDOWN);
-			break;
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-			th_input_key(3, msg.message == WM_RBUTTONDOWN);
-			break;
-		case WM_MOUSEMOVE:
-			thg->mouse = (th_vf2){ .x = GET_X_LPARAM(msg.lParam), .y = GET_Y_LPARAM(msg.lParam) };
-			break;
-		case WM_MOUSEWHEEL:
-			th_input_key(GET_WHEEL_DELTA_WPARAM(msg.wParam) < 0 ? 5 : 4, 1);
-			break;
-		default:
-			DispatchMessage(&msg);
-			break;
-		}
+		DispatchMessage(&msg);
 	}
 	GetClientRect(th_win, &th_win_rect);
 	glViewport(0, 0, th_win_rect.right, th_win_rect.bottom);

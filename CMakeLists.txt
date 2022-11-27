@@ -13,10 +13,10 @@ if(MSVC)
 
     file( GLOB th_sources
         "src/*.c"
-        "lib/glad.c"
+        "lib/glad/glad.c"
     )
 
-    add_executable(tophat ${th_sources})
+    add_executable(tophat WIN32 ${th_sources})
     
     # NOTE(skejeton): _USE_MATH_DEFINES flag for M_PI and so on.
     # NOTE(skejeton): UMKA_STATIC flag for we are linking umka statically not as a DLL. 
