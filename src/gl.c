@@ -3,14 +3,16 @@
 
 #include "tophat.h"
 
-#include <GL/gl.h>
-#include <chew.h>
+#include "openglapi.h"
 
 extern th_global *thg;
 
 void th_gl_init() {
 #ifdef _WIN32
-	chewInit();
+	if (gladLoadGL() == 0) {
+		th_error("Failed to initialize opengl!");
+		exit(-1);
+	}
 #endif
 }
 

@@ -6,5 +6,9 @@ import (
 )
 
 fn main() {
+	// TODO(skejeton): If we don't call this on windows, most of the following
+	//				   tophat calls will cause a null dereference, because 
+	//				   GLAD didn't initialize any functions.
+	window.setup("Hello world", 100, 100)
 	for window.cycle() { }
 }

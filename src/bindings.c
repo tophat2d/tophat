@@ -2,9 +2,8 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <string.h>
-#include <GL/gl.h>
+#include "openglapi.h"
 
-#include <chew.h>
 #include <umka_api.h>
 #include <stb_image.h>
 
@@ -12,6 +11,7 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#include <timeapi.h>
 #else
 #include <unistd.h>
 #endif
@@ -571,7 +571,6 @@ void umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_window_setup(title, w, h);
 
-	th_gl_init();
 	th_image_init();
 	th_canvas_init();
 }
@@ -599,7 +598,13 @@ void umth_window_sleep(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int ms = p[0].intVal;
 
 #ifdef _WIN32
-	Sleep(ms);
+  double sec = ms/1000.0;
+  double time_start = timeGetTime();
+  double time = time_start;
+  while ((time - time_start) < sec) {
+    Sleep(0);
+    time = timeGetTime();
+  }
 #else
 	usleep(ms * 1000);
 #endif

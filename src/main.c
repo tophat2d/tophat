@@ -157,6 +157,7 @@ int main(int argc, char *argv[]) {
 	thg->scaling = 1;
 
 	umkaOK = umkaRun(thg->umka);
+
 	if (!umkaOK) {
 		UmkaError error;
 		umkaGetError(thg->umka, &error);

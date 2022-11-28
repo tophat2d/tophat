@@ -4,8 +4,7 @@
 #include <stdio.h>
 
 #include "tophat.h"
-#include <GL/gl.h>
-#include <chew.h>
+#include "openglapi.h"
 
 extern th_global *thg;
 

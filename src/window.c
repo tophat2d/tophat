@@ -251,6 +251,15 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
 
 static HKL hkl;
 
+void w32_get_client_window_size(int *w, int *h) {
+	RECT rect = {0};
+	rect.right = *w;
+	rect.bottom = *h;
+	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+	*w = rect.right-rect.left;
+	*h = rect.bottom-rect.top;
+}
+
 void th_window_setup(char *name, int w, int h) {
 	if (window_active) {
 		th_error("Window already created.");
@@ -270,16 +279,22 @@ void th_window_setup(char *name, int w, int h) {
 
 	RegisterClass(&wc);
 
+	// NOTE(skejeton): Set window size to w/h, because in CreateWindow the window size also includes the titlebar/decoraion size,
+	//				   that makes the actual content window size incorrect.
+	int window_w = w, window_h = h;
+	w32_get_client_window_size(&window_w, &window_h);
+
 	th_win = CreateWindow(
 		CLASS_NAME,
 		name,
 		WS_OVERLAPPEDWINDOW,
 		CW_USEDEFAULT,
 		CW_USEDEFAULT,
-		w, h,
+		window_w, window_h,
 		NULL, NULL,
 		hInstance, NULL);
 	GetWindowRect(th_win, &th_win_rect);
+
 	win_size.x = th_win_rect.right;
 	win_size.y = th_win_rect.bottom;
 
@@ -318,6 +333,7 @@ void th_window_setup(char *name, int w, int h) {
 		exit(1);
 	}
 	wglMakeCurrent(th_hdc, ctx);
+	th_gl_init();
 
 	glDisable(GL_DEPTH_TEST);
 	glDepthMask(GL_FALSE);
@@ -413,7 +429,7 @@ void th_window_clear_frame() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-// CC: ~ske
+// TO: ~ske
 // After implementing these functions, please remove the "linux only" note in
 // their umka docs.
 void th_window_set_dims(th_vf2 dm) { }
@@ -429,8 +445,8 @@ void th_window_freeze_cursor(bool freeze) { }
 #endif
 
 void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
-	// NOTE(skejeton): The flush is necessary because all the previous render calls
-	//				   shouldn't be cut out using the rectangle.
+	// NOTE(skejeton): The flush is necessary because all the previous render
+	//                 calls shouldn't be cut out using the rectangle.
 	th_canvas_flush();
 	th_image_flush();
 

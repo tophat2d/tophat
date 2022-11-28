@@ -1,11 +1,12 @@
 #ifndef TOPHAT_H
 #define TOPHAT_H
 
+#include <stdint.h>
 #include <stdbool.h>
 #include <miniaudio.h>
 #include <stb_truetype.h>
 #include <umka_api.h>
-#include <GL/gl.h>
+#include "openglapi.h"
 
 #define INPUT_STRING_SIZE 256
 #define MAX_SCISSORS 1024
@@ -16,7 +17,6 @@ typedef float fu;
 typedef uint32_t uu;
 typedef int32_t iu;
 
-#define SWAP(v1, v2) do { typeof(v1) tmp = v1; v1 = v2; v2 = tmp; } while (0)
 #define LEN(a) (sizeof(a) / sizeof((a)[0]))
 
 typedef union {

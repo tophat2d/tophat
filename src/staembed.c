@@ -793,6 +793,10 @@ const char *th_em_modulesrc[] = {
 "\n"
 "\treturn ret\n"
 "}\n"
+"\n"
+"fn (r: ^Rect) shrink*(p: th.Vf2): Rect {\n"
+"\treturn Rect{ r.x + p.x, r.y + p.y, r.w - 2*p.x, r.h - 2*p.y }\n"
+"}\n"
 "",
 "// Tilemaps allow for easy level construction and fast collisions. You can even\n"
 "// use them for some games instead of entities (tetris comes to mind)\n"
