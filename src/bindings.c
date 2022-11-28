@@ -11,7 +11,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <timeapi.h>
 #else
 #include <unistd.h>
 #endif
@@ -612,16 +611,26 @@ void umth_window_handle(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = th_window_handle();
 }
 
+#ifdef _WIN32
+static double time_now() {
+	LARGE_INTEGER cnt, frq;
+	QueryPerformanceCounter(&cnt);
+	QueryPerformanceFrequency(&frq);
+
+	return (double)cnt.QuadPart/(double)frq.QuadPart;
+}
+#endif
+
 void umth_window_sleep(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int ms = p[0].intVal;
 
 #ifdef _WIN32
   double sec = ms/1000.0;
-  double time_start = timeGetTime();
+  double time_start = time_now();
   double time = time_start;
   while ((time - time_start) < sec) {
     Sleep(0);
-    time = timeGetTime();
+    time = time_now();
   }
 #else
 	usleep(ms * 1000);
