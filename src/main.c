@@ -66,7 +66,7 @@ void win32_argv_free(char **argv) {
   free(argv);
 }
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow) {
+int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
 	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
 		freopen("CON", "w", stdout);
 		freopen("CON", "w", stderr);
