@@ -11,7 +11,6 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#include <timeapi.h>
 #else
 #include <unistd.h>
 #endif
@@ -564,6 +563,14 @@ void umth_window_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_window_end_scissor();
 }
 
+void umth_window_get_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->uintVal = th_window_is_fullscreen();
+}
+
+void umth_window_set_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_window_set_fullscreen(p->uintVal);
+}
+
 void umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *title = (char *)p[2].ptrVal;
 	int w = p[1].intVal;
@@ -573,6 +580,16 @@ void umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_image_init();
 	th_canvas_init();
+}
+
+// draws text
+void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
+	fu size = p[0].real32Val;
+	uint32_t color = (uint32_t)p[1].uintVal;
+	th_vf2 pos = *(th_vf2 *)&p[2];
+	char *text = (char *)p[3].ptrVal;
+
+	th_canvas_text(text, color, pos, size);
 }
 
 void umth_window_clear_frame(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -594,16 +611,26 @@ void umth_window_handle(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = th_window_handle();
 }
 
+#ifdef _WIN32
+static double time_now() {
+	LARGE_INTEGER cnt, frq;
+	QueryPerformanceCounter(&cnt);
+	QueryPerformanceFrequency(&frq);
+
+	return (double)cnt.QuadPart/(double)frq.QuadPart;
+}
+#endif
+
 void umth_window_sleep(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int ms = p[0].intVal;
 
 #ifdef _WIN32
   double sec = ms/1000.0;
-  double time_start = timeGetTime();
+  double time_start = time_now();
   double time = time_start;
   while ((time - time_start) < sec) {
     Sleep(0);
-    time = timeGetTime();
+    time = time_now();
   }
 #else
 	usleep(ms * 1000);
@@ -885,6 +912,17 @@ void _th_umka_bind(void *umka) {
 		&umth_sound_set_stop_time_ms);
 
 	// window
+	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
+	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
+	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);
+	umkaAddFunc(umka, "umth_window_get_dimensions", &umth_window_get_dimensions);
+	umkaAddFunc(umka, "umth_window_swap_buffers", &umth_window_swap_buffers);
+	umkaAddFunc(umka, "umth_window_handle", &umth_window_handle);
+	umkaAddFunc(umka, "umth_window_sleep", &umth_window_sleep);
+
+	// window
+	umkaAddFunc(umka, "umth_window_get_fullscreen", &umth_window_get_fullscreen);
+	umkaAddFunc(umka, "umth_window_set_fullscreen", &umth_window_set_fullscreen);
 	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
 	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
 	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);

@@ -3,6 +3,7 @@
 build
 tophat
 tophat.exe
+tophatnc.exe
 src/umkalibs.h
 lib/stb_image.h
 lib/miniaudio.h

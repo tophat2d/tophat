@@ -350,6 +350,8 @@ void th_window_show_cursor(bool show);
 void th_window_freeze_cursor(bool freeze);
 void th_window_begin_scissor(int x, int y, size_t w, size_t h);
 void th_window_end_scissor();
+bool th_window_is_fullscreen();
+void th_window_set_fullscreen(bool fullscreen);
 
 #endif
 

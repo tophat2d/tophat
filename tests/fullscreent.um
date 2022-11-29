@@ -1,0 +1,25 @@
+import ("window.um"; "rect.um"; "canvas.um"; "input.um"; "th.um")
+
+fn main() {
+	window.setup("fullscreen test", 640, 480)
+
+	for window.cycle() {
+		canvas.drawText("[ALT + ENTER] TO ENTER FULLSCREEN", th.Vf2{0, 0}, th.black, 2)
+		canvas.drawText("[ESC] TO EXIT FULLSCREEN", th.Vf2{0, 11}, th.black, 2)
+		canvas.drawText("NOTE: THE FULLSCREEN HOTKEYS ARE CONFIGURED MANUALLY", th.Vf2{0, 22}, th.black, 2)
+
+		if window.isFullscreen() {
+			canvas.drawText("FULLSCREEN ON", th.Vf2{0, 33}, th.green, 4)
+		} else {
+			canvas.drawText("FULLSCREEN OFF", th.Vf2{0, 33}, th.red, 4)
+		}
+
+		if input.isPressed(input.key_alt) && input.isJustPressed(input.key_enter) {
+			window.setFullscreen(true)
+		}
+
+		if input.isJustPressed(input.key_escape) {
+			window.setFullscreen(false)
+		}
+	}
+}
