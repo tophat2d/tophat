@@ -306,6 +306,8 @@ void th_particles_draw(th_particles *p, th_rect cam, int t);
 
 // quad/transform
 th_vf2 th_quad_min(th_quad q);
+th_vf2 th_quad_max(th_quad q);
+th_rect th_quad_bounding_box(th_quad q);
 void th_transform_rect(th_quad *q, th_transform t, th_rect r);
 void th_transform_quad(th_quad *q, th_transform t);
 void th_transform_vf2(th_vf2 *v, th_transform t);

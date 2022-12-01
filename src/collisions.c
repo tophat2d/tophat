@@ -29,10 +29,10 @@ int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic) {
 uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic) {
 	uu coll = 0;
 	for (uu i=0; i < 4; i++) {
-		th_vf2 v = q->v[i];
+		th_vf2 c = q->v[i];
 		th_vf2 n = q->v[(i + 1) % 4];
-		if (((v.y >= p.y && n.y < p.y) || (v.y < p.y && n.y >= p.y)) && 
-			p.x < (n.x-v.x)*(p.y - v.y) / (n.y - v.y) + v.x)
+		if (((c.y >= p.y && n.y < p.y) || (c.y < p.y && n.y >= p.y)) && 
+		    (p.x < (n.x-c.x)*(p.y - c.y) / (n.y - c.y) + c.x))
 			coll = !coll;
 	}
 	return coll;
@@ -46,13 +46,28 @@ uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic) {
 	return 0;
 }
 
+static
+uu rect_to_rect(th_rect *r1, th_rect *r2) {
+	return r1->x + r1->w >= r2->x && r1->x <= r2->x + r2->w &&
+		r1->y + r1->h >= r2->y && r1->y <= r2->y + r2->h;
+}
+
 uu th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic) {
+	th_rect r1 = th_quad_bounding_box(*q1);
+	th_rect r2 = th_quad_bounding_box(*q2);
+	if (!rect_to_rect(&r1, &r2) && !rect_to_rect(&r1, &r2))
+		return 0;
+
 	for (uu i=0; i < 4; i++)
 		if (th_line_to_quad(q1->v[i], q1->v[(i+1)%4], q2, ic))
 			return 1;
 
 	for (uu i=0; i < 4; i++)
 		if (th_point_to_quad(q1->v[i], q2, ic))
+			return 1;
+
+	for (uu i=0; i < 4; i++)
+		if (th_point_to_quad(q2->v[i], q1, ic))
 			return 1;
 
 	return 0;
