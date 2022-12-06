@@ -832,6 +832,22 @@ void umth_coll_point_to_rect(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = th_coll_point_on_rect(v, re);
 }
 
+void umth_nav_mesh_add_quad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_navmesh *m = p[1].ptrVal;
+	th_quad *q = p[0].ptrVal;
+
+	th_navmesh_add_quad(m, q);
+}
+
+void umth_nav_mesh_nav(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *cameFrom = p[3].ptrVal;
+	th_navmesh *m = p[2].ptrVal;
+	th_vf2 p1 = *(th_vf2 *)&p[1];
+	th_vf2 p2 = *(th_vf2 *)&p[0];
+
+	th_navmesh_nav(cameFrom, m, p1, p2);
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "umth_fopen", &umth_fopen);
@@ -967,6 +983,10 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_coll_line_to_quad", &umth_coll_line_to_quad);
 	umkaAddFunc(umka, "umth_coll_quad_to_quad", &umth_coll_quad_to_quad);
 	umkaAddFunc(umka, "umth_coll_point_to_rect", &umth_coll_point_to_rect);
+
+	// nav
+	umkaAddFunc(umka, "umth_nav_mesh_add_quad", &umth_nav_mesh_add_quad);
+	umkaAddFunc(umka, "umth_nav_mesh_nav", &umth_nav_mesh_nav);
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);

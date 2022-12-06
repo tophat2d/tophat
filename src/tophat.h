@@ -188,6 +188,13 @@ typedef struct {
 	ma_engine audio_engine;
 } th_global;
 
+typedef struct {
+	UmkaDynArray(bool) d;
+	th_rect r;
+	uu w;
+	fu s;
+} th_navmesh;
+
 #ifdef THEXT
 #undef THEXT
 #define THEXT(ret, name, ...) static ret (*name)(__VA_ARGS__) = NULL
@@ -300,6 +307,10 @@ void th_input_cycle();
 // misc
 void th_error(char *text, ...);
 void th_calculate_scaling(float camw, float camh);
+
+// navmesh
+void th_navmesh_add_quad(th_navmesh *m, th_quad *q);
+void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2);
 
 // particles
 void th_particles_draw(th_particles *p, th_rect cam, int t);

@@ -1,0 +1,71 @@
+
+import (
+	"canvas.um"
+	"input.um"
+	"nav.um"
+	"rect.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+fn update*(m: ^nav.Mesh, s, e: th.Vf2): []th.Vf2 {
+	c := std.clock()
+
+	p := m.nav(s, e)
+
+	printf("took %f ms\n", (std.clock() - c) * 1000)
+
+	return p
+}
+
+fn main() {
+	window.setup("nav.um test", 200, 200)
+	mr := rect.mk(10, 10, 100, 100)
+
+	m := nav.mk(mr, 2)
+
+	rects := []rect.Rect{
+		rect.mk(15, 15, 10, 10),
+		rect.mk(10, 30, 20, 20),
+		rect.mk(80, 80, 30, 10)}
+
+	for i in rects {
+		m.addQuad(rects[i].transformed(th.mkTransform(th.Vf2{})))
+	}
+
+	m.addQuad(rect.mk(60, 40, 30, 20).transformed(th.Transform{
+		s: th.Vf2{1, 1},
+		r: 45,
+		o: th.Vf2{60, 40}} ))
+
+	s := th.Vf2{10, 10}
+	e := th.Vf2{100, 100}
+	p := m.nav(s, e)
+
+	for window.cycle() {
+		if input.isJustPressed(input.mouse1) {
+			s = input.getMousePos()
+			p = update(&m, s, e)
+		}
+
+		if input.isJustPressed(input.mouse3) {
+			e = input.getMousePos()
+			p = update(&m, s, e)
+		}
+
+		for x:=0; x < m.w; x++ {
+			for y:=0; y < len(m.d)/m.w; y += 1 {
+				c := th.cyan
+				if m.d[x + y*m.w] {
+					c = th.black
+				}
+				canvas.drawRect(c, rect.mk(m.r.x + x*m.s, m.r.y + y*m.s, m.s, m.s))
+			}
+		}
+
+		for i:=1; i < len(p); i += 1 {
+			canvas.drawLine(th.red, p[i-1], p[i], 1)
+		}
+	}
+}
