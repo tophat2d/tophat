@@ -39,14 +39,20 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	return th.Vf2{maxw * scale * 6 - scale, h * 6 * scale}
 }
 
-fn umth_canvas_draw_rect*(color: uint32, r: rect.Rect)
+fn umth_canvas_draw_rect(color: uint32, r: rect.Rect)
 // Draws a Rectangle.
 fn drawRect*(color: uint32, r: rect.Rect) {
 	umth_canvas_draw_rect(color, r)
 }
 
-fn umth_canvas_draw_line*(color: uint32, b, e: th.Vf2, thickness: th.fu)
+fn umth_canvas_draw_line(color: uint32, b, e: th.Vf2, thickness: th.fu)
 // Draws a line.
 fn drawLine*(color: uint32, b, e: th.Vf2, thickness: th.fu) {
 	umth_canvas_draw_line(color, b, e, thickness)
+}
+
+fn umth_canvas_draw_quad(color: uint32, q: ^th.Quad)
+// Draws a convex quad.
+fn drawQuad*(color: uint32, q: th.Quad) {
+	umth_canvas_draw_quad(color, &q)
 }

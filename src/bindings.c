@@ -689,6 +689,13 @@ void umth_canvas_draw_line(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_canvas_line(color, b, e, thickness);
 }
 
+void umth_canvas_draw_quad(UmkaStackSlot *p, UmkaStackSlot *r) {
+	uint32_t color = p[1].uintVal;
+	th_quad *q = p[0].ptrVal;
+
+	th_canvas_quad(q, color);
+}
+
 void umth_utf8_get_next_rune(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int idx = p[0].intVal;
 	char *str = p[1].ptrVal;
@@ -957,6 +964,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);
 	umkaAddFunc(umka, "umth_canvas_draw_rect", &umth_canvas_draw_rect);
 	umkaAddFunc(umka, "umth_canvas_draw_line", &umth_canvas_draw_line);
+	umkaAddFunc(umka, "umth_canvas_draw_quad", &umth_canvas_draw_quad);
 
 	// utf8
 	umkaAddFunc(umka, "umth_utf8_get_next_rune", &umth_utf8_get_next_rune);

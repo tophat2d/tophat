@@ -68,6 +68,13 @@ void th_canvas_flush() {
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	th_image_flush();
 
+	a.x *= thg->scaling;
+	a.y *= thg->scaling;
+	b.x *= thg->scaling;
+	b.y *= thg->scaling;
+	c.x *= thg->scaling;
+	c.y *= thg->scaling;
+
 	float colors[4];
 	for (int i=0; i < 4; ++i)
 		colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
@@ -96,10 +103,6 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 }
 
 void th_canvas_rect(uint32_t color, th_rect r) {
-	r.x *= thg->scaling;
-	r.y *= thg->scaling;
-	r.w *= thg->scaling;
-	r.h *= thg->scaling;
 	th_canvas_triangle(color,
 		(th_vf2){{r.x, r.y}},
 		(th_vf2){{r.x + r.w, r.y}},
@@ -112,12 +115,6 @@ void th_canvas_rect(uint32_t color, th_rect r) {
 
 // stolen from here: stackoverflow.com/questions/1936934/turn-a-line-into-a-rectangle
 void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness) {
-	f.x *= thg->scaling;
-	f.y *= thg->scaling;
-	t.x *= thg->scaling;
-	t.y *= thg->scaling;
-	thickness *= thg->scaling;
-
 	th_vf2 d = { .x = t.x - f.x, .y = t.y - f.y};
 	fu mag = sqrt(d.x*d.x + d.y*d.y);
 	d.x /= mag;
@@ -152,4 +149,9 @@ void th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size) {
 					p.y + (i/5)*size, size, size});
 		p.x += size * 6;
 	}
+}
+
+void th_canvas_quad(th_quad *q, uint32_t color) {
+	th_canvas_triangle(color, q->tl, q->tr, q->br);
+	th_canvas_triangle(color, q->tl, q->br, q->bl);
 }
