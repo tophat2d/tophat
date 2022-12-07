@@ -1,5 +1,6 @@
 
 import (
+		"canvas.um"
 	"rect.um"
 	"th.um"
 )

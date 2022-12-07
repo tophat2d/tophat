@@ -31,9 +31,9 @@ void th_navmesh_add_quad(th_navmesh *m, th_quad *q) {
 }
 
 // euclidian distance
-static
+static inline
 fu heuristic(th_vf2 p1, th_vf2 p2) {
-	return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
+	return pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2);
 }
 
 struct qnode {
@@ -58,7 +58,7 @@ struct qnode *push(struct qnode *q, th_vf2 p, fu *hcost, uu w) {
 	return q;
 }
 
-static
+static inline
 struct qnode *pop(struct qnode *q) {
 	if (q == NULL)
 		return NULL;
@@ -69,12 +69,12 @@ struct qnode *pop(struct qnode *q) {
 	return nq;
 }
 
-static
-bool check_bounds(th_navmesh *m, th_vf2 p) {
+static inline
+bool check_bounds(th_navmesh *m, th_vf2 p, size_t h) {
 	return p.x >= 0
 		&& p.y >= 0
 		&& p.x < m->w
-		&& p.y < umkaGetDynArrayLen((void *)&m->d)/m->w;
+		&& p.y < h;
 }
 
 void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2) {
@@ -83,6 +83,8 @@ void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2) {
 		{{-1, +0}},             {{+1, +0}},
 		{{-1, +1}}, {{+0, +1}}, {{+1, +1}}
 	};
+	const size_t msiz = umkaGetDynArrayLen((void *)&m->d);
+	const size_t mh = msiz / m->w;
 
 	p1 = vf2_to_loc(m, p1);
 	p2 = vf2_to_loc(m, p2);
@@ -94,13 +96,13 @@ void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2) {
 		cameFrom[i].y = -1;
 	}*/
 
-	fu *cost = calloc(sizeof(fu), umkaGetDynArrayLen((void *)&m->d));
-	for (int i=0; i < umkaGetDynArrayLen((void *)&m->d); ++i) {
+	fu *cost = calloc(sizeof(fu), msiz);
+	for (int i=0; i < msiz; ++i) {
 		cost[i] = -1;
 	}
 	cost[(uu)(p1.x + p1.y*m->w)] = 0;
 
-	fu *hcost = calloc(sizeof(fu), umkaGetDynArrayLen((void *)&m->d));
+	fu *hcost = calloc(sizeof(fu), msiz);
 	hcost[(uu)(p1.x + p2.y*m->w)] = heuristic(p1, p2);
 
 	while (q) {
@@ -117,7 +119,7 @@ void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2) {
 			const uu idx = nb.x + nb.y*m->w;
 
 			// skip out of bounds fields
-			if (!check_bounds(m, nb))
+			if (!check_bounds(m, nb, mh))
 				continue;
 
 			// skip inacessible fields
@@ -128,10 +130,11 @@ void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2) {
 			if (cost[idx] < c && cost[idx] != -1)
 				continue;
 
-			cameFrom[idx] = p;
 			cost[idx] = c;
 			hcost[idx] = c + heuristic(nb, p2);
-			q = push(q, nb, hcost, m->w);
+			if (cameFrom[idx].x < 0)
+				q = push(q, nb, hcost, m->w);
+			cameFrom[idx] = p;
 		}
 	}
 

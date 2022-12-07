@@ -28,7 +28,8 @@ fn main() {
 	rects := []rect.Rect{
 		rect.mk(15, 15, 10, 10),
 		rect.mk(10, 30, 20, 20),
-		rect.mk(80, 80, 30, 10)}
+		rect.mk(80, 80, 30, 10),
+		rect.mk(60, 20, 10, 30)}
 
 	for i in rects {
 		m.addQuad(rects[i].transformed(th.mkTransform(th.Vf2{})))
@@ -67,5 +68,7 @@ fn main() {
 		for i:=1; i < len(p); i += 1 {
 			canvas.drawLine(th.red, p[i-1], p[i], 1)
 		}
+
+		m.nav(s, e)
 	}
 }

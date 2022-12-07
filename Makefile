@@ -18,7 +18,7 @@ else
 endif
 endif
 
-CFLAGS ?= -s -O3 -pipe
+CFLAGS ?= -g -pipe
 CFLAGS += -Ilib/stb/ \
 	  -Ilib/miniaudio/ \
 	  -Ilib/umprof/ \
