@@ -280,7 +280,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			// NOTE(skejeton): disable the ding sound when pressing an alt shortcut
 			return MNC_CLOSE << 16;
 			break;
-		case WM_KEYDOWN: 
+		case WM_KEYDOWN: {
 			char key_state[256];
 			GetKeyboardState(key_state);
 
@@ -292,7 +292,7 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 		case WM_KEYUP:
 			KeyProc(hwnd, msg, wParam, lParam);
 			break;
-		case WM_LBUTTONDOWN:
+		} case WM_LBUTTONDOWN:
 		case WM_LBUTTONUP:
 			th_input_key(1, msg == WM_LBUTTONDOWN);
 			break;
