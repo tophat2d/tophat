@@ -1,14 +1,27 @@
 
 import (
-		"canvas.um"
+	"canvas.um"
 	"rect.um"
 	"th.um"
 )
 
+// Mesh is a 2d array of bool cells.  If a cell is true, the cell can be used
+// in a path.  The mesh is located in a world using the `r` field.  A cell can
+// have an arbitrary size as specified by `s`.
+// 
+// The mesh can be edited using the `addQuad` method, but it should be trivial
+// to add your own, similar methods.
+// 
+// Please use the `mk` constructor to construct a `Mesh`, unless you really
+// know what you're doing.
 type Mesh* = struct {
+	// The mesh data.
 	d: []bool
+	// The dimensions and position of the mesh, r.w == w * s
 	r: rect.Rect
+	// Width of the mesh.  Used to adress the mesh data.
 	w: th.uu
+	// Scale of one cell (cell is a square)
 	s: th.fu
 }
 
