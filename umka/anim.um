@@ -1,66 +1,52 @@
-// Module for frame based image animation.
-// TODO: Rework this module to use atlases.
 
 import (
 	"th.um"
-	"image.um"
-	"rect.um"
+	"atlas.um"
 )
 
-// Anim is able to animate an array of images. As opposed to ent.Ent.animate,
-// it starts from the first frame.
+// Anim allows you to animate between individual frames of an atlas.
 type Anim* = struct {
-	anim: []image.Image
-	rot: th.fu
-	scale: th.fu
-	fps: th.uu
-	looping: bool
-
-	pos: th.Vf2
-
-	zeroTime: int
-
-	frame: int
+	// the source atlas
+	atl: atlas.Atlas
+	// the first cell of the animation
+	min: int
+	// the last cell of the animation
+	max: int
+	fps: real32
+	// offset in time
+	offset: int
 }
 
-// Anim's constructor.
-fn mk*(pos: th.Vf2, anm: []image.Image, fps: th.uu): Anim {
+// `Anim` constructor
+fn mk*(atl: atlas.Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 */, offset: int = -1 /* th.time */): Anim {
 	a := Anim{}
 
-	a.anim = append(anm, anm[len(anm)-1])
-
+	a.atl = atl
 	a.fps = fps
-	a.scale = 1
-	a.rot = 0
+	a.min = min
+	if max == -1 {
+		a.max = trunc(atl.dm.x * atl.dm.y) - 1
+	} else {
+		a.max = max
+	}
 
-	a.pos = pos
-
-	a.looping = false
+	if offset == -1 {
+		a.offset = th.time
+	} else {
+		a.offset = offset
+	}
 
 	return a
 }
 
-// Starts animation with start_time of t.
-fn (a: ^Anim) start*(t: int) {
-	a.zeroTime = t
+// Crops the base atlas to the cell that should be visible at `time`.
+fn (anm: ^Anim) animate*(time: int) {
+	n := (round(real(time-anm.offset)/round((1000.0/anm.fps))) % anm.max) + anm.min
+
+	anm.atl.cropSource(anm.atl.coords(n))
 }
 
-// This draws the animation. Returns true, if the animation ended.
-fn (a: ^Anim) handle*(t: uint, cam: rect.Rect): bool {
-	a.frame = (round(real(t-a.zeroTime)/round((1000.0/a.fps))) % len(a.anim))
-
-	a.anim[a.frame].draw(
-		th.Transform{
-			th.Vf2{round(a.pos.x) - cam.x + cam.w/2, round(a.pos.y) - cam.y + cam.h/2},
-			th.Vf2{a.scale, a.scale}, th.Vf2{}, a.rot})
-
-	if a.frame == len(a.anim) - 1 {
-		if a.looping {
-			a.zeroTime = t
-		} else {
-			return true
-		}
-	}
-
-	return false
+// Returns how many frames were played at `time`.
+fn (anm: ^Anim) framesPlayed*(time: int): int {
+	return trunc((time - anm.offset) / 1000.0 * anm.fps)
 }
