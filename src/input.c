@@ -18,6 +18,12 @@ extern th_global *thg;
 #define LINUX_KEY_ALT XK_Alt_L
 #define LINUX_KEY_CTRL XK_Control_L
 #define LINUX_KEY_TAB XK_Tab
+#define LINUX_KEY_PG_DOWN XK_Page_Down
+#define LINUX_KEY_PG_UP XK_Page_Up
+#define LINUX_KEY_HOME XK_Home
+#define LINUX_KEY_END XK_End
+#define LINUX_KEY_INSERT XK_Insert
+#define LINUX_KEY_FN XK_F1
 #endif
 
 // https://learn.microsoft.com/en-us/windows/win32/inputdev/virtual-key-codes
@@ -33,6 +39,12 @@ extern th_global *thg;
 #define WIN_KEY_ALT (0x12 + 0x7f)
 #define WIN_KEY_CTRL (0x11 + 0x7f)
 #define WIN_KEY_TAB (0x09 + 0x7f)
+#define WIN_KEY_PG_DOWN (0x22 + 0x7f)
+#define WIN_KEY_PG_UP (0x21 + 0x7f)
+#define WIN_KEY_HOME (0x24 + 0x7f)
+#define WIN_KEY_END (0x23 + 0x7f)
+#define WIN_KEY_INSERT (0x2d + 0x7f)
+#define WIN_KEY_FN (0x70 - 1)
 
 void HandleKey( int keycode, int bDown ) { }
 void HandleButton( int x, int y, int button, int bDown ) { }
@@ -78,6 +90,23 @@ void th_input_key(int keycode, int bDown) {
 	case LINUX_KEY_TAB:
 		keycode = WIN_KEY_TAB;
 		break;
+	case LINUX_KEY_PG_DOWN:
+		keycode = WIN_KEY_PG_DOWN;
+		break;
+	case LINUX_KEY_PG_UP:
+		keycode = WIN_KEY_PG_UP;
+		break;
+	case LINUX_KEY_HOME:
+		keycode = WIN_KEY_HOME;
+		break;
+	case LINUX_KEY_END:
+		keycode = WIN_KEY_END;
+		break;
+	case LINUX_KEY_INSERT:
+		keycode = WIN_KEY_INSERT;
+		break;
+	case LINUX_KEY_FN:
+		keycode = WIN_KEY_FN;
 	}
 #endif
 

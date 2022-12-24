@@ -12,6 +12,12 @@
 //   key_down
 //   key_escape
 //   key_enter
+//   key_pg_down
+//   key_pg_up
+//   key_home
+//   key_end
+//   key_insert
+//   key_fn - use as input.key_fn + char(n)
 // 
 // is* functions return info based on a us QWERTY layout. They are supposed to
 // be used for game controls. For text input use getStr.
@@ -39,6 +45,12 @@ const (
 	key_alt* =       char(0x12 + 0x7f)
 	key_ctrl* =      char(0x11 + 0x7f)
 	key_tab* =       char(0x09 + 0x7f)
+	key_pg_down* =   char(0x22 + 0x7f)
+	key_pg_up* =     char(0x21 + 0x7f)
+	key_home* =      char(0x24 + 0x7f)
+	key_end* =       char(0x23 + 0x7f)
+	key_insert* =    char(0x2d + 0x7f)
+	key_fn* =        char(0x70 - 1)
 )
 
 fn umth_input_get_mouse(out: ^th.Vf2)
