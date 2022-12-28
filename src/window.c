@@ -25,6 +25,8 @@ static bool cursor_frozen = false;
 static XkbDescPtr desc;
 static XIC xic;
 
+static bool is_fullscreen = false;
+
 static void th_window_deinit() {
 	XDestroyWindow(th_dpy, th_win);
 	XCloseDisplay(th_dpy);
@@ -120,14 +122,45 @@ void th_window_get_dimensions(int *w, int *h) {
 	*h = th_win_attribs.height;
 }
 
+static void send_event(Atom type, int a, int b, int c, int d, int e) {
+	XEvent event = {0};
+
+	event.type = ClientMessage;
+	event.xclient.window = th_win;
+	event.xclient.format = 32;
+	event.xclient.message_type = type;
+	event.xclient.data.l[0] = a;
+	event.xclient.data.l[1] = b;
+	event.xclient.data.l[2] = c;
+	event.xclient.data.l[3] = d;
+	event.xclient.data.l[4] = e;
+
+	XSendEvent(th_dpy, XDefaultRootWindow(th_dpy),
+		False,
+		SubstructureNotifyMask | SubstructureRedirectMask,
+		&event);
+}
+
+static Atom intern_atom(char *n) {
+	Atom a = XInternAtom(th_dpy, n, False);
+	if (a == NULL)
+		th_error("Could not find atom %s.", n);
+	return a;
+}
+
 bool th_window_is_fullscreen() {
-	// TODO(skejeton): ~mrms this is for you
-	return false;
+	return is_fullscreen;
 }
 
 void th_window_set_fullscreen(bool fullscreen) {
-	// TODO(skejeton): ~mrms this is for you
-	(void)fullscreen;
+	if (is_fullscreen == fullscreen)
+		return;
+
+	send_event(intern_atom("_NET_WM_STATE"), fullscreen,
+		intern_atom("_NET_WM_STATE_FULLSCREEN"), 0, 1, 0);
+	XFlush(th_dpy);
+
+	is_fullscreen = fullscreen;
 }
 
 int th_window_handle() {
