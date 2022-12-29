@@ -2336,6 +2336,13 @@ const char *th_em_modulesrc[] = {
 "fn vf2ToRect*(p: th.Vf2, r: rect.Rect): bool {\n"
 "\treturn umth_coll_point_to_rect(p, &r)\n"
 "}\n"
+"\n"
+"fn umth_coll_rect_to_rect(r1, r2: ^rect.Rect): bool\n"
+"// Check for a collision between two rects\n"
+"fn rectToRect*(r1, r2: rect.Rect): bool {\n"
+"\treturn umth_coll_rect_to_rect(&r1, &r2)\n"
+"}\n"
+"\n"
 "",
 "import(\"image.um\"; \"th.um\")\n"
 "var (\n"

@@ -46,8 +46,7 @@ uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic) {
 	return 0;
 }
 
-static
-uu rect_to_rect(th_rect *r1, th_rect *r2) {
+uu th_rect_to_rect(th_rect *r1, th_rect *r2) {
 	return r1->x + r1->w >= r2->x && r1->x <= r2->x + r2->w &&
 		r1->y + r1->h >= r2->y && r1->y <= r2->y + r2->h;
 }
@@ -55,7 +54,7 @@ uu rect_to_rect(th_rect *r1, th_rect *r2) {
 uu th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic) {
 	th_rect r1 = th_quad_bounding_box(*q1);
 	th_rect r2 = th_quad_bounding_box(*q2);
-	if (!rect_to_rect(&r1, &r2) && !rect_to_rect(&r1, &r2))
+	if (!th_rect_to_rect(&r1, &r2) && !th_rect_to_rect(&r1, &r2))
 		return 0;
 
 	for (uu i=0; i < 4; i++)

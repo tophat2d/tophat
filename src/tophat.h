@@ -255,6 +255,7 @@ uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
 uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
 bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
 uu th_coll_point_on_rect(th_vf2 p, th_rect *r);
+uu th_rect_to_rect(th_rect *r1, th_rect *r2);
 
 // entity
 th_quad th_ent_transform(th_ent *e);

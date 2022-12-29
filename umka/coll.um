@@ -34,3 +34,10 @@ fn umth_coll_point_to_rect(p: th.Vf2, r: ^rect.Rect): bool
 fn vf2ToRect*(p: th.Vf2, r: rect.Rect): bool {
 	return umth_coll_point_to_rect(p, &r)
 }
+
+fn umth_coll_rect_to_rect(r1, r2: ^rect.Rect): bool
+// Check for a collision between two rects
+fn rectToRect*(r1, r2: rect.Rect): bool {
+	return umth_coll_rect_to_rect(&r1, &r2)
+}
+
