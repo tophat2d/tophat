@@ -29,5 +29,5 @@ fn draw*() {
 				s: th.Vf2{1, 1}}, th.white)
 	}
 
-	mainFont.draw(repr(global.score), th.Vf2{1, 1}, th.white, 1.0)
+	mainFont.draw(repr(global.score), th.Vf2{1, 1}, th.white, 0.2)
 }

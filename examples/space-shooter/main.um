@@ -5,7 +5,7 @@ import (
 	"rect.um"
 	"window.um"
 	"canvas.um"
-	
+
 	"game.um"
 	"menu.um"
 	"star.um"
@@ -34,7 +34,7 @@ fn main() {
 
 	for window.cycle() {
 		canvas.drawRect(0x000022ff, global.cam)
-		
+
 		star.handle()
 		star.draw()
 

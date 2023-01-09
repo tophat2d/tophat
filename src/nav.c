@@ -88,7 +88,7 @@ void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2) {
 
 	p1 = vf2_to_loc(m, p1);
 	p2 = vf2_to_loc(m, p2);
-	
+
 	struct qnode *q = push(NULL, p1, NULL, 0);
 	/*th_vf2 *cameFrom = calloc(sizeof(th_vf2), umkaGetDynArrayLen((void *)&m->d));
 	for (int i=0; i < umkaGetDynArrayLen((void *)&m->d); ++i) {

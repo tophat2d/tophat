@@ -10,7 +10,7 @@ import (
 
 const (
 	starNum = 200
-	speed = 0.04
+	speed = 0.01
 )
 
 var (
@@ -24,8 +24,8 @@ fn init*() {
 		stars[i].y = -std.rand()%round(window.wp.y)
 		stars[i].x = std.rand()%round(window.wp.x)
 
-		stars[i].w = 1
-		stars[i].h = 2
+		stars[i].w = 0.1
+		stars[i].h = 0.2
 	}
 }
 

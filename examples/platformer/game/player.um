@@ -60,12 +60,10 @@ fn move() {
 
 	if input.isPressed(input.key_left) {
 		mot.x = -1
-		body.i.fliph(false)
 	}
 
 	if input.isPressed(input.key_right) {
 		mot.x = 1
-		body.i.fliph(true)
 	}
 
 	mot.x *= th.delta * moveSpeed
@@ -143,7 +141,7 @@ fn handle*() {
 	if !dying && body.t.p.distanceTo(env.end) < global.tileSize {
 		signal.emit("finish", null)
 	}
-	
+
 	if colls := body.getColl(env.coins, 1); len(colls) != 0 {
 		env.coins = delete(env.coins, colls[0].index)
 		env.score++

@@ -18,9 +18,7 @@ fn init*() {
 	emitters = []particles.Emitter{}
 }
 
-fn handle*() {
-	
-}
+fn handle*() { }
 
 fn damage*() {
 	dmgEffect.enqueue(
@@ -30,18 +28,19 @@ fn damage*() {
 }
 
 fn enemyDestroy*(pos: th.Vf2) {
+	const particlec = 2000
 	e := particles.Emitter{
 		pos, th.Vf2{0, 0},
 		th.Vf2{0.1, 0.1}, false, true,
 
 		th.Vf2{0, 360},
-		400, 0,
-		0.2, 0.2,
-		1, 0.6, 2,
+		200, 0.4,
+		0.4, 0.2,
+		0.4, 0.2, 2,
 		0, 0, 0,
 		[]uint32{0xFFA500ff, 0xe9330caa},
-		make([]particles.Particle, 200)}
-	
+		make([]particles.Particle, particlec)}
+
 	for i:=0; i < len(e.particles); i++ {
 		e.particles[i] = particles.Particle{
 			th.time + std.rand() % 200,

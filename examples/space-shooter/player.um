@@ -103,3 +103,4 @@ fn draw*() {
 		bullets[i].draw(global.cam)
 	}
 }
+
