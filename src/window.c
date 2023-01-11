@@ -198,8 +198,9 @@ int th_window_handle() {
 			unsigned mods = 0;
 			
 			// translate to a qwerty key
-			KeySym sym;
-			XkbTranslateKeyCode(desc, ev.xkey.keycode, mods, &mods, &sym);
+			KeySym sym = 0;
+			if (desc)
+				XkbTranslateKeyCode(desc, ev.xkey.keycode, mods, &mods, &sym);
 			if (!sym)
 				sym = XLookupKeysym(&ev.xkey, 0);
 
