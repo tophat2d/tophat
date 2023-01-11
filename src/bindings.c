@@ -272,7 +272,7 @@ void umth_image_get_data(UmkaStackSlot *p, UmkaStackSlot *r) {
 	if (!img) return;
 	uint32_t *o = p[0].ptrVal;
 
-	uint32_t *data = th_image_get_data(img, true);
+	uint32_t *data = th_image_get_data(img, false);
 	memcpy(o, data, img->dm.w * img->dm.h * sizeof(uint32_t));
 
 	free(data);

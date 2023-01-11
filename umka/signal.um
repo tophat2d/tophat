@@ -1,33 +1,61 @@
-// A module for importless communication between modules. A signal is an array
-// of callbacks with a name.
+// A module for importless communication between modules. A signal is a set of
+// callbacks.  You can use signals directly in your own structs if you want
+// them to be instance specific, of you can use global signals which are
+// adressed by a string name.
 
-type Any* = interface{}
-type Callback* = fn(ctx: Any) 
-type Signal* = []Callback
+type Callback* = fn(ctx: any) 
+type Id* = uint
+type Signal* = map[Id]Callback
 
 var signals: map[str]Signal
+var idCounter: Id
 
-// Registers a callback to a signal. There is no need to explicitely create
-// signals.
-fn register*(name: str, callback: Callback) {
+// `Signal` constructor
+fn mk*(): Signal {
+	return make(Signal)
+}
+
+// Registers a callback to a signal and returns the callback id.
+fn (this: ^Signal) register*(callback: Callback): Id {
+	idCounter++
+	this[idCounter] = callback
+
+	return idCounter
+}
+
+// Removes a callback by id.
+fn (this: ^Signal) remove*(id: Id) {
+	delete(this^, id)
+}
+
+// Emits a signal.
+fn (this: ^Signal) emit*(ctx: any) {
+	for c in this {
+		this[c](ctx)
+	}
+}
+
+// Registers a callback to a global signal.  There is no need to explicitely
+// create global signals.  Returns id of the added callback
+fn register*(name: str, callback: Callback): Id {
 	if !valid(signals) {
 		signals = make(map[str]Signal)
 	}
 
-	if !validkey(signals, name) {
-		signals[name] = Signal{callback}
-	} else {
-		signals[name] = append(signals[name], callback)
-	}
+	return signals[name].register(callback)
 }
 
-// Calls all callbacks associated with the passed name.
-fn emit*(name: str, ctx: Any) {
+// Removes a callback from a global signal by id.
+fn remove*(name: str, id: Id) {
+	signals[name].remove(id)
+}
+
+// Calls all callbacks associated with the passed global signal name.
+fn emit*(name: str, ctx: any) {
 	if !valid(signals) {
 		signals = make(map[str]Signal)
 	}
 
-	for i, c in signals[name] {
-		c(ctx)
-	}
+	signals[name].emit(ctx)
 }
+

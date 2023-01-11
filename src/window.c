@@ -143,7 +143,7 @@ static void send_event(Atom type, int a, int b, int c, int d, int e) {
 
 static Atom intern_atom(char *n) {
 	Atom a = XInternAtom(th_dpy, n, False);
-	if (a == NULL)
+	if (a)
 		th_error("Could not find atom %s.", n);
 	return a;
 }
