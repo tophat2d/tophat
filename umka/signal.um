@@ -3,9 +3,17 @@
 // them to be instance specific, of you can use global signals which are
 // adressed by a string name.
 
-type Callback* = fn(ctx: any) 
+// `cctx` is value passed by the caller to `emit`. `uctx` is the value passed
+// to the register function.
+type Callback* = fn(cctx, uctx: any) 
+
+type User* = struct {
+	func: Callback
+	uctx: any
+}
+
 type Id* = uint
-type Signal* = map[Id]Callback
+type Signal* = map[Id]User
 
 var signals: map[str]Signal
 var idCounter: Id
@@ -16,9 +24,9 @@ fn mk*(): Signal {
 }
 
 // Registers a callback to a signal and returns the callback id.
-fn (this: ^Signal) register*(callback: Callback): Id {
+fn (this: ^Signal) register*(callback: Callback, uctx: any): Id {
 	idCounter++
-	this[idCounter] = callback
+	this[idCounter] = User{ callback, uctx }
 
 	return idCounter
 }
@@ -31,18 +39,18 @@ fn (this: ^Signal) remove*(id: Id) {
 // Emits a signal.
 fn (this: ^Signal) emit*(ctx: any) {
 	for c in this {
-		this[c](ctx)
+		this[c].func(ctx, this[c].uctx)
 	}
 }
 
 // Registers a callback to a global signal.  There is no need to explicitely
 // create global signals.  Returns id of the added callback
-fn register*(name: str, callback: Callback): Id {
+fn register*(name: str, callback: Callback, uctx: any): Id {
 	if !valid(signals) {
 		signals = make(map[str]Signal)
 	}
 
-	return signals[name].register(callback)
+	return signals[name].register(callback, uctx)
 }
 
 // Removes a callback from a global signal by id.
