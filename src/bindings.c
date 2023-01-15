@@ -238,7 +238,7 @@ void umth_image_copy(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img2 = th_image_alloc();
 	if (!img2) return;
 	
-	uint32_t *data = th_image_get_data(img1, false);
+	uint32_t *data = th_image_get_data(img1, true);
 
 	th_image_from_data(img2, data, img1->dm);
 	img2->flipv = img1->flipv;

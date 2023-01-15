@@ -1854,6 +1854,8 @@ const char *th_em_modulesrc[] = {
 "// them to be instance specific, of you can use global signals which are\n"
 "// adressed by a string name.\n"
 "\n"
+"// `cctx` is value passed by the caller to `emit`. `uctx` is the value passed\n"
+"// to the register function.\n"
 "type Callback* = fn(cctx, uctx: any) \n"
 "\n"
 "type User* = struct {\n"

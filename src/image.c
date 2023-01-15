@@ -203,7 +203,7 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 	th_blit_tex(img, q, color);
 }
 
-#define SWAP(a, b) { th_vf2 t = a; b = a; a = t; }
+#define SWAP(a, b) { th_vf2 t = b; b = a; a = t; }
 
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	th_canvas_flush();
@@ -224,12 +224,12 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 			colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
 	th_quad bounds = img->crop;
-	if (img->flipv) {
+	if (img->fliph) {
 		SWAP(bounds.tl, bounds.bl);
 		SWAP(bounds.tr, bounds.br);
 	}
 
-	if (img->fliph) {
+	if (img->flipv) {
 		SWAP(bounds.tl, bounds.tr);
 		SWAP(bounds.bl, bounds.br);
 	}
