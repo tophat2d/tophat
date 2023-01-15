@@ -41,7 +41,7 @@ fn main() {
 
 	pos := th.Vf2{100, 100}
 
-	for window.cycle(cam) {
+	for window.cycle() {
 		var change: th.Vf2
 
 		// Handle input
@@ -56,6 +56,20 @@ fn main() {
 		// Draw!
 		canvas.drawRect(th.green, rect.mk(pos.x, pos.y, 10, 10))
 	}
+}
+```
+
+Draw an image to the screen using this:
+
+```go
+import ("window.um"; "image.um"; "th.um")
+fn main() {
+    window.setup("image drawing", 400, 400)
+    img := image.load("my-image.png")
+    
+    for window.cycle() {
+        img.draw(th.mkTransform(th.Vf2{ 0, 0 }))
+    }
 }
 ```
 
