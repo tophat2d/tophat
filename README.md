@@ -34,12 +34,10 @@ Creating a moving rectangle is as easy as this:
 import ("th.um"; "rect.um"; "input.um"; "canvas.um"; "window.um")
 
 fn main() {
-	const (
-		cam = rect.Rect{0, 0, 200, 200}
-		speed = 100
-	)
+	const speed = 100
 
 	window.setup("my game", 400, 400)
+	window.setViewport(th.Vf2{200, 200})
 
 	pos := th.Vf2{100, 100}
 
