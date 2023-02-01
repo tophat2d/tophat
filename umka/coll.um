@@ -1,4 +1,6 @@
+//~~
 // Builtin collision functions. The ic argument stores the collision position.
+//~~
 
 import (
 	"th.um"
@@ -6,38 +8,50 @@ import (
 )
 
 fn umth_coll_line_to_line(b1, e1, b2, e2, ic: ^th.Vf2): bool
+//~~fn lineToLine
 // Checks for a collision between 2 lines specified by their end points.
 fn lineToLine*(b1, e1, b2, e2: th.Vf2, ic: ^th.Vf2): bool {
+//~~
 	return umth_coll_line_to_line(&b1, &e1, &b2, &e2, ic)
 }
 
 fn umth_coll_point_to_quad(p: ^th.Vf2, q: ^th.Quad, ic: ^th.Vf2): bool
+//~~fn vf2ToQuad
 // Checks for a collision between a vf2 and a quad.
 fn vf2ToQuad*(p: th.Vf2, q: th.Quad, ic: ^th.Vf2): bool {
+//~~
 	return umth_coll_point_to_quad(&p, &q, ic)
 }
 
 fn umth_coll_line_to_quad(b, e: ^th.Vf2, q: ^th.Quad, ic: ^th.Vf2): bool
+//~~fn lineToQuad
 // Check for a collision between a line and quad edges.
 fn lineToQuad*(b, e: th.Vf2, q: th.Quad, ic: ^th.Vf2): bool {
+//~~
 	return umth_coll_line_to_quad(&b, &e, &q, ic)
 }
 
 fn umth_coll_quad_to_quad(q1, q2: ^th.Quad, ic: ^th.Vf2): bool
+//~~fn quadToQuad
 // Check for a collision between two quads.
 fn quadToQuad*(q1, q2: th.Quad, ic: ^th.Vf2): bool {
+//~~
 	return umth_coll_quad_to_quad(&q1, &q2, ic)
 }
 
 fn umth_coll_point_to_rect(p: th.Vf2, r: ^rect.Rect): bool
+//~~fn vf2ToRect
 // Check for a collision between a vf2 and a rectangle.
 fn vf2ToRect*(p: th.Vf2, r: rect.Rect): bool {
+//~~
 	return umth_coll_point_to_rect(p, &r)
 }
 
 fn umth_coll_rect_to_rect(r1, r2: ^rect.Rect): bool
+//~~fn rectToRect
 // Check for a collision between two rects
 fn rectToRect*(r1, r2: rect.Rect): bool {
+//~~
 	return umth_coll_rect_to_rect(&r1, &r2)
 }
 

@@ -1,12 +1,16 @@
+//~~
 // Misc functions.
+//~~
 
 import (
 	"th.um"
 	"std.um"							
 )
 
+//~~fn readall
 // Reads file content into a string.
 fn readall*(path: str): str {
+//~~
 	f := std.fopen(path, "r")
 	const blockSize = 16
 	res := ""
@@ -21,8 +25,10 @@ fn readall*(path: str): str {
 	return res
 }
 
+//~~fn stepify
 // Snaps a value to step.
 fn stepify*(val, step: th.fu): th.fu {
+//~~
 	if step != 0 {
 		val = floor(val / step + 0.5) * step
 	}

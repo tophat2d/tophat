@@ -1,45 +1,61 @@
+//~~
 // Module for audio loading and playback.
+//~~
 
+//~~opaque Sound
 // Represents an instance of a playable sound. It is an opaque structure.
 type Sound* = struct { _: ^struct{} }
+//~~
 
 var pool: []^Sound
 
 fn umth_sound_load(path: str): ^struct{}
+//~~fn load
 // Loads a sounds at path, if there is an error, the underlying pointer
 // will be `NULL` and `validate` will return false.
 fn load*(path: str): Sound {
+//~~
 	return Sound{umth_sound_load(path)}
 }
 
 fn umth_sound_copy(s: Sound): ^struct{}
+//~~fn Sound.copy
 // Copies the sound. This will create another sound which can be configured
 // and played independently from the original sound.
 fn (s: ^Sound) copy*(): Sound {
+//~~
 	return Sound{umth_sound_copy(s^)}
 }
 
+//~~fn Sound.validate
 // Returns `true` if `s` loaded correctly.
 fn (s: ^Sound) validate*(): bool {
+//~~
 	return s._ != null
 }
 
 fn umth_sound_is_playing(s: Sound): bool
+//~~fn Sound.isPlaying
 // Returns true if the sound is still playing.
 fn (s: ^Sound) isPlaying*(): bool {
+//~~
 	return umth_sound_is_playing(s^)
 }
 
 fn umth_sound_play(s: Sound)
+//~~fn Sound.play
 // Plays the sound.
 fn (s: ^Sound) play*() {
+//~~
 	umth_sound_play(s^)
 }
 
+//~~fn Sound.start
 // The start function allows you to play a single sound multiple times.
 // It will create a copy and return a pointer to it, so you can controll it
 // while it is playing. The returned pointer can be discarded.
 fn (s: ^Sound) start*(): ^Sound {
+//~~
 	cpy := new(Sound)
 	cpy ^= s.copy()
 	cpy.play()
@@ -50,55 +66,73 @@ fn (s: ^Sound) start*(): ^Sound {
 }
 
 fn umth_sound_stop(s: Sound)
+//~~fn Sound.stop
 // Stops the sound, but keeps the progress. If you want to start from the
 // begginning, use `audio.Sound.seekToFrame(0)`.
 fn (s: ^Sound) stop*() {
+//~~
 	umth_sound_stop(s^)
 }
 
 fn umth_sound_set_volume(s: Sound, vol: real32)
+//~~fn Sound.setVol
 // Sets the volume as a multiplier of the base volume.
 fn (s: ^Sound) setVol*(vol: real32) {
+//~~
 	umth_sound_set_volume(s^, vol)
 }
 
 fn umth_sound_set_pan(s: Sound, pan: real32)
+//~~fn Sound.setPan
 // Sets the pan of the sound.
 fn (s: ^Sound) setPan*(pan: real32) {
+//~~
 	umth_sound_set_pan(s^, pan)
 }
 
 fn umth_sound_set_pitch(s: Sound, pitch: real32)
+//~~fn Sound.setPitch
 // Sets the pitch of the sound.
 fn (s: ^Sound) setPitch*(pitch: real32) {
+//~~
 	umth_sound_set_pitch(s^, pitch)
 }
 
 fn umth_sound_set_looping(s: Sound, looping: bool)
+//~~fn Sound.setLooping
 // Sets whether the sound will loop upon finishing.
 fn (s: ^Sound) setLooping*(looping: bool) {
+//~~
 	umth_sound_set_looping(s^, looping)
 }
 
 fn umth_sound_seek_to_frame(s: Sound, frame: uint)
+//~~fn Sound.seekToFrame
 // Seeks to a specified PCM frame.
 fn (s: ^Sound) seekToFrame*(frame: uint) {
+//~~
 	umth_sound_seek_to_frame(s^, frame)
 }
 
 fn umth_sound_frame_count(s: Sound): uint
+//~~fn Sound.frameCount
 // Returns length of the sound in PCM frames.
 fn (s: ^Sound) frameCount*(): uint {
+//~~
 	return umth_sound_frame_count(s^)
 }
 
 fn umth_sound_set_start_time_ms(s: Sound, t: uint)
+//~~fn Sound.setStartTimeMs
 fn (s: ^Sound) setStartTimeMs*(t: uint) {
+//~~
 	umth_sound_set_start_time_ms(s^, t)
 }
 
 fn umth_sound_set_stop_time_ms(s: Sound, t: uint)
+//~~fn Sound.setStopTimeMs
 fn (s: ^Sound) setStopTimeMs*(t: uint) {
+//~~
 	umth_sound_set_stop_time_ms(s^, t)
 }
 

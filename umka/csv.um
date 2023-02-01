@@ -1,6 +1,8 @@
 
+//~~fn parse
 // Parses input into a 2d string array.
 fn parse*(inp: str, sep: char = ','): [][]str {
+//~~
 	length := len(inp)
 	outLen := 0
 	out := [][]str{}
@@ -30,8 +32,10 @@ fn parse*(inp: str, sep: char = ','): [][]str {
 	return slice(out, 0, outLen)
 }
 
+//~~fn encode
 // Converts 2d array to csv string.
 fn encode*(inp: [][]str, sep: char = ','): str {
+//~~
 	strLen := 1
 	for i in inp {
 		for j in inp[i] {

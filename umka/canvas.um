@@ -1,5 +1,7 @@
+//~~
 // Canvas library allowing for drawing basic shapes. Coordinates are based on
 // the screen.
+//~~
 
 import (
 	"th.um"
@@ -7,13 +9,17 @@ import (
 )
 
 fn umth_canvas_draw_text(text: str, pos: th.Vf2, color: uint32, size: th.fu)
+//~~fn drawText
 // Draws a basic pixel text. Only ascii is supported.
 fn drawText*(text: str, pos: th.Vf2, color: uint32, size: th.fu) {
+//~~
 	umth_canvas_draw_text(text, pos, color, size)
 }
 
+//~~fn textSize
 // Returns the size of text taken by an equivalent drawText call.
 fn textSize*(text: str, scale: th.fu): th.Vf2 {
+//~~
 	var w, maxw, h: int
 	w = 0
 	maxw = 0
@@ -40,19 +46,25 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 }
 
 fn umth_canvas_draw_rect(color: uint32, r: rect.Rect)
+//~~fn drawRect
 // Draws a Rectangle.
 fn drawRect*(color: uint32, r: rect.Rect) {
+//~~
 	umth_canvas_draw_rect(color, r)
 }
 
 fn umth_canvas_draw_line(color: uint32, b, e: th.Vf2, thickness: th.fu)
+//~~fn drawLine
 // Draws a line.
 fn drawLine*(color: uint32, b, e: th.Vf2, thickness: th.fu) {
+//~~
 	umth_canvas_draw_line(color, b, e, thickness)
 }
 
 fn umth_canvas_draw_quad(color: uint32, q: ^th.Quad)
+//~~fn drawQuad
 // Draws a convex quad.
 fn drawQuad*(color: uint32, q: th.Quad) {
+//~~
 	umth_canvas_draw_quad(color, &q)
 }

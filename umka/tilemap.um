@@ -1,5 +1,7 @@
+//~~
 // Tilemaps allow for easy level construction and fast collisions. You can even
 // use them for some games instead of entities (tetris comes to mind)
+//~~
 
 import (
 	"th.um"
@@ -8,13 +10,16 @@ import (
 	"atlas.um"
 )
 
+//~~Direction constants used for autotile
 const (
 	top* = 1
 	right* = 2
 	bot* = 4
 	left* = 8
 )
+//~~
 
+//~~struct Tilemap
 // Tilemap struct
 type Tilemap* = struct {
 	atlas: atlas.Atlas
@@ -24,8 +29,11 @@ type Tilemap* = struct {
 	collMask: []bool // if true, the tile collides
 	scale: th.fu
 }
+//~~
 
+//~~fn mk
 fn mk*(cells: []th.uu, w: th.uu, at: atlas.Atlas, scale: th.fu = 1): Tilemap {
+//~~
 	t := Tilemap{}
 	t.cells = cells
 	t.w = w
@@ -36,25 +44,31 @@ fn mk*(cells: []th.uu, w: th.uu, at: atlas.Atlas, scale: th.fu = 1): Tilemap {
 	return t
 }
 
+//~~fn Tilemap.edit
 // Sets tile at [x, y] to tile.
 fn (t: ^Tilemap) edit*(x, y, tile: int) {
+//~~
 	t.cells[y*t.w + x] = tile
 }
 
 fn umth_tilemap_draw(ct: ^Tilemap, cam: ^rect.Rect)
+//~~fn Tilemap.draw
 // Draws the tilemap.
 fn (t: ^Tilemap) draw*(cam: rect.Rect) {
+//~~
 	if len(t.cells) == 0 { return }
 
 	umth_tilemap_draw(t, &cam)
 }
 
 fn umth_tilemap_getcoll(pos: ^th.Vf2, vert: ^th.uu, t: ^Tilemap, e: ^ent.Ent): int32
+//~~fn Tilemap.getColl
 // Checks, if t collides with e.
 // pos is the tile index where the collision happened
 // vert is which index collided
 // You need to pass a valid pointer (TODO)
 fn (t: ^Tilemap) getColl*(e: ent.Ent, vert: ^th.uu, pos: ^th.Vf2): bool {
+//~~
 	if len(t.cells) == 0 { return false }
 
 	c := umth_tilemap_getcoll(pos, vert, t, &e)
@@ -63,6 +77,7 @@ fn (t: ^Tilemap) getColl*(e: ent.Ent, vert: ^th.uu, pos: ^th.Vf2): bool {
 }
 
 fn umth_tilemap_autotile(tgt: ^th.uu, w, h: th.uu, src, cfg: ^th.uu, tile: th.uu)
+//~~fn Tilemap.autotile
 // Autotile turns all `tile` tiles in `src` into tiles in `tileCfg`, so they
 // follow up correctly. `tileCfg` is an array of 16 tiles. They are placed in
 // a way where OR of all the places where the tile continues (top, right bot,
@@ -70,6 +85,7 @@ fn umth_tilemap_autotile(tgt: ^th.uu, w, h: th.uu, src, cfg: ^th.uu, tile: th.uu
 // tileCfg[top | bot] = 21
 // top | bot would look something like this: |
 fn (t: ^Tilemap) autotile*(src, tileCfg: []th.uu, tile: th.uu) {
+//~~
 	if len(tileCfg) < 16 {
 		error("autotile: tileCfg len isn't 16'")
 	}

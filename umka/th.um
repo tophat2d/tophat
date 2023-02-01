@@ -1,30 +1,40 @@
+//~~
 // Module with useful variables and types.
 // Variables: time, delta, platform
 // Constants: black, white, red, green, blue, yellow, magenta, cyan.
+//~~
 
 import (
 	"std.um"
 )
 
+//~~Tophat type aliases
 // standard type for real values
 type fu* = real32
 // standard type for integer values
 type iu* = int32
 // standard type for unsigned values
 type uu* = uint32
+//~~
 
+//~~struct Vf2
 // vector 2
 type Vf2* = struct {
 	x, y: fu
 }
+//~~
 
+//~~fn mkVf2
 // Vf2 constructor
 fn mkVf2*(x: fu = 0, y: fu = 0): Vf2 {
 	return Vf2{x, y}
 }
+//~~
 
+//~~fn Vf2.rotated
 // rotates `p` around `origin` with `rot` in degrees
 fn (p: ^Vf2) rotated*(origin: Vf2, rot: fu): Vf2 {
+//~~
 	angle := (rot * std.pi) / 180
 
 	pos := p^
@@ -40,94 +50,130 @@ fn (p: ^Vf2) rotated*(origin: Vf2, rot: fu): Vf2 {
 	return pos
 }
 
+//~~fn Vf2.distanceTo
 // distance between p1 and p2
 fn (p1: ^Vf2) distanceTo*(p2: Vf2): fu {
+//~~
 	return std.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 }
 
+//~~fn Vf2.angleTo
 // Angle between p1 and p2
 fn (p1: ^Vf2) angleTo*(p2: Vf2): real {
+//~~
 	if p1.x == p2.x && p1.y == p2.y { return 0 }
 	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std.pi + 180
 }
 
+//~~fn Vf2.abs
 // Absolute value of a vector.
 fn (p: ^Vf2) abs*(): Vf2 {
+//~~
 	return Vf2{fabs(p.x), fabs(p.y)}
 }
 
+//~~fn Vf2.round
 // Rounds a vector.
 fn (p: ^Vf2) round*(): Vf2 {
+//~~
 	return Vf2{round(p.x), round(p.y)}
 }
 
+//~~fn Vf2.trunc
 // Truncates a vector.
 fn (p: ^Vf2) trunc*(): Vf2 {
+//~~
 	return Vf2{trunc(p.x), trunc(p.y)}
 }
 
+//~~fn Vf2.floor
 // Floors a vector.
 fn (p: ^Vf2) floor*(): Vf2 {
+//~~
 	return Vf2{floor(p.x), floor(p.y)}
 }
 
+//~~fn Vf2.ceil
 // Ceils a vector.
 fn (p: ^Vf2) ceil*(): Vf2 {
+//~~
 	return Vf2{ceil(p.x), ceil(p.y)}
 }
 
+//~~fn vf2f
 // Creates a vector with both x and y set to f
 fn vf2f*(f: fu): Vf2 {
+//~~
 	return Vf2{f, f}
 }
 
+//~~fn Vf2.sub
 // Subtracts a vector from another one.
 fn (p: ^Vf2) sub*(p2: Vf2): Vf2 {
+//~~
 	return Vf2{p.x - p2.x, p.y - p2.y}
 }
 
+//~~fn Vf2.subf
 // Subtracts a fu from a vector.
 fn (p: ^Vf2) subf*(f: fu): Vf2 {
+//~~
 	return Vf2{p.x - f, p.y - f}
 }
 
+//~~fn Vf2.add
 // Adds a vector to another one.
 fn (p: ^Vf2) add*(p2: Vf2): Vf2 {
+//~~
 	return Vf2{p.x + p2.x, p.y + p2.y}
 }
 
+//~~fn Vf2.addf
 // Adds a fu to a vector.
 fn (p: ^Vf2) addf*(f: fu): Vf2 {
+//~~
 	return Vf2{p.x + f, p.y + f}
 }
 
+//~~fn Vf2.div
 // Divides a vector by another one.
 fn (p: ^Vf2) div*(p2: Vf2): Vf2 {
+//~~
 	return Vf2{p.x / p2.x, p.y / p2.y}
 }
 
+//~~fn Vf2.divf
 // Divides a vector by a fu.
 fn (p: ^Vf2) divf*(f: fu): Vf2 {
+//~~
 	return Vf2{p.x / f, p.y / f}
 }
 
+//~~fn Vf2.mul
 // Multiplies a vector by another one.
 fn (p: ^Vf2) mul*(p2: Vf2): Vf2 {
+//~~
 	return Vf2{p.x * p2.x, p.y * p2.y}
 }
 
+//~~fn Vf2.mulf
 // Multiplies a vector by a fu.
 fn (p: ^Vf2) mulf*(f: fu): Vf2 {
+//~~
 	return Vf2{p.x * f, p.y * f}
 }
 
+//~~fn Vf2.mag
 // Returns the magnitude of a vector p.
 fn (p: ^Vf2) mag*(): fu {
+//~~
 	return sqrt(p.x * p.x + p.y * p.y)
 }
 
+//~~fn Vf2.norm
 // Normalizes a vector.
 fn (p: ^Vf2) norm*(): Vf2 {
+//~~
 	if p.x == 0 && p.y == 0 {
 		return p^
 	}
@@ -135,11 +181,14 @@ fn (p: ^Vf2) norm*(): Vf2 {
 	return p.divf(p.mag())
 }
 
+//~~fn Vf2.dot
 // Calculates dot product between 2 vectors.
 fn (p: ^Vf2) dot*(q: Vf2): fu {
+//~~
 	return p.x*q.x + p.y*q.y
 }
 
+//~~struct Transform
 // Struct defining transformation. Used for example by entities.
 type Transform* = struct {
 	p: Vf2 // position
@@ -147,15 +196,20 @@ type Transform* = struct {
 	o: Vf2 // origin
 	r: fu  // rotation
 }
+//~~
 
+//~~fn mkTransform
 // Transform constructor
 fn mkTransform*(p: Vf2, s: Vf2 = Vf2{1, 1}, o: Vf2 = Vf2{0, 0}, r: fu = 0.0): Transform {
+//~~
 	return Transform{p: p, s: s, o: o, r: r}
 }
 
 fn umth_transform_transform(o, t: ^Transform)
+//~~fn Transform.transformed
 // Transforms a transform with another transform.
 fn (o: ^Transform) transformed*(t: Transform): Transform {
+//~~
 	ret := o^
 	umth_transform_transform(&ret, &t)
 
@@ -163,6 +217,7 @@ fn (o: ^Transform) transformed*(t: Transform): Transform {
 }
 
 fn umth_transform_vf2(v: ^Vf2, t: ^Transform)
+//~~fn Vf2.transformed
 // Transforms a vf2 to another vf2.
 // Order:
 // 	1. scale
@@ -171,37 +226,47 @@ fn umth_transform_vf2(v: ^Vf2, t: ^Transform)
 // 
 // This allows conversion from a relative to an absolute vf2.
 fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
+//~~
 	ret := v^
 	umth_transform_vf2(&ret, &t)
 	return ret
 }
 
+//~~type Quad
 type Quad* = [4]Vf2
+//~~
 
 fn umth_transform_quad(q: ^Quad, t: ^Transform)
+//~~fn Quad.transformed
 // Transforms a quad into another quad.
 // Order:
 // 	1. scale
 // 	2. rotation
 // 	3. position
 fn (q: ^Quad) transformed*(t: Transform): Quad {
+//~~
 	ret := q^
 	umth_transform_quad(&ret, &t)
 	return ret
 }
 
 fn umth_th_getglobal(): ^struct{}
+//~~fn getGlobal
 // returns a pointer to the th_global. Set this as your extensions thg.
 fn getGlobal*(): ^struct{} {
+//~~
 	return umth_th_getglobal()
 }
 
 fn umth_th_getfuncs(): ^struct{}
+//~~fn getFuncs
 // returns pointer to tophat functions. Pass this to th_ext_set.
 fn getFuncs*(): ^struct{} {
+//~~
 	return umth_th_getfuncs()
 }
 
+//~~Color constants
 const (
 	black* = 0xff
 	white* = 0xffffffff
@@ -212,9 +277,15 @@ const (
 	magenta* = 0xff00ffff
 	cyan* = 0x00ffffff
 )
+//~~
 
+//~~Misc variables
 var (
+	// time in ms from start of the game
 	time*: uint
+	// length of the last frame in ms
 	delta*: int
+	// platform tophat is running on
 	platform*: str = "linux"
 )
+//~~

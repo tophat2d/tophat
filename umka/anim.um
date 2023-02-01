@@ -4,6 +4,7 @@ import (
 	"atlas.um"
 )
 
+//~~struct Anim
 // Anim allows you to animate between individual frames of an atlas.
 type Anim* = struct {
 	// the source atlas
@@ -16,9 +17,12 @@ type Anim* = struct {
 	// offset in time
 	offset: int
 }
+//~~
 
+//~~fn mk
 // `Anim` constructor
 fn mk*(atl: atlas.Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 */, offset: int = -1 /* th.time */): Anim {
+//~~
 	a := Anim{}
 
 	a.atl = atl
@@ -39,14 +43,18 @@ fn mk*(atl: atlas.Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 *
 	return a
 }
 
+//~~fn Anim.animate
 // Crops the base atlas to the cell that should be visible at `time`.
 fn (anm: ^Anim) animate*(time: int) {
+//~~
 	n := (round(real(time-anm.offset)/round((1000.0/anm.fps))) % anm.max) + anm.min
 
 	anm.atl.cropSource(anm.atl.coords(n))
 }
 
+//~~fn Anim.framesPlayed
 // Returns how many frames were played at `time`.
 fn (anm: ^Anim) framesPlayed*(time: int): int {
+//~~
 	return trunc((time - anm.offset) / 1000.0 * anm.fps)
 }
