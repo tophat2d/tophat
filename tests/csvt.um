@@ -1,0 +1,11 @@
+
+import (
+	"../umka/csv.um"
+)
+
+fn main() {
+	s := "a,b\\,b,c\r\nd,e\\\ne"
+	t := csv.parse(s)
+	printf("%s\n", repr(t))
+	printf("%s\n", csv.encode(t))
+}
