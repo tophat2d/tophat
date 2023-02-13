@@ -13,11 +13,9 @@ th_quad th_ent_transform(th_ent *e) {
 }
 
 void th_ent_draw(th_ent *o, th_rect *camera) {
-	const int camx = camera->x - (camera->w / 2);
-	const int camy = camera->y - (camera->h / 2);
 	th_transform t = o->t;
-	t.pos.x -= camx;
-	t.pos.y -= camy;
+	t.pos.x -= camera->x;
+	t.pos.y -= camera->y;
 
 	// this logic is incorrect
 	/*if (q.br.x < 0 || q.br.y < 0)

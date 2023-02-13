@@ -33,7 +33,7 @@ fn init*() {
 
 	e = ent.mk(
 		frames[0],
-		th.Transform{p: th.Vf2{y: window.wp.y/3}, s: th.Vf2{1, 1}})
+		th.Transform{p: th.Vf2{y: window.wp.y * 0.8}, s: th.Vf2{1, 1}})
 
 	bulletPrefab.t.s = th.Vf2{1, 1}
 	bulletPrefab.r.w = 1
@@ -46,14 +46,14 @@ fn init*() {
 fn handle*() {
 	if input.isPressed('a') {
 		e.t.p.x -= speed * th.delta
-		if e.t.p.x < -window.wp.x/2 - e.r.w {
-			e.t.p.x = window.wp.x/2
+		if e.t.p.x < -e.r.w {
+			e.t.p.x = window.wp.x
 		}
 	}
 	if input.isPressed('d') {
 		e.t.p.x += speed * th.delta
-		if e.t.p.x > window.wp.x/2 {
-			e.t.p.x = -window.wp.x/2 - e.r.w
+		if e.t.p.x > window.wp.x {
+			e.t.p.x = -e.r.w
 		}
 	}
 

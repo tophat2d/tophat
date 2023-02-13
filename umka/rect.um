@@ -27,14 +27,14 @@ fn mk*(x, y, w, h: th.fu): Rect {
 // translates screen coordinates to world coordinates with cam r
 fn (r: ^Rect) toWorld*(p: th.Vf2): th.Vf2 {
 //~~
-	return th.Vf2{ p.x + r.x - r.w/2, p.y + r.y - r.h/2 }
+	return th.Vf2{ p.x + r.x, p.y + r.y }
 }
 
 //~~fn Rect.toScreen
 // translates world coordinates to screen coordinates with cam r
 fn (r: ^Rect) toScreen*(p: th.Vf2): th.Vf2 {
 //~~
-	return th.Vf2{ p.x - r.x + r.w/2, p.y - r.y + r.h/2 }
+	return th.Vf2{ p.x - r.x, p.y - r.y }
 }
 
 //~~fn Rect.getPos

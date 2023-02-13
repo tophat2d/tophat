@@ -12,8 +12,8 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	th_image *a = t->a.i;
 	if (!a) return;
 
-	int camx = cam->x - (cam->w / 2);
-	int camy = cam->y - (cam->h / 2);
+	int camx = cam->x;
+	int camy = cam->y;
 
 	int
 		tw = t->w,

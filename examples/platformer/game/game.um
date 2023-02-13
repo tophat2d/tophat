@@ -36,12 +36,12 @@ fn setup*() {
 	signal.register("die", signal.Callback{
 		reset()
 		deathCount++
-	})
+	}, null)
 
 	signal.register("finish", signal.Callback{
 		finishTime = th.time - env.start
 		state = stateFinished
-	})
+	}, null)
 
 	state = stateGame
 }

@@ -22,9 +22,9 @@ fn handle*() { }
 
 fn damage*() {
 	dmgEffect.enqueue(
-		lerp.Item{0, 0xaa, 200, 0, false, null, fn(ctx: lerp.Any){}})
+		lerp.Item{0, 0xaa, 200, 0, false, null, fn(ctx: any){}})
 	dmgEffect.enqueue(
-		lerp.Item{0xaa, 0, 200, 0, false, null, fn(ctx: lerp.Any){}})
+		lerp.Item{0xaa, 0, 200, 0, false, null, fn(ctx: any){}})
 }
 
 fn enemyDestroy*(pos: th.Vf2) {
