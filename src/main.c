@@ -11,6 +11,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+#include <sokol_app.h>
 
 th_global *thg;
 int destroyfunc;
@@ -40,43 +41,11 @@ static void die() {
 	dead = 1;
 }
 
-#if defined(_WIN32)
-
-static char **win32_argv(int *out_argc) {
-  LPWSTR *argv_wide;
-  int argc;
-
-  argv_wide = CommandLineToArgvW(GetCommandLineW(), &argc);
-  LPCSTR *argv = malloc(sizeof(LPCSTR)*(argc+1));
-  for (int i = 0; i < argc; i++) {
-    argv[i] = malloc(2048);
-    wcstombs(argv[i], argv_wide[i], 2048);
-  }
-  argv[argc] = NULL;
-
-  *out_argc = argc;
-
-	LocalFree(argv_wide);
-  return argv;
+sapp_desc sokol_main(int argc, char *argv[]) {
+	return th_window_sapp_desc();
 }
 
-void win32_argv_free(char **argv) {
-  for (int i = 0; argv[i]; i++)
-    free(argv[i]);
-  free(argv);
-}
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
-		freopen("CON", "w", stdout);
-		freopen("CON", "w", stderr);
-		freopen("CON", "w", stdin);
-	}
-	int argc;
-  char **argv = win32_argv(&argc);
-#else
 int main(int argc, char *argv[]) {
-#endif
 	th_global thg_ = {0};
 	thg = &thg_;
 
@@ -197,7 +166,7 @@ int main(int argc, char *argv[]) {
 
 	umkaOK = umkaRun(thg->umka);
 
-	if (!umkaOK) {
+	if (!umkaOK) 
 		UmkaError error;
 		umkaGetError(thg->umka, &error);
 		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
@@ -212,7 +181,7 @@ int main(int argc, char *argv[]) {
 				break;
 				fprintf(stderr, "\t\t...\n");
 			}
-
+{
 #ifndef _WIN32
 			fprintf(stderr, "\033[34m");
 #endif

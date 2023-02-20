@@ -8,16 +8,56 @@ import (
 	"canvas.um"
 )
 
+var (
+	logo: image.Image
+	fg: uint32
+	bg: uint32
+	lines: []str
+)
+
+fn onFrame(context: interface{}) {
+	canvas.drawRect(bg, rect.mk(0, 0, window.wp.x, window.wp.y))
+
+	p := th.Vf2{ 0, 1 }
+	for i in lines {
+		s := 1
+		if i == 1 {
+			s = 2
+		}
+
+		canvas.drawText(
+			lines[i],
+			th.Vf2{
+				(window.wp.x - canvas.textSize(lines[i], s).x) / 2,
+				p.y},
+			fg, s)
+		p.y += 6 * s
+	}
+
+	if input.isJustPressed(input.key_enter) {
+		if th.platform == "windows" {
+			std.system("open https://th.mrms.cz/")
+		} else {
+			std.system("xdg-open https://th.mrms.cz/")
+		}
+	}
+
+	const s = 1.5
+	logo.draw(th.Transform{
+		p: p.add(window.wp.sub(p).sub(logo.getDims().mulf(s)).divf(2)),
+		s: th.vf2f(s)})
+}
+
 fn main() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
 	
-	logo := image.load("etc/logo/logo-normal-white.png")
+	logo = image.load("etc/logo/logo-normal-white.png")
 
-	fg := 0xadadd5ff
-	bg := 0x262626ff
+	fg = 0xadadd5ff
+	bg = 0x262626ff
 
-	lines := []str {
+	lines = []str {
 		"WELCOME TO",
 		"TOPHAT",
 		"",
@@ -29,36 +69,5 @@ fn main() {
 		"OPEN THE",
 		"HOMEPAGE" }
 
-	for window.cycle() {
-		canvas.drawRect(bg, rect.mk(0, 0, window.wp.x, window.wp.y))
-
-		p := th.Vf2{ 0, 1 }
-		for i in lines {
-			s := 1
-			if i == 1 {
-				s = 2
-			}
-
-			canvas.drawText(
-				lines[i],
-				th.Vf2{
-					(window.wp.x - canvas.textSize(lines[i], s).x) / 2,
-					p.y},
-				fg, s)
-			p.y += 6 * s
-		}
-
-		if input.isJustPressed(input.key_enter) {
-			if th.platform == "windows" {
-				std.system("open https://th.mrms.cz/")
-			} else {
-				std.system("xdg-open https://th.mrms.cz/")
-			}
-		}
-
-		const s = 1.5
-		logo.draw(th.Transform{
-			p: p.add(window.wp.sub(p).sub(logo.getDims().mulf(s)).divf(2)),
-			s: th.vf2f(s)})
-	}
+	window.onFrame(onFrame, null)
 }

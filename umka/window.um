@@ -9,7 +9,16 @@ import (
 	"th.um"
 )
 
+//~~type FrameCallback
+// Callback to be executed every frame
+// Also see: `window.onFrame`
+type FrameCallback* = fn(context: interface{}): void;
+//~~
+
 var (
+	frameCallback: FrameCallback
+	frameCallbackContext: ^any
+
 	start, end, clockOffset: real
 	fpsLimit: int = 60
 )
@@ -68,7 +77,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 //~~fn cycle
 // Cycle needs to be called every cycle for the window to work. If the window
 // was closed, it returns false.
-fn cycle*(): bool {
+fn cycle(delta: real): bool {
 //~~
 	umth_window_set_viewport(wp)
 	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
@@ -78,11 +87,9 @@ fn cycle*(): bool {
 
 	umth_window_swap_buffers()
 
-	end = std.clock()*1000
-	th.delta = round(end - start)
-	if 1000/fpsLimit - th.delta > 0 {
-		umth_window_sleep(1000/fpsLimit - th.delta)
-		th.delta = round(std.clock()*1000 - start)
+	th.delta = delta*1000
+	if th.delta == 0 {
+		th.delta = 1
 	}
 
 	start = std.clock()*1000
@@ -94,6 +101,19 @@ fn cycle*(): bool {
 
 	audio.__cycle()
 	return running
+}
+
+fn umth_frame_callback() {
+	cycle()
+	frameCallback(frameCallbackContext)
+}
+
+//~~fn onFrame
+// Sets callback for every frame of the game
+fn onFrame*(callback: FrameCallback, context: ^any) {
+//~~
+	frameCallbackContext = context	
+	frameCallback = callback
 }
 
 fn umth_window_begin_scissor(x, y: int, w, h: uint)
