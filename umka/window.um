@@ -122,7 +122,7 @@ fn setTargetFps*(fps: int) {
 }
 
 fn umth_window_set_dims(dm: th.Vf2)
-// Sets the dimensions of the window, linux only.
+// Sets the dimensions of the window.
 // 
 // `dm`
 // : the target dimensions in screen pixels

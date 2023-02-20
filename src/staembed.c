@@ -1002,7 +1002,7 @@ const char *th_em_modulesrc[] = {
 "}\n"
 "\n"
 "fn umth_window_set_dims(dm: th.Vf2)\n"
-"// Sets the dimensions of the window, linux only.\n"
+"// Sets the dimensions of the window.\n"
 "// \n"
 "// `dm`\n"
 "// : the target dimensions in screen pixels\n"

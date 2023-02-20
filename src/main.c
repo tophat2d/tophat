@@ -40,7 +40,36 @@ static void die() {
 	dead = 1;
 }
 
+static int chkaccess(const char *path, const char *flags) {
+	FILE *f;
+	if ((f = fopen(path, flags))) {
+		fclose(f);
+		return 1;
+	}
+
+	return 0;
+}
+
 #if defined(_WIN32)
+
+
+static BOOL open_file_dialog(char *out, size_t max) {
+	OPENFILENAME ofn = {0};
+
+	ofn.lStructSize = sizeof ofn;
+	ofn.hwndOwner = NULL;
+	ofn.lpstrFile = out;
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = max;
+	ofn.lpstrFilter = "umka\0*.um\0";
+	ofn.nFilterIndex = 0;
+	ofn.lpstrFileTitle = "Select main file";
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	return GetOpenFileName(&ofn);
+}
 
 static char **win32_argv(int *out_argc) {
   LPWSTR *argv_wide;
@@ -60,7 +89,7 @@ static char **win32_argv(int *out_argc) {
   return argv;
 }
 
-void win32_argv_free(char **argv) {
+static void win32_argv_free(char **argv) {
   for (int i = 0; argv[i]; i++)
     free(argv[i]);
   free(argv);
@@ -74,6 +103,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine,
 	}
 	int argc;
   char **argv = win32_argv(&argc);
+  char scriptpathtemp[512];
 #else
 int main(int argc, char *argv[]) {
 #endif
@@ -157,13 +187,37 @@ int main(int argc, char *argv[]) {
 		}
 	}
 
-	FILE *f;
-	if ((f = fopen(scriptpath, "r"))) {
-		fclose(f);
-	} else {
-		th_error("Could not find main.um. Make sure you are in a proper directory, or specify it using the dir flag.");
+	if (!chkaccess(scriptpath, "r")) {
+#ifdef _WIN32
+		if (open_file_dialog(scriptpathtemp, sizeof scriptpathtemp)) {
+			scriptpath = scriptpathtemp;
+			if (!chkaccess(scriptpath, "r")) {
+				th_error("Can not access '%s'. Make sure you have access rights to the file.", scriptpath);
+				return 1;
+			}
+				
+			const char *_filepart;
 
+			if (_splitpath_s(scriptpath, 
+				NULL, 0, // no drive
+				thg->respath, sizeof thg->respath,
+				NULL, 0, // no filename
+				NULL, 0 // 1 el
+				) == EINVAL) {
+
+				th_error("Can not access directory of '%s'. Make sure you have access rights to the directory.", scriptpath);
+				return 1;
+			}
+		} else {
+			th_error(
+				"No file selected.\n"
+				"Could not find '%s'. Make sure you are in a proper directory, or specify it using the dir flag.", scriptpath);
+			return 1;
+		}
+#else
+		th_error("Could not find '%s'. Make sure you are in a proper directory, or specify it using the dir flag.", scriptpath);
 		return 1;
+#endif
 	}
 	
 	umkaOK = umkaInit(thg->umka, scriptpath, NULL, 1024 * 1024, NULL,

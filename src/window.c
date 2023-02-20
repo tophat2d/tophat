@@ -6,6 +6,7 @@
 extern th_global *thg;
 
 static bool window_active = false;
+static bool cursor_frozen = false;
 
 #ifdef linux
 #include <X11/Xlib.h>
@@ -20,7 +21,6 @@ static XWindowAttributes th_win_attribs;
 static GLXContext th_ctx;
 
 static Cursor blank_cursor;
-static bool cursor_frozen = false;
 
 static XkbDescPtr desc;
 static XIC xic;
@@ -305,7 +305,17 @@ static LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			th_input_key(3, msg == WM_RBUTTONDOWN);
 			break;
 		case WM_MOUSEMOVE:
-			thg->mouse = (th_vf2){ .x = GET_X_LPARAM(lParam), .y = GET_Y_LPARAM(lParam) };
+			if (cursor_frozen) {
+
+				POINT at = {thg->mouse.x, thg->mouse.y};
+				ClientToScreen(th_win, &at);
+				RECT confines = {at.x, at.y, at.x+1, at.y+1};
+				ClipCursor(&confines);
+				thg->mouse = (th_vf2){ .x = GET_X_LPARAM(lParam), .y = GET_Y_LPARAM(lParam) };
+			} else {
+				ClipCursor(NULL);
+				thg->mouse = (th_vf2){ .x = GET_X_LPARAM(lParam), .y = GET_Y_LPARAM(lParam) };
+			}
 			break;
 		case WM_MOUSEWHEEL:
 			th_input_key(GET_WHEEL_DELTA_WPARAM(wParam) < 0 ? 5 : 4, 1);
@@ -495,13 +505,26 @@ void th_window_clear_frame() {
 // CC: ~ske
 // After implementing these functions, please remove the "linux only" note in
 // their umka docs.
-void th_window_set_dims(th_vf2 dm) { }
+void th_window_set_dims(th_vf2 dm) {
+	RECT r;
 
-void th_window_set_icon(th_image *img) { }
+	int w = dm.w, h = dm.h;
+	GetWindowRect(th_win, &r);
+	w32_get_client_window_size(&w, &h);
+	SetWindowPos(th_win, HWND_TOP, r.left, r.top, w, h, SWP_FRAMECHANGED);
+}
 
-void th_window_show_cursor(bool show) { }
+void th_window_set_icon(th_image *img) {
 
-void th_window_freeze_cursor(bool freeze) { }
+}
+
+void th_window_show_cursor(bool show) {
+
+}
+
+void th_window_freeze_cursor(bool freeze) {
+	cursor_frozen = freeze;
+}
 
 #else
 #error tophat cant create a window on this platform yet

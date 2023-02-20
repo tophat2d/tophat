@@ -5,7 +5,12 @@ project(tophat)
 if(MSVC)
     set(umka_dir  ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka/umka_windows_msvc)
     set(umka_lib_path  ${umka_dir}/libumka_static.lib)
-    
+
+    if (NOT EXISTS ${umka_lib_path})
+        message("Recompiling umka.")
+        execute_process(WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka/build_windows_msvc.bat)
+    endif()
+
     execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmd/win-buildmodules.bat WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} RESULT_VARIABLE ret)
     if (NOT ret EQUAL "0")
         message(FATAL_ERROR "Failed to generate staembed.c")
