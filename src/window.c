@@ -25,7 +25,7 @@ static void init() {
 	umth_frame_callback = umkaGetFunc(thg->umka, "window", "umth_frame_callback");
 	
 	UmkaStackSlot s;
-	if (umkaCall(thg->umka, umkaGetFunc(thg->umka, NULL, "main"), 0, &s, &s)) {
+	if (umkaCall(thg->umka, umkaGetFunc(thg->umka, NULL, "init"), 0, &s, &s)) {
 		UmkaError error;
 		umkaGetError(thg->umka, &error);
 		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
