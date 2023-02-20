@@ -6,7 +6,6 @@
 #include <miniaudio.h>
 #include <stb_truetype.h>
 #include <umka_api.h>
-#include "openglapi.h"
 
 #define INPUT_STRING_SIZE 256
 #define MAX_SCISSORS 1024

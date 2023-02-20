@@ -22,8 +22,7 @@ CFLAGS ?= -s -O3 -pipe
 CFLAGS += -Ilib/stb/ \
 	  -Ilib/miniaudio/ \
 	  -Ilib/umprof/ \
-		-Ilib/chew \
-		-Ilib/glad
+		-Ilib/sokol/
 
 # NOTE(skejeton): @vtereshkov here you might need to fix the flags
 # 								try adding -mwin32 and -municode, or removing them in permutations
