@@ -5,20 +5,12 @@ import (
 	"image.um"
 	"placeholders.um"
 	"rect.um"
+	"signal.um"
 	"std.um"
 	"th.um"
 )
 
-//~~type FrameCallback
-// Callback to be executed every frame
-// Also see: `window.onFrame`
-type FrameCallback* = fn(context: interface{}): void;
-//~~
-
 var (
-	frameCallback: FrameCallback
-	frameCallbackContext: ^any
-
 	start, end, clockOffset: real
 	fpsLimit: int = 60
 )
@@ -31,6 +23,10 @@ var (
 
 //~~Viewport size
 var wp*: th.Vf2
+//~~
+
+//~~signal OnFrame
+var onFrame*: signal.Signal
 //~~
 
 fn umth_window_setup(title: str, w, h: int)
@@ -105,15 +101,7 @@ fn cycle(delta: real): bool {
 
 fn umth_frame_callback() {
 	cycle()
-	frameCallback(frameCallbackContext)
-}
-
-//~~fn onFrame
-// Sets callback for every frame of the game
-fn onFrame*(callback: FrameCallback, context: ^any) {
-//~~
-	frameCallbackContext = context	
-	frameCallback = callback
+	onFrame.emit(null)
 }
 
 fn umth_window_begin_scissor(x, y: int, w, h: uint)

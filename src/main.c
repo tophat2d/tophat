@@ -14,8 +14,6 @@
 #include <sokol_app.h>
 
 th_global *thg;
-int destroyfunc;
-int dead = 0;
 
 extern char *th_em_modulenames[];
 extern char *th_em_modulesrc[];
@@ -26,26 +24,7 @@ static void warning(UmkaError *error) {
 	fprintf(stderr, "Warning %s (%d, %d): %s\n", error->fileName, error->line, error->pos, error->msg);
 }
 
-static void die() {
-	if (dead) return;
-	
-	th_audio_deinit();
-	th_font_deinit();
-	th_image_deinit();
-	th_shader_deinit();
-	if (destroyfunc) {
-		umkaCall(thg->umka, destroyfunc, 0, NULL, NULL);
-	}
-
-	umkaFree(thg->umka);
-	dead = 1;
-}
-
-sapp_desc sokol_main(int argc, char *argv[]) {
-	return th_window_sapp_desc();
-}
-
-int main(int argc, char *argv[]) {
+static int th_main(int argc, char *argv[]) {
 	th_global thg_ = {0};
 	thg = &thg_;
 
@@ -161,43 +140,13 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	destroyfunc = umkaGetFunc(thg->umka, NULL, "windowdestroy");
 	thg->scaling = 1;
 
-	umkaOK = umkaRun(thg->umka);
-
-	if (!umkaOK) 
-		UmkaError error;
-		umkaGetError(thg->umka, &error);
-		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
-		fprintf(stderr, "\tStack trace:\n");
-
-		for (int depth = 0; depth < 10; depth++) {
-			char fnName[UMKA_MSG_LEN + 1];
-			char file[UMKA_MSG_LEN + 1];
-			int line, offset;
-
-			if (!umkaGetCallStack(thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
-				break;
-				fprintf(stderr, "\t\t...\n");
-			}
-{
-#ifndef _WIN32
-			fprintf(stderr, "\033[34m");
-#endif
-			fprintf(stderr, "\t\t%s:%06d: ", file, line);
-#ifndef _WIN32
-			fprintf(stderr, "\033[0m");
-#endif
-			fprintf(stderr, "%s\n", fnName);
-		}
-	} else if (prof) {
-		UmprofInfo info[2048] = {0};
-		int len = umprofGetInfo(info, 2048);
-		umprofPrintInfo(stderr, info, len);
-	}
-
-	die();
-
 	return 0;
+}
+
+
+sapp_desc sokol_main(int argc, char *argv[]) {
+	th_main(argc, argv);
+	return th_window_sapp_desc();
 }

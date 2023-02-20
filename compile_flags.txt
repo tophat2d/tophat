@@ -5,6 +5,7 @@
 -Ilib/rawdraw
 -Ilib/chew
 -Ilib/umpr
+-Ilib/sokol
 -Wall
 -Wextra
 -Wno-unused-parameter
