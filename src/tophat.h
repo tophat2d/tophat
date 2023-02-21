@@ -7,6 +7,8 @@
 #include <stb_truetype.h>
 #include <umka_api.h>
 
+#include <sokol_gfx.h>
+
 #define INPUT_STRING_SIZE 256
 #define MAX_SCISSORS 1024
 #define BATCH_SIZE 1024
@@ -161,12 +163,11 @@ typedef struct {
 
 	char input_string[INPUT_STRING_SIZE];
 	uu input_string_len;
+	
+	sg_pass_action pass_action;
 
-	GLuint canvas_vao;
-	GLuint canvas_vbo;
-	GLuint canvas_prog;
-	int canvas_batch_size;
-	float canvas_batch[BATCH_SIZE * 3 * 6];
+	sg_bindings canvas_bind;
+	sg_pipeline canvas_pip;
 
 	GLuint blit_prog;
 	GLuint blit_prog_tex;

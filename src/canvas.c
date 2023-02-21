@@ -1,54 +1,49 @@
 #include "tophat.h"
-#include "openglapi.h"
 #include <string.h>
 #include <math.h>
 #include "pixelfont.h"
 
 extern th_global *thg;
 
-int th_canvas_compile_shader(char *frag, char *vert) {
-	const char *attribs[] = { "th_pos", "th_color" };
-	return th_shader_compile(frag, vert,
-		"attribute vec2 th_pos;\n"
-		"attribute vec4 th_color;\n"
-		"varying vec4 th_vcolor;\n"
-
-		"vec2 th_vertex(vec2 vert);\n"
-
-		"void main() {\n"
-		"  gl_Position = vec4(th_vertex(th_pos), 0, 1.0);\n"
-		"  th_vcolor = th_color;\n"
-		"}\n",
-
-		"varying vec4 th_vcolor;\n"
-
-		"vec4 th_fragment(vec4 color);\n"
-
-		"void main() {\n"
-		"  gl_FragColor = th_fragment(th_vcolor);\n"
-		"}\n", attribs, 2);
-}
+#define BATCH_SIZE 1024
 
 void th_canvas_init() {
-	thg->canvas_prog = *th_get_shader_err(th_canvas_compile_shader(
-		"vec2 th_vertex(vec2 vert) { return vert; }\n",
-		"vec4 th_fragment(vec4 color) { return color; }\n"));
-
-	glGenVertexArrays(1, &thg->canvas_vao);
-	glGenBuffers(1, &thg->canvas_vbo);
-
-	glBindVertexArray(thg->canvas_vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, thg->canvas_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(thg->canvas_batch), thg->canvas_batch, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), NULL);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(2 * sizeof(float)));
-
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+	thg->canvas_bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
+		.size = BATCH_SIZE * 3 * (2 + 4) * sizeof(float),
+		.type = SG_BUFFERTYPE_VERTEXBUFFER,
+		.usage = SG_USAGE_DYNAMIC,
+		.label = "canvas-buffer"
+	});
+	
+	sg_shader shd = sg_make_shader(&(sg_shader_desc){
+		.vs.source =
+			"#version 330\n"
+			"layout(location=0) in vec2 pos;\n"
+			"layout(location=1) in vec4 color0;\n"
+			"out vec4 color\n"
+			"void main() {\n"
+			"  gl_Position = pos;\n"
+			"  color = color0;\n"
+			"}\n",
+		.fs.source =
+			"#version 330\n"
+			"in vec4 color;\n"
+			"out vec4 frag_color;\n"
+			"void main() {\n"
+			"  frag_color = color;\n"
+			"}\n"
+	});
+	
+	thg->canvas_pip = sg_make_pipeline(&(sg_pipeline_desc){
+		.shader = shd,
+		.layout = {
+			.attrs = {
+				[0].format = SG_VERTEXFORMAT_FLOAT2,
+				[1].format = SG_VERTEXFORMAT_FLOAT4
+			}
+		},
+		.label = "canvas-pip"
+	});
 }
 
 void th_canvas_flush() {
