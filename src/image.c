@@ -254,163 +254,18 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	++thg->blit_batch_size;
 }
 
-void th_image_flush() {
-	if (!thg->blit_batch_size) return;
-
-	glBindBuffer(GL_ARRAY_BUFFER, thg->blit_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, thg->blit_batch_size * 6 * (4 + 2 + 2) * sizeof(float), thg->blit_batch);
-
-	glUniform1i(thg->blit_prog_tex, 0);
-	glBindTexture(GL_TEXTURE_2D, thg->batch_tex);
-
-	glUseProgram(thg->blit_prog);
-	glBindVertexArray(thg->blit_vao);
-	glDrawArrays(GL_TRIANGLES, 0, thg->blit_batch_size * 6);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	thg->blit_batch_size = 0;
-}
-
 void th_image_set_as_render_target(th_image *img) {
-	if (thg->has_framebuffer) {
-		th_error("Another image is alredy selected as the render target.");
-		return;
-	}
-		
-	if (img->dm.w >= RENDER_TARGET_MAX_SIZE || img->dm.h >= RENDER_TARGET_MAX_SIZE) {
-		th_error("Render target can be atmost %dx%d big.",
-			RENDER_TARGET_MAX_SIZE, RENDER_TARGET_MAX_SIZE);
-		return;
-	}
-
-	th_image_flush();
-	th_canvas_flush();
-
-	thg->scaling = 1;
-	thg->offset.x = 0;
-	thg->offset.y = 0;
-	thg->viewport = img->dm;
-	thg->has_framebuffer = 1;
-
-	glBindFramebuffer(GL_FRAMEBUFFER, thg->framebuffer);
-	
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, img->gltexture, 0);
-
-	GLenum drawBuffer = GL_COLOR_ATTACHMENT0;
-	glDrawBuffers(1, &drawBuffer);
-
-	glViewport(0, 0, img->dm.w, img->dm.h);
-
-	glUseProgram(thg->blit_prog);
-	glUniform1i(thg->framebuffer_uniform, 1);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		th_error("Could not setup image render target %x, %x.", glGetError(), glCheckFramebufferStatus(GL_FRAMEBUFFER));
+	// TODO
 }
 
 void th_image_remove_render_target(th_image *img, th_vf2 wp) {
-	if (!thg->has_framebuffer) {
-		th_error("No render target is set.");
-		return;
-	}
-
-	th_canvas_flush();
-	th_image_flush();
-
-	th_calculate_scaling(wp.w, wp.h);
-
-	/*glBindTexture(GL_TEXTURE_2D, img->gltexture);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->data);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->dm.w, img->dm.h, 0, GL_RGBA,
-		GL_UNSIGNED_INT_8_8_8_8, img->data);*/
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glUseProgram(thg->blit_prog);
-	glUniform1i(thg->framebuffer_uniform, 0);
-
-	int w,h;
-	th_window_get_dimensions(&w, &h);
-	glViewport(0, 0, w, h);
-	thg->viewport.w = w;
-	thg->viewport.h = h;
-	thg->has_framebuffer = 0;
-}
-
-int th_image_compile_shader(char *frag, char *vert) {
-	const char *attribs[] = {
-		"th_vert", "th_tex_vert", "th_color"
-	};
-
-	return th_shader_compile(frag, vert,
-		"attribute vec2 th_vert;\n"
-		"attribute vec2 th_tex_vert;\n"
-		"attribute vec4 th_color;\n"
-		"varying vec2 th_tc;\n"
-		"varying vec4 th_vcolor;\n"
-
-		"vec2 th_vertex(vec2 vert);\n"
-
-		"void main() {\n"
-		"  th_vcolor = th_color;\n"
-		"  gl_Position = vec4( th_vertex(th_vert), 0, 1 );\n"
-		"  th_tc = th_tex_vert;\n"
-		"}\n",
-
-		"uniform int th_has_framebuffer;\n"
-		"uniform sampler2D th_tex;\n"
-		"varying vec2 th_tc;\n"
-		"varying vec4 th_vcolor;\n"
-
-		"vec4 th_fragment(sampler2D tex, vec2 coord);\n"
-
-		"void main() {\n"
-		"  gl_FragColor = th_fragment(th_tex, th_tc) * th_vcolor; \n"
-		"}\n",
-		attribs, 3);
+	// TODO
 }
 
 void th_image_init() {
-	thg->blit_prog = *th_get_shader_err(th_image_compile_shader(
-		"vec2 th_vertex(vec2 vert) { return vert; }",
-		"vec4 th_fragment(sampler2D tex, vec2 coord) { return texture2D(tex, coord); }"));
-
-	thg->blit_prog_tex = glGetUniformLocation(thg->blit_prog, "th_tex");
-	thg->framebuffer_uniform = glGetUniformLocation(thg->blit_prog, "th_has_framebuffer");
-
-	glGenVertexArrays(1, &thg->blit_vao);
-	glGenBuffers(1, &thg->blit_vbo);
-
-	glBindVertexArray(thg->blit_vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, thg->blit_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(thg->blit_batch), thg->blit_batch, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), NULL);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(2 * sizeof(float)));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	glGenFramebuffers(1, &thg->framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, thg->framebuffer);
-		glGenRenderbuffers(1, &thg->depthbuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, thg->depthbuffer);
-			glRenderbufferStorage(
-				GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
-				RENDER_TARGET_MAX_SIZE, RENDER_TARGET_MAX_SIZE
-			);
-
-			glFramebufferRenderbuffer(
-				GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-				GL_RENDERBUFFER, thg->depthbuffer
-			);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	// TODO
 }
 
-void th_image_deinit() { }
+void th_image_deinit() {
+	return;
+}

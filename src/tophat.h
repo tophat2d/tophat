@@ -6,12 +6,17 @@
 #include <miniaudio.h>
 #include <stb_truetype.h>
 #include <umka_api.h>
-
 #include <sokol_gfx.h>
 
 #define INPUT_STRING_SIZE 256
 #define MAX_SCISSORS 1024
+
+// each unit here is a triangle, that's why multiplication by 3
+// 2 + 2 + 4 is (position + uv + colour)
 #define BATCH_SIZE 1024
+#define BATCH_VERTEX (2 + 2 + 4)
+#define BATCH_UNIT (3 * BATCH_VERTEX)
+#define BATCH_LENGTH (BATCH_SIZE * BATCH_UNIT)
 #define RENDER_TARGET_MAX_SIZE 1024
 
 typedef float fu;
@@ -170,23 +175,12 @@ typedef struct {
 	char input_string[INPUT_STRING_SIZE];
 	uu input_string_len;
 	
-	sg_pass_action pass_action;
+	float canvas_batch[BATCH_LENGTH];
+	uu canvas_batch_size;
 
+	sg_pass_action pass_action;
 	sg_bindings canvas_bind;
 	sg_pipeline canvas_pip;
-
-	GLuint blit_prog;
-	GLuint blit_prog_tex;
-	GLuint blit_vao;
-	GLuint blit_vbo;
-	int blit_batch_size;
-	float blit_batch[BATCH_SIZE * 6 * (2 + 2 + 4)];
-	GLuint batch_tex;
-
-	GLuint framebuffer;
-	GLuint depthbuffer;
-	bool has_framebuffer;
-	GLuint framebuffer_uniform;
 
 	th_rect scissors[MAX_SCISSORS];
 	uu scissor;
@@ -250,6 +244,7 @@ void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
 void th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size);
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);
 void th_canvas_quad(th_quad *q, uint32_t color);
+bool th_canvas_batch_push(float *array, size_t n);
 void th_canvas_flush();
 
 // collisions
@@ -279,13 +274,6 @@ void th_font_draw(th_font *font, const char *s, double x, double y, uint32_t col
 th_vf2 th_font_measure(th_font *font, const char *s);
 void th_font_deinit();
 
-// gl
-void th_gl_init();
-GLuint th_gl_compile_shader(const char **src, GLenum type);
-GLuint th_gl_create_prog(const char *vert_src, const char *frag_src, const char **attribs, int nattribs);
-void th_gl_free_prog(GLuint prog);
-void th_gl_get_viewport_max(int *w, int *h);
-
 // image
 th_image *th_load_image(char *path);
 void th_image_free(th_image *img);
@@ -302,7 +290,6 @@ void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
 th_image *th_image_alloc();
 void th_image_init();
 void th_image_deinit();
-void th_image_flush();
 int th_image_compile_shader(char *frag, char *vert);
 
 void th_image_set_as_render_target(th_image *img);
@@ -362,7 +349,7 @@ size_t th_utf8_encode(char *out, uint32_t r);
 // window
 void th_window_setup(char *name, int w, int h);
 void th_window_get_dimensions(int *w, int *h);
-th_window_handle th_window_handle();
+th_window_handle th_get_window_handle();
 void th_window_swap_buffers();
 void th_window_clear_frame();
 void th_window_set_dims(th_vf2 dm);

@@ -28,7 +28,7 @@ if(MSVC)
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/stb
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/umprof
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka/src
-        ${CMAKE_CURRENT_SOURCE_DIR}/lib/glad
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib/sokol
     )
 
     target_link_libraries(tophat gdi32 opengl32 user32 ${umka_lib_path})

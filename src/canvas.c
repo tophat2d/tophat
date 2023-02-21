@@ -5,11 +5,39 @@
 
 extern th_global *thg;
 
-#define BATCH_SIZE 1024
+// pushes the vertices onto the batch
+bool th_canvas_batch_push(float *array, size_t n) {
+	if (n % BATCH_UNIT != 0) {
+		// trying to push partial units (triangles), not allowed
+		th_error("odd unit size");
+		return false;
+	}
+
+	if ((thg->canvas_batch_size + n) > BATCH_LENGTH) {
+		// not enough space
+		return false;
+	}
+
+	memcpy(thg->canvas_batch+thg->canvas_batch_size, array, n * sizeof(float));
+	thg->canvas_batch_size += n;
+
+	return true;
+}
+
+// same as th_canvas_batch_push except automatically flushes the buffer if needed
+int th_canvas_batch_push_auto_flush(float *array, size_t n) {
+	bool ok = th_canvas_batch_push(array, n);
+	if (!ok) { // if buffer is too small
+		th_canvas_flush();
+		ok = th_canvas_batch_push(array, n);
+	}
+
+	return ok;
+}
 
 void th_canvas_init() {
 	thg->canvas_bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
-		.size = BATCH_SIZE * 3 * (2 + 4) * sizeof(float),
+		.data = SG_RANGE(thg->canvas_batch),
 		.type = SG_BUFFERTYPE_VERTEXBUFFER,
 		.usage = SG_USAGE_DYNAMIC,
 		.label = "canvas-buffer"
@@ -19,45 +47,49 @@ void th_canvas_init() {
 		.vs.source =
 			"#version 330\n"
 			"layout(location=0) in vec2 pos;\n"
-			"layout(location=1) in vec4 color0;\n"
-			"out vec4 color\n"
+			"layout(location=1) in vec2 uv0;\n"
+			"layout(location=2) in vec4 color0;\n"
+			"out vec2 uv;\n"
+			"out vec4 color;\n"
 			"void main() {\n"
 			"  gl_Position = pos;\n"
+			"  uv = uv0;\n"
 			"  color = color0;\n"
 			"}\n",
 		.fs.source =
 			"#version 330\n"
+			"in vec2 uv;\n"
 			"in vec4 color;\n"
 			"out vec4 frag_color;\n"
 			"void main() {\n"
-			"  frag_color = color;\n"
-			"}\n"
+			"  frag_color = color + (uv * 0.00001);\n" // NOTE: I need to add this uv because otherwise it wont compile
+			"}\n"																			 // 			it will be removed when texture support is added.
 	});
 	
 	thg->canvas_pip = sg_make_pipeline(&(sg_pipeline_desc){
 		.shader = shd,
 		.layout = {
 			.attrs = {
-				[0].format = SG_VERTEXFORMAT_FLOAT2,
-				[1].format = SG_VERTEXFORMAT_FLOAT4
+				[0].format = SG_VERTEXFORMAT_FLOAT2, // X, Y
+				[1].format = SG_VERTEXFORMAT_FLOAT2, // U, V
+				[2].format = SG_VERTEXFORMAT_FLOAT4  // R, G, B, A
 			}
 		},
 		.label = "canvas-pip"
 	});
 }
 
-void th_canvas_flush() {
-	if (!thg->canvas_batch_size) return;
-	glBindBuffer(GL_ARRAY_BUFFER, thg->canvas_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER,
-		0, thg->canvas_batch_size * 3 * 6 * sizeof(float), thg->canvas_batch);
+static int batch_vertex_count() {
+	if (thg->canvas_batch_size % BATCH_VERTEX != 0) {
+		th_error("odd batch size")
+	}
+	return thg->canvas_batch_size/BATCH_VERTEX;
+}
 
-	glUseProgram(thg->canvas_prog);
-	glBindVertexArray(thg->canvas_vao);
-	glDrawArrays(GL_TRIANGLES, 0, thg->canvas_batch_size * 3);
+void th_canvas_flush() {
+	// NOTE: (offset, no-vertices, no-instances)
+  sg_draw(0, batch_vertex_count(), 1);
 	thg->canvas_batch_size = 0;
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 }
 
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
@@ -79,22 +111,17 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 
 	const float yoff = thg->has_framebuffer ? -1.0 : 1.0;
 	const float verts[] = {
-		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + yoff,
-	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + yoff,
-		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + yoff,
+		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + yoff, 0, 0, 0, 0, 0, 0 // NOTE: Temporarily uvs are zeroed out
+	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + yoff, 0, 0, 0, 0, 0, 0
+		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + yoff, 0, 0, 0, 0, 0, 0
 	};
 
-	float *base = &thg->canvas_batch[thg->canvas_batch_size * 3 * 6];
-	for (int i=0; i < 3; ++i) {
-		memcpy(base, &verts[i * 2], sizeof(float) * 2);
-		base += 2;
-		memcpy(base, colors, sizeof(float) * 4);
-		base += 4;
+	for (int i = 0; i < 3; ++i) {
+		// +4 = color
+		memcpy(verts+(i*BATCH_VERTEX+4), colors, sizeof(float) * 4);
 	}
 
-	++thg->canvas_batch_size;
-	if (thg->canvas_batch_size >= BATCH_SIZE)
-		th_canvas_flush();
+	th_canvas_batch_push_auto_flush(verts, sizeof verts);
 }
 
 void th_canvas_rect(uint32_t color, th_rect r) {

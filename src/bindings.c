@@ -2,7 +2,6 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <string.h>
-#include "openglapi.h"
 
 #include <umka_api.h>
 #include <stb_image.h>

@@ -9,6 +9,10 @@
 #include <sokol_gfx.h>
 #include <sokol_glue.h>
 
+#ifdef _WIN32
+#include <windows.h>
+#endif
+
 extern th_global *thg;
 
 static bool window_active = false;
@@ -172,7 +176,7 @@ void th_window_end_scissor() {
 // ---- PLATFORM DEPENDENT CODE
 
 #ifdef _WIN32
-th_window_handle th_window_handle() {
+th_window_handle th_get_window_handle() {
 	return sapp_win32_get_hwnd();
 }
 
