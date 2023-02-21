@@ -119,6 +119,12 @@ typedef struct {
 	fu scale;
 } th_tmap;
 
+#ifdef _WIN32
+typedef void* th_window_handle;
+#else
+#error Unsupported platform
+#endif
+
 #define TH_FONTPLATFORM_PAGECOUNT 1024
 #define TH_FONTPLATFORM_CHARSPERPAGE 256
 
@@ -355,7 +361,7 @@ size_t th_utf8_encode(char *out, uint32_t r);
 // window
 void th_window_setup(char *name, int w, int h);
 void th_window_get_dimensions(int *w, int *h);
-int th_window_handle();
+th_window_handle th_window_handle();
 void th_window_swap_buffers();
 void th_window_clear_frame();
 void th_window_set_dims(th_vf2 dm);

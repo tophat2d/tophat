@@ -54,7 +54,9 @@ static void init() {
 
 static void frame() {
 	UmkaStackSlot s;
-	umkaCall(thg->umka, umth_frame_callback, 0, &s, &s);
+	if (umth_frame_callback) {
+		umkaCall(thg->umka, umth_frame_callback, 0, &s, &s);
+	}
 }
 
 static void event(sapp_event *ev) {
@@ -100,7 +102,7 @@ sapp_desc th_window_sapp_desc() {
     .gl_force_gles2 = true,
     .window_title = "Tophat",
     .icon.sokol_default = true,
-	.logger.func = slog_func
+		.logger.func = slog_func
   };
 }
 
@@ -124,19 +126,11 @@ void th_window_set_fullscreen(bool fullscreen) {
 	}
 }
 
-int th_window_handle() {
-	// TODO
-}
-
 void th_window_clear_frame() {
 	// TODO
 }
 
 void th_window_swap_buffers() {
-	// TODO
-}
-
-void th_window_set_dims(th_vf2 dm) {
 	// TODO
 }
 
@@ -171,6 +165,25 @@ void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
 	sg_apply_scissor_rect(x, y, w, h, true);
 }
 
-void th_window_end_scissor() { }
+void th_window_end_scissor() {
+	sg_apply_scissor_rect(x, y, sapp_width(), sapp_height(), true);
+}
 
+// ---- PLATFORM DEPENDENT CODE
 
+#ifdef _WIN32
+th_window_handle th_window_handle() {
+	return sapp_win32_get_hwnd();
+}
+
+void th_window_set_dims(th_vf2 dm) {
+	RECT r;
+	HWND hwnd = th_window_handle();
+	if (GetWindowRect(hwnd, &r)) {
+		SetWindowPos(hwnd, HWND_TOP, r.left, r.top, dm.x, dm.y, 0);
+	}
+}
+#else
+// TODO: LINUX
+#error Unsupported platform
+#endif

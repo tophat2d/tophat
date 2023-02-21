@@ -48,7 +48,7 @@ fn onFrame(context: interface{}) {
 		s: th.vf2f(s)})
 }
 
-fn main() {
+fn init() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
 	
