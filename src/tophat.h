@@ -6,6 +6,7 @@
 #include <miniaudio.h>
 #include <stb_truetype.h>
 #include <umka_api.h>
+#include <sokol_app.h>
 #include <sokol_gfx.h>
 
 #define INPUT_STRING_SIZE 256
@@ -128,6 +129,9 @@ typedef struct {
 
 #ifdef _WIN32
 typedef void* th_window_handle;
+#elif __linux__
+#include <X11/Xlib.h>
+typedef Window *th_window_handle;
 #else
 #error Unsupported platform
 #endif
@@ -278,7 +282,7 @@ void th_font_deinit();
 th_image *th_load_image(char *path);
 void th_image_free(th_image *img);
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
-uint32_t *th_image_get_data(th_image *img, bool rgba);
+uint32_t *th_image_get_data(th_image *img);
 
 unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void th_blit_tex(th_image *img, th_quad q, uint32_t color);

@@ -11,6 +11,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <X11/Xlib.h>
 #endif
 
 extern th_global *thg;
@@ -139,7 +141,7 @@ void th_window_swap_buffers() {
 }
 
 void th_window_set_icon(th_image *img) {
-	uint32_t *pixels = th_image_get_data(img, true);
+	uint32_t *pixels = th_image_get_data(img);
 
 	sapp_set_icon(&(sapp_icon_desc){
 		.images = {
@@ -187,7 +189,16 @@ void th_window_set_dims(th_vf2 dm) {
 		SetWindowPos(hwnd, HWND_TOP, r.left, r.top, dm.x, dm.y, 0);
 	}
 }
+#elif __linux__
+extern Window *th_sapp_win;
+extern Display **th_sapp_dpy;
+th_window_handle th_get_window_handle() {
+	return th_sapp_win;
+}
+
+void th_window_set_dims(th_vf2 dm) {
+	XResizeWindow(*th_sapp_dpy, *th_sapp_win, dm.x, dm.y);
+}
 #else
-// TODO: LINUX
 #error Unsupported platform
 #endif

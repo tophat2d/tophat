@@ -2,8 +2,9 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "openglapi.h"
 #include <stb_image.h>
+
+#include <sokol_gfx.h>
 
 #include "tophat.h"
 
@@ -14,7 +15,7 @@
 extern th_global *thg;
 
 void th_image_free(th_image *img) {
-	glDeleteTextures(1, &img->gltexture);
+	sg_dealloc_image(img->tex);
 }
 
 static void th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -52,23 +53,30 @@ uint32_t *th_rdimg(th_image *img, unsigned char *data) {
 	return rd;
 }
 
-uint32_t *th_image_get_data(th_image *img, bool rgba) {
+uint32_t *th_image_get_data(th_image *img) {
+	sg_image_desc desc = sg_query_image_desc(img->tex);
 	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-	glBindTexture(GL_TEXTURE_2D, img->gltexture);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-
-	if (rgba)
-		for (int i=0; i < img->dm.w * img->dm.h; ++i) {
-			uint32_t c = data[i];
-			data[i] = 
-				(c >> 0*8 & 0xff) << 3*8 |
-				(c >> 1*8 & 0xff) << 2*8 |
-				(c >> 2*8 & 0xff) << 1*8 |
-				(c >> 3*8 & 0xff) << 0*8;
-		}
-			
+	memcpy(data, desc.data.subimage[0][0].ptr, img->dm.w * img->dm.h);
 
 	return data;
+}
+
+static void gen_tex(th_image *img, uint32_t *data) {
+	img->tex = sg_make_image(&(sg_image_desc){
+		.width = img->dm.w,
+		.height = img->dm.h,
+		.data.subimage = (sg_range) {
+			.ptr = data,
+			.size = img->dm.w * img->dm.h
+		},
+		.pixel_format = SG_PIXELFORMAT_RGBA8UI,
+		.mag_filter = img->filter,
+		.min_filter = img->filter,
+		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+		.usage = SG_USAGE_DYNAMIC
+	});
 }
 
 th_image *th_load_image(char *path) {
@@ -91,20 +99,7 @@ th_image *th_load_image(char *path) {
 	img->flipv = 0;
 	img->fliph = 0;
 
-	img->tex = sg_make_image(&(sg_image_desc){
-		.width = w,
-		.height = h,
-		.data.subimage = (sg_range) {
-			.ptr = data,
-			.size = w * h
-		},
-		.pixel_format = c == 4 ? SG_PIXELFORMAT_RGBA8UI : SG_PIXELFORMAT_RGB8UI,
-		.mag_filter = img->filter,
-		.min_filter = img->filter,
-		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
-		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
-		.wrap_v = SG_WRAP_CLAMP_TO_EDGE
-	});
+	gen_tex(img, data);
 
 	stbi_image_free(data);
 
@@ -112,15 +107,6 @@ th_image *th_load_image(char *path) {
 }
 
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
-	for (int i=0; i < dm.w * dm.h; ++i) {
-		uint32_t c = data[i];
-		data[i] = 
-			(c >> 0*8 & 0xff) << 3*8 |
-			(c >> 1*8 & 0xff) << 2*8 |
-			(c >> 2*8 & 0xff) << 1*8 |
-			(c >> 3*8 & 0xff) << 0*8;
-	}
-
 	img->dm = dm;
 	img->flipv = 0;
 	img->fliph = 0;
@@ -128,63 +114,25 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
 		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
 	img->channels = 4;
-	img->filter = 1;
+	img->filter = SG_FILTER_NEAREST;
 
-	img->gltexture = th_gen_texture(data, dm, img->filter);
+	gen_tex(img, data);
 }
 
-void th_image_set_filter(th_image *img, int filter) {
-	uint32_t *data = th_image_get_data(img, false);
-
+void th_image_set_filter(th_image *img, sg_filter filter) {
+	uint32_t *data = th_image_get_data(img);
 	img->filter = filter;
-	glDeleteTextures(1, &img->gltexture);
-	img->gltexture = th_gen_texture(data, img->dm, img->filter);
+	sg_dealloc_image(img->tex);
+	gen_tex(img, data);
 
 	free(data);
 }
 
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm) {
-	for (int i=0; i < img->dm.w * img->dm.h; ++i) {
-		uint32_t c = data[i];
-		data[i] = 
-			(c >> 0*8 & 0xff) << 3*8 |
-			(c >> 1*8 & 0xff) << 2*8 |
-			(c >> 2*8 & 0xff) << 1*8 |
-			(c >> 3*8 & 0xff) << 0*8;
-	}
-
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, img->gltexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dm.w, dm.h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, data);
+	sg_dealloc_image(img->tex);
 
 	img->dm = dm;
-}
-
-unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
-	GLuint tex;
-
-	glGenTextures(1, &tex);
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, tex);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-
-	if (filter)
-		filter = GL_NEAREST;
-	else
-		filter = GL_LINEAR;
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dm.w, dm.h, 0,  GL_RGBA,
-		GL_UNSIGNED_BYTE, data);
-
-	return (unsigned int)tex;
+	gen_tex(img, data);
 }
 
 void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br) {

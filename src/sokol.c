@@ -16,3 +16,9 @@
 #include <sokol_gfx.h>
 #include <sokol_glue.h>
 #include <sokol_time.h>
+
+#ifdef __linux__
+#include <X11/Xlib.h>
+Window *th_sapp_win = &_sapp.x11.window;
+Display **th_sapp_dpy = &_sapp.x11.display;
+#endif
