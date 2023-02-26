@@ -8,14 +8,21 @@ import (
 	"canvas.um"
 )
 
+var (
+	img: image.Image
+)
+
 fn onFrame(cctx, uctx: any) {
 	canvas.drawRect(th.white, rect.mk(0, 0, 100, 100))
-	canvas.drawRect(th.green, rect.mk(0, 0, 50, 50))
+	img.draw(th.Transform{p: th.Vf2{0, 0}, s: th.Vf2{2, 2}})
+	//canvas.drawText("Hello world!", th.Vf2{0, 0}, th.white, 4)
+	//canvas.drawRect(th.green, rect.mk(0, 0, 50, 50))
 }
 
 fn init*() {
-	window.setup("Hello world", 600, 600)
-	window.setViewport(th.Vf2{ 100, 100 })
+	img = image.load("etc/test.png")
+	window.setup("Hello world", 640, 480)
+	window.setViewport(th.Vf2{ 640, 480 })
 
 	window.onFrame.register(onFrame, null)
 }

@@ -7,6 +7,34 @@
 
 extern th_global *thg;
 
+struct {
+	size_t start, end;
+	th_image *img;
+}
+typedef phase;
+
+phase phases[32];
+size_t phases_len;
+
+void push_phase(th_image *img) {
+	if (phases_len >= 32) {
+		th_error("overflow");
+		return;
+	}
+	size_t start = 0;
+	if (phases_len > 0) {
+		if (phases[phases_len-1].img == img) {
+			phases[phases_len-1].end = thg->canvas_batch_size;
+			return;
+		}
+		start = phases[phases_len-1].end;
+	}
+	phases[phases_len].start = start;
+	phases[phases_len].end = thg->canvas_batch_size;
+	phases[phases_len].img = img;
+	phases_len++;
+}
+
 // pushes the vertices onto the batch
 bool th_canvas_batch_push(float *array, size_t n) {
 	if (n % BATCH_UNIT != 0) {
@@ -72,23 +100,21 @@ void th_canvas_deinit() {
 	th_image_free(&white_img);
 }
 
-static int batch_vertex_count() {
-	if (thg->canvas_batch_size % BATCH_VERTEX != 0) {
-		th_error("odd batch size");
-	}
-	return thg->canvas_batch_size/BATCH_VERTEX;
-}
-
 void th_canvas_flush() {
+	sg_update_buffer(thg->canvas_bind.vertex_buffers[0], &SG_RANGE(thg->canvas_batch));
+	for (size_t i = 0; i < phases_len; i++) {
+		phase *phs = &phases[i];
+		thg->canvas_bind.fs_images[0] = phs->img->tex;
+		fprintf(stderr, "%zu %zu\n", phs->start/BATCH_VERTEX, (phs->end - phs->start)/BATCH_VERTEX);
+	  sg_draw(phs->start/BATCH_VERTEX, (phs->end - phs->start)/BATCH_VERTEX, 1);
+	}
+	phases_len = 0;
 	// NOTE: (offset, no-vertices, no-instances)
-  sg_draw(0, batch_vertex_count(), 1);
 	thg->canvas_batch_size = 0;
 }
 
 void th_canvas_use_image(th_image *img) {
-	if (img != thg->canvas_image)
-		th_canvas_flush();
-	thg->canvas_bind.fs_images[SLOT_tex] = img->tex;
+	push_phase(img);
 	thg->canvas_image = img;
 }
 
@@ -110,9 +136,9 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	th_window_get_dimensions(&sw, &sh);
 
 	const float verts[] = {
-		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + 1, 0, 0, 0, 0, 0, 0, // NOTE: Temporarily uvs are zeroed out
-	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + 1, 0, 0, 0, 0, 0, 0,
-		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + 1, 0, 0, 0, 0, 0, 0
+		(a.x + thg->offset.x) / sw, (a.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0, // NOTE: Temporarily uvs are zeroed out
+	 	(b.x + thg->offset.x) / sw, (b.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0,
+		(c.x + thg->offset.x) / sw, (c.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0
 	};
 
 	for (int i = 0; i < 3; ++i) {

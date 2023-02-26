@@ -69,7 +69,6 @@ static void gen_tex(th_image *img, uint32_t *data) {
 			.ptr = data,
 			.size = img->dm.w * img->dm.h * sizeof(uint32_t)
 		},
-		.pixel_format = SG_PIXELFORMAT_RGBA8UI,
 		.mag_filter = img->filter,
 		.min_filter = img->filter,
 		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
@@ -191,17 +190,17 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	}
 
 	const float verts[] = {
-		q.tl.x / sw - 1.0, q.tl.y / sh + 1, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
-		q.tr.x / sw - 1.0, q.tr.y / sh + 1, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,
-		q.br.x / sw - 1.0, q.br.y / sh + 1, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
-		q.tl.x / sw - 1.0, q.tl.y / sh + 1, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
-		q.br.x / sw - 1.0, q.br.y / sh + 1, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
-		q.bl.x / sw - 1.0, q.bl.y / sh + 1, bounds.bl.x, bounds.bl.y, 0, 0, 0, 0};
+		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
+		q.tr.x / sw, q.tr.y / sh, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,
+		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
+		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
+		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
+		q.bl.x / sw, q.bl.y / sh, bounds.bl.x, bounds.bl.y, 0, 0, 0, 0};
 
 	for (uu i=0; i < 6; i++)
 		memcpy(verts + (i * 8) + 4, colors, 4 * sizeof(float));
 
-	th_canvas_batch_push_auto_flush(verts, sizeof(verts));
+	th_canvas_batch_push_auto_flush(verts, sizeof(verts) / sizeof(verts[0]));
 }
 
 void th_image_set_as_render_target(th_image *img) {
