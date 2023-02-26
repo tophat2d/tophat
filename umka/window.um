@@ -30,7 +30,6 @@ var onFrame*: signal.Signal
 //~~
 
 fn umth_window_setup(title: str, w, h: int)
-fn umth_window_clear_frame()
 fn umth_window_get_dimensions(w, h: ^int32)
 fn umth_window_swap_buffers()
 fn umth_window_handle(): bool
@@ -55,7 +54,6 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 //~~
 	w, h = width, height
 	umth_window_setup(title, width, height)
-	umth_window_clear_frame()
 
 	if std.getenv("HOME") == "" {
 		th.platform = "windows"
@@ -73,15 +71,13 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 //~~fn cycle
 // Cycle needs to be called every cycle for the window to work. If the window
 // was closed, it returns false.
-fn cycle(delta: real): bool {
+fn cycle(delta: int): bool {
 //~~
 	umth_window_set_viewport(wp)
 	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
 	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
-
-	umth_window_swap_buffers()
 
 	th.delta = delta*1000
 	if th.delta == 0 {
@@ -92,7 +88,6 @@ fn cycle(delta: real): bool {
 	th.time = round(start - clockOffset)
 
 	running := umth_window_handle()
-	umth_window_clear_frame()
 	umth_window_get_dimensions(&w, &h)
 
 	audio.__cycle()
@@ -100,7 +95,7 @@ fn cycle(delta: real): bool {
 }
 
 fn umth_frame_callback() {
-	cycle()
+	cycle(16)
 	onFrame.emit(null)
 }
 

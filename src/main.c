@@ -147,6 +147,7 @@ static int th_main(int argc, char *argv[]) {
 
 
 sapp_desc sokol_main(int argc, char *argv[]) {
-	th_main(argc, argv);
+	if (th_main(argc, argv))
+		exit(1);
 	return th_window_sapp_desc();
 }

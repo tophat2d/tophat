@@ -15,7 +15,7 @@ var (
 	lines: []str
 )
 
-fn onFrame(context: interface{}) {
+fn onFrame(cctx, uctx: any) {
 	canvas.drawRect(bg, rect.mk(0, 0, window.wp.x, window.wp.y))
 
 	p := th.Vf2{ 0, 1 }
@@ -69,5 +69,7 @@ fn init() {
 		"OPEN THE",
 		"HOMEPAGE" }
 
-	window.onFrame(onFrame, null)
+	window.onFrame.register(onFrame, null)
 }
+
+fn main() { }

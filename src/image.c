@@ -75,7 +75,7 @@ static void gen_tex(th_image *img, uint32_t *data) {
 		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
-		.usage = SG_USAGE_DYNAMIC
+		.usage = SG_USAGE_IMMUTABLE
 	});
 }
 

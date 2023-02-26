@@ -39,7 +39,7 @@ static th_image white_img;
 
 void th_canvas_init() {
 	thg->canvas_bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
-		.data = SG_RANGE(thg->canvas_batch),
+		.size = sizeof(thg->canvas_batch),
 		.type = SG_BUFFERTYPE_VERTEXBUFFER,
 		.usage = SG_USAGE_DYNAMIC,
 		.label = "canvas-buffer"
@@ -54,7 +54,7 @@ void th_canvas_init() {
 			"out vec2 uv;\n"
 			"out vec4 color;\n"
 			"void main() {\n"
-			"  gl_Position = pos;\n"
+			"  gl_Position = vec4(pos, 0, 0);\n"
 			"  uv = uv0;\n"
 			"  color = color0;\n"
 			"}\n",
