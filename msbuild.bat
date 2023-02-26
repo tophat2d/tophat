@@ -15,6 +15,6 @@ if %ERRORLEVEL% NEQ 0 (
 
 md bin
 cd bin
-cmake -DCMAKE_BUILD_TYPE=Release .. && msbuild tophat.sln /property:Configuration=Release
+cmake -DCMAKE_BUILD_TYPE=Debug .. && msbuild tophat.sln /property:Configuration=Debug
 cd ..
-copy bin\Release\tophat.exe tophat.exe
+copy bin\Debug\tophat.exe tophat.exe

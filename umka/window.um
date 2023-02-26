@@ -94,7 +94,7 @@ fn cycle(delta: int): bool {
 	return running
 }
 
-fn umth_frame_callback() {
+fn umth_frame_callback*() {
 	cycle(16)
 	onFrame.emit(null)
 }

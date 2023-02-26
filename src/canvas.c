@@ -1,6 +1,8 @@
 #include "tophat.h"
 #include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include "shader.glsl.h"
 #include "pixelfont.h"
 
 extern th_global *thg;
@@ -38,37 +40,15 @@ int th_canvas_batch_push_auto_flush(float *array, size_t n) {
 static th_image white_img;
 
 void th_canvas_init() {
+	thg->canvas_bind = (sg_bindings){0};
 	thg->canvas_bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
 		.size = sizeof(thg->canvas_batch),
 		.type = SG_BUFFERTYPE_VERTEXBUFFER,
-		.usage = SG_USAGE_DYNAMIC,
+		.usage = SG_USAGE_STREAM,
 		.label = "canvas-buffer"
 	});
-	
-	sg_shader shd = sg_make_shader(&(sg_shader_desc){
-		.vs.source =
-			"#version 330\n"
-			"layout(location=0) in vec2 pos;\n"
-			"layout(location=1) in vec2 uv0;\n"
-			"layout(location=2) in vec4 color0;\n"
-			"out vec2 uv;\n"
-			"out vec4 color;\n"
-			"void main() {\n"
-			"  gl_Position = vec4(pos, 0, 0);\n"
-			"  uv = uv0;\n"
-			"  color = color0;\n"
-			"}\n",
-		.fs.source =
-			"#version 330\n"
-			"uniform sampler2D tex;"
-			"in vec2 uv;\n"
-			"in vec4 color;\n"
-			"out vec4 frag_color;\n"
-			"void main() {\n"
-			"  frag_color = color * texture(tex, uv);\n"
-			"}\n"
-	});
-	
+
+	sg_shader shd = sg_make_shader(th_shader_desc(sg_query_backend()));
 	thg->canvas_pip = sg_make_pipeline(&(sg_pipeline_desc){
 		.shader = shd,
 		.layout = {
@@ -80,9 +60,12 @@ void th_canvas_init() {
 		},
 		.label = "canvas-pip"
 	});
-	
+
 	uint32_t white = 0xffffffff;
 	th_image_from_data(&white_img, &white, (th_vf2){ .w = 1, .h = 1 });
+
+	thg->canvas_bind.fs_images[SLOT_tex] = white_img.tex;
+	thg->canvas_image = &white_img;
 }
 
 void th_canvas_deinit() {
@@ -105,7 +88,7 @@ void th_canvas_flush() {
 void th_canvas_use_image(th_image *img) {
 	if (img != thg->canvas_image)
 		th_canvas_flush();
-	thg->canvas_bind.fs_images[0] = img->tex;
+	thg->canvas_bind.fs_images[SLOT_tex] = img->tex;
 	thg->canvas_image = img;
 }
 
@@ -137,7 +120,7 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 		memcpy(verts+(i*BATCH_VERTEX+4), colors, sizeof(float) * 4);
 	}
 
-	th_canvas_batch_push_auto_flush(verts, sizeof verts);
+	th_canvas_batch_push_auto_flush(verts, sizeof verts / sizeof verts[0]);
 }
 
 void th_canvas_rect(uint32_t color, th_rect r) {

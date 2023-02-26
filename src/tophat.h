@@ -1,6 +1,12 @@
 #ifndef TOPHAT_H
 #define TOPHAT_H
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <X11/Xlib.h>
+#endif
+
 #include <stdint.h>
 #include <stdbool.h>
 #include <miniaudio.h>

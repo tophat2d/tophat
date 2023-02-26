@@ -67,7 +67,7 @@ static void gen_tex(th_image *img, uint32_t *data) {
 		.height = img->dm.h,
 		.data.subimage = (sg_range) {
 			.ptr = data,
-			.size = img->dm.w * img->dm.h
+			.size = img->dm.w * img->dm.h * sizeof(uint32_t)
 		},
 		.pixel_format = SG_PIXELFORMAT_RGBA8UI,
 		.mag_filter = img->filter,

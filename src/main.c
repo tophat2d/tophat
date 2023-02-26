@@ -25,8 +25,8 @@ static void warning(UmkaError *error) {
 }
 
 static int th_main(int argc, char *argv[]) {
-	th_global thg_ = {0};
-	thg = &thg_;
+	thg = malloc(sizeof(th_global));
+	*thg = (th_global){0};
 
 	thg->umka = umkaAlloc();
 	int umkaOK;
@@ -117,8 +117,6 @@ static int th_main(int argc, char *argv[]) {
 	umkaOK = umkaInit(thg->umka, scriptpath, NULL, 1024 * 1024, NULL,
 		argc - argOffset, argv + argOffset, true, true, silent ? NULL : warning);
 	if (prof) umprofInit(thg->umka);
-
-	th_audio_init();
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");

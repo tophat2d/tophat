@@ -9,12 +9,6 @@
 #include <sokol_gfx.h>
 #include <sokol_glue.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <X11/Xlib.h>
-#endif
-
 extern th_global *thg;
 
 static bool window_active = false;
@@ -23,6 +17,7 @@ static bool window_fullscreen = false;
 static int umth_frame_callback = 0;
 
 static void init() {
+	//th_audio_init();
 	sg_setup(&(sg_desc){
 		.context = sapp_sgcontext(),
 		.logger.func = slog_func
@@ -30,10 +25,11 @@ static void init() {
 
 	th_canvas_init();
 
-	umth_frame_callback = umkaGetFunc(thg->umka, "window", "umth_frame_callback");
-	
+	umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
+
 	UmkaStackSlot s;
-	if (umkaCall(thg->umka, umkaGetFunc(thg->umka, NULL, "init"), 0, &s, &s)) {
+
+	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, NULL, "init"), 0, &s, &s)) {
 		UmkaError error;
 		umkaGetError(thg->umka, &error);
 		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
@@ -57,19 +53,25 @@ static void init() {
 #endif
 			fprintf(stderr, "%s\n", fnName);
 		}
+		exit(-1);
 	}
 }
 
 static void frame() {
+
+	thg->pass_action = (sg_pass_action) {
+		.colors[0] = { .action = SG_ACTION_CLEAR, .value = { 0.25f, 0.5f, 0.75f, 1.0f } }
+	};
 	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
 	sg_apply_pipeline(thg->canvas_pip);
 	sg_apply_bindings(&thg->canvas_bind);
 
 	UmkaStackSlot s;
-	if (umth_frame_callback) {
+	if (umth_frame_callback != -1) {
 		umkaCall(thg->umka, umth_frame_callback, 0, &s, &s);
 	}
 	
+	th_canvas_flush();
 	sg_end_pass();
 	sg_commit();
 }
@@ -193,7 +195,7 @@ th_window_handle th_get_window_handle() {
 
 void th_window_set_dims(th_vf2 dm) {
 	RECT r;
-	HWND hwnd = th_window_handle();
+	HWND hwnd = th_get_window_handle();
 	if (GetWindowRect(hwnd, &r)) {
 		SetWindowPos(hwnd, HWND_TOP, r.left, r.top, dm.x, dm.y, 0);
 	}
