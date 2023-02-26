@@ -28,6 +28,8 @@ static void init() {
 		.logger.func = slog_func
 	});
 
+	th_canvas_init();
+
 	umth_frame_callback = umkaGetFunc(thg->umka, "window", "umth_frame_callback");
 	
 	UmkaStackSlot s;
@@ -59,10 +61,17 @@ static void init() {
 }
 
 static void frame() {
+	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
+	sg_apply_pipeline(thg->canvas_pip);
+	sg_apply_bindings(&thg->canvas_bind);
+
 	UmkaStackSlot s;
 	if (umth_frame_callback) {
 		umkaCall(thg->umka, umth_frame_callback, 0, &s, &s);
 	}
+	
+	sg_end_pass();
+	sg_commit();
 }
 
 static void event(sapp_event *ev) {
