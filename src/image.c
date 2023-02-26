@@ -84,18 +84,29 @@ th_image *th_load_image(char *path) {
 	img->dm.w = w;
 	img->dm.h = h;
 	img->channels = c;
-	img->filter = 1;
+	img->filter = SG_FILTER_NEAREST;
 	img->crop = (th_quad){
 		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
 		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
 	img->flipv = 0;
 	img->fliph = 0;
 
-	uint32_t *udata = th_rdimg(img, data);
-	stbi_image_free(data);
+	img->tex = sg_make_image(&(sg_image_desc){
+		.width = w,
+		.height = h,
+		.data.subimage = (sg_range) {
+			.ptr = data,
+			.size = w * h
+		},
+		.pixel_format = c == 4 ? SG_PIXELFORMAT_RGBA8UI : SG_PIXELFORMAT_RGB8UI,
+		.mag_filter = img->filter,
+		.min_filter = img->filter,
+		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_v = SG_WRAP_CLAMP_TO_EDGE
+	});
 
-	img->gltexture = th_gen_texture(udata, img->dm, img->filter);
-	free(udata);
+	stbi_image_free(data);
 
 	return img;
 }

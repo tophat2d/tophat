@@ -49,8 +49,8 @@ typedef struct {
 typedef struct {
 	th_vf2 dm;
 	uu channels;
-	unsigned int gltexture;
-	uu filter;
+	sg_image tex;
+	sg_filter filter;
 	th_quad crop;
 	char flipv;
 	char fliph;
