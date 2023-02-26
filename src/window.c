@@ -172,7 +172,7 @@ void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
 }
 
 void th_window_end_scissor() {
-	sg_apply_scissor_rect(x, y, sapp_width(), sapp_height(), true);
+	sg_apply_scissor_rect(0, 0, sapp_width(), sapp_height(), true);
 }
 
 // ---- PLATFORM DEPENDENT CODE

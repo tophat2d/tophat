@@ -6,7 +6,6 @@ THEXT(void, th_audio_deinit);
 THEXT(void, th_audio_load, char *);
 THEXT(th_sound *, th_sound_copy, th_sound *);
 
-THEXT(int, th_canvas_compile_shader, char *, char *);
 THEXT(void, th_canvas_rect, uint32_t, th_rect);
 THEXT(void, th_canvas_line, uint32_t, th_vf2, th_vf2, fu);
 THEXT(void, th_canvas_text, char *, uint32_t, th_vf2, fu);
@@ -37,7 +36,6 @@ THEXT(void, th_blit_tex, th_image *, th_quad, uint32_t);
 THEXT(void, th_image_render_transformed, th_image *, th_transform trans, uint32_t);
 THEXT(void, th_image_set_filter, th_image *, int);
 THEXT(void, th_image_update_data, th_image *, uint32_t *, th_vf2);
-THEXT(void, th_image_compile_shader, char *, char *);
 THEXT(void, th_image_set_as_render_target, th_image *);
 THEXT(void, th_image_remove_render_target, th_vf2);
 

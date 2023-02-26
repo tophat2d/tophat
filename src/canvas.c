@@ -35,6 +35,8 @@ int th_canvas_batch_push_auto_flush(float *array, size_t n) {
 	return ok;
 }
 
+static th_image white_img;
+
 void th_canvas_init() {
 	thg->canvas_bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
 		.data = SG_RANGE(thg->canvas_batch),
@@ -78,6 +80,13 @@ void th_canvas_init() {
 		},
 		.label = "canvas-pip"
 	});
+	
+	uint32_t white = 0xffffffff;
+	th_image_from_data(&white_img, &white, (th_vf2){ .w = 1, .h = 1 });
+}
+
+void th_canvas_deinit() {
+	th_image_free(&white_img);
 }
 
 static int batch_vertex_count() {
@@ -94,12 +103,14 @@ void th_canvas_flush() {
 }
 
 void th_canvas_use_image(th_image *img) {
-	th_canvas_flush();
+	if (img != thg->canvas_image)
+		th_canvas_flush();
 	thg->canvas_bind.fs_images[0] = img->tex;
+	thg->canvas_image = img;
 }
 
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
-	th_image_flush();
+	th_canvas_use_image(&white_img);
 
 	a.x *= thg->scaling;
 	a.y *= thg->scaling;
@@ -113,7 +124,7 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 		colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
 	int sw, sh;
-	th_gl_get_viewport_max(&sw, &sh);
+	th_window_get_dimensions(&sw, &sh);
 
 	const float verts[] = {
 		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + 1, 0, 0, 0, 0, 0, 0, // NOTE: Temporarily uvs are zeroed out

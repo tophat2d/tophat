@@ -47,7 +47,7 @@ void th_error(char *text, ...) {
 }
 
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
-	const float angle = (rot * M_PI)/180;
+	const float angle = (rot * PI)/180;
 
 	const fu cosa = cos(angle);
 	const fu sina = sin(angle);

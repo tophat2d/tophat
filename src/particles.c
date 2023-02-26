@@ -46,7 +46,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 
 		if ((p->angle.y - p->angle.x) + p->angle.x == 0)
 			p->angle.x++;
-		double direction = (rand() % (long)(p->angle.y - p->angle.x + 1) + p->angle.x) * M_PI / 180;
+		double direction = (rand() % (long)(p->angle.y - p->angle.x + 1) + p->angle.x) * PI / 180;
 
 		fu vx = p->velocity * cos(direction);
 		fu vy = p->velocity * sin(direction);

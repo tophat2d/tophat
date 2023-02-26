@@ -165,10 +165,7 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 #define SWAP(a, b) { th_vf2 t = b; b = a; a = t; }
 
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
-	th_canvas_flush();
-	if (img->gltexture != thg->batch_tex || thg->blit_batch_size >= BATCH_SIZE - 1)
-		th_image_flush();
-	thg->batch_tex = img->gltexture;
+	th_canvas_use_image(img);
 
 	for (uu i=0; i < 4; i++) {
 		q.v[i].x = trunc(q.v[i].x * thg->scaling + thg->offset.x);
@@ -176,7 +173,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	}
 
 	int sw, sh;
-	th_gl_get_viewport_max(&sw, &sh);
+	th_window_get_dimensions(&sw, &sh);
 
 	float colors[4];
 		for (int i=0; i < 4; ++i)
@@ -193,24 +190,18 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		SWAP(bounds.bl, bounds.br);
 	}
 
-	const float yoff = thg->has_framebuffer ? -1.0 : 1.0;
 	const float verts[] = {
-		q.tl.x / sw - 1.0, q.tl.y / sh + yoff, bounds.tl.x, bounds.tl.y,
-		q.tr.x / sw - 1.0, q.tr.y / sh + yoff, bounds.tr.x, bounds.tr.y,
-		q.br.x / sw - 1.0, q.br.y / sh + yoff, bounds.br.x, bounds.br.y,
-		q.tl.x / sw - 1.0, q.tl.y / sh + yoff, bounds.tl.x, bounds.tl.y,
-		q.br.x / sw - 1.0, q.br.y / sh + yoff, bounds.br.x, bounds.br.y,
-		q.bl.x / sw - 1.0, q.bl.y / sh + yoff, bounds.bl.x, bounds.bl.y};
+		q.tl.x / sw - 1.0, q.tl.y / sh + 1, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
+		q.tr.x / sw - 1.0, q.tr.y / sh + 1, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,
+		q.br.x / sw - 1.0, q.br.y / sh + 1, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
+		q.tl.x / sw - 1.0, q.tl.y / sh + 1, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
+		q.br.x / sw - 1.0, q.br.y / sh + 1, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
+		q.bl.x / sw - 1.0, q.bl.y / sh + 1, bounds.bl.x, bounds.bl.y, 0, 0, 0, 0};
 
-	float *ptr = &thg->blit_batch[thg->blit_batch_size * 6 * (2 + 2 + 4)];
-	for (uu i=0; i < 6; i++) {
-		memcpy(ptr, &verts[i * (2 + 2)], (2 + 2) * sizeof(float));
-		ptr += 2 + 2;
-		memcpy(ptr, colors, 4 * sizeof(float));
-		ptr += 4;
-	}
+	for (uu i=0; i < 6; i++)
+		memcpy(verts + (i * 8) + 4, colors, 4 * sizeof(float));
 
-	++thg->blit_batch_size;
+	th_canvas_batch_push_auto_flush(verts, sizeof(verts));
 }
 
 void th_image_set_as_render_target(th_image *img) {

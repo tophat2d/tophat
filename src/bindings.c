@@ -237,7 +237,7 @@ void umth_image_copy(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img2 = th_image_alloc();
 	if (!img2) return;
 	
-	uint32_t *data = th_image_get_data(img1, true);
+	uint32_t *data = th_image_get_data(img1);
 
 	th_image_from_data(img2, data, img1->dm);
 	img2->flipv = img1->flipv;
@@ -271,7 +271,7 @@ void umth_image_get_data(UmkaStackSlot *p, UmkaStackSlot *r) {
 	if (!img) return;
 	uint32_t *o = p[0].ptrVal;
 
-	uint32_t *data = th_image_get_data(img, false);
+	uint32_t *data = th_image_get_data(img);
 	memcpy(o, data, img->dm.w * img->dm.h * sizeof(uint32_t));
 
 	free(data);
@@ -606,9 +606,7 @@ void umth_window_swap_buffers(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_window_swap_buffers();
 }
 
-void umth_window_handle(UmkaStackSlot *p, UmkaStackSlot *r) {
-	r->intVal = th_window_handle();
-}
+void umth_window_handle(UmkaStackSlot *p, UmkaStackSlot *r) {}
 
 #ifdef _WIN32
 static double time_now() {
@@ -702,70 +700,6 @@ void umth_utf8_get_next_rune(UmkaStackSlot *p, UmkaStackSlot *r) {
 	uint32_t rune;
 	th_utf8_decode(&rune, &str[idx]);
 	r->uintVal = rune;
-}
-
-void umth_shader_compile_canvas(UmkaStackSlot *p, UmkaStackSlot *r) {
-	char *frag = p[0].ptrVal;
-	char *vert = p[1].ptrVal;
-
-	r->intVal = th_canvas_compile_shader(vert, frag);
-}
-
-void umth_shader_compile_image(UmkaStackSlot *p, UmkaStackSlot *r) {
-	char *frag = p[0].ptrVal;
-	char *vert = p[1].ptrVal;
-
-	r->intVal = th_image_compile_shader(vert, frag);
-}
-
-void umth_shader_pick_canvas(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_shader *s = th_get_shader_err(p[0].intVal);
-	if (!s) return;
-
-	th_canvas_flush();
-	thg->canvas_prog = *s;
-}
-
-void umth_shader_pick_image(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_shader *s = th_get_shader_err(p[0].intVal);
-	if (!s) return;
-
-	th_image_flush();
-	thg->blit_prog = *s;
-}
-
-void umth_shader_get_uniform_location(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_shader *s = th_get_shader_err(p[1].intVal);
-	if (!s) return;
-
-	glUseProgram(*s);
-	r->intVal = glGetUniformLocation(*s, p[0].ptrVal);
-}
-
-void umth_shader_set_uniform_int(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_shader *s = th_get_shader_err(p[2].intVal);
-	if (!s) return;
-
-	th_canvas_flush();
-	th_image_flush();
-	glUseProgram(*s);
-	glUniform1i(p[1].intVal, p[0].intVal);
-}
-
-void umth_shader_set_uniform_vf2(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_shader *s = th_get_shader_err(p[2].intVal);
-	if (!s) return;
-	th_vf2 *v = (th_vf2 *)&p[0];
-
-	int sw, sh;
-	th_window_get_dimensions(&sw, &sh);
-	sw *= 0.5f;
-	sh *= -0.5f;
-
-	th_canvas_flush();
-	th_image_flush();
-	glUseProgram(*s);
-	glUniform2f(p[1].intVal, v->x / sw + 1.f, v->y / sh + 1.f);
 }
 
 void umth_transform_rect(UmkaStackSlot *p, UmkaStackSlot *_) {
@@ -974,16 +908,6 @@ void _th_umka_bind(void *umka) {
 
 	// utf8
 	umkaAddFunc(umka, "umth_utf8_get_next_rune", &umth_utf8_get_next_rune);
-
-	// shader
-	umkaAddFunc(umka, "umth_shader_compile_canvas", &umth_shader_compile_canvas);
-	umkaAddFunc(umka, "umth_shader_compile_image", &umth_shader_compile_image);
-	umkaAddFunc(umka, "umth_shader_pick_canvas", &umth_shader_pick_canvas);
-	umkaAddFunc(umka, "umth_shader_pick_image", &umth_shader_pick_image);
-	umkaAddFunc(umka, "umth_shader_get_uniform_location",
-		&umth_shader_get_uniform_location);
-	umkaAddFunc(umka, "umth_shader_set_uniform_int", &umth_shader_set_uniform_int);
-	umkaAddFunc(umka, "umth_shader_set_uniform_vf2", &umth_shader_set_uniform_vf2);
 
 	// transform
 	umkaAddFunc(umka, "umth_transform_rect", &umth_transform_rect);

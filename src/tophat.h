@@ -9,6 +9,8 @@
 #include <sokol_app.h>
 #include <sokol_gfx.h>
 
+#define PI 3.1415926535897932
+
 #define INPUT_STRING_SIZE 256
 #define MAX_SCISSORS 1024
 
@@ -185,6 +187,7 @@ typedef struct {
 	sg_pass_action pass_action;
 	sg_bindings canvas_bind;
 	sg_pipeline canvas_pip;
+	th_image *canvas_image;
 
 	th_rect scissors[MAX_SCISSORS];
 	uu scissor;
@@ -241,7 +244,6 @@ th_sound *th_sound_copy(th_sound *s);
 void _th_umka_bind(void *umka);
 
 // canvas
-int th_canvas_compile_shader(char *frag, char *vert);
 void th_canvas_rect(uint32_t color, th_rect r);
 void th_canvas_init();
 void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
@@ -250,6 +252,8 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);
 void th_canvas_quad(th_quad *q, uint32_t color);
 bool th_canvas_batch_push(float *array, size_t n);
 void th_canvas_flush();
+void th_canvas_use_image(th_image *img);
+int th_canvas_batch_push_auto_flush(float *array, size_t n);
 
 // collisions
 int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
@@ -294,7 +298,6 @@ void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
 th_image *th_image_alloc();
 void th_image_init();
 void th_image_deinit();
-int th_image_compile_shader(char *frag, char *vert);
 
 void th_image_set_as_render_target(th_image *img);
 void th_image_remove_render_target(th_image *img, th_vf2 wp);
@@ -331,11 +334,6 @@ void th_vector_normalize(float *x, float *y);
 void th_ray_getcoll(th_ray *ra, th_coll *colls, int maxColls,
                     int *collCount, th_ent **scene, int sceneLen);
 
-// shader
-int th_shader_compile(
-	char *vertf, char *fragf, char *vertb, char *fragb,
-	const char **verta, int vertac);
-void th_shader_deinit();
 
 // tilemap
 void th_tmap_draw(th_tmap *t, th_rect *cam);
