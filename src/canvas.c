@@ -58,12 +58,13 @@ void th_canvas_init() {
 			"}\n",
 		.fs.source =
 			"#version 330\n"
+			"uniform sampler2D tex;"
 			"in vec2 uv;\n"
 			"in vec4 color;\n"
 			"out vec4 frag_color;\n"
 			"void main() {\n"
-			"  frag_color = color + (uv * 0.00001);\n" // NOTE: I need to add this uv because otherwise it wont compile
-			"}\n"																			 // 			it will be removed when texture support is added.
+			"  frag_color = color * texture(tex, uv);\n"
+			"}\n"
 	});
 	
 	thg->canvas_pip = sg_make_pipeline(&(sg_pipeline_desc){
@@ -81,7 +82,7 @@ void th_canvas_init() {
 
 static int batch_vertex_count() {
 	if (thg->canvas_batch_size % BATCH_VERTEX != 0) {
-		th_error("odd batch size")
+		th_error("odd batch size");
 	}
 	return thg->canvas_batch_size/BATCH_VERTEX;
 }
@@ -90,6 +91,11 @@ void th_canvas_flush() {
 	// NOTE: (offset, no-vertices, no-instances)
   sg_draw(0, batch_vertex_count(), 1);
 	thg->canvas_batch_size = 0;
+}
+
+void th_canvas_use_image(th_image *img) {
+	th_canvas_flush();
+	thg->canvas_bind.fs_images[0] = img->tex;
 }
 
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
@@ -109,11 +115,10 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	int sw, sh;
 	th_gl_get_viewport_max(&sw, &sh);
 
-	const float yoff = thg->has_framebuffer ? -1.0 : 1.0;
 	const float verts[] = {
-		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + yoff, 0, 0, 0, 0, 0, 0 // NOTE: Temporarily uvs are zeroed out
-	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + yoff, 0, 0, 0, 0, 0, 0
-		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + yoff, 0, 0, 0, 0, 0, 0
+		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + 1, 0, 0, 0, 0, 0, 0, // NOTE: Temporarily uvs are zeroed out
+	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + 1, 0, 0, 0, 0, 0, 0,
+		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + 1, 0, 0, 0, 0, 0, 0
 	};
 
 	for (int i = 0; i < 3; ++i) {

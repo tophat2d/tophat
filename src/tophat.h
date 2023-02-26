@@ -157,7 +157,7 @@ typedef struct {
 	th_font_atlas_page *pages[TH_FONTPLATFORM_PAGECOUNT];
 } th_font;
 
-typedef GLuint th_shader;
+typedef uint32_t th_shader;
 
 // struct holding all tophat's global variables.
 typedef struct {
@@ -289,7 +289,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color);
 void th_image_render_transformed(th_image *img, th_transform trans, uint32_t color);
 void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
 
-void th_image_set_filter(th_image *img, int filter);
+void th_image_set_filter(th_image *img, sg_filter filter);
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
 th_image *th_image_alloc();
 void th_image_init();
