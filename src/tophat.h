@@ -22,7 +22,7 @@
 
 // each unit here is a triangle, that's why multiplication by 3
 // 2 + 2 + 4 is (position + uv + colour)
-#define BATCH_SIZE 1024
+#define BATCH_SIZE 2048
 #define BATCH_VERTEX (2 + 2 + 4)
 #define BATCH_UNIT (3 * BATCH_VERTEX)
 #define BATCH_LENGTH (BATCH_SIZE * BATCH_UNIT)

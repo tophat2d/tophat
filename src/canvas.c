@@ -13,11 +13,17 @@ struct {
 }
 typedef phase;
 
-phase phases[32];
+phase phases[256];
 size_t phases_len;
 
+void finalize_last_phase() {
+	if (phases_len > 0) {
+		phases[phases_len-1].end = thg->canvas_batch_size;
+	}
+}
+
 void push_phase(th_image *img) {
-	if (phases_len >= 32) {
+	if (phases_len >= 256) {
 		th_error("overflow");
 		return;
 	}
@@ -27,6 +33,7 @@ void push_phase(th_image *img) {
 			phases[phases_len-1].end = thg->canvas_batch_size;
 			return;
 		}
+		phases[phases_len-1].end = thg->canvas_batch_size;
 		start = phases[phases_len-1].end;
 	}
 	phases[phases_len].start = start;
@@ -57,9 +64,10 @@ bool th_canvas_batch_push(float *array, size_t n) {
 // same as th_canvas_batch_push except automatically flushes the buffer if needed
 int th_canvas_batch_push_auto_flush(float *array, size_t n) {
 	bool ok = th_canvas_batch_push(array, n);
+
 	if (!ok) { // if buffer is too small
-		th_canvas_flush();
-		ok = th_canvas_batch_push(array, n);
+		th_error("buffer too small");
+		return 0;
 	}
 
 	return ok;
@@ -101,11 +109,12 @@ void th_canvas_deinit() {
 }
 
 void th_canvas_flush() {
+	finalize_last_phase();
 	sg_update_buffer(thg->canvas_bind.vertex_buffers[0], &SG_RANGE(thg->canvas_batch));
 	for (size_t i = 0; i < phases_len; i++) {
 		phase *phs = &phases[i];
-		thg->canvas_bind.fs_images[0] = phs->img->tex;
-		fprintf(stderr, "%zu %zu\n", phs->start/BATCH_VERTEX, (phs->end - phs->start)/BATCH_VERTEX);
+		thg->canvas_bind.fs_images[SLOT_tex] = phs->img->tex;
+		sg_apply_bindings(&thg->canvas_bind);
 	  sg_draw(phs->start/BATCH_VERTEX, (phs->end - phs->start)/BATCH_VERTEX, 1);
 	}
 	phases_len = 0;

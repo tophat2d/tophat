@@ -17,7 +17,7 @@ static bool window_fullscreen = false;
 static int umth_frame_callback = 0;
 
 static void init() {
-	//th_audio_init();
+	th_audio_init();
 	sg_setup(&(sg_desc){
 		.context = sapp_sgcontext(),
 		.logger.func = slog_func
@@ -64,7 +64,6 @@ static void frame() {
 	};
 	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
 	sg_apply_pipeline(thg->canvas_pip);
-	sg_apply_bindings(&thg->canvas_bind);
 
 	UmkaStackSlot s;
 	if (umth_frame_callback != -1) {

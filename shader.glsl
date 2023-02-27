@@ -7,8 +7,9 @@ out vec4 color;
 
 void main() {
   vec2 p = pos;
-  p.y = 1.0-pos.y;
-  gl_Position = vec4(p-vec2(1.0, 0.0), -0.1, 1);
+  p *= 2;
+  p.y *= -1;
+  gl_Position = vec4(p+vec2(-1, 1), -0.1, 1);
   uv = uv0;
   color = color0;
 }

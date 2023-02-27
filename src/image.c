@@ -56,7 +56,7 @@ uint32_t *th_rdimg(th_image *img, unsigned char *data) {
 uint32_t *th_image_get_data(th_image *img) {
 	sg_image_desc desc = sg_query_image_desc(img->tex);
 	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-	memcpy(data, desc.data.subimage[0][0].ptr, img->dm.w * img->dm.h);
+	memcpy(data, desc.data.subimage[0][0].ptr, sizeof(uint32_t) * img->dm.w * img->dm.h);
 
 	return data;
 }
@@ -65,10 +65,11 @@ static void gen_tex(th_image *img, uint32_t *data) {
 	img->tex = sg_make_image(&(sg_image_desc){
 		.width = img->dm.w,
 		.height = img->dm.h,
-		.data.subimage = (sg_range) {
+		.data.subimage[0][0] = (sg_range) {
 			.ptr = data,
 			.size = img->dm.w * img->dm.h * sizeof(uint32_t)
 		},
+		.pixel_format = SG_PIXELFORMAT_RGBA8,
 		.mag_filter = img->filter,
 		.min_filter = img->filter,
 		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
@@ -81,7 +82,7 @@ static void gen_tex(th_image *img, uint32_t *data) {
 th_image *th_load_image(char *path) {
 	int w, h, c;
 
-	unsigned char *data = stbi_load(path, &w, &h, &c, 0);
+	unsigned char *data = stbi_load(path, &w, &h, &c, STBI_rgb_alpha);
 	if (!data) {
 		th_error("Could not load an image at path %s.", path);
 		return NULL;
@@ -119,12 +120,14 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 }
 
 void th_image_set_filter(th_image *img, sg_filter filter) {
+	/*
 	uint32_t *data = th_image_get_data(img);
 	img->filter = filter;
 	sg_dealloc_image(img->tex);
 	gen_tex(img, data);
 
 	free(data);
+	*/
 }
 
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm) {

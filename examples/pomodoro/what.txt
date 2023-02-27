@@ -1,0 +1,17 @@
+Warning C:/Users/skeje/Personal/Projects/Programs/tophat/examples/pomodoro/window.um (189, 1): Module canvas is not used
+Warning C:/Users/skeje/Personal/Projects/Programs/tophat/examples/pomodoro/window.um (189, 1): Identifier end is not used
+Warning C:/Users/skeje/Personal/Projects/Programs/tophat/examples/pomodoro/window.um (189, 1): Identifier umth_window_swap_buffers is not used
+Warning C:/Users/skeje/Personal/Projects/Programs/tophat/examples/pomodoro/window.um (189, 1): Identifier umth_window_sleep is not used
+Warning C:/Users/skeje/Personal/Projects/Programs/tophat/examples/pomodoro/main.um (500, 13): Identifier init is not used
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow
+[1m[31merror: [0moverflow

@@ -5,12 +5,16 @@
 //~~
 
 import (
-	"th.um"
-	"rect.um"
+    "th.um"
+    "rect.um"
 )
 
 //~~Keycode constants
 const (
+    mouse1*              = 0
+    mouse2*              = 1
+    mouse3*              = 2
+
     key_space*           = 32
     key_apostrophe*      = 39  /* ' */
     key_comma*           = 44  /* , */
