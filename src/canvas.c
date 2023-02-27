@@ -94,6 +94,15 @@ void th_canvas_init() {
 				[2].format = SG_VERTEXFORMAT_FLOAT4  // R, G, B, A
 			}
 		},
+		.colors[0].blend = {
+			.enabled = true,
+			.src_factor_alpha = SG_BLENDFACTOR_ONE,
+			.dst_factor_alpha = SG_BLENDFACTOR_ZERO,
+			.op_alpha = SG_BLENDOP_ADD,
+			.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+			.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+			.op_rgb = SG_BLENDOP_ADD,
+		},
 		.label = "canvas-pip"
 	});
 

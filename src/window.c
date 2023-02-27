@@ -58,7 +58,6 @@ static void init() {
 }
 
 static void frame() {
-
 	thg->pass_action = (sg_pass_action) {
 		.colors[0] = { .action = SG_ACTION_CLEAR, .value = { 0.25f, 0.5f, 0.75f, 1.0f } }
 	};
