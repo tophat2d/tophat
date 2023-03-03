@@ -33,7 +33,7 @@ endif
 
 DEFS += -DUMKA_STATIC -DUMKA_EXT_LIBS
 WARNS = -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
-	-Wno-old-style-declaration -Wno-implicit-fallthrough
+	-Wno-old-style-declaration -Wno-implicit-fallthrough -Wno-switch
 
 CFLAGS += $(WARNS) $(DEFS)
 

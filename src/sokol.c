@@ -23,4 +23,4 @@
 Window *th_sapp_win = &_sapp.x11.window;
 Display **th_sapp_dpy = &_sapp.x11.display;
 #endif
-int th_sapp_swap_interval = &_sapp.swap_interval;
+int *th_sapp_swap_interval = &_sapp.swap_interval;

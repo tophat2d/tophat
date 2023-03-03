@@ -667,7 +667,7 @@ void umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r) {
 	if (fps < 0) {
 		fps = 0;
 	}
-	th_sapp_swap_interval = fps;
+	*th_sapp_swap_interval = fps;
 }
 
 // draws text

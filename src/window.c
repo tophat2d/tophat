@@ -11,7 +11,6 @@
 
 extern th_global *thg;
 
-static bool window_active = false;
 static bool window_fullscreen = false;
 
 static int umth_frame_callback = 0;
@@ -67,7 +66,7 @@ static void frame() {
 	UmkaStackSlot s;
 	if (umth_frame_callback != -1) {
 		s.realVal = sapp_frame_duration();
-		umkaCall(thg->umka, umth_frame_callback, 0, &s, &s);
+		umkaCall(thg->umka, umth_frame_callback, 1, &s, &s);
 	}
 	
 	th_input_cycle();
@@ -76,7 +75,7 @@ static void frame() {
 	sg_commit();
 }
 
-static void event(sapp_event *ev) {
+static void event(const sapp_event *ev) {
 	switch (ev->type) {
 	case SAPP_EVENTTYPE_MOUSE_MOVE:
 		thg->mouse_delta = (th_vf2){ .x = ev->mouse_dx, .y = ev->mouse_dy };
@@ -101,7 +100,6 @@ static void cleanup() {
 	th_audio_deinit();
 	th_font_deinit();
 	th_image_deinit();
-	th_shader_deinit();
 
 	umkaFree(thg->umka);
 	

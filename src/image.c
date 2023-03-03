@@ -26,33 +26,6 @@ th_image *th_image_alloc() {
 	return umkaAllocData(thg->umka, sizeof(th_image), th_image_free_umka);
 }
 
-static
-uint32_t *th_rdimg(th_image *img, unsigned char *data) {
-	uint32_t *rd = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-
-	for (int i=0; i < img->dm.w * img->dm.h; i++) {
-		switch (img->channels) {
-		case 3:
-			rd[i] = 0;
-			for (int j=0; j < 3; j++) {
-				rd[i] |= data[i*3 + j] << j*8;
-			}
-			rd[i] |= 0xff << 3*8;
-			break;
-		case 4:
-			rd[i] = 0;
-			for (int j=0; j < 4; j++)
-				rd[i] |= data[i*4 + j] << j*8;
-			break;
-		default:
-			th_error("tophat can't load this image.");
-			break;
-		}
-	}
-
-	return rd;
-}
-
 uint32_t *th_image_get_data(th_image *img) {
 	sg_image_desc desc = sg_query_image_desc(img->tex);
 	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
@@ -99,7 +72,7 @@ th_image *th_load_image(char *path) {
 	img->flipv = 0;
 	img->fliph = 0;
 
-	gen_tex(img, data);
+	gen_tex(img, (uint32_t *)data);
 
 	stbi_image_free(data);
 
@@ -192,7 +165,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		SWAP(bounds.bl, bounds.br);
 	}
 
-	const float verts[] = {
+	float verts[] = {
 		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
 		q.tr.x / sw, q.tr.y / sh, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,
 		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
