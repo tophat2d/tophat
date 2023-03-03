@@ -6,6 +6,7 @@ import (
 	"image.um"
 	"window.um"	
 	"canvas.um"
+	"font.um"
 )
 
 var (
@@ -13,6 +14,7 @@ var (
 	fg: uint32
 	bg: uint32
 	lines: []str
+	loadedFont: font.Font
 )
 
 fn onFrame(cctx, uctx: any) {
@@ -52,6 +54,11 @@ fn init() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
 	
+	loadedFont = font.load("etc/roboto.ttf", 16, 3)
+	if !loadedFont.validate() {
+		error("could not load font")
+	}
+
 	logo = image.load("etc/logo/logo-normal-white.png")
 
 	fg = 0xadadd5ff

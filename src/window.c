@@ -66,9 +66,11 @@ static void frame() {
 
 	UmkaStackSlot s;
 	if (umth_frame_callback != -1) {
+		s.realVal = sapp_frame_duration();
 		umkaCall(thg->umka, umth_frame_callback, 0, &s, &s);
 	}
 	
+	th_input_cycle();
 	th_canvas_flush();
 	sg_end_pass();
 	sg_commit();

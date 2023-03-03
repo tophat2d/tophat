@@ -71,7 +71,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 //~~fn cycle
 // Cycle needs to be called every cycle for the window to work. If the window
 // was closed, it returns false.
-fn cycle(delta: int): bool {
+fn cycle(delta: real): bool {
 //~~
 	umth_window_set_viewport(wp)
 	/*
@@ -81,7 +81,7 @@ fn cycle(delta: int): bool {
 	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
 	*/
 
-	th.delta = delta*1000
+	th.delta = trunc(delta*1000)
 	if th.delta == 0 {
 		th.delta = 1
 	}
@@ -96,8 +96,8 @@ fn cycle(delta: int): bool {
 	return running
 }
 
-fn umth_frame_callback*() {
-	cycle(16)
+fn umth_frame_callback*(delta: real) {
+	cycle(delta)
 	onFrame.emit(null)
 }
 
@@ -141,14 +141,18 @@ fn getDims*(): th.Vf2 {
 	return th.Vf2{w, h}
 }
 
+fn umth_window_set_target_fps(fps: int)
+
 //~~fn setTargetFps
 // Sets the fps limit.
 // 
 // `fps`
 // : amount of fps the limit should be set to
+//	 
 fn setTargetFps*(fps: int) {
 //~~
 	fpsLimit = fps
+	umth_window_set_target_fps(fps)
 }
 
 fn umth_window_set_dims(dm: th.Vf2)

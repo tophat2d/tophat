@@ -43,7 +43,7 @@ static bool f_pack_atlas_page(th_font *font, uint32_t char_offset, th_font_atlas
 			// Sigh.. We're just doing that to later simply throw it away. What a waste of CPU time >:(
 			uint32_t *rgba = malloc(size * size * sizeof(*rgba));
 			for (int i = 0; i < size*size; ++i) {
-				rgba[i] = 0xFFFFFF00 | buffer[i];
+				rgba[i] = 0x00FFFFFF | (buffer[i] << 24);
 			}
 
 			th_image_from_data(&out_page->img, rgba, (th_vf2){{size, size}});

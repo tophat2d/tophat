@@ -270,6 +270,7 @@ var (
 
   isDark: bool = true
   v_colorscheme: Colorscheme = c_colorschemeDark
+  v_lastTime: int
   v_countdown: Countdown
   v_countdownNumber: int
   v_alarm: th_audio.Sound
@@ -377,7 +378,8 @@ fn getCountdown(num: int): Countdown {
 }
 
 fn updateCountdown() {
-  v_countdown.time -= th.delta/1000.0
+  v_countdown.time -= (th.time - v_lastTime) / 1000.0
+  v_lastTime = th.time
   for v_countdown.time <= 0 {
     diff := -v_countdown.time
     v_countdownNumber += 1
@@ -479,9 +481,13 @@ fn onFrame(cctx, uctx: any) {
     drawGuiElementFrames(&gui)
   }
 
+  v_mainFont.draw(sprintf("fps: %d", th.delta), th.Vf2{5, 5}, th.red)
+
+  v_lastTime = th.time
 }
 
 fn init() {
+  v_lastTime = th.time
   th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
 	th_window.setViewport(th.Vf2{screen.w, screen.h})
   v_mainFont = th_font.load("Font.ttf", 32, 1)
