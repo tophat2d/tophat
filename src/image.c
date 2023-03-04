@@ -100,14 +100,12 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 }
 
 void th_image_set_filter(th_image *img, sg_filter filter) {
-	/*
 	uint32_t *data = th_image_get_data(img);
 	img->filter = filter;
 	sg_dealloc_image(img->tex);
 	gen_tex(img, data);
 
 	free(data);
-	*/
 }
 
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm) {
