@@ -185,11 +185,39 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 }
 
 void th_image_set_as_render_target(th_image *img) {
-	// TODO
+	if (thg->has_render_target) {
+		th_error("There already is a render target set!");
+		return;
+	}
+	
+	th_canvas_flush();
+	sg_end_pass();
+
+	sg_begin_pass(sg_make_pass(&(sg_pass_desc){
+		.color_attachments[0].image = img->tex,
+		.depth_stencil_attachment.image = img->tex,
+		.label = "offscreen-pass"
+	}), &thg->pass_action);
+	
+	thg->has_render_target = true;
+	
+	th_calculate_scaling(img->dm.w, img->dm.y);
 }
 
 void th_image_remove_render_target(th_image *img, th_vf2 wp) {
-	// TODO
+	if (!thg->has_render_target) {
+		th_error("No render taget is set.");
+		return;
+	}
+
+	th_canvas_flush();
+	sg_end_pass();
+	
+	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
+
+	th_calculate_scaling(wp.x, wp.y);
+	
+	thg->has_render_target = false;
 }
 
 void th_image_init() {

@@ -194,6 +194,8 @@ typedef struct {
 	sg_bindings canvas_bind;
 	sg_pipeline canvas_pip;
 	th_image *canvas_image;
+	
+	bool has_render_target;
 
 	th_rect scissors[MAX_SCISSORS];
 	uu scissor;
