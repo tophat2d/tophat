@@ -1,6 +1,7 @@
 #include <math.h>
 #include <string.h>
 #include <stdint.h>
+#include <GL/gl.h>
 
 #include <stb_image.h>
 
@@ -27,9 +28,15 @@ th_image *th_image_alloc() {
 }
 
 uint32_t *th_image_get_data(th_image *img) {
-	sg_image_desc desc = sg_query_image_desc(img->tex);
 	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-	memcpy(data, desc.data.subimage[0][0].ptr, sizeof(uint32_t) * img->dm.w * img->dm.h);
+	
+	void glBindTexture(GLenum target, GLuint texture);
+	void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *pixels);
+
+	GLuint tex = th_sg_get_gl_image(img->tex);
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, data);
 
 	return data;
 }

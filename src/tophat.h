@@ -340,6 +340,9 @@ void th_vector_normalize(float *x, float *y);
 void th_ray_getcoll(th_ray *ra, th_coll *colls, int maxColls,
                     int *collCount, th_ent **scene, int sceneLen);
 
+// sokol
+uint32_t th_sg_get_gl_image(sg_image img);
+
 
 // tilemap
 void th_tmap_draw(th_tmap *t, th_rect *cam);
