@@ -5,26 +5,28 @@ import (
 	"input.um"
 	"canvas.um"
 	"window.um"
+	"signal.um"
 )
 
-fn main() {
+y := 200
+
+fn init() {
 	window.setup("input test", 400, 400)
 
-	y := 200
-
-	for window.cycle() {
-		if input.isJustPressed(input.mouse_up) {
+	window.onFrame.register(signal.Callback{
+		/*if input.isJustPressed(input.mouse_up) {
 			y -= 5
 		}
 		if input.isJustPressed(input.mouse_down) {
 			y += 5
-		}
+		}*/
 
-		if input.isJustPressed('r') {
-			printf("r was just pressed\n")
-		}
+		printf("lshift: %s %s %s\n",
+			repr(input.isPressed(input.key_left_shift)),
+			repr(input.isJustPressed(input.key_left_shift)),
+			repr(input.isJustReleased(input.key_left_shift)))
 
-		if input.isJustPressed('\'') {
+		if input.isJustPressedc('\'') {
 			printf("' was just pressed\n")
 		}
 
@@ -32,11 +34,11 @@ fn main() {
 			printf("key right was just pressed\n")
 		}
 
-		if input.isPressed('s') {
+		if input.isPressedc('S') {
 			printf("s is pressed\n")
 		}
 
-		if input.isJustReleased('t') {
+		if input.isJustReleasedc('T') {
 			printf("t was just released\n")
 		}
 
@@ -46,5 +48,7 @@ fn main() {
 		}
 
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
-	}
+	}, null)
 }
+
+fn main() {}
