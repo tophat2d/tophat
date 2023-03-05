@@ -10,8 +10,8 @@
 #include "tophat.h"
 #include <GL/gl.h>
 
-#ifndef GL_BGRA
-#define GL_BGRA 0x80E1
+#ifndef GL_RGBA
+#define GL_RGBA 0x1908
 #endif
 #ifndef GL_UNSIGNED_INT_8_8_8_8_REV
 #define GL_UNSIGNED_INT_8_8_8_8_REV 0x8367
@@ -41,7 +41,7 @@ uint32_t *th_image_get_data(th_image *img) {
 	GLuint tex = th_sg_get_gl_image(img->tex);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
 	glGetError();
 
 	return data;
