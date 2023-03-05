@@ -47,6 +47,7 @@ fn init() {
 			printf("input string: %s %s\n", input.getStr(), repr([]char(input.getStr())))
 		}
 
+		canvas.drawText(sprintf("%s", repr(input.getMouseScroll())), th.Vf2{5, 5}, th.black, 2);
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
 	}, null)
 }

@@ -411,6 +411,11 @@ void umth_input_get_mouse_delta(UmkaStackSlot *p, UmkaStackSlot *r) {
 	o->y = thg->mouse_delta.y / thg->scaling;
 }
 
+void umth_input_get_mouse_scroll(UmkaStackSlot *p, UmkaStackSlot *r) {
+	*(fu*)(p[0].ptrVal) = thg->mouse_wheel.y;
+	*(fu*)(p[1].ptrVal) = thg->mouse_wheel.x;
+}
+
 ///////////////////////
 // entities
 // draws an entity
@@ -856,6 +861,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_input_clear", &umth_input_clear);
 	umkaAddFunc(umka, "umth_input_get_str", &umth_input_get_str);
 	umkaAddFunc(umka, "umth_input_get_mouse_delta", &umth_input_get_mouse_delta);
+	umkaAddFunc(umka, "umth_input_get_mouse_scroll", &umth_input_get_mouse_scroll);
 
 	// entities
 	umkaAddFunc(umka, "umth_ent_draw", &umth_ent_draw);

@@ -223,7 +223,7 @@ fn getStr*(): str {
 }
 
 fn umth_input_get_mouse_delta(o: ^th.Vf2)
-//~~fn getMousDelta
+//~~fn getMouseDelta
 // Returns the difference between mouse positions in the last cycle. Will work
 // even if `window.freezeCursor` is enabled.
 fn getMouseDelta*(): th.Vf2 {
@@ -231,4 +231,14 @@ fn getMouseDelta*(): th.Vf2 {
 	o := th.Vf2{}
 	umth_input_get_mouse_delta(&o)
 	return o
+}
+
+fn umth_input_get_mouse_scroll(x, y: ^th.fu)
+//~~fn getMouseScroll
+// Returns the scroll wheel value
+fn getMouseScroll*(): th.Vf2 {
+//~~
+    var x, y: th.fu
+    umth_input_get_mouse_scroll(&x, &y)
+    return th.Vf2{x, y}
 }

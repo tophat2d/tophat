@@ -70,7 +70,7 @@ static void frame() {
 	UmkaStackSlot s;
 	if (umth_frame_callback != -1) {
 		s.realVal = sapp_frame_duration();
-		
+
 		if (!umkaCall(thg->umka, umth_frame_callback, 1, &s, &s)) {
 			print_umka_error_and_quit();
 		}
@@ -88,17 +88,23 @@ static void event(const sapp_event *ev) {
 		thg->mouse_delta = (th_vf2){ .x = ev->mouse_dx, .y = ev->mouse_dy };
 		thg->mouse = (th_vf2){ .x = ev->mouse_x, .y = ev->mouse_y };
 		break;
-	case SAPP_EVENTTYPE_KEY_DOWN:
+	case SAPP_EVENTTYPE_CHAR:
 		thg->input_string_len = th_utf8_encode(thg->input_string, ev->char_code);
+		break;
+	case SAPP_EVENTTYPE_KEY_DOWN:
 	case SAPP_EVENTTYPE_KEY_UP:
 		if (ev->key_repeat)
 			break;
 
 		th_input_key(ev->key_code, ev->type == SAPP_EVENTTYPE_KEY_DOWN);
 		break;
+	case SAPP_EVENTTYPE_MOUSE_SCROLL:
+		thg->mouse_wheel.x = ev->scroll_x;
+		thg->mouse_wheel.y = ev->scroll_y;
+		break;
 	case SAPP_EVENTTYPE_MOUSE_DOWN:
 	case SAPP_EVENTTYPE_MOUSE_UP:
-		th_input_key(ev->mouse_button, ev->type == SAPP_EVENTTYPE_MOUSE_DOWN);
+		th_input_key(ev->mouse_button+1, ev->type == SAPP_EVENTTYPE_MOUSE_DOWN);
 		break;
 	}
 }

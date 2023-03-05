@@ -180,6 +180,7 @@ typedef struct {
 	uu just_released[512];
 	th_vf2 mouse;
 	th_vf2 mouse_delta;
+	th_vf2 mouse_wheel;
 
 	th_shader *shaders;
 	uu shader_count;
