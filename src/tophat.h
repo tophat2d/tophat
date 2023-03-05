@@ -194,6 +194,8 @@ typedef struct {
 	sg_bindings canvas_bind;
 	sg_pipeline canvas_pip;
 	th_image *canvas_image;
+	
+	bool has_render_target;
 
 	th_rect scissors[MAX_SCISSORS];
 	uu scissor;
@@ -339,6 +341,9 @@ void th_vector_normalize(float *x, float *y);
 // raycast
 void th_ray_getcoll(th_ray *ra, th_coll *colls, int maxColls,
                     int *collCount, th_ent **scene, int sceneLen);
+
+// sokol
+uint32_t th_sg_get_gl_image(sg_image img);
 
 
 // tilemap

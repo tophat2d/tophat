@@ -7,6 +7,7 @@ import (
 	"canvas.um"
 	"color.um"
 	"window.um"
+	"signal.um"
 
 	"placeholders.um"
 )
@@ -19,14 +20,18 @@ fn pixelsplit(inp: uint32): (uint8, uint8, uint8, uint8) {
 
 fn pixelmerge(r, g, b, a: uint8): uint32 { return r << 24 | g << 16 | b << 8 | a }
 
-fn main() {
+var (
+	img, img2, target: image.Image
+)
+
+fn init() {
 	window.setup("image test", 600, 600)
 	window.setViewport(th.Vf2{600, 600})
 
-	img := image.load("etc/test.png")
+	img = image.load("etc/test.png")
 	printf("etc/test.png: %s\n", repr(img.validate()))
 
-	img2 := img.copy()
+	img2 = img.copy()
 	printf("copy: %s\n", repr(img2.validate()))
 	data := img.getData()
 	dm := img.getDims()
@@ -39,9 +44,9 @@ fn main() {
 	//img2 := image.mk(data, dm)
 	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
 
-	target := image.mk(make([]uint32, 10 * 10), th.Vf2{10, 10})
+	target = image.mk(make([]uint32, 10 * 10), th.Vf2{10, 10})
 
-	for window.cycle() {
+	window.onFrame.register(signal.Callback{
 		p := th.Vf2{1, 1}
 
 		canvas.drawText("drawOnQuad:", p, th.black, 2)
@@ -98,6 +103,8 @@ fn main() {
 		target.removeRenderTarget(window.wp)
 		target.draw(th.Transform{s: th.Vf2{10, 10}, p: p})
 
-		if input.isJustPressed('q') { break }
-	}
+		if input.isJustPressedc('Q') { exit() }
+	}, null)
 }
+
+fn main() {}

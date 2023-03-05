@@ -74,12 +74,6 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 fn cycle(delta: real): bool {
 //~~
 	umth_window_set_viewport(wp)
-	/*
-	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
-	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
-	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
-	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
-	*/
 
 	th.delta = trunc(delta*1000.0)
 	if th.delta == 0 {
@@ -96,9 +90,17 @@ fn cycle(delta: real): bool {
 	return running
 }
 
+fn drawBlackBars() {
+	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
+	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
+}
+
 fn umth_frame_callback*(delta: real) {
 	cycle(delta)
 	onFrame.emit(null)
+	drawBlackBars()
 }
 
 fn umth_window_begin_scissor(x, y: int, w, h: uint)

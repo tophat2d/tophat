@@ -22,18 +22,18 @@ fn onFrame(cctx, uctx: any) {
 
 	p := th.Vf2{ 0, 1 }
 	for i in lines {
-		s := 1
+		s := 1*(1/4.0)
 		if i == 1 {
-			s = 2
+			s = 2*(1/4.0)
 		}
 
-		canvas.drawText(
+		loadedFont.draw(
 			lines[i],
 			th.Vf2{
 				(window.wp.x - canvas.textSize(lines[i], s).x) / 2,
 				p.y},
 			fg, s)
-		p.y += 6 * s
+		p.y += 16 * s
 	}
 
 	if input.isJustPressed(input.key_enter) {
@@ -54,7 +54,7 @@ fn init() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
 	
-	loadedFont = font.load("etc/roboto.ttf", 16, 3)
+	loadedFont = font.load("etc/roboto.ttf", 16, 2)
 	if !loadedFont.validate() {
 		error("could not load font")
 	}

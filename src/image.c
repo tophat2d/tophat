@@ -2,14 +2,19 @@
 #include <string.h>
 #include <stdint.h>
 
+#include <assert.h>
 #include <stb_image.h>
 
 #include <sokol_gfx.h>
 
 #include "tophat.h"
+#include <GL/gl.h>
 
-#ifndef GL_UNSIGNED_INT_8_8_8_8 
-#define GL_UNSIGNED_INT_8_8_8_8 0x8035
+#ifndef GL_BGRA
+#define GL_BGRA 0x80E1
+#endif
+#ifndef GL_UNSIGNED_INT_8_8_8_8_REV
+#define GL_UNSIGNED_INT_8_8_8_8_REV 0x8367
 #endif
 
 extern th_global *thg;
@@ -26,37 +31,18 @@ th_image *th_image_alloc() {
 	return umkaAllocData(thg->umka, sizeof(th_image), th_image_free_umka);
 }
 
-static
-uint32_t *th_rdimg(th_image *img, unsigned char *data) {
-	uint32_t *rd = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-
-	for (int i=0; i < img->dm.w * img->dm.h; i++) {
-		switch (img->channels) {
-		case 3:
-			rd[i] = 0;
-			for (int j=0; j < 3; j++) {
-				rd[i] |= data[i*3 + j] << j*8;
-			}
-			rd[i] |= 0xff << 3*8;
-			break;
-		case 4:
-			rd[i] = 0;
-			for (int j=0; j < 4; j++)
-				rd[i] |= data[i*4 + j] << j*8;
-			break;
-		default:
-			th_error("tophat can't load this image.");
-			break;
-		}
-	}
-
-	return rd;
-}
-
 uint32_t *th_image_get_data(th_image *img) {
-	sg_image_desc desc = sg_query_image_desc(img->tex);
 	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-	memcpy(data, desc.data.subimage[0][0].ptr, sizeof(uint32_t) * img->dm.w * img->dm.h);
+	
+	void glBindTexture(GLenum target, GLuint texture);
+	GLenum glGetError();
+	void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *pixels);
+
+	GLuint tex = th_sg_get_gl_image(img->tex);
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+	glGetError();
 
 	return data;
 }
@@ -77,6 +63,13 @@ static void gen_tex(th_image *img, uint32_t *data) {
 		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
 		.usage = SG_USAGE_IMMUTABLE
 	});
+
+	sg_resource_state creation_status = sg_query_image_state(img->tex);
+	if (creation_status != SG_RESOURCESTATE_VALID) {
+		assert(creation_status != SG_RESOURCESTATE_INVALID && "gen_tex: INVALID");
+		assert(creation_status != SG_RESOURCESTATE_FAILED && "gen_tex: FAILED");
+		assert(false && "gen_tex: Unknown error");
+	}
 }
 
 th_image *th_load_image(char *path) {
@@ -99,7 +92,7 @@ th_image *th_load_image(char *path) {
 	img->flipv = 0;
 	img->fliph = 0;
 
-	gen_tex(img, data);
+	gen_tex(img, (uint32_t *)data);
 
 	stbi_image_free(data);
 
@@ -120,14 +113,13 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 }
 
 void th_image_set_filter(th_image *img, sg_filter filter) {
-	/*
 	uint32_t *data = th_image_get_data(img);
-	img->filter = filter;
+	img->filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST;
+
 	sg_dealloc_image(img->tex);
 	gen_tex(img, data);
 
 	free(data);
-	*/
 }
 
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm) {
@@ -192,7 +184,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		SWAP(bounds.bl, bounds.br);
 	}
 
-	const float verts[] = {
+	float verts[] = {
 		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
 		q.tr.x / sw, q.tr.y / sh, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,
 		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
@@ -207,11 +199,39 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 }
 
 void th_image_set_as_render_target(th_image *img) {
-	// TODO
+	if (thg->has_render_target) {
+		th_error("There already is a render target set!");
+		return;
+	}
+	
+	th_canvas_flush();
+	sg_end_pass();
+
+	sg_begin_pass(sg_make_pass(&(sg_pass_desc){
+		.color_attachments[0].image = img->tex,
+		.depth_stencil_attachment.image = img->tex,
+		.label = "offscreen-pass"
+	}), &thg->pass_action);
+	
+	thg->has_render_target = true;
+	
+	th_calculate_scaling(img->dm.w, img->dm.y);
 }
 
 void th_image_remove_render_target(th_image *img, th_vf2 wp) {
-	// TODO
+	if (!thg->has_render_target) {
+		th_error("No render target is set.");
+		return;
+	}
+
+	th_canvas_flush();
+	sg_end_pass();
+	
+	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
+
+	th_calculate_scaling(wp.x, wp.y);
+	
+	thg->has_render_target = false;
 }
 
 void th_image_init() {
