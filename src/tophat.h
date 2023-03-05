@@ -175,9 +175,9 @@ typedef struct {
 	th_vf2 viewport;
 	void *umka;
 
-	uu pressed[255];
-	uu just_pressed[255];
-	uu just_released[255];
+	uu pressed[512];
+	uu just_pressed[512];
+	uu just_released[512];
 	th_vf2 mouse;
 	th_vf2 mouse_delta;
 

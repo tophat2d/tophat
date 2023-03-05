@@ -11,9 +11,13 @@ import (
 
 //~~Keycode constants
 const (
-    mouse1*              = 0
-    mouse2*              = 1
-    mouse3*              = 2
+    mouse1*              = 1
+    mouse2*              = 2
+    mouse3*              = 3
+
+    key_ctrl*            = 16
+    key_shift*           = 17
+    key_alt*             = 18
 
     key_space*           = 32
     key_apostrophe*      = 39  /* ' */
