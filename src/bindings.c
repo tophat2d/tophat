@@ -596,22 +596,12 @@ void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_canvas_text(text, color, pos, size);
 }
 
-void umth_window_clear_frame(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_window_clear_frame();
-}
-
 void umth_window_get_dimensions(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int *w = (int *)p[1].ptrVal;
 	int *h = (int *)p[0].ptrVal;
 
 	th_window_get_dimensions(w, h);
 }
-
-void umth_window_swap_buffers(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_window_swap_buffers();
-}
-
-void umth_window_handle(UmkaStackSlot *p, UmkaStackSlot *r) {}
 
 #ifdef _WIN32
 static double time_now() {
@@ -894,8 +884,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
 	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);
 	umkaAddFunc(umka, "umth_window_get_dimensions", &umth_window_get_dimensions);
-	umkaAddFunc(umka, "umth_window_swap_buffers", &umth_window_swap_buffers);
-	umkaAddFunc(umka, "umth_window_handle", &umth_window_handle);
 	umkaAddFunc(umka, "umth_window_sleep", &umth_window_sleep);
 
 	// window
@@ -904,10 +892,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
 	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
 	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);
-	umkaAddFunc(umka, "umth_window_clear_frame", &umth_window_clear_frame);
 	umkaAddFunc(umka, "umth_window_get_dimensions", &umth_window_get_dimensions);
-	umkaAddFunc(umka, "umth_window_swap_buffers", &umth_window_swap_buffers);
-	umkaAddFunc(umka, "umth_window_handle", &umth_window_handle);
 	umkaAddFunc(umka, "umth_window_sleep", &umth_window_sleep);
 	umkaAddFunc(umka, "umth_window_set_viewport", &umth_window_set_viewport);
 	umkaAddFunc(umka, "umth_window_set_dims", &umth_window_set_dims);

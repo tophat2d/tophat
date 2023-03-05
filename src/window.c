@@ -137,7 +137,6 @@ sapp_desc th_window_sapp_desc() {
 void th_window_setup(char *name, int w, int h) {
 	sapp_set_window_title(name);
 	th_window_set_dims((th_vf2){w, h});
-	// TODO: Set window size here
 }
 
 void th_window_get_dimensions(int *w, int *h) {
@@ -153,14 +152,6 @@ void th_window_set_fullscreen(bool fullscreen) {
 	if (window_fullscreen != fullscreen) {
 		sapp_toggle_fullscreen();
 	}
-}
-
-void th_window_clear_frame() {
-	// TODO
-}
-
-void th_window_swap_buffers() {
-	// TODO
 }
 
 void th_window_set_icon(th_image *img) {

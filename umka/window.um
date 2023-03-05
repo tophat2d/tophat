@@ -31,8 +31,6 @@ var onFrame*: signal.Signal
 
 fn umth_window_setup(title: str, w, h: int)
 fn umth_window_get_dimensions(w, h: ^int32)
-fn umth_window_swap_buffers()
-fn umth_window_handle(): bool
 fn umth_window_sleep(ms: int)
 
 fn umth_window_set_viewport(dm: th.Vf2)
@@ -71,7 +69,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 //~~fn cycle
 // Cycle needs to be called every cycle for the window to work. If the window
 // was closed, it returns false.
-fn cycle(delta: real): bool {
+fn cycle(delta: real) {
 //~~
 	umth_window_set_viewport(wp)
 
@@ -83,11 +81,9 @@ fn cycle(delta: real): bool {
 	start = std.clock()*1000
 	th.time = round(start - clockOffset)
 
-	running := umth_window_handle()
 	umth_window_get_dimensions(&w, &h)
 
 	audio.__cycle()
-	return running
 }
 
 fn drawBlackBars() {
