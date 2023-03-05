@@ -214,6 +214,13 @@ fn clear*(code: int) {
 	umth_input_clear(code)
 }
 
+//~~fn clearc
+// Like `clear`, but you can pass char as the code.
+fn clearc*(code: char) {
+//~~
+    umth_input_clear(int(code))
+}
+
 fn umth_input_get_str(): str
 //~~fn getStr
 // Returns a string entered by the user in the last cycle.

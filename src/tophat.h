@@ -22,7 +22,7 @@
 
 // each unit here is a triangle, that's why multiplication by 3
 // 2 + 2 + 4 is (position + uv + colour)
-#define BATCH_SIZE 2048
+#define BATCH_SIZE 4096
 #define BATCH_VERTEX (2 + 2 + 4)
 #define BATCH_UNIT (3 * BATCH_VERTEX)
 #define BATCH_LENGTH (BATCH_SIZE * BATCH_UNIT)
@@ -364,8 +364,6 @@ size_t th_utf8_encode(char *out, uint32_t r);
 void th_window_setup(char *name, int w, int h);
 void th_window_get_dimensions(int *w, int *h);
 th_window_handle th_get_window_handle();
-void th_window_swap_buffers();
-void th_window_clear_frame();
 void th_window_set_dims(th_vf2 dm);
 void th_window_set_icon(th_image *img);
 void th_window_show_cursor(bool show);

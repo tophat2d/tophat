@@ -50,7 +50,7 @@ bool th_canvas_batch_push(float *array, size_t n) {
 		return false;
 	}
 
-	if ((thg->canvas_batch_size + n) > BATCH_LENGTH) {
+	if ((thg->canvas_batch_size + n) >= BATCH_LENGTH) {
 		// not enough space
 		return false;
 	}
