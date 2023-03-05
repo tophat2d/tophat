@@ -9,6 +9,7 @@ import (
 )
 
 y := 200
+text := ""
 
 fn init() {
 	window.setup("input test", 400, 400)
@@ -25,6 +26,10 @@ fn init() {
 			repr(input.isPressed(input.key_left_shift)),
 			repr(input.isJustPressed(input.key_left_shift)),
 			repr(input.isJustReleased(input.key_left_shift)))
+
+		if input.isJustPressed(input.key_backspace) {
+			text = ""
+		}
 
 		if input.isJustPressedc('\'') {
 			printf("' was just pressed\n")
@@ -47,9 +52,12 @@ fn init() {
 			printf("input string: %s %s\n", input.getStr(), repr([]char(input.getStr())))
 		}
 
+		text = text + s
+
+		canvas.drawText(text, th.Vf2{5, 20}, th.black, 2);
 		canvas.drawText(sprintf("%s", repr(input.getMouseScroll())), th.Vf2{5, 5}, th.black, 2);
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
-	}, null)
+	}, text)
 }
 
 fn main() {}

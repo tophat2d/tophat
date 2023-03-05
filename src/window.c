@@ -136,6 +136,7 @@ sapp_desc th_window_sapp_desc() {
 
 void th_window_setup(char *name, int w, int h) {
 	sapp_set_window_title(name);
+	th_window_set_dims((th_vf2){w, h});
 	// TODO: Set window size here
 }
 
@@ -204,11 +205,22 @@ th_window_handle th_get_window_handle() {
 	return sapp_win32_get_hwnd();
 }
 
+void w32_get_client_window_size(int *w, int *h) {
+	RECT rect = {0};
+	rect.right = *w;
+	rect.bottom = *h;
+	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+	*w = rect.right-rect.left;
+	*h = rect.bottom-rect.top;
+}
+
 void th_window_set_dims(th_vf2 dm) {
 	RECT r;
+	int w = dm.x, h = dm.y;
+	w32_get_client_window_size(&w, &h);
 	HWND hwnd = th_get_window_handle();
 	if (GetWindowRect(hwnd, &r)) {
-		SetWindowPos(hwnd, HWND_TOP, r.left, r.top, dm.x, dm.y, 0);
+		SetWindowPos(hwnd, HWND_TOP, r.left, r.top, w, h, 0);
 	}
 }
 #elif __linux__
