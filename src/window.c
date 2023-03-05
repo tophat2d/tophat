@@ -16,6 +16,33 @@ static bool window_fullscreen = false;
 
 static int umth_frame_callback = 0;
 
+static void print_umka_error_and_quit() {
+	UmkaError error;
+	umkaGetError(thg->umka, &error);
+	th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
+	fprintf(stderr, "\tStack trace:\n");
+
+	for (int depth = 0; depth < 10; depth++) {
+		char fnName[UMKA_MSG_LEN + 1];
+		char file[UMKA_MSG_LEN + 1];
+		int line, offset;
+
+		if (!umkaGetCallStack(thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
+			break;
+			fprintf(stderr, "\t\t...\n");
+		}
+#ifndef _WIN32
+		fprintf(stderr, "\033[34m");
+#endif
+		fprintf(stderr, "\t\t%s:%06d: ", file, line);
+#ifndef _WIN32
+		fprintf(stderr, "\033[0m");
+#endif
+		fprintf(stderr, "%s\n", fnName);
+	}
+	exit(-1);
+}
+
 static void init() {
 	th_audio_init();
 	sg_setup(&(sg_desc){
@@ -30,30 +57,7 @@ static void init() {
 	UmkaStackSlot s;
 
 	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, NULL, "init"), 0, &s, &s)) {
-		UmkaError error;
-		umkaGetError(thg->umka, &error);
-		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
-		fprintf(stderr, "\tStack trace:\n");
-
-		for (int depth = 0; depth < 10; depth++) {
-			char fnName[UMKA_MSG_LEN + 1];
-			char file[UMKA_MSG_LEN + 1];
-			int line, offset;
-
-			if (!umkaGetCallStack(thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
-				break;
-				fprintf(stderr, "\t\t...\n");
-			}
-#ifndef _WIN32
-			fprintf(stderr, "\033[34m");
-#endif
-			fprintf(stderr, "\t\t%s:%06d: ", file, line);
-#ifndef _WIN32
-			fprintf(stderr, "\033[0m");
-#endif
-			fprintf(stderr, "%s\n", fnName);
-		}
-		exit(-1);
+		print_umka_error_and_quit();
 	}
 }
 
@@ -67,7 +71,9 @@ static void frame() {
 	UmkaStackSlot s;
 	if (umth_frame_callback != -1) {
 		s.realVal = sapp_frame_duration();
-		umkaCall(thg->umka, umth_frame_callback, 0, &s, &s);
+		if (!umkaCall(thg->umka, umth_frame_callback, 1, &s, &s)) {
+			print_umka_error_and_quit();
+		}
 	}
 	
 	th_input_cycle();

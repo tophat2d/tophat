@@ -81,7 +81,7 @@ fn cycle(delta: real): bool {
 	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
 	*/
 
-	th.delta = trunc(delta*1000)
+	th.delta = trunc(delta*1000.0)
 	if th.delta == 0 {
 		th.delta = 1
 	}

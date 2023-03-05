@@ -1266,7 +1266,7 @@ const char *th_em_modulesrc[] = {
 "\tcanvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))\n"
 "\t*/\n"
 "\n"
-"\tth.delta = trunc(delta*1000)\n"
+"\tth.delta = trunc(delta*1000.0)\n"
 "\tif th.delta == 0 {\n"
 "\t\tth.delta = 1\n"
 "\t}\n"
