@@ -250,6 +250,33 @@ fn (q: ^Quad) transformed*(t: Transform): Quad {
 	return ret
 }
 
+//~~fn Quad.getDims
+// Returns the dimensions of the quad's bounding box
+fn (q: ^Quad) getDims*(): Vf2 {
+//~~
+	max := q[0]
+	min := q[0]
+
+	maxmag := max.mag()
+	minmag := min.mag()
+
+	for i:=1; i < len(q^); i++ {
+		qmag := q[i].mag()
+
+		if maxmag < qmag {
+			max = q[i]
+			maxmag = qmag
+		}
+
+		if minmag > qmag {
+			min = q[i]
+			minmag = qmag
+		}
+	}
+
+	return max.sub(min)
+}
+
 fn umth_th_getglobal(): ^struct{}
 //~~fn getGlobal
 // returns a pointer to the th_global. Set this as your extensions thg.
