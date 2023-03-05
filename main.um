@@ -30,7 +30,7 @@ fn onFrame(cctx, uctx: any) {
 		loadedFont.draw(
 			lines[i],
 			th.Vf2{
-				(window.wp.x - canvas.textSize(lines[i], s).x) / 2,
+				(window.wp.x - loadedFont.measure(lines[i]).x * s) / 2,
 				p.y},
 			fg, s)
 		p.y += 16 * s
