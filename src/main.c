@@ -160,9 +160,7 @@ static int th_main(int argc, char *argv[]) {
 
 
 sapp_desc sokol_main(int argc, char *argv[]) {
-	printf("PROBE1\n");
 	if (th_main(argc, argv))
 		exit(1);
-	printf("PROBE2\n");
 	return th_window_sapp_desc();
 }

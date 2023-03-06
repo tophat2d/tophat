@@ -43,17 +43,13 @@ static void print_umka_error_and_quit() {
 }
 
 static void init() {
-	printf("PROBE3\n");
 	th_audio_init();
-	printf("PROBE4\n");
 	sg_setup(&(sg_desc){
 		.context = sapp_sgcontext(),
 		.logger.func = slog_func
 	});
-	printf("PROBE5\n");
 
 	th_canvas_init();
-	printf("PROBE6\n");
 
 	umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
 
