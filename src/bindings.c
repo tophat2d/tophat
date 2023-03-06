@@ -383,6 +383,12 @@ void umth_input_is_just_pressed(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->intVal = thg->just_pressed[keycode];
 }
 
+void umth_input_is_pressed_repeat(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int keycode = p[0].intVal;
+
+	r->intVal = thg->press_repeat[keycode];
+}
+
 void umth_input_is_just_released(UmkaStackSlot *p, UmkaStackSlot *r) {
 	int keycode = p[0].intVal;
 
@@ -847,6 +853,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_input_get_mouse", &umth_input_get_mouse);
 	umkaAddFunc(umka, "umth_input_is_pressed", &umth_input_is_pressed);
 	umkaAddFunc(umka, "umth_input_is_just_pressed", &umth_input_is_just_pressed);
+	umkaAddFunc(umka, "umth_input_is_pressed_repeat", &umth_input_is_pressed_repeat);
 	umkaAddFunc(umka, "umth_input_is_just_released", &umth_input_is_just_released);
 	umkaAddFunc(umka, "umth_input_clear", &umth_input_clear);
 	umkaAddFunc(umka, "umth_input_get_str", &umth_input_get_str);

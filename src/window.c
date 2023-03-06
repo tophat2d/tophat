@@ -94,6 +94,7 @@ static void event(const sapp_event *ev) {
 		break;
 	case SAPP_EVENTTYPE_KEY_DOWN:
 	case SAPP_EVENTTYPE_KEY_UP:
+		th_input_repeated(ev->key_code, ev->type == SAPP_EVENTTYPE_KEY_DOWN);
 		if (ev->key_repeat)
 			break;
 

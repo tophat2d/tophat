@@ -36,10 +36,17 @@ void th_input_key(int keycode, int bDown) {
 	thg->just_pressed[keycode] = 0;
 }
 
+void th_input_repeated(int keycode, int bDown) {
+	if (bDown) {
+		thg->press_repeat[keycode] = true;
+	}
+}
+
 void th_input_cycle() {
 	thg->mouse_wheel = (th_vf2){0, 0};
 	*thg->input_string = 0;
 	thg->input_string_len = 0;
 	memset(thg->just_pressed, 0, 512 * sizeof(uu));
 	memset(thg->just_released, 0, 512 * sizeof(uu));
+	memset(thg->press_repeat, 0, 512 * sizeof(uu));
 }
