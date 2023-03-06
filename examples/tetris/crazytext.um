@@ -5,7 +5,7 @@ import (
 )
 
 type (
-  Entry = struct {
+  Entry* = struct {
     text: str
     life: real
     lifeGenesis: real

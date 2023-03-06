@@ -3,17 +3,19 @@ import (
 	"th.um"
 	"rect.um"
 	"canvas.um"
+	"signal.um"
 	"window.um"
 )
 
-fn main() {
+fn init*() {
 	window.setup("title", 400, 400)
 	window.setViewport(th.Vf2{400, 400})
-	cam := rect.mk(0, 0, 400, 400)
 
-	for window.cycle() {
-		canvas.drawRect(th.blue, rect.mk(0, 0, cam.w, cam.h))
+	window.onFrame.register(signal.Callback{
+		canvas.drawRect(th.blue, rect.mk(0, 0, window.wp.x, window.wp.y))
 
 		canvas.drawText("hello world", th.Vf2{2, 2}, th.white, 4)
-	}
+	}, null)
 }
+
+fn main() {}
