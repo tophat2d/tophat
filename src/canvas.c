@@ -7,7 +7,15 @@
 
 extern th_global *thg;
 
+enum {
+	SCISSOR_NONE,
+	SCISSOR_START,
+	SCISSOR_END
+};
+
 struct {
+	int scissor_stage;
+	th_rect scissor_rect;
 	size_t start, end;
 	th_image *img;
 }
@@ -16,30 +24,62 @@ typedef phase;
 phase phases[256];
 size_t phases_len;
 
-void finalize_last_phase() {
+static void finalize_last_phase() {
 	if (phases_len > 0) {
 		phases[phases_len-1].end = thg->canvas_batch_size;
 	}
 }
 
-void push_phase(th_image *img) {
+static phase *alloc_phase() {
 	if (phases_len >= 256) {
-		th_error("overflow");
-		return;
+		th_error("phase overflow");
+		return NULL;
 	}
+
+	return &phases[phases_len++];
+}
+
+static void push_phase(phase phs) {
 	size_t start = 0;
 	if (phases_len > 0) {
-		if (phases[phases_len-1].img == img) {
+		if (phases[phases_len-1].scissor_stage == SCISSOR_NONE) {
 			phases[phases_len-1].end = thg->canvas_batch_size;
-			return;
+			if (phs.scissor_stage == SCISSOR_NONE && phases[phases_len-1].img == phs.img) {
+				return;
+			}
 		}
-		phases[phases_len-1].end = thg->canvas_batch_size;
 		start = phases[phases_len-1].end;
 	}
-	phases[phases_len].start = start;
-	phases[phases_len].end = thg->canvas_batch_size;
-	phases[phases_len].img = img;
-	phases_len++;
+
+	phs.start = start;
+	phs.end = thg->canvas_batch_size;
+	phase *p = alloc_phase();
+	if (p) {
+		*p = phs;
+	}
+}
+
+void th_canvas_begin_scissor_rect(th_rect rect) {
+	// prevent invalid value in sokol
+	if (rect.w < 0) rect.w = 0;
+	if (rect.h < 0) rect.h = 0;
+
+	push_phase((phase){
+		.scissor_stage = SCISSOR_START,
+		.scissor_rect = rect
+	});
+}
+
+void th_canvas_end_scissor() {
+	push_phase((phase){
+		.scissor_stage = SCISSOR_END
+	});
+}
+
+static void push_image_phase(th_image *img) {
+	push_phase((phase){
+		.img = img
+	});
 }
 
 // pushes the vertices onto the batch
@@ -122,9 +162,19 @@ void th_canvas_flush() {
 	sg_update_buffer(thg->canvas_bind.vertex_buffers[0], &SG_RANGE(thg->canvas_batch));
 	for (size_t i = 0; i < phases_len; i++) {
 		phase *phs = &phases[i];
-		thg->canvas_bind.fs_images[SLOT_tex] = phs->img->tex;
-		sg_apply_bindings(&thg->canvas_bind);
-	  sg_draw(phs->start/BATCH_VERTEX, (phs->end - phs->start)/BATCH_VERTEX, 1);
+		switch (phs->scissor_stage) {
+		case SCISSOR_NONE:
+			thg->canvas_bind.fs_images[SLOT_tex] = phs->img->tex;
+			sg_apply_bindings(&thg->canvas_bind);
+			sg_draw(phs->start/BATCH_VERTEX, (phs->end - phs->start)/BATCH_VERTEX, 1);
+			break;
+		case SCISSOR_START:
+			sg_apply_scissor_rectf(phs->scissor_rect.x, phs->scissor_rect.y, phs->scissor_rect.w, phs->scissor_rect.h, true);
+			break;
+		case SCISSOR_END:
+			sg_apply_scissor_rectf(0, 0, sapp_widthf(), sapp_heightf(), true);
+			break;
+		}
 	}
 	phases_len = 0;
 	// NOTE: (offset, no-vertices, no-instances)
@@ -132,7 +182,7 @@ void th_canvas_flush() {
 }
 
 void th_canvas_use_image(th_image *img) {
-	push_phase(img);
+	push_image_phase(img);
 	thg->canvas_image = img;
 }
 

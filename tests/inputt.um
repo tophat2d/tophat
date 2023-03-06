@@ -10,6 +10,7 @@ import (
 
 y := 200
 text := ""
+qcount := 0
 
 fn init() {
 	window.setup("input test", 400, 400)
@@ -39,6 +40,10 @@ fn init() {
 			printf("key right was just pressed\n")
 		}
 
+		if input.isPressedRepeatc('q') {
+			qcount += 1
+		}
+
 		if input.isPressedc('S') {
 			printf("s is pressed\n")
 		}
@@ -54,6 +59,7 @@ fn init() {
 
 		text = text + s
 
+		canvas.drawText(sprintf("%d", qcount), th.Vf2{5, 40}, th.black, 2);
 		canvas.drawText(text, th.Vf2{5, 20}, th.black, 2);
 		canvas.drawText(sprintf("%s", repr(input.getMouseScroll())), th.Vf2{5, 5}, th.black, 2);
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))

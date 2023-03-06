@@ -68,3 +68,19 @@ fn drawQuad*(color: uint32, q: th.Quad) {
 //~~
 	umth_canvas_draw_quad(color, &q)
 }
+
+fn umth_canvas_begin_scissor_rect(x, y, w, h: real)
+fn umth_canvas_end_scissor()
+//~~fn beginScissorRect
+// Disable rendering outside of rect `r`
+fn beginScissorRect*(r: rect.Rect) {
+//~~
+	umth_canvas_begin_scissor_rect(r.x, r.y, r.w, r.h)
+}
+
+//~~fn endScissor
+// Stops cropping
+fn endScissor*() {
+//~~
+	umth_canvas_end_scissor();
+}

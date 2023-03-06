@@ -99,22 +99,6 @@ fn umth_frame_callback*(delta: real) {
 	drawBlackBars()
 }
 
-fn umth_window_begin_scissor(x, y: int, w, h: uint)
-fn umth_window_end_scissor()
-//~~fn beginScissorRect
-// Disable rendering outside of rect `r`
-fn beginScissorRect*(r: rect.Rect) {
-//~~
-	umth_window_begin_scissor(trunc(r.x), trunc(r.y), trunc(r.w), trunc(r.h))
-}
-
-//~~fn endScissor
-// Stops cropping
-fn endScissor*() {
-//~~
-	umth_window_end_scissor();
-}
-
 fn umth_window_set_fullscreen(fullscreen: bool)
 fn umth_window_get_fullscreen(): bool
 

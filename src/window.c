@@ -183,14 +183,6 @@ void th_window_freeze_cursor(bool freeze) {
 	sapp_lock_mouse(freeze);
 }
 
-void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
-	sg_apply_scissor_rect(x, y, w, h, true);
-}
-
-void th_window_end_scissor() {
-	sg_apply_scissor_rect(0, 0, sapp_width(), sapp_height(), true);
-}
-
 // ---- PLATFORM DEPENDENT CODE
 
 #ifdef _WIN32

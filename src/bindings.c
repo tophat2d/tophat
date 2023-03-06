@@ -565,14 +565,6 @@ void umth_ray_get_tilemap_coll(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // misc
 
-void umth_window_begin_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_window_begin_scissor(p[3].intVal, p[2].intVal, p[1].uintVal, p[0].uintVal);
-}
-
-void umth_window_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_window_end_scissor();
-}
-
 void umth_window_get_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->uintVal = th_window_is_fullscreen();
 }
@@ -701,6 +693,14 @@ void umth_canvas_draw_quad(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_quad *q = p[0].ptrVal;
 
 	th_canvas_quad(q, color);
+}
+
+void umth_canvas_begin_scissor_rect(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_canvas_begin_scissor_rect((th_rect){p[3].realVal, p[2].realVal, p[1].realVal, p[0].realVal});
+}
+
+void umth_canvas_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_canvas_end_scissor();
 }
 
 void umth_utf8_get_next_rune(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -887,17 +887,8 @@ void _th_umka_bind(void *umka) {
 		&umth_sound_set_stop_time_ms);
 
 	// window
-	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
-	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
-	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);
-	umkaAddFunc(umka, "umth_window_get_dimensions", &umth_window_get_dimensions);
-	umkaAddFunc(umka, "umth_window_sleep", &umth_window_sleep);
-
-	// window
 	umkaAddFunc(umka, "umth_window_get_fullscreen", &umth_window_get_fullscreen);
 	umkaAddFunc(umka, "umth_window_set_fullscreen", &umth_window_set_fullscreen);
-	umkaAddFunc(umka, "umth_window_begin_scissor", &umth_window_begin_scissor);
-	umkaAddFunc(umka, "umth_window_end_scissor", &umth_window_end_scissor);
 	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);
 	umkaAddFunc(umka, "umth_window_get_dimensions", &umth_window_get_dimensions);
 	umkaAddFunc(umka, "umth_window_sleep", &umth_window_sleep);
@@ -913,6 +904,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_canvas_draw_rect", &umth_canvas_draw_rect);
 	umkaAddFunc(umka, "umth_canvas_draw_line", &umth_canvas_draw_line);
 	umkaAddFunc(umka, "umth_canvas_draw_quad", &umth_canvas_draw_quad);
+	umkaAddFunc(umka, "umth_canvas_begin_scissor_rect", &umth_canvas_begin_scissor_rect);
+	umkaAddFunc(umka, "umth_canvas_end_scissor", &umth_canvas_end_scissor);
 
 	// utf8
 	umkaAddFunc(umka, "umth_utf8_get_next_rune", &umth_utf8_get_next_rune);
