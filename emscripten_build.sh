@@ -1,6 +1,9 @@
 #rm -rf wasm-out
 mkdir -p wasm-out
 
+# run make to do all the necessary embedding stuff
+make
+
 emcc -g -O2 -DUMKA_STATIC -sASYNCIFY -Wall -Wno-format-security\
 	-Ilib/miniaudio \
 	-Ilib/sokol \
