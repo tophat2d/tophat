@@ -1,4 +1,3 @@
- 
 const char *th_em_modulesrc[] = {
 "\n"
 "import (\n"
