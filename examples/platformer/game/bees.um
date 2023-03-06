@@ -8,7 +8,6 @@ import (
 	"image.um"
 	"input.um"
 	"canvas.um"
-	"shader.um"
 	"window.um"
 	"tilemap.um"
 	"../strings.um"
