@@ -9,7 +9,8 @@
  * It's a good practice to prefix the c functions.
  *
  * Compile with: cc -fPIC -shared -o main.umi main.c \
- *   -I../../lib/umka/src -I../../lib/miniaudio -I../../lib/stb
+ *   -I../../lib/umka/src -I../../lib/miniaudio -I../../lib/stb \
+ *   -I../../lib/sokol
  *
  * p is an array of parameters, indexed from the last.
  * r is a pointer to the return value.
@@ -18,7 +19,7 @@
 
 th_global *thg = NULL;
 
-void init(UmkaStackSlot *p, UmkaStackSlot *r) {
+void initExt(UmkaStackSlot *p, UmkaStackSlot *r) {
 	thg = (th_global *)p[1].ptrVal;
 	th_ext_set((void **)p[0].ptrVal);
 }

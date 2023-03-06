@@ -7,6 +7,7 @@ import (
 	"std.um"
 	"th.um"
 	"window.um"
+	"signal.um"
 )
 
 fn update*(m: ^nav.Mesh, s, e: th.Vf2): []th.Vf2 {
@@ -19,11 +20,17 @@ fn update*(m: ^nav.Mesh, s, e: th.Vf2): []th.Vf2 {
 	return p
 }
 
-fn main() {
+var (
+	s, e: th.Vf2
+	p: []th.Vf2
+	m: nav.Mesh
+)
+
+fn init*() {
 	window.setup("nav.um test", 200, 200)
 	mr := rect.mk(10, 10, 100, 100)
 
-	m := nav.mk(mr, 2)
+	m = nav.mk(mr, 2)
 
 	rects := []rect.Rect{
 		rect.mk(15, 15, 10, 10),
@@ -40,11 +47,11 @@ fn main() {
 		r: 45,
 		o: th.Vf2{60, 40}} ))
 
-	s := th.Vf2{10, 10}
-	e := th.Vf2{100, 100}
-	p := m.nav(s, e)
+	s = th.Vf2{10, 10}
+	e = th.Vf2{100, 100}
+	p = m.nav(s, e)
 
-	for window.cycle() {
+	window.onFrame.register(signal.Callback{
 		if input.isJustPressed(input.mouse1) {
 			s = input.getMousePos()
 			p = update(&m, s, e)
@@ -70,5 +77,7 @@ fn main() {
 		}
 
 		m.nav(s, e)
-	}
+	}, null)
 }
+
+fn main() { }

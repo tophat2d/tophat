@@ -200,15 +200,15 @@ fn update*() {
 		}
 	}
 
-	if (input.isJustPressedc('x')) {
+	if (input.isJustPressedc('X')) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
 		rotateClockwise()
-	} else if (input.isJustPressedc('z')) {
+	} else if (input.isJustPressedc('Z')) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
 		rotateCounterclockwise()
-	} else if (input.isJustPressedc('c')) {
+	} else if (input.isJustPressedc('C')) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
 		rotate180()

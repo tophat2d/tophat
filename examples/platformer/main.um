@@ -8,24 +8,26 @@ import (
 	"image.um"
 	"input.um"
 	"canvas.um"
-	"shader.um"
 	"window.um"
+	"signal.um"
 	"tilemap.um"
 
 	"game/game.um"
 	"global.um"
 )
 
-fn main() {
-	window.setup("hra", 512, 512)
+fn init*() {
+	window.setup("tophat platformer", 512, 512)
 	window.setViewport(th.Vf2{16 * 16, 16 * 16})
 	global.cam = rect.mk(0, 0, 16 * 16, 16 * 16)
 
 	game.setup()
 	game.reset()
 
-	for window.cycle() {
+	window.onFrame.register(signal.Callback{
 		game.handle()
 		game.draw()
-	}
+	}, null)
 }
+
+fn main() {}

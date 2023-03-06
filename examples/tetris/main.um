@@ -14,12 +14,12 @@ import (
 	"signal.um"
 )
 
+bgPlaying := true
 var (
-	bgPlaying: bool = true
 	scoreText: ^crazytext.Entry
 )
 
-fn init() {
+fn init*() {
 	window.setup("bricks lol", 640, 480)
 
 	global.initAudio()
@@ -36,7 +36,7 @@ fn init() {
 	crazytext.putText("M - MUTE", crazytext.lifetimeForever, false)
 
 	window.onFrame.register(signal.Callback{
-		if input.isJustPressedc('m') {
+		if input.isJustPressedc('M') {
 			if bgPlaying {
 				global.audioBackground.seekToFrame(std.rand() % global.audioBackground.frameCount())
 				global.audioBackground.play()
