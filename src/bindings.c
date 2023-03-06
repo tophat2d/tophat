@@ -663,6 +663,23 @@ void umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r) {
 	*th_sapp_swap_interval = fps;
 }
 
+// 0 = other/unknown
+// 1 = linux
+// 2 = windows
+// 3 = macos (unsupported currently)
+// 4 = emscripten
+void umth_window_get_platform_id(UmkaStackSlot *p, UmkaStackSlot *r) {
+#ifdef _WIN32 
+	r->intVal = 2;
+#elif __linux__
+	r->intVal = 1;
+#elif defined(__EMSCRIPTEN__)
+	r->intVal = 4;
+#else
+	r->intVal = 0;
+#endif
+}
+
 // draws text
 void umth_canvas_draw_text(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fu size = p[0].real32Val;
@@ -898,6 +915,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_window_show_cursor", &umth_window_show_cursor);
 	umkaAddFunc(umka, "umth_window_freeze_cursor", &umth_window_freeze_cursor);
 	umkaAddFunc(umka, "umth_window_set_target_fps", &umth_window_set_target_fps);
+	umkaAddFunc(umka, "umth_window_get_platform_id", &umth_window_get_platform_id);
 
 	// canvas
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);

@@ -8,7 +8,12 @@
 #include <sokol_gfx.h>
 
 #include "tophat.h"
+#ifdef __EMSCRIPTEN__
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#else 
 #include <GL/gl.h>
+#endif
 
 #ifndef GL_RGBA
 #define GL_RGBA 0x1908
@@ -32,17 +37,31 @@ th_image *th_image_alloc() {
 }
 
 uint32_t *th_image_get_data(th_image *img) {
-	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
+	size_t size = sizeof(uint32_t) * img->dm.w * img->dm.h;
+	uint32_t *data = malloc(size);
 	
+	GLuint tex = th_sg_get_gl_image(img->tex);
+
+#ifdef __EMSCRIPTEN__
+	glBindTexture(GL_TEXTURE_2D, tex);
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo); 
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+	glReadPixels(0, 0, img->dm.w, img->dm.h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &fbo);
+#else
 	void glBindTexture(GLenum target, GLuint texture);
 	GLenum glGetError();
 	void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *pixels);
 
-	GLuint tex = th_sg_get_gl_image(img->tex);
-
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
 	glGetError();
+#endif
 
 	return data;
 }

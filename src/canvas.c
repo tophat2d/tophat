@@ -2,7 +2,13 @@
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
-#include "shader.glsl.h"
+
+#ifdef __EMSCRIPTEN__
+# include "shader-web.glsl.h"
+#else
+# include "shader.glsl.h"
+#endif
+
 #include "pixelfont.h"
 
 extern th_global *thg;
@@ -132,7 +138,11 @@ void th_canvas_init() {
 		.label = "canvas-buffer"
 	});
 
-	sg_shader shd = sg_make_shader(th_shader_desc(sg_query_backend()));
+	sg_shader_desc *shd_desc = th_shader_desc(sg_query_backend());
+	if (shd_desc == NULL) {
+		th_error("shader is null!");
+	}
+	sg_shader shd = sg_make_shader(shd_desc);
 	thg->canvas_pip = sg_make_pipeline(&(sg_pipeline_desc){
 		.shader = shd,
 		.layout = {

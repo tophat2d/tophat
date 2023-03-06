@@ -43,13 +43,17 @@ static void print_umka_error_and_quit() {
 }
 
 static void init() {
+	printf("PROBE3\n");
 	th_audio_init();
+	printf("PROBE4\n");
 	sg_setup(&(sg_desc){
 		.context = sapp_sgcontext(),
 		.logger.func = slog_func
 	});
+	printf("PROBE5\n");
 
 	th_canvas_init();
+	printf("PROBE6\n");
 
 	umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
 
@@ -217,6 +221,14 @@ th_window_handle th_get_window_handle() {
 
 void th_window_set_dims(th_vf2 dm) {
 	XResizeWindow(*th_sapp_dpy, *th_sapp_win, dm.x, dm.y);
+}
+#elif defined(__EMSCRIPTEN__)
+th_window_handle th_get_window_handle() {
+	return 0;
+}
+
+void th_window_set_dims(th_vf2 dm) {
+	// FIXME: FAKE
 }
 #else
 #error Unsupported platform

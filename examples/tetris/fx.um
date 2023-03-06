@@ -90,7 +90,7 @@ fn drawCell(c: uint32, r: rect.Rect) {
 		}
 
 		color := value << 24 | value << 16 | value << 8 | (c & 0xFF)
-		canvas.drawRect(c | color, rect.Rect{r.x, r.y+(i / 5.0)*r.h, r.w, 3})
+		//canvas.drawRect(c | color, rect.Rect{r.x, r.y+(i / 5.0)*r.h, r.w, 3})
 	}
 	canvas.drawRect(0xFFFFFF33, rect.Rect{r.x, r.y, r.w, 1})
 }

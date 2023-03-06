@@ -129,7 +129,9 @@ static int th_main(int argc, char *argv[]) {
 	if (!umkaOK) {
 		UmkaError error;
 		umkaGetError(thg->umka, &error);
-		th_error("%s (%d, %d): %s\n", error.fileName, error.line, error.pos, error.msg);
+		int val = 42;
+		th_error("bazinga! %d", val);
+		th_error("%s (%d, %d): %s", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}
 
@@ -145,7 +147,9 @@ static int th_main(int argc, char *argv[]) {
 
 
 sapp_desc sokol_main(int argc, char *argv[]) {
+	printf("PROBE1\n");
 	if (th_main(argc, argv))
 		exit(1);
+	printf("PROBE2\n");
 	return th_window_sapp_desc();
 }
