@@ -61,13 +61,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	w, h = width, height
 	umth_window_setup(title, width, height)
 
-	switch umth_window_get_platform_id() {
-		case 0: th.platform = "unknown";
-		case 1: th.platform = "linux";
-		case 2: th.platform = "windows";
-		case 3: th.platform = "macos";
-		case 4: th.platform = "emscripten";
-	}
+	th.platform = umth_window_get_platform_id()
 
 	audio.__setup()
 	placeholders.__setup()

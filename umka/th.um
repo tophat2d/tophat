@@ -54,7 +54,7 @@ fn (p: ^Vf2) rotated*(origin: Vf2, rot: fu): Vf2 {
 // distance between p1 and p2
 fn (p1: ^Vf2) distanceTo*(p2: Vf2): fu {
 //~~
-	return std.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
+	return sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y))
 }
 
 //~~fn Vf2.angleTo
@@ -279,6 +279,17 @@ const (
 )
 //~~
 
+//~~enum Platform
+type Platform* = int
+const (
+	PlatformUnknown* = 0
+	PlatformLinux*
+	PlatformWindows*
+	PlatformMacOs*
+	PlatformWeb*
+)
+//~~
+
 //~~Misc variables
 var (
 	// time in ms from start of the game
@@ -286,6 +297,6 @@ var (
 	// length of the last frame in ms
 	delta*: int
 	// platform tophat is running on
-	platform*: str = "linux"
+	platform*: Platform
 )
 //~~
