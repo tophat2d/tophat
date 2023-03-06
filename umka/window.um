@@ -46,6 +46,8 @@ fn setViewport*(dm: th.Vf2) {
 	umth_window_set_viewport(dm)
 }
 
+fn setIcon*(img: image.Image)
+
 //~~fn setup
 // Sets up the engine and opens a window.
 fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
@@ -59,6 +61,8 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 
 	audio.__setup()
 	placeholders.__setup()
+
+	setIcon(placeholders.icon)
 
 	clockOffset = std.clock() * 1000
 	start = std.clock() * 1000

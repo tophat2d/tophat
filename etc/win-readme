@@ -1,6 +1,0 @@
-How to use:
-	init.bat - creates a new tophat project
-	package.bat - creates a zip for windows and linux
-	run.bat (in project directory) - runs the game
-
-Additional info can be found here: https://github.com/marekmaskarinec/tophat

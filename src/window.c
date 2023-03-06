@@ -166,7 +166,7 @@ void th_window_set_icon(th_image *img) {
 				.height = img->dm.y,
 				.pixels = (sapp_range){
 					.ptr = pixels,
-					.size = img->dm.x * img->dm.y
+					.size = img->dm.x * img->dm.y * sizeof(uint32_t)
 				}
 			}
 		}
