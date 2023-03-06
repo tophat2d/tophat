@@ -59,7 +59,7 @@ static void init() {
 
 	UmkaStackSlot s;
 
-	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, NULL, "init"), 0, &s, &s)) {
+	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
 		print_umka_error_and_quit();
 	}
 }

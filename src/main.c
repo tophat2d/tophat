@@ -114,7 +114,20 @@ static int th_main(int argc, char *argv[]) {
 		return 1;
 	}
 	
-	umkaOK = umkaInit(thg->umka, scriptpath, NULL, 1024 * 1024, NULL,
+	char *mainmod_fmt =
+"import (\"window.um\"; mainmod = \"%s\")\n"
+"fn main() {}\n"
+"fn __th_init*() {\n"
+"  mainmod.init()\n"
+"}\n";
+	char mainmod[sizeof(mainmod_fmt) + BUFSIZ];
+	snprintf(
+		mainmod,
+		sizeof(mainmod),
+		mainmod_fmt,
+		scriptpath);
+
+	umkaOK = umkaInit(thg->umka, "tophat_main.um", mainmod, 1024 * 1024, NULL,
 		argc - argOffset, argv + argOffset, true, true, silent ? NULL : warning);
 	if (prof) umprofInit(thg->umka);
 
