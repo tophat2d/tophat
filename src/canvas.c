@@ -64,6 +64,14 @@ void th_canvas_begin_scissor_rect(th_rect rect) {
 	if (rect.w < 0) rect.w = 0;
 	if (rect.h < 0) rect.h = 0;
 
+	rect.x *= thg->scaling;
+	rect.y *= thg->scaling;
+	rect.w *= thg->scaling;
+	rect.h *= thg->scaling;
+
+	rect.x += thg->offset.x;
+	rect.y += thg->offset.y;
+
 	push_phase((phase){
 		.scissor_stage = SCISSOR_START,
 		.scissor_rect = rect
