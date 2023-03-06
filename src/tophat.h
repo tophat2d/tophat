@@ -313,6 +313,7 @@ void th_image_remove_render_target(th_image *img, th_vf2 wp);
 
 // input
 void th_input_key(int keycode, int bDown);
+void th_input_sync_fake_keys();
 void th_input_cycle();
 
 // misc

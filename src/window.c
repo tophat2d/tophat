@@ -66,6 +66,7 @@ static void frame() {
 	};
 	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
 	sg_apply_pipeline(thg->canvas_pip);
+	th_input_sync_fake_keys();
 
 	UmkaStackSlot s;
 	if (umth_frame_callback != -1) {

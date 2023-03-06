@@ -11,9 +11,9 @@ import (
 
 //~~Keycode constants
 const (
-    mouse1*              = 1
-    mouse2*              = 2
-    mouse3*              = 3
+    mouse1*              = 1   // NOTE: mouse 2 and 3 key codes are swapped
+    mouse2*              = 3   //       because sokol uses 3 for middle mouse
+    mouse3*              = 2   //       button.
 
     key_ctrl*            = 16
     key_shift*           = 17
@@ -143,6 +143,14 @@ const (
 )
 //~~
 
+
+fn toupper(c: char): int {
+    if c >= 'a' && c <= 'z' {
+        return int(c) - 32;
+    }
+    return int(c);
+}
+
 fn umth_input_get_mouse(out: ^th.Vf2)
 //~~fn getMousePos
 // Returns the position of mouse cursor in relation to the screen.
@@ -174,7 +182,7 @@ fn isPressed*(code: int): bool {
 // Like `isPressed`, but you can pass char as the code.
 fn isPressedc*(code: char): bool {
 //~~
-	return isPressed(int(code))
+	return isPressed(toupper(code))
 }
 
 fn umth_input_is_just_pressed(key: int): int32
@@ -189,7 +197,7 @@ fn isJustPressed*(code: int): bool {
 // Like `isJustPressed`, but you can pass char as the code.
 fn isJustPressedc*(code: char): bool {
 //~~
-	return isJustPressed(int(code))
+	return isJustPressed(toupper(code))
 }
 
 fn umth_input_is_just_released(key: int): int32
@@ -203,7 +211,7 @@ fn isJustReleased*(code: int): bool {
 // Like `isJustReleased`, but you can pass char as the code.
 fn isJustReleasedc*(code: char): bool {
 //~~
-	return isJustReleased(int(code))
+	return isJustReleased(toupper(code))
 }
 
 fn umth_input_clear*(code: int)
@@ -218,7 +226,7 @@ fn clear*(code: int) {
 // Like `clear`, but you can pass char as the code.
 fn clearc*(code: char) {
 //~~
-    umth_input_clear(int(code))
+    umth_input_clear(toupper(code))
 }
 
 fn umth_input_get_str(): str
