@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	start, end, clockOffset: real
+	start, clockOffset: real
 	fpsLimit: int = 60
 )
 
@@ -31,7 +31,6 @@ var onFrame*: signal.Signal
 
 fn umth_window_setup(title: str, w, h: int)
 fn umth_window_get_dimensions(w, h: ^int32)
-fn umth_window_sleep(ms: int)
 
 fn umth_window_set_viewport(dm: th.Vf2)
 //~~fn setViewport
@@ -46,6 +45,13 @@ fn setViewport*(dm: th.Vf2) {
 	umth_window_set_viewport(dm)
 }
 
+// 0 = other/unknown
+// 2 = linux
+// 3 = windows
+// 4 = macos (unsupported currently)
+// 5 = emscripten
+fn umth_window_get_platform_id(): int
+
 //~~fn setup
 // Sets up the engine and opens a window.
 fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
@@ -53,8 +59,12 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	w, h = width, height
 	umth_window_setup(title, width, height)
 
-	if std.getenv("HOME") == "" {
-		th.platform = "windows"
+	switch umth_window_get_platform_id() {
+		case 0: th.platform = "unknown";
+		case 1: th.platform = "linux";
+		case 2: th.platform = "windows";
+		case 3: th.platform = "macos";
+		case 4: th.platform = "emscripten";
 	}
 
 	audio.__setup()

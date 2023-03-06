@@ -12,6 +12,7 @@ tophat-win.zip
 src/*.o
 src/*.d
 **/gmon.out
+wasm-out
 
 # Windows:
 .obj

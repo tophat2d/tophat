@@ -1,5 +1,4 @@
 import (
-	"rect.um"
 	"audio.um"
 )
 

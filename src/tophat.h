@@ -22,7 +22,11 @@
 
 // each unit here is a triangle, that's why multiplication by 3
 // 2 + 2 + 4 is (position + uv + colour)
+#ifdef __EMSCRIPTEN__
+#define BATCH_SIZE 2048
+#else
 #define BATCH_SIZE 4096
+#endif
 #define BATCH_VERTEX (2 + 2 + 4)
 #define BATCH_UNIT (3 * BATCH_VERTEX)
 #define BATCH_LENGTH (BATCH_SIZE * BATCH_UNIT)
@@ -140,6 +144,8 @@ typedef void* th_window_handle;
 #elif __linux__
 #include <X11/Xlib.h>
 typedef Window *th_window_handle;
+#elif defined(__EMSCRIPTEN__)
+typedef int th_window_handle;
 #else
 #error Unsupported platform
 #endif

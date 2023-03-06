@@ -58,7 +58,7 @@ fn onFrame(cctx, uctx: any) {
 	if input.isJustPressed(input.key_enter) {
 		if th.platform == "windows" {
 			std.system("explorer \"https://th.mrms.cz/\"")
-		} else {
+		} else if th.platform == "linux" {
 			std.system("xdg-open https://th.mrms.cz/")
 		}
 	}
