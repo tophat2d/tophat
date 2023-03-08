@@ -17,5 +17,3 @@ fn init*() {
 		canvas.drawText("hello world", th.Vf2{2, 2}, th.white, 4)
 	}, null)
 }
-
-fn main() {}

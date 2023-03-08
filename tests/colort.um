@@ -22,5 +22,3 @@ fn init*() {
 		}
 	}, null)
 }
-
-fn main() { }

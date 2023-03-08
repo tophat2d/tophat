@@ -58,5 +58,3 @@ fn init*() {
 		t.draw(cam)	
 	}, null)
 }
-
-fn main() {}

@@ -79,5 +79,3 @@ fn init*() {
 		m.nav(s, e)
 	}, null)
 }
-
-fn main() { }

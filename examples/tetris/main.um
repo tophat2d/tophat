@@ -54,5 +54,3 @@ fn init*() {
 		fx.draw()
 	}, null)
 }
-
-fn main() {}

@@ -11,7 +11,7 @@ var (
 	img: image.Image
 )
 
-fn init() {
+fn init*() {
 	img = image.load("etc/test.png")
 	window.setViewport(th.Vf2{192, 168})
 
@@ -28,8 +28,4 @@ fn init() {
 
 		img.draw(th.Transform{p: th.Vf2{10, 40}, s: th.Vf2{1, 1}}, th.white)
 	}, null)
-}
-
-fn main() {
-	window.setup("my title", 400, 400)
 }

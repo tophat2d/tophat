@@ -23,5 +23,3 @@ fn init*() {
     window.onFrame.register(signal.Callback{
     }, null)
 }
-
-fn main() {}

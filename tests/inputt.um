@@ -12,7 +12,7 @@ y := 200
 text := ""
 qcount := 0
 
-fn init() {
+fn init*() {
 	window.setup("input test", 400, 400)
 
 	window.onFrame.register(signal.Callback{
@@ -65,5 +65,3 @@ fn init() {
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
 	}, text)
 }
-
-fn main() {}

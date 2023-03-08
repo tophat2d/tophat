@@ -30,5 +30,3 @@ fn init*() {
 		canvas.endScissor()
 	}, null)
 }
-
-fn main() {}

@@ -24,7 +24,7 @@ var (
 	img, img2, target: image.Image
 )
 
-fn init() {
+fn init*() {
 	window.setup("image test", 600, 600)
 	window.setViewport(th.Vf2{600, 600})
 
@@ -106,5 +106,3 @@ fn init() {
 		if input.isJustPressedc('Q') { exit() }
 	}, null)
 }
-
-fn main() {}

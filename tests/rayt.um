@@ -47,5 +47,3 @@ fn init*() {
 		e.draw(cam)
 	}, null)
 }
-
-fn main() {}

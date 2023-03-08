@@ -29,5 +29,3 @@ fn init*() {
 		drawTextRect("|||||||", th.Vf2{100, 0})
 	}, null)
 }
-
-fn main() {}
