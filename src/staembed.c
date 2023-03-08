@@ -2530,7 +2530,7 @@ const char *th_em_modulesrc[] = {
 "\t\"th.um\"\n"
 "\t\"utf8.um\"\n"
 "\t\"rect.um\"\n"
-"\t\"../ui.um\"\n"
+"\t\"ui.um\"\n"
 "\t\"canvas.um\"\n"
 ")\n"
 "\n"

@@ -486,7 +486,7 @@ fn onFrame(cctx, uctx: any) {
   v_lastTime = th.time
 }
 
-fn init() {
+fn init*() {
   v_lastTime = th.time
   th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
 	th_window.setViewport(th.Vf2{screen.w, screen.h})
@@ -502,5 +502,3 @@ fn init() {
 
   th_window.onFrame.register(onFrame, null)
 }
-
-fn main() {}

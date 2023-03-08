@@ -3,7 +3,7 @@ import (
 	"th.um"
 	"utf8.um"
 	"rect.um"
-	"../ui.um"
+	"ui.um"
 	"canvas.um"
 )
 

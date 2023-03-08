@@ -14,7 +14,7 @@ import (
 	"global.um"
 )
 
-fn init() {
+fn init*() {
 	window.setup("title", 1280, 720)
 
 	window.setViewport(th.Vf2{92, 168})
@@ -49,5 +49,3 @@ fn init() {
 		}
 	}, null)
 }
-
-fn main() {}
