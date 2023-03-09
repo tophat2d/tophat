@@ -5,7 +5,7 @@ make
 
 cc () {
 	echo EMCC $f
-	emcc -g -O2 -DUMKA_STATIC \
+	emcc -O3 -Wall -fno-strict-aliasing -Wno-format-security -DUMKA_STATIC \
 		-Ilib/miniaudio \
 		-Ilib/sokol \
 		-Ilib/stb \
@@ -24,6 +24,3 @@ done
 
 emar rcs th_emscripten.a *.o
 rm *.o
-
-#emcc --shell-file=./shell.html -s ASYNCIFY=1 -s ALLOW_MEMORY_GROWTH=1 -lc -lm src/*.c -o output.html
-#--shell-file=./shell.html
