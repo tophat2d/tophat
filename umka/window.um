@@ -147,7 +147,7 @@ fn setTargetFps*(fps: int) {
 
 fn umth_window_set_dims(dm: th.Vf2)
 //~~fn setDims
-// Sets the dimensions of the window, linux only.
+// Sets the dimensions of the window.
 // 
 // `dm`
 // : the target dimensions in screen pixels
@@ -158,7 +158,7 @@ fn setDims*(dm: th.Vf2) {
 
 fn umth_window_set_icon(img: image.Image)
 //~~fn setIcon
-// Sets the window icon, linux only.
+// Sets the window icon.
 fn setIcon*(img: image.Image) {
 //~~
 	umth_window_set_icon(img)
@@ -175,8 +175,9 @@ fn showCursor*(show: bool) {
 fn umth_window_freeze_cursor(freeze: bool)
 //~~fn freezeCursor
 // Freezes the cursor in place. `input.getMouseDelta` will still report mouse
-// movements. Linux only.
+// movements.  The cursor will be automatically hidden.
 fn freezeCursor*(freeze: bool) {
 //~~
+	showCursor(freeze)
 	umth_window_freeze_cursor(freeze)
 }
