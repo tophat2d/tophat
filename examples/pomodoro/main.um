@@ -481,7 +481,7 @@ fn onFrame(cctx, uctx: any) {
     drawGuiElementFrames(&gui)
   }
 
-  v_mainFont.draw(sprintf("fps: %d", th.delta), th.Vf2{5, 5}, th.red)
+  v_mainFont.draw(sprintf("fps: %d", 1000/(th.delta)), th.Vf2{5, 5}, th.red)
 
   v_lastTime = th.time
 }
