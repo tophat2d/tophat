@@ -139,6 +139,11 @@ typedef struct {
 	fu scale;
 } th_tmap;
 
+typedef struct {
+	uint32_t *data;
+	th_vf2 dm;
+} th_em_placeholder;
+
 #ifdef _WIN32
 typedef void* th_window_handle;
 #elif __linux__
