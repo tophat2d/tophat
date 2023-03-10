@@ -1,3 +1,4 @@
+ 
 const char *th_em_modulesrc[] = {
 "\n"
 "import (\n"
@@ -1390,7 +1391,7 @@ const char *th_em_modulesrc[] = {
 "\n"
 "fn umth_window_set_dims(dm: th.Vf2)\n"
 "//~~fn setDims\n"
-"// Sets the dimensions of the window, linux only.\n"
+"// Sets the dimensions of the window.\n"
 "// \n"
 "// `dm`\n"
 "// : the target dimensions in screen pixels\n"
@@ -1401,7 +1402,7 @@ const char *th_em_modulesrc[] = {
 "\n"
 "fn umth_window_set_icon(img: image.Image)\n"
 "//~~fn setIcon\n"
-"// Sets the window icon, linux only.\n"
+"// Sets the window icon.\n"
 "fn setIcon*(img: image.Image) {\n"
 "//~~\n"
 "\tumth_window_set_icon(img)\n"
@@ -1418,9 +1419,10 @@ const char *th_em_modulesrc[] = {
 "fn umth_window_freeze_cursor(freeze: bool)\n"
 "//~~fn freezeCursor\n"
 "// Freezes the cursor in place. `input.getMouseDelta` will still report mouse\n"
-"// movements. Linux only.\n"
+"// movements.  The cursor will be automatically hidden.\n"
 "fn freezeCursor*(freeze: bool) {\n"
 "//~~\n"
+"\tshowCursor(freeze)\n"
 "\tumth_window_freeze_cursor(freeze)\n"
 "}\n"
 "",

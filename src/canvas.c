@@ -2,6 +2,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdio.h>
+#include <assert.h>
 
 #ifdef __EMSCRIPTEN__
 # include "shader-web.glsl.h"
@@ -12,6 +13,50 @@
 #include "pixelfont.h"
 
 extern th_global *thg;
+
+struct {
+	sg_buffer *buffers;
+	size_t buffers_count;
+	size_t buffers_cap;
+	size_t current_buffer; 	
+	size_t starting_buffer; // buffer to start flush at
+}
+typedef buffer_cache_t;
+
+buffer_cache_t buffer_cache;
+
+static sg_buffer alloc_buffer() {
+	// 1: check if we already have a cached buffer
+	if (buffer_cache.current_buffer < buffer_cache.buffers_count) {
+		return buffer_cache.buffers[buffer_cache.current_buffer++];
+	}
+
+	// 2: check if we need to resize the buffers array
+	assert(buffer_cache.buffers_count <= buffer_cache.buffers_cap && "flaw: count > cap");
+	if (buffer_cache.buffers_cap == buffer_cache.buffers_count) {
+		if (buffer_cache.buffers_cap == 0) {
+			buffer_cache.buffers_cap = 1;
+		} else {
+			buffer_cache.buffers_cap *= 2;
+		}
+		buffer_cache.buffers = realloc(buffer_cache.buffers, buffer_cache.buffers_cap*sizeof(sg_buffer));
+	}
+
+	// 3: alloc a new buffer
+	sg_buffer new_buffer = sg_make_buffer(&(sg_buffer_desc){
+		.size = sizeof(thg->canvas_batch),
+		.type = SG_BUFFERTYPE_VERTEXBUFFER,
+		.usage = SG_USAGE_STREAM
+	});
+
+	buffer_cache.buffers[buffer_cache.buffers_count++] = new_buffer;
+	return new_buffer;
+}
+
+static void buffer_cache_reset() {
+	buffer_cache.current_buffer = 0;
+	buffer_cache.starting_buffer = 0;
+}
 
 enum {
 	SCISSOR_NONE,
@@ -115,28 +160,24 @@ bool th_canvas_batch_push(float *array, size_t n) {
 	return true;
 }
 
+void th_canvas_use_image(th_image *img) {
+}
+
 // same as th_canvas_batch_push except automatically flushes the buffer if needed
-int th_canvas_batch_push_auto_flush(float *array, size_t n) {
-	bool ok = th_canvas_batch_push(array, n);
+void th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n) {
+	push_image_phase(img);
+	thg->canvas_image = img;
 
-	if (!ok) { // if buffer is too small
-		th_error("buffer too small");
-		return 0;
+	if (!th_canvas_batch_push(array, n)) { 
+		// if buffer is too small
+		th_canvas_flush();
 	}
-
-	return ok;
 }
 
 static th_image white_img;
 
 void th_canvas_init() {
 	thg->canvas_bind = (sg_bindings){0};
-	thg->canvas_bind.vertex_buffers[0] = sg_make_buffer(&(sg_buffer_desc){
-		.size = sizeof(thg->canvas_batch),
-		.type = SG_BUFFERTYPE_VERTEXBUFFER,
-		.usage = SG_USAGE_STREAM,
-		.label = "canvas-buffer"
-	});
 
 	sg_shader_desc *shd_desc = th_shader_desc(sg_query_backend());
 	if (shd_desc == NULL) {
@@ -175,9 +216,15 @@ void th_canvas_deinit() {
 	th_image_free(&white_img);
 }
 
+void th_canvas_end_frame() {
+	buffer_cache_reset();
+}
+
 void th_canvas_flush() {
+	sg_buffer buf = alloc_buffer();
+	sg_update_buffer(buf, &SG_RANGE(thg->canvas_batch));
+	thg->canvas_bind.vertex_buffers[0] = buf;
 	finalize_last_phase();
-	sg_update_buffer(thg->canvas_bind.vertex_buffers[0], &SG_RANGE(thg->canvas_batch));
 	for (size_t i = 0; i < phases_len; i++) {
 		phase *phs = &phases[i];
 		switch (phs->scissor_stage) {
@@ -199,14 +246,7 @@ void th_canvas_flush() {
 	thg->canvas_batch_size = 0;
 }
 
-void th_canvas_use_image(th_image *img) {
-	push_image_phase(img);
-	thg->canvas_image = img;
-}
-
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
-	th_canvas_use_image(&white_img);
-
 	a.x *= thg->scaling;
 	a.y *= thg->scaling;
 	b.x *= thg->scaling;
@@ -232,7 +272,7 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 		memcpy(verts+(i*BATCH_VERTEX+4), colors, sizeof(float) * 4);
 	}
 
-	th_canvas_batch_push_auto_flush(verts, sizeof verts / sizeof verts[0]);
+	th_canvas_batch_push_auto_flush(&white_img, verts, sizeof verts / sizeof verts[0]);
 }
 
 void th_canvas_rect(uint32_t color, th_rect r) {

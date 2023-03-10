@@ -23,11 +23,7 @@
 
 // each unit here is a triangle, that's why multiplication by 3
 // 2 + 2 + 4 is (position + uv + colour)
-#ifdef __EMSCRIPTEN__
-#define BATCH_SIZE 2048
-#else
 #define BATCH_SIZE 4096
-#endif
 #define BATCH_VERTEX (2 + 2 + 4)
 #define BATCH_UNIT (3 * BATCH_VERTEX)
 #define BATCH_LENGTH (BATCH_SIZE * BATCH_UNIT)
@@ -270,9 +266,10 @@ void th_canvas_quad(th_quad *q, uint32_t color);
 bool th_canvas_batch_push(float *array, size_t n);
 void th_canvas_flush();
 void th_canvas_use_image(th_image *img);
-int th_canvas_batch_push_auto_flush(float *array, size_t n);
+void th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n);
 void th_canvas_begin_scissor_rect(th_rect rect);
 void th_canvas_end_scissor();
+void th_canvas_end_frame();
 
 // collisions
 int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);

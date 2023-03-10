@@ -178,8 +178,6 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 #define SWAP(a, b) { th_vf2 t = b; b = a; a = t; }
 
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
-	th_canvas_use_image(img);
-
 	for (uu i=0; i < 4; i++) {
 		q.v[i].x = trunc(q.v[i].x * thg->scaling + thg->offset.x);
 		q.v[i].y = trunc(q.v[i].y * thg->scaling + thg->offset.y);
@@ -214,7 +212,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	for (uu i=0; i < 6; i++)
 		memcpy(verts + (i * 8) + 4, colors, 4 * sizeof(float));
 
-	th_canvas_batch_push_auto_flush(verts, sizeof(verts) / sizeof(verts[0]));
+	th_canvas_batch_push_auto_flush(img, verts, sizeof(verts) / sizeof(verts[0]));
 }
 
 void th_image_set_as_render_target(th_image *img) {

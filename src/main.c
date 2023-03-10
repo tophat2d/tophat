@@ -143,7 +143,6 @@ static int th_main(int argc, char *argv[]) {
 		UmkaError error;
 		umkaGetError(thg->umka, &error);
 		int val = 42;
-		th_error("bazinga! %d", val);
 		th_error("%s (%d, %d): %s", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}

@@ -140,9 +140,8 @@ static inline const sg_shader_desc* th_shader_desc(sg_backend backend) {
   if (backend == SG_BACKEND_GLES2) {
     static sg_shader_desc desc;
     static bool valid;
-    memset(&desc, 0, sizeof desc);
-//    if (!valid) {
-//      valid = true;
+    if (!valid) {
+      valid = true;
       desc.attrs[0].name = "pos";
       desc.attrs[1].name = "uv0";
       desc.attrs[2].name = "color0";
@@ -154,7 +153,7 @@ static inline const sg_shader_desc* th_shader_desc(sg_backend backend) {
       desc.fs.images[0].image_type = SG_IMAGETYPE_2D;
       desc.fs.images[0].sampler_type = SG_SAMPLERTYPE_FLOAT;
       desc.label = "th_shader";
-//    }
+    }
     return &desc;
   }
   return 0;

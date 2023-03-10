@@ -79,6 +79,7 @@ static void frame() {
 	
 	th_input_cycle();
 	th_canvas_flush();
+	th_canvas_end_frame();
 	sg_end_pass();
 	sg_commit();
 }
