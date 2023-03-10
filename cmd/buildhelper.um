@@ -122,20 +122,20 @@ fn main() {
 
 		printf(" };\n")
 		printf("int %s_count = %d;\n", std.argv(2), std.argc() - 3)
-	} else if mode == "umimg" {
-		decl := "import(\"image.um\"; \"th.um\")\nvar (\n"
-		init := "// **INTERNAL**\nfn __setup*() {\n"
+	} else if mode == "placeholders" {
+		ws := []int{}
+		hs := []int{}
 
-		for i:=2; i < std.argc(); i += 2 {
+		for i:=2; i < std.argc(); i++ {
 			fname := std.argv(i)
-			name := std.argv(i + 1)
+
 
 			data, w, h, err := loadFF(fname)
 			if err > 0 { continue }
-			
-			decl += sprintf("\t%s*: image.Image\n", name)
+			ws = append(ws, w)
+			hs = append(hs, h)
 
-			datas := ""
+			datas := "{"
 			for i in data {
 				data[i] =
 					(data[i] >> (0*8) & 0xff) << (3*8) |
@@ -145,13 +145,15 @@ fn main() {
 				datas += sprintf("0x%x", data[i])
 				if i < len(data) - 1 { datas += ", " }
 			}
-
-			init += sprintf("\t%s = image.mk([]uint32{ %s }, th.Vf2{ %d, %d })\n", name, datas, w, h)
+			datas += "}"
+			printf("static uint32_t th_em_placeholder_data_%d[] = %s;\n", i, datas)
 		}
 
-		decl += ")"
-		init += "}"
-
-		printf("%s\n%s\n", decl, init)
+		printf("th_em_placeholder th_em_placeholders[] = {\n")
+		for i:=2; i < std.argc(); i++ {
+			printf("{ th_em_placeholder_data_%d, { .w = %d, .h = %d } },\n",
+				i, ws[i - 2], hs[i - 2])
+		}
+		printf("};\n")
 	}
 }

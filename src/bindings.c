@@ -78,6 +78,20 @@ static void umth_rgb_uint32(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 ///////////////////////////
+// PLACEHOLDERS
+
+extern th_em_placeholder th_em_placeholders[];
+
+// fn umth_placeholder_fetch((0) id: uint): ^struct{}
+static void umth_placeholder_fetch(UmkaStackSlot *p, UmkaStackSlot *r) {
+	uint32_t id = p[0].intVal;
+
+	th_image *img = th_image_alloc();
+	th_image_from_data(img, th_em_placeholders[id].data, th_em_placeholders[id].dm);
+	r->ptrVal = img;
+}
+
+///////////////////////////
 // FONT
 
 // fn umth_font_load((2) path: str, (1) size: real, (0) filter: uint32) 
@@ -839,6 +853,9 @@ void _th_umka_bind(void *umka) {
 
 	// particles
 	umkaAddFunc(umka, "umth_particles_draw", &umth_particles_draw);
+
+	// placeholders
+	umkaAddFunc(umka, "umth_placeholder_fetch", &umth_placeholder_fetch);
 
 	// tilemaps
 	umkaAddFunc(umka, "umth_tilemap_draw", &umth_tilemap_draw);

@@ -12,15 +12,13 @@ UMKA_MODULES = umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um 
 IMAGES_MOD = umka/placeholders.um
 IMAGES = etc/test.ff etc/icon.ff
 
-$(IMAGES_MOD): $(IMAGES) $(HELPER_SCRIPT) $(UMKA_BIN)
+$(EM_TARGET): $(UMKA_MODULES) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(UMKA_BIN) $(IMAGES)
 	@echo EM $@
-	$(UMKA_BIN) $(HELPER_SCRIPT) umimg etc/test.ff test etc/icon.ff icon > $@
-
-$(EM_TARGET): $(UMKA_MODULES) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(UMKA_BIN)
-	@echo EM $@
-	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_modulesrc $(UMKA_MODULES) > $(EM_TARGET)
+	@echo '#include "tophat.h"' > $(EM_TARGET)
+	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_modulesrc $(UMKA_MODULES) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(UMKA_MODULES:umka/%=%) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_misc LICENSE version >> $(EM_TARGET)
+	$(UMKA_BIN) $(HELPER_SCRIPT) placeholders $(IMAGES) >> $(EM_TARGET)
 
 %.o: %.c
 	@echo CC $@

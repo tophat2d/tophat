@@ -17,7 +17,6 @@ fn update*() {
 }
 
 fn drawBgRow*(xOffset: int, y: int, slice: int) {
-	/*
 	dims := bgTile.getDims()
 
 	for xOffset < 0 {
@@ -28,12 +27,11 @@ fn drawBgRow*(xOffset: int, y: int, slice: int) {
 	for x := -(xOffset % trunc(dims.x)); x <= window.w; x += trunc(dims.x) {
 		bgTile.draw(th.Transform{p: th.Vf2{x, y}, s: th.Vf2{1, 1}}, rowColor)
 	}
-	*/
 }
 
 fn draw*() {
-	/*for y := 0; y < window.h; y += 32 {
+	for y := 0; y < window.h; y += 32 {
 		x := (y/32/real(window.h/32)-0.5) * 2
 		drawBgRow(trunc(x*x*time*1000+y/32), y, y)
-	}*/
+	}
 }

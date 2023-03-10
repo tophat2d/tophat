@@ -69,7 +69,7 @@ fn onFrame(cctx, uctx: any) {
 		s: th.vf2f(s)})
 }
 
-fn init() {
+fn init*() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
 	

@@ -72,8 +72,9 @@ struct {
 }
 typedef phase;
 
-phase phases[256];
+phase *phases;
 size_t phases_len;
+size_t phases_cap;
 
 static void finalize_last_phase() {
 	if (phases_len > 0) {
@@ -82,9 +83,14 @@ static void finalize_last_phase() {
 }
 
 static phase *alloc_phase() {
-	if (phases_len >= 256) {
-		th_error("phase overflow");
-		return NULL;
+	assert(phases_len <= phases_cap && "flaw: len > cap");
+	if (phases_len == phases_cap) {
+		if (phases_cap == 0) {
+			phases_cap = 1;
+		} else {
+			phases_cap *= 2;
+		}
+		phases = realloc(phases, phases_cap*sizeof(phase));
 	}
 
 	return &phases[phases_len++];

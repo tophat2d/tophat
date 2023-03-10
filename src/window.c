@@ -11,8 +11,6 @@
 
 extern th_global *thg;
 
-static bool window_fullscreen = false;
-
 static int umth_frame_callback = 0;
 
 static void print_umka_error_and_quit() {
@@ -152,7 +150,7 @@ bool th_window_is_fullscreen() {
 }
 
 void th_window_set_fullscreen(bool fullscreen) {
-	if (window_fullscreen != fullscreen) {
+	if (sapp_is_fullscreen() != fullscreen) {
 		sapp_toggle_fullscreen();
 	}
 }
