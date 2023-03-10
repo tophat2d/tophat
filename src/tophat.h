@@ -3,7 +3,8 @@
 
 #ifdef _WIN32
 #include <windows.h>
-#else
+#define _CRT_SECURE_NO_WARNINGS
+#elif defined(__linux__)
 #include <X11/Xlib.h>
 #endif
 

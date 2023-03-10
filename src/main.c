@@ -30,7 +30,7 @@ static int th_main(int argc, char *argv[]) {
 
 	thg->umka = umkaAlloc();
 	int umkaOK;
-	strcpy(thg->respath, "");
+	strncpy(thg->respath, "", sizeof thg->respath);
 	const char *scriptpath = "main.um";
 	bool check = false;
 	bool prof = false;
@@ -79,7 +79,7 @@ static int th_main(int argc, char *argv[]) {
 				return 1;
 			}
 
-			strcpy(thg->respath, argv[argOffset+1]);
+			strncpy(thg->respath, argv[argOffset+1], sizeof thg->respath);
 			argOffset += 2;
 		} else if (strcmp(argv[argOffset], "help") == 0) {
 			printf(

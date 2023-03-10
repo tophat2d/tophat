@@ -1,6 +1,7 @@
 -Ilib/miniaudio
 -Ilib/glad
 -Ilib/stb
+-Ilib/umprof
 -Ilib/umka/src
 -Ilib/rawdraw
 -Ilib/chew
