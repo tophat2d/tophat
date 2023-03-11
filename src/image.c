@@ -8,6 +8,7 @@
 #include <sokol_gfx.h>
 
 #include "tophat.h"
+#include "umka_api.h"
 #ifdef __EMSCRIPTEN__
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
@@ -67,6 +68,45 @@ uint32_t *th_image_get_data(th_image *img) {
 	return data;
 }
 
+static void assert_image(th_image *img) {
+	sg_resource_state creation_status = sg_query_image_state(img->tex);
+	if (creation_status != SG_RESOURCESTATE_VALID) {
+		assert(creation_status != SG_RESOURCESTATE_INVALID && "gen_tex: INVALID");
+		assert(creation_status != SG_RESOURCESTATE_FAILED && "gen_tex: FAILED");
+		assert(false && "gen_tex: Unknown error");
+	}
+}
+
+th_image *th_image_create_render_target(int width, int height) {
+	th_image *img = th_image_alloc();
+  sg_image_desc img_desc = {
+    .render_target = true,
+    .width = width,
+    .height = height,
+    .mag_filter = SG_FILTER_NEAREST,
+		.min_filter = SG_FILTER_NEAREST,
+		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+    .pixel_format = SG_PIXELFORMAT_RGBA8,
+    .sample_count = 1,
+	};
+
+	img->dm.w = width;
+	img->dm.h = height;
+	img->channels = 4;
+	img->filter = SG_FILTER_NEAREST;
+	img->crop = (th_quad){
+		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
+		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
+	img->flipv = 0;
+	img->fliph = 0;
+	img->tex = sg_make_image(&img_desc);
+
+	assert_image(img);
+	return img;
+}
+
 static void gen_tex(th_image *img, uint32_t *data) {
 	img->tex = sg_make_image(&(sg_image_desc){
 		.width = img->dm.w,
@@ -84,12 +124,7 @@ static void gen_tex(th_image *img, uint32_t *data) {
 		.usage = SG_USAGE_IMMUTABLE
 	});
 
-	sg_resource_state creation_status = sg_query_image_state(img->tex);
-	if (creation_status != SG_RESOURCESTATE_VALID) {
-		assert(creation_status != SG_RESOURCESTATE_INVALID && "gen_tex: INVALID");
-		assert(creation_status != SG_RESOURCESTATE_FAILED && "gen_tex: FAILED");
-		assert(false && "gen_tex: Unknown error");
-	}
+	assert_image(img);
 }
 
 th_image *th_load_image(char *path) {

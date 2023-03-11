@@ -21,7 +21,8 @@ fn pixelsplit(inp: uint32): (uint8, uint8, uint8, uint8) {
 fn pixelmerge(r, g, b, a: uint8): uint32 { return r << 24 | g << 16 | b << 8 | a }
 
 var (
-	img, img2, target: image.Image
+	img, img2: image.Image
+	target: image.RenderTarget
 )
 
 fn init*() {
@@ -44,7 +45,7 @@ fn init*() {
 	//img2 := image.mk(data, dm)
 	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
 
-	target = image.mk(make([]uint32, 10 * 10), th.Vf2{10, 10})
+	target = image.createRenderTarget(th.Vf2{10, 10})
 
 	window.onFrame.register(signal.Callback{
 		p := th.Vf2{1, 1}
@@ -95,13 +96,14 @@ fn init*() {
 		canvas.drawText("render target:", p, th.black, 2)
 		p.y += 12
 
-		target.makeRenderTarget()
+		target.begin()
 			canvas.drawLine(0xff, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
 			img.draw(th.Transform{
 				s: th.Vf2{0.5, 0.5},
 				p: th.Vf2{0, 0}})
-		target.removeRenderTarget(window.wp)
-		target.draw(th.Transform{s: th.Vf2{10, 10}, p: p})
+		target.end(window.wp)
+
+		target.toImage().draw(th.Transform{s: th.Vf2{10, 10}, p: p})
 
 		if input.isJustPressedc('Q') { exit() }
 	}, null)

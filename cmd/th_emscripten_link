@@ -27,6 +27,7 @@ emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
 	-s STACK_SIZE=2MB \
 	-lc \
 	-lm \
+	-s MINIFY_HTML=0 \
 	--shell-file=$TH_DIR/shell.html \
 	$FILES \
 	-o wasm-out/index.html

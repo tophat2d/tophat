@@ -291,14 +291,14 @@ void umth_image_get_data(UmkaStackSlot *p, UmkaStackSlot *r) {
 	free(data);
 }
 
-void umth_image_make_render_target(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umth_image_render_target_begin(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = p[0].ptrVal;
 	if (!img) return;
 
 	th_image_set_as_render_target(img);
 }
 
-void umth_image_remove_render_target(UmkaStackSlot *p, UmkaStackSlot *r) {
+void umth_image_render_target_end(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = p[1].ptrVal;
 	th_vf2 wp = *(th_vf2 *)&p[0];
 
@@ -374,6 +374,16 @@ void umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r) {
     src.y = outer.y;
     dst.y = dest.y;
   }
+}
+
+void umth_image_create_render_target(UmkaStackSlot *p, UmkaStackSlot *r) {
+	int height = p[0].intVal;
+	int width = p[1].intVal;
+	r->ptrVal = th_image_create_render_target(height, width);
+}
+
+void umth_image_render_target_to_image(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->ptrVal = p[0].ptrVal;
 }
 
 ///////////////////////
@@ -875,13 +885,15 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_image_set_filter", &umth_image_set_filter);
 	umkaAddFunc(umka, "umth_image_update_data", &umth_image_update_data);
 	umkaAddFunc(umka, "umth_image_get_data", &umth_image_get_data);
-	umkaAddFunc(umka, "umth_image_make_render_target",
-		&umth_image_make_render_target);
-	umkaAddFunc(umka, "umth_image_remove_render_target",
-		&umth_image_remove_render_target);
+	umkaAddFunc(umka, "umth_image_render_target_begin",
+		&umth_image_render_target_begin);
+	umkaAddFunc(umka, "umth_image_render_target_end",
+		&umth_image_render_target_end);
 	umkaAddFunc(umka, "umth_image_draw", &umth_image_draw);
 	umkaAddFunc(umka, "umth_image_draw_on_quad", &umth_image_draw_on_quad);
 	umkaAddFunc(umka, "umth_image_draw_nine_patch", &umth_image_draw_nine_patch);
+	umkaAddFunc(umka, "umth_image_create_render_target", &umth_image_create_render_target);
+	umkaAddFunc(umka, "umth_image_render_target_to_image", &umth_image_render_target_to_image);
 
 	// input
 	umkaAddFunc(umka, "umth_input_get_mouse", &umth_input_get_mouse);

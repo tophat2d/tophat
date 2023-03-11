@@ -10,6 +10,30 @@ import (
 type Image* = struct{ _: ^struct{} }
 //~~
 
+//~~opaque RenderTarget
+// An image you can render to
+type RenderTarget* = struct { _: ^struct{} }
+//~~
+
+fn umth_image_create_render_target(width: int, height: int): RenderTarget
+fn createRenderTarget*(size: th.Vf2): RenderTarget {
+	return umth_image_create_render_target(trunc(size.x), trunc(size.y))
+}
+
+fn umth_image_render_target_begin(rt: RenderTarget)
+fn (rt: ^RenderTarget) begin*() {
+	umth_image_render_target_begin(rt^)
+}
+
+fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2)
+fn (rt: ^RenderTarget) end*(wp: th.Vf2) {
+	umth_image_render_target_end(rt^, wp)
+}
+
+fn umth_image_render_target_to_image(rt: RenderTarget): Image
+fn (rt: ^RenderTarget) toImage*(): Image {
+	return umth_image_render_target_to_image(rt^)
+}
 
 fn umth_image_load(ret: ^Image, path: str)
 //~~fn load
@@ -181,24 +205,4 @@ fn (i: ^Image) getData*(): []uint32 {
 	umth_image_get_data(i^, &buf[0])
 
 	return buf
-}
-
-fn umth_image_make_render_target(img: Image)
-//~~fn Image.makeRenderTarget
-// Sets the image a the render target. This means stuff won't be drawn onto the
-// screen, but into the image. In this mode, the scaling is always 1. An the
-// resolution of the screen are the image's dimensions.
-fn (i: ^Image) makeRenderTarget*() {
-//~~
-	umth_image_make_render_target(i^)
-}
-
-fn umth_image_remove_render_target(img: Image, wp: th.Vf2)
-//~~fn Image.removeRenderTarget
-// Returns to rendering onto the screen.
-// `wp`
-// : viewport to be set
-fn (i: ^Image) removeRenderTarget*(wp: th.Vf2) {
-//~~
-	umth_image_remove_render_target(i^, wp)
 }
