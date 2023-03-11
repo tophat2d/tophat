@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #ifdef __EMSCRIPTEN__
 # include "shader-web.glsl.h"
