@@ -20,6 +20,7 @@ endif
 
 CFLAGS ?= -g -pipe
 CFLAGS += -Ilib/stb/ \
+		-Isrc \
 	  -Ilib/miniaudio/ \
 	  -Ilib/umprof/ \
 		-Ilib/sokol/
