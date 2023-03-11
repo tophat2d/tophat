@@ -8,7 +8,7 @@ set run=%umka% cmd\buildhelper.um
 set images=etc/test.ff etc/icon.ff
 
 echo. > %em_target%
-echo #include ^<tophat.h^> > %em_target%
+echo #include "tophat.h" > %em_target%
 %run% em th_em_modulesrc %modules% >> %em_target%
 %run% argarr th_em_modulenames %module_names% >> %em_target%
 %run% em th_em_misc LICENSE version >> %em_target%

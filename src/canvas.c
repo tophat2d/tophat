@@ -3,6 +3,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <assert.h>
+#include <stdlib.h>
 
 #ifdef __EMSCRIPTEN__
 # include "shader-web.glsl.h"
@@ -48,7 +49,7 @@ static sg_buffer alloc_buffer() {
 		.type = SG_BUFFERTYPE_VERTEXBUFFER,
 		.usage = SG_USAGE_STREAM
 	});
-	
+
 	buffer_cache.current_buffer++;
 	buffer_cache.buffers[buffer_cache.buffers_count++] = new_buffer;
 	return new_buffer;
