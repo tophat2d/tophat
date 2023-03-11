@@ -48,7 +48,8 @@ static sg_buffer alloc_buffer() {
 		.type = SG_BUFFERTYPE_VERTEXBUFFER,
 		.usage = SG_USAGE_STREAM
 	});
-
+	
+	buffer_cache.current_buffer++;
 	buffer_cache.buffers[buffer_cache.buffers_count++] = new_buffer;
 	return new_buffer;
 }
@@ -178,6 +179,8 @@ void th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n) {
 		// if buffer is too small
 		th_canvas_flush();
 	}
+
+	th_canvas_batch_push(array, n);
 }
 
 static th_image white_img;
@@ -228,6 +231,7 @@ void th_canvas_end_frame() {
 
 void th_canvas_flush() {
 	sg_buffer buf = alloc_buffer();
+	fprintf(stderr, "Buffer ID: %u\n", buf.id);
 	sg_update_buffer(buf, &SG_RANGE(thg->canvas_batch));
 	thg->canvas_bind.vertex_buffers[0] = buf;
 	finalize_last_phase();

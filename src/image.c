@@ -223,7 +223,6 @@ void th_image_set_as_render_target(th_image *img) {
 	
 	th_canvas_flush();
 	sg_end_pass();
-
 	sg_begin_pass(sg_make_pass(&(sg_pass_desc){
 		.color_attachments[0].image = img->tex,
 		.depth_stencil_attachment.image = img->tex,
