@@ -137,7 +137,7 @@ sapp_desc th_window_sapp_desc() {
 
 void th_window_setup(char *name, int w, int h) {
 	sapp_set_window_title(name);
-	th_window_set_dims((th_vf2){w, h});
+	th_window_set_dims((th_vf2){{w, h}});
 }
 
 void th_window_get_dimensions(int *w, int *h) {

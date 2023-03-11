@@ -43,7 +43,7 @@ void th_input_repeated(int keycode, int bDown) {
 }
 
 void th_input_cycle() {
-	thg->mouse_wheel = (th_vf2){0, 0};
+	thg->mouse_wheel = (th_vf2){{0, 0}};
 	*thg->input_string = 0;
 	thg->input_string_len = 0;
 	memset(thg->just_pressed, 0, 512 * sizeof(uu));
