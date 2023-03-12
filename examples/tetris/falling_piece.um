@@ -200,7 +200,7 @@ fn update*() {
 		}
 	}
 
-	if (input.isJustPressedc('X')) {
+	if (input.isJustPressedc('X') || input.isJustPressed(input.key_up)) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
 		rotateClockwise()

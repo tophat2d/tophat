@@ -194,6 +194,7 @@ void th_canvas_init() {
 		th_error("shader is null!");
 	}
 	sg_shader shd = sg_make_shader(shd_desc);
+	thg->main_shader = shd;
 	thg->canvas_pip = sg_make_pipeline(&(sg_pipeline_desc){
 		.shader = shd,
 		.layout = {

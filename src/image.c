@@ -38,6 +38,19 @@ th_image *th_image_alloc() {
 	return umkaAllocData(thg->umka, sizeof(th_image), th_image_free_umka);
 }
 
+static void th_image_free_render_target(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_render_target *t = p[0].ptrVal;
+	sg_destroy_pass(t->pass);
+	sg_destroy_image(t->depth);
+	th_image_free(t->image);
+}
+
+th_render_target *th_render_target_alloc() {
+	th_render_target *t = umkaAllocData(thg->umka, sizeof(th_render_target), th_image_free_render_target);
+	t->image = calloc(sizeof(th_image), 1);
+	return t;
+}
+
 uint32_t *th_image_get_data(th_image *img) {
 	size_t size = sizeof(uint32_t) * img->dm.w * img->dm.h;
 	uint32_t *data = malloc(size);
@@ -77,34 +90,44 @@ static void assert_image(th_image *img) {
 	}
 }
 
-th_image *th_image_create_render_target(int width, int height) {
-	th_image *img = th_image_alloc();
+th_render_target *th_image_create_render_target(int width, int height) {
+	th_render_target *t = th_render_target_alloc();
+
   sg_image_desc img_desc = {
     .render_target = true,
     .width = width,
     .height = height,
+    .pixel_format = SG_PIXELFORMAT_RGBA8,
     .mag_filter = SG_FILTER_NEAREST,
 		.min_filter = SG_FILTER_NEAREST,
 		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
-    .pixel_format = SG_PIXELFORMAT_RGBA8,
     .sample_count = 1,
 	};
 
-	img->dm.w = width;
-	img->dm.h = height;
-	img->channels = 4;
-	img->filter = SG_FILTER_NEAREST;
-	img->crop = (th_quad){
+	t->image->dm.w = width;
+	t->image->dm.h = height;
+	t->image->channels = 4;
+	t->image->filter = SG_FILTER_NEAREST;
+	t->image->crop = (th_quad){
 		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
 		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
-	img->flipv = 0;
-	img->fliph = 0;
-	img->tex = sg_make_image(&img_desc);
+	t->image->flipv = 0;
+	t->image->fliph = 1;
+	t->image->tex = sg_make_image(&img_desc);
+	assert_image(t->image);
 
-	assert_image(img);
-	return img;
+	img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
+	t->depth = sg_make_image(&img_desc);
+
+	t->pass = sg_make_pass(&(sg_pass_desc){
+		.color_attachments[0].image = t->image->tex,
+		.depth_stencil_attachment.image = t->depth,
+		.label = "offscreen-pass"
+	});
+
+	return t;
 }
 
 static void gen_tex(th_image *img, uint32_t *data) {
@@ -238,7 +261,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		SWAP(bounds.tl, bounds.tr);
 		SWAP(bounds.bl, bounds.br);
 	}
-	
+
 	float verts[] = {
 		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
 		q.tr.x / sw, q.tr.y / sh, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,
@@ -253,7 +276,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	th_canvas_batch_push_auto_flush(img, verts, sizeof(verts) / sizeof(verts[0]));
 }
 
-void th_image_set_as_render_target(th_image *img) {
+void th_image_set_as_render_target(th_render_target *t) {
 	if (thg->has_render_target) {
 		th_error("There already is a render target set!");
 		return;
@@ -261,18 +284,17 @@ void th_image_set_as_render_target(th_image *img) {
 	
 	th_canvas_flush();
 	sg_end_pass();
-	sg_begin_pass(sg_make_pass(&(sg_pass_desc){
-		.color_attachments[0].image = img->tex,
-		.depth_stencil_attachment.image = img->tex,
-		.label = "offscreen-pass"
-	}), &thg->pass_action);
-	
+
+	sg_begin_pass(t->pass, &thg->offscreen_pass_action);
+	sg_apply_pipeline(thg->image_pip);
+
 	thg->has_render_target = true;
 	
-	th_calculate_scaling(img->dm.w, img->dm.y);
+	th_calculate_scaling(t->image->dm.w, t->image->dm.y);
 }
 
-void th_image_remove_render_target(th_image *img, th_vf2 wp) {
+
+void th_image_remove_render_target(th_render_target *t, th_vf2 wp) {
 	if (!thg->has_render_target) {
 		th_error("No render target is set.");
 		return;
@@ -282,6 +304,7 @@ void th_image_remove_render_target(th_image *img, th_vf2 wp) {
 	sg_end_pass();
 	
 	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
+	sg_apply_pipeline(thg->canvas_pip);
 
 	th_calculate_scaling(wp.x, wp.y);
 	
@@ -289,7 +312,36 @@ void th_image_remove_render_target(th_image *img, th_vf2 wp) {
 }
 
 void th_image_init() {
-	// TODO
+	thg->offscreen_pass_action = (sg_pass_action) {
+		.colors[0] = { .action = SG_ACTION_CLEAR, .value = {0, 0, 0, 0} }
+	};
+	thg->image_pip = sg_make_pipeline(&(sg_pipeline_desc){
+		.shader = thg->main_shader,
+		.layout = {
+			.attrs = {
+				[0].format = SG_VERTEXFORMAT_FLOAT2, // X, Y
+				[1].format = SG_VERTEXFORMAT_FLOAT2, // U, V
+				[2].format = SG_VERTEXFORMAT_FLOAT4  // R, G, B, A
+			}
+		},
+		.depth = {
+			.pixel_format = SG_PIXELFORMAT_DEPTH,
+			.compare = SG_COMPAREFUNC_LESS_EQUAL,
+			.write_enabled = true,
+		},
+		.colors[0].blend = {
+			.enabled = true,
+			.src_factor_alpha = SG_BLENDFACTOR_ONE,
+			.dst_factor_alpha = SG_BLENDFACTOR_ZERO,
+			.op_alpha = SG_BLENDOP_ADD,
+			.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+			.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+			.op_rgb = SG_BLENDOP_ADD,
+		},
+		.label = "image-pip"
+	});
+
+	return;
 }
 
 void th_image_deinit() {

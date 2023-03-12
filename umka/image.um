@@ -15,9 +15,11 @@ type Image* = struct{ _: ^struct{} }
 type RenderTarget* = struct { _: ^struct{} }
 //~~
 
-fn umth_image_create_render_target(width: int, height: int): RenderTarget
+fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int)
 fn createRenderTarget*(size: th.Vf2): RenderTarget {
-	return umth_image_create_render_target(trunc(size.x), trunc(size.y))
+	rt := RenderTarget{}
+	umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y))
+	return rt
 }
 
 fn umth_image_render_target_begin(rt: RenderTarget)
@@ -30,9 +32,11 @@ fn (rt: ^RenderTarget) end*(wp: th.Vf2) {
 	umth_image_render_target_end(rt^, wp)
 }
 
-fn umth_image_render_target_to_image(rt: RenderTarget): Image
+fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
 fn (rt: ^RenderTarget) toImage*(): Image {
-	return umth_image_render_target_to_image(rt^)
+	img := Image{}
+	umth_image_render_target_to_image(&img, rt^)
+	return img
 }
 
 fn umth_image_load(ret: ^Image, path: str)

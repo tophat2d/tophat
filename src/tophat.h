@@ -67,6 +67,12 @@ typedef struct {
 } th_image;
 
 typedef struct {
+	sg_pass pass;
+	sg_image depth;
+	th_image *image;
+} th_render_target;
+
+typedef struct {
 	ma_sound inst;
 } th_sound;
 
@@ -200,10 +206,15 @@ typedef struct {
 	float canvas_batch[BATCH_LENGTH];
 	uu canvas_batch_size;
 
+	sg_shader main_shader;
+
 	sg_pass_action pass_action;
 	sg_bindings canvas_bind;
 	sg_pipeline canvas_pip;
 	th_image *canvas_image;
+
+	sg_pass_action offscreen_pass_action;
+	sg_pipeline image_pip;
 	
 	bool has_render_target;
 
@@ -320,9 +331,9 @@ th_image *th_image_alloc();
 void th_image_init();
 void th_image_deinit();
 
-th_image *th_image_create_render_target(int width, int height);
-void th_image_set_as_render_target(th_image *img);
-void th_image_remove_render_target(th_image *img, th_vf2 wp);
+th_render_target *th_image_create_render_target(int width, int height);
+void th_image_set_as_render_target(th_render_target *t);
+void th_image_remove_render_target(th_render_target *t, th_vf2 wp);
 
 // input
 void th_input_key(int keycode, int bDown);

@@ -292,17 +292,17 @@ void umth_image_get_data(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umth_image_render_target_begin(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = p[0].ptrVal;
-	if (!img) return;
+	th_render_target *t = p[0].ptrVal;
+	if (!t) return;
 
-	th_image_set_as_render_target(img);
+	th_image_set_as_render_target(t);
 }
 
 void umth_image_render_target_end(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = p[1].ptrVal;
+	th_image *t = p[1].ptrVal;
 	th_vf2 wp = *(th_vf2 *)&p[0];
 
-	th_image_remove_render_target(img, wp);
+	th_image_remove_render_target(t, wp);
 }
 
 void umth_image_draw(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -377,13 +377,17 @@ void umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umth_image_create_render_target(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_render_target **result = p[2].ptrVal;
 	int height = p[0].intVal;
 	int width = p[1].intVal;
-	r->ptrVal = th_image_create_render_target(height, width);
+
+	*result = th_image_create_render_target(width, height);
 }
 
 void umth_image_render_target_to_image(UmkaStackSlot *p, UmkaStackSlot *r) {
-	r->ptrVal = p[0].ptrVal;
+	th_image **result = p[1].ptrVal;
+
+	*result = ((th_render_target*)p[0].ptrVal)->image;
 }
 
 ///////////////////////
