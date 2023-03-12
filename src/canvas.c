@@ -232,7 +232,6 @@ void th_canvas_end_frame() {
 
 void th_canvas_flush() {
 	sg_buffer buf = alloc_buffer();
-	fprintf(stderr, "Buffer ID: %u\n", buf.id);
 	sg_update_buffer(buf, &SG_RANGE(thg->canvas_batch));
 	thg->canvas_bind.vertex_buffers[0] = buf;
 	finalize_last_phase();

@@ -28,6 +28,7 @@ emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
 	-lc \
 	-lm \
 	-s MINIFY_HTML=0 \
+	-s EXPORTED_FUNCTIONS="['_malloc', '_free', '_main']" \
 	--shell-file=$TH_DIR/shell.html \
 	$FILES \
 	-o wasm-out/index.html

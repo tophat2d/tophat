@@ -238,7 +238,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		SWAP(bounds.tl, bounds.tr);
 		SWAP(bounds.bl, bounds.br);
 	}
-
+	
 	float verts[] = {
 		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
 		q.tr.x / sw, q.tr.y / sh, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,

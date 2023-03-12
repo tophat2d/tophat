@@ -33,10 +33,6 @@
       var spinnerElement = document.getElementById('spinner');
 
       var Module = {
-        preRun: [() => {
-            Module["_malloc"] = Module["asm"]["malloc"]
-            Module["_free"] = Module["asm"]["free"]
-        }],
         postRun: [],
         print: (function() {
           return function(text) {
