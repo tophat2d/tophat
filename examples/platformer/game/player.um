@@ -9,7 +9,6 @@ import (
 	"image.um"
 	"input.um"
 	"canvas.um"
-	"shader.um"
 	"signal.um"
 	"window.um"
 	"tilemap.um"
@@ -52,7 +51,7 @@ fn move() {
 		plYMotion += gravity * th.delta
 	}
 
-	if input.isJustPressed(' ') && canJump {
+	if input.isJustPressedc(' ') && canJump {
 		body.t.p.y -= 1
 		plYMotion = jumpForce
 		canJump = false

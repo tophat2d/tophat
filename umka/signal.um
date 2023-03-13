@@ -60,8 +60,19 @@ fn (this: ^Signal) emit*(ctx: any) {
 	}
 }
 
+//~~fn Signal.clear
+// Removes all signal handlers.
+fn (this: ^Signal) clear*() {
+//~~
+	ks := keys(this^)
+
+	for i, k in ks {
+		this ^= delete(this^, k)
+	}
+}
+
 //~~fn register
-// Registers a callback to a global signal.  There is no need to explicitely
+// Registers a callback to a global signal.  There is no need to explicitly
 // create global signals.  Returns id of the added callback
 fn register*(name: str, callback: Callback, uctx: any): Id {
 //~~
@@ -79,6 +90,13 @@ fn remove*(name: str, id: Id) {
 	signals[name].remove(id)
 }
 
+//~~fn remove
+// Removes all signal handlers from a global signal.
+fn clear*(name: str) {
+//~~
+	signals[name].clear()
+}
+
 //~~fn emit
 // Calls all callbacks associated with the passed global signal name.
 fn emit*(name: str, ctx: any) {
@@ -89,4 +107,5 @@ fn emit*(name: str, ctx: any) {
 
 	signals[name].emit(ctx)
 }
+
 

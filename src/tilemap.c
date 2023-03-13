@@ -4,7 +4,6 @@
 #include <stdio.h>
 
 #include "tophat.h"
-#include "openglapi.h"
 
 extern th_global *thg;
 

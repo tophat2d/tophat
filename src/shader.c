@@ -1,7 +1,6 @@
 #include <string.h>
 #include <stdlib.h>
 
-#include "openglapi.h"
 #include "tophat.h"
 
 extern th_global *thg;
@@ -9,6 +8,7 @@ extern th_global *thg;
 int th_shader_compile(
 	char *vertf, char *fragf, char *vertb, char *fragb,
 	const char **verta, int vertac) {
+	/*
 
 	char *vert = calloc(1, strlen(vertf) + strlen(vertb) + 1);
 	if (!vert)
@@ -29,12 +29,13 @@ int th_shader_compile(
 	free(vert);
 	free(frag);
 
-	return thg->shader_count;
+	return thg->shader_count;*/
+	return 0;
 }
 
 void th_shader_deinit() {
-	for (int i=0; i < thg->shader_count; i++)
+	/*for (int i=0; i < thg->shader_count; i++)
 		th_gl_free_prog(thg->shaders[i]);
 
-	free(thg->shaders);
+	free(thg->shaders);*/
 }

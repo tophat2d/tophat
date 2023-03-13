@@ -1,73 +1,263 @@
 #include "tophat.h"
-#include "openglapi.h"
 #include <string.h>
 #include <math.h>
+#include <stdio.h>
+#include <assert.h>
+#include <stdlib.h>
+
+#ifdef __EMSCRIPTEN__
+# include "shader-web.glsl.h"
+#else
+# include "shader.glsl.h"
+#endif
+
 #include "pixelfont.h"
 
 extern th_global *thg;
 
-int th_canvas_compile_shader(char *frag, char *vert) {
-	const char *attribs[] = { "th_pos", "th_color" };
-	return th_shader_compile(frag, vert,
-		"attribute vec2 th_pos;\n"
-		"attribute vec4 th_color;\n"
-		"varying vec4 th_vcolor;\n"
+struct {
+	sg_buffer *buffers;
+	size_t buffers_count;
+	size_t buffers_cap;
+	size_t current_buffer; 	
+	size_t starting_buffer; // buffer to start flush at
+}
+typedef buffer_cache_t;
 
-		"vec2 th_vertex(vec2 vert);\n"
+buffer_cache_t buffer_cache;
 
-		"void main() {\n"
-		"  gl_Position = vec4(th_vertex(th_pos), 0, 1.0);\n"
-		"  th_vcolor = th_color;\n"
-		"}\n",
+static sg_buffer alloc_buffer() {
+	// 1: check if we already have a cached buffer
+	if (buffer_cache.current_buffer < buffer_cache.buffers_count) {
+		return buffer_cache.buffers[buffer_cache.current_buffer++];
+	}
 
-		"varying vec4 th_vcolor;\n"
+	// 2: check if we need to resize the buffers array
+	assert(buffer_cache.buffers_count <= buffer_cache.buffers_cap && "flaw: count > cap");
+	if (buffer_cache.buffers_cap == buffer_cache.buffers_count) {
+		if (buffer_cache.buffers_cap == 0) {
+			buffer_cache.buffers_cap = 1;
+		} else {
+			buffer_cache.buffers_cap *= 2;
+		}
+		buffer_cache.buffers = realloc(buffer_cache.buffers, buffer_cache.buffers_cap*sizeof(sg_buffer));
+	}
 
-		"vec4 th_fragment(vec4 color);\n"
+	// 3: alloc a new buffer
+	sg_buffer new_buffer = sg_make_buffer(&(sg_buffer_desc){
+		.size = sizeof(thg->canvas_batch),
+		.type = SG_BUFFERTYPE_VERTEXBUFFER,
+		.usage = SG_USAGE_STREAM
+	});
 
-		"void main() {\n"
-		"  gl_FragColor = th_fragment(th_vcolor);\n"
-		"}\n", attribs, 2);
+	buffer_cache.current_buffer++;
+	buffer_cache.buffers[buffer_cache.buffers_count++] = new_buffer;
+	return new_buffer;
 }
 
+static void buffer_cache_reset() {
+	buffer_cache.current_buffer = 0;
+	buffer_cache.starting_buffer = 0;
+}
+
+enum {
+	SCISSOR_NONE,
+	SCISSOR_START,
+	SCISSOR_END
+};
+
+struct {
+	int scissor_stage;
+	th_rect scissor_rect;
+	size_t start, end;
+	th_image *img;
+}
+typedef phase;
+
+phase *phases;
+size_t phases_len;
+size_t phases_cap;
+
+static void finalize_last_phase() {
+	if (phases_len > 0) {
+		phases[phases_len-1].end = thg->canvas_batch_size;
+	}
+}
+
+static phase *alloc_phase() {
+	assert(phases_len <= phases_cap && "flaw: len > cap");
+	if (phases_len == phases_cap) {
+		if (phases_cap == 0) {
+			phases_cap = 1;
+		} else {
+			phases_cap *= 2;
+		}
+		phases = realloc(phases, phases_cap*sizeof(phase));
+	}
+
+	return &phases[phases_len++];
+}
+
+static void push_phase(phase phs) {
+	size_t start = 0;
+	if (phases_len > 0) {
+		if (phases[phases_len-1].scissor_stage == SCISSOR_NONE) {
+			phases[phases_len-1].end = thg->canvas_batch_size;
+			if (phs.scissor_stage == SCISSOR_NONE && phases[phases_len-1].img == phs.img) {
+				return;
+			}
+		}
+		start = phases[phases_len-1].end;
+	}
+
+	phs.start = start;
+	phs.end = thg->canvas_batch_size;
+	phase *p = alloc_phase();
+	if (p) {
+		*p = phs;
+	}
+}
+
+void th_canvas_begin_scissor_rect(th_rect rect) {
+	// prevent invalid value in sokol
+	if (rect.w < 0) rect.w = 0;
+	if (rect.h < 0) rect.h = 0;
+
+	rect.x *= thg->scaling;
+	rect.y *= thg->scaling;
+	rect.w *= thg->scaling;
+	rect.h *= thg->scaling;
+
+	rect.x += thg->offset.x;
+	rect.y += thg->offset.y;
+
+	push_phase((phase){
+		.scissor_stage = SCISSOR_START,
+		.scissor_rect = rect
+	});
+}
+
+void th_canvas_end_scissor() {
+	push_phase((phase){
+		.scissor_stage = SCISSOR_END
+	});
+}
+
+static void push_image_phase(th_image *img) {
+	push_phase((phase){
+		.img = img
+	});
+}
+
+// pushes the vertices onto the batch
+bool th_canvas_batch_push(float *array, size_t n) {
+	if (n % BATCH_UNIT != 0) {
+		// trying to push partial units (triangles), not allowed
+		th_error("odd unit size");
+		return false;
+	}
+
+	if ((thg->canvas_batch_size + n) >= BATCH_LENGTH) {
+		// not enough space
+		return false;
+	}
+
+	memcpy(thg->canvas_batch+thg->canvas_batch_size, array, n * sizeof(float));
+	thg->canvas_batch_size += n;
+
+	return true;
+}
+
+void th_canvas_use_image(th_image *img) {
+}
+
+// same as th_canvas_batch_push except automatically flushes the buffer if needed
+void th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n) {
+	push_image_phase(img);
+	thg->canvas_image = img;
+
+	if (!th_canvas_batch_push(array, n)) { 
+		// if buffer is too small
+		th_canvas_flush();
+	}
+
+	th_canvas_batch_push(array, n);
+}
+
+static th_image white_img;
+
 void th_canvas_init() {
-	thg->canvas_prog = *th_get_shader_err(th_canvas_compile_shader(
-		"vec2 th_vertex(vec2 vert) { return vert; }\n",
-		"vec4 th_fragment(vec4 color) { return color; }\n"));
+	thg->canvas_bind = (sg_bindings){0};
 
-	glGenVertexArrays(1, &thg->canvas_vao);
-	glGenBuffers(1, &thg->canvas_vbo);
+	const sg_shader_desc *shd_desc = th_shader_desc(sg_query_backend());
+	if (shd_desc == NULL) {
+		th_error("shader is null!");
+	}
+	sg_shader shd = sg_make_shader(shd_desc);
+	thg->main_shader = shd;
+	thg->canvas_pip = sg_make_pipeline(&(sg_pipeline_desc){
+		.shader = shd,
+		.layout = {
+			.attrs = {
+				[0].format = SG_VERTEXFORMAT_FLOAT2, // X, Y
+				[1].format = SG_VERTEXFORMAT_FLOAT2, // U, V
+				[2].format = SG_VERTEXFORMAT_FLOAT4  // R, G, B, A
+			}
+		},
+		.colors[0].blend = {
+			.enabled = true,
+			.src_factor_alpha = SG_BLENDFACTOR_ONE,
+			.dst_factor_alpha = SG_BLENDFACTOR_ZERO,
+			.op_alpha = SG_BLENDOP_ADD,
+			.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+			.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+			.op_rgb = SG_BLENDOP_ADD,
+		},
+		.label = "canvas-pip"
+	});
 
-	glBindVertexArray(thg->canvas_vao);
+	uint32_t white = 0xffffffff;
+	th_image_from_data(&white_img, &white, (th_vf2){ .w = 1, .h = 1 });
 
-	glBindBuffer(GL_ARRAY_BUFFER, thg->canvas_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(thg->canvas_batch), thg->canvas_batch, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 6 * sizeof(float), NULL);
-	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void *)(2 * sizeof(float)));
+	thg->canvas_bind.fs_images[SLOT_tex] = white_img.tex;
+	thg->canvas_image = &white_img;
+}
 
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
+void th_canvas_deinit() {
+	th_image_free(&white_img);
+}
 
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
+void th_canvas_end_frame() {
+	buffer_cache_reset();
 }
 
 void th_canvas_flush() {
-	if (!thg->canvas_batch_size) return;
-	glBindBuffer(GL_ARRAY_BUFFER, thg->canvas_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER,
-		0, thg->canvas_batch_size * 3 * 6 * sizeof(float), thg->canvas_batch);
-
-	glUseProgram(thg->canvas_prog);
-	glBindVertexArray(thg->canvas_vao);
-	glDrawArrays(GL_TRIANGLES, 0, thg->canvas_batch_size * 3);
+	sg_buffer buf = alloc_buffer();
+	sg_update_buffer(buf, &SG_RANGE(thg->canvas_batch));
+	thg->canvas_bind.vertex_buffers[0] = buf;
+	finalize_last_phase();
+	for (size_t i = 0; i < phases_len; i++) {
+		phase *phs = &phases[i];
+		switch (phs->scissor_stage) {
+		case SCISSOR_NONE:
+			thg->canvas_bind.fs_images[SLOT_tex] = phs->img->tex;
+			sg_apply_bindings(&thg->canvas_bind);
+			sg_draw(phs->start/BATCH_VERTEX, (phs->end - phs->start)/BATCH_VERTEX, 1);
+			break;
+		case SCISSOR_START:
+			sg_apply_scissor_rectf(phs->scissor_rect.x, phs->scissor_rect.y, phs->scissor_rect.w, phs->scissor_rect.h, true);
+			break;
+		case SCISSOR_END:
+			sg_apply_scissor_rectf(0, 0, sapp_widthf(), sapp_heightf(), true);
+			break;
+		}
+	}
+	phases_len = 0;
+	// NOTE: (offset, no-vertices, no-instances)
 	thg->canvas_batch_size = 0;
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
 }
 
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
-	th_image_flush();
-
 	a.x *= thg->scaling;
 	a.y *= thg->scaling;
 	b.x *= thg->scaling;
@@ -79,27 +269,20 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	for (int i=0; i < 4; ++i)
 		colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
-	int sw, sh;
-	th_gl_get_viewport_max(&sw, &sh);
+	float sw = thg->target_size.x, sh = thg->target_size.y;
 
-	const float yoff = thg->has_framebuffer ? -1.0 : 1.0;
-	const float verts[] = {
-		(a.x + thg->offset.x) / sw - 1, (a.y + thg->offset.y) / sh + yoff,
-	 	(b.x + thg->offset.x) / sw - 1, (b.y + thg->offset.y) / sh + yoff,
-		(c.x + thg->offset.x) / sw - 1, (c.y + thg->offset.y) / sh + yoff,
+	float verts[] = {
+		(a.x + thg->offset.x) / sw, (a.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0, // NOTE: Temporarily uvs are zeroed out
+	 	(b.x + thg->offset.x) / sw, (b.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0,
+		(c.x + thg->offset.x) / sw, (c.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0
 	};
 
-	float *base = &thg->canvas_batch[thg->canvas_batch_size * 3 * 6];
-	for (int i=0; i < 3; ++i) {
-		memcpy(base, &verts[i * 2], sizeof(float) * 2);
-		base += 2;
-		memcpy(base, colors, sizeof(float) * 4);
-		base += 4;
+	for (int i = 0; i < 3; ++i) {
+		// +4 = color
+		memcpy(verts+(i*BATCH_VERTEX+4), colors, sizeof(float) * 4);
 	}
 
-	++thg->canvas_batch_size;
-	if (thg->canvas_batch_size >= BATCH_SIZE)
-		th_canvas_flush();
+	th_canvas_batch_push_auto_flush(&white_img, verts, sizeof verts / sizeof verts[0]);
 }
 
 void th_canvas_rect(uint32_t color, th_rect r) {

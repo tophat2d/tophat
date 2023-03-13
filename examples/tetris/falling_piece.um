@@ -200,20 +200,20 @@ fn update*() {
 		}
 	}
 
-	if (input.isJustPressed('x')) {
+	if (input.isJustPressedc('X') || input.isJustPressed(input.key_up)) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
 		rotateClockwise()
-	} else if (input.isJustPressed('z')) {
+	} else if (input.isJustPressedc('Z')) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
 		rotateCounterclockwise()
-	} else if (input.isJustPressed('c')) {
+	} else if (input.isJustPressedc('C')) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
 		rotate180()
 	}
-	if (input.isJustPressed(' ')) {
+	if (input.isJustPressedc(' ')) {
 		global.playSound(&global.audioPush)
 		push()	
 	}

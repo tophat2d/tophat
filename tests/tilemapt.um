@@ -7,12 +7,18 @@ import (
 	"canvas.um"
 	"window.um"
 	"tilemap.um"
+	"signal.um"
 )
 
-fn main() {
+var (
+	t: tilemap.Tilemap
+	cam: rect.Rect
+)
+
+fn init*() {
 	window.setup("title", 1280, 720)
 	window.setViewport(th.Vf2{192, 108})
-	cam := rect.mk(0, 0, 192, 108)
+	cam = rect.mk(0, 0, 192, 108)
 
 	atl := atlas.mk(image.load("etc/atlas.png"), th.Vf2{4, 4})
 	src := []th.uu{
@@ -23,7 +29,7 @@ fn main() {
 	w := 8
 	h := len(src) / w
 
-	t := tilemap.mk(make([]th.uu, w * h), w,
+	t = tilemap.mk(make([]th.uu, w * h), w,
 		atlas.mk(image.load("etc/atlas.png"), th.Vf2{4, 4}), 2)
 
 	cfg := make([]th.uu, 16)	
@@ -46,10 +52,9 @@ fn main() {
 
 	t.autotile(src, cfg, 1)
 
-	for window.cycle() {
+	window.onFrame.register(signal.Callback{
 		canvas.drawRect(th.white, cam)
 
 		t.draw(cam)	
-		canvas.drawText(repr(th.delta) + " " + repr(th.time), th.Vf2{0, 0}, th.black, 1)
-	}
+	}, null)
 }

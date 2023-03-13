@@ -5,26 +5,34 @@ import (
 	"input.um"
 	"canvas.um"
 	"window.um"
+	"signal.um"
 )
 
-fn main() {
+y := 200
+text := ""
+qcount := 0
+
+fn init*() {
 	window.setup("input test", 400, 400)
 
-	y := 200
-
-	for window.cycle() {
-		if input.isJustPressed(input.mouse_up) {
+	window.onFrame.register(signal.Callback{
+		/*if input.isJustPressed(input.mouse_up) {
 			y -= 5
 		}
 		if input.isJustPressed(input.mouse_down) {
 			y += 5
+		}*/
+
+		printf("lshift: %s %s %s\n",
+			repr(input.isPressed(input.key_left_shift)),
+			repr(input.isJustPressed(input.key_left_shift)),
+			repr(input.isJustReleased(input.key_left_shift)))
+
+		if input.isJustPressed(input.key_backspace) {
+			text = ""
 		}
 
-		if input.isJustPressed('r') {
-			printf("r was just pressed\n")
-		}
-
-		if input.isJustPressed('\'') {
+		if input.isJustPressedc('\'') {
 			printf("' was just pressed\n")
 		}
 
@@ -32,11 +40,15 @@ fn main() {
 			printf("key right was just pressed\n")
 		}
 
-		if input.isPressed('s') {
+		if input.isPressedRepeatc('q') {
+			qcount += 1
+		}
+
+		if input.isPressedc('S') {
 			printf("s is pressed\n")
 		}
 
-		if input.isJustReleased('t') {
+		if input.isJustReleasedc('T') {
 			printf("t was just released\n")
 		}
 
@@ -45,6 +57,11 @@ fn main() {
 			printf("input string: %s %s\n", input.getStr(), repr([]char(input.getStr())))
 		}
 
+		text = text + s
+
+		canvas.drawText(sprintf("%d", qcount), th.Vf2{5, 40}, th.black, 2);
+		canvas.drawText(text, th.Vf2{5, 20}, th.black, 2);
+		canvas.drawText(sprintf("%s", repr(input.getMouseScroll())), th.Vf2{5, 5}, th.black, 2);
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
-	}
+	}, text)
 }

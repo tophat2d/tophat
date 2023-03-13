@@ -1,0 +1,80 @@
+
+import (
+	"canvas.um"
+	"image.um"
+	"input.um"
+	"rect.um"
+	"signal.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+const (
+	modeRects = 0
+	modeHalf
+	modeOddEven
+)
+	
+rectCount := 20
+const rectSize = 12
+img := image.Image{}
+mode := modeRects
+
+fn init*() {
+	window.setup("th canvas stress test", 640, 480)
+
+	img = image.load("etc/test.png")
+
+	window.onFrame.register(signal.Callback{
+		p := th.Vf2{}
+
+		if input.isJustPressedc('1') { mode = 0 }
+		if input.isJustPressedc('2') { mode = 1 }
+		if input.isJustPressedc('3') { mode = 2 }
+
+		if input.isJustPressedc(' ') {
+			rectCount += 50
+		}
+
+		for i:=0; i < rectCount; i++ {
+			r := std.rand()
+
+			switch (mode) {
+			case modeRects:
+				canvas.drawRect(r, rect.mk(p.x, p.y, rectSize, rectSize))
+			case modeHalf:
+				if i < rectCount / 2 {
+					canvas.drawRect(r, rect.mk(p.x, p.y, rectSize, rectSize))
+				} else {
+					img.draw(th.Transform{
+						p: p,
+						s: th.vf2f(1) })
+				}
+			case modeOddEven:
+				if i % 2 == 0 {
+					canvas.drawRect(r, rect.mk(p.x, p.y, rectSize, rectSize))
+				} else {
+					img.draw(th.Transform{
+						p: p,
+						s: th.vf2f(1) })
+				}
+			}
+
+			p.x += rectSize / 2
+			if p.x >= window.wp.x {
+				p.x = 0
+				p.y += rectSize
+
+				if p.y >= window.wp.y {
+					p.y = 0
+				}
+			}
+		}
+
+		canvas.drawText(
+			sprintf("MODE: %d, RECTS: %d, TRIGS: %d, DELTA: %d, FPS: %f",
+				mode, rectCount, rectCount * 2, th.delta, 1000.0 / th.delta),
+			th.Vf2{ 1, window.wp.y - 12 }, th.black, 1.5)
+	}, null)
+}

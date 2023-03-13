@@ -3,16 +3,19 @@ import (
 	"rect.um"
 	"image.um"
 	"canvas.um"
+	"signal.um"
 	"window.um"
 )
 
-fn main() {
-	window.setup("my title", 400, 400)
+var (
+	img: image.Image
+)
+
+fn init*() {
+	img = image.load("etc/test.png")
 	window.setViewport(th.Vf2{192, 168})
 
-	img := image.load("etc/test.png")
-
-	for window.cycle() {
+	window.onFrame.register(signal.Callback{
 		canvas.drawRect(th.red, rect.mk(10, 10, 20, 5))
 		canvas.drawRect(0x0022ff88, rect.mk(10, 10, 10, 10))
 		canvas.drawLine(th.red, th.Vf2{10, 10}, th.Vf2{20, 20}, 1)
@@ -24,5 +27,5 @@ fn main() {
 				th.Vf2{106, 120}, th.Vf2{95, 110}})
 
 		img.draw(th.Transform{p: th.Vf2{10, 40}, s: th.Vf2{1, 1}}, th.white)
-	}
+	}, null)
 }

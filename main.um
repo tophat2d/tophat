@@ -6,33 +6,23 @@ import (
 	"image.um"
 	"window.um"	
 	"canvas.um"
+	"font.um"
 )
 
-fn main() {
-	window.setup("Hello world", 600, 600)
-	window.setViewport(th.Vf2{ 100, 100 })
-	
-	logo := image.load("etc/logo/logo-normal-white.png")
+var (
+	logo: image.Image
+	fg: uint32
+	bg: uint32
+	lines: []str
+	loadedFont: font.Font
+)
 
-	fg := 0xadadd5ff
-	bg := 0x262626ff
+fn onFrame(cctx, uctx: any) {
+	canvas.drawRect(bg, rect.mk(0, 0, window.wp.x, window.wp.y))
 
-	lines := []str {
-		"WELCOME TO",
-		"TOPHAT",
-		"",
-		"EXAMPLES ARE IN",
-		"THE examples/",
-		"DIRECTORY",
-		"",
-		"PRESS ENTER TO",
-		"OPEN THE",
-		"HOMEPAGE" }
+	p := th.Vf2{ 0, 1 }
 
-	for window.cycle() {
-		canvas.drawRect(bg, rect.mk(0, 0, window.wp.x, window.wp.y))
-
-		p := th.Vf2{ 0, 1 }
+	if !input.isPressed(input.key_left_alt) {
 		for i in lines {
 			s := 1
 			if i == 1 {
@@ -47,18 +37,64 @@ fn main() {
 				fg, s)
 			p.y += 6 * s
 		}
-
-		if input.isJustPressed(input.key_enter) {
-			if th.platform == "windows" {
-				std.system("open https://th.mrms.cz/")
-			} else {
-				std.system("xdg-open https://th.mrms.cz/")
+	} else {
+		for i in lines {
+			s := 1*(1/4.0)
+			if i == 1 {
+				s = 2*(1/4.0)
 			}
-		}
 
-		const s = 1.5
-		logo.draw(th.Transform{
-			p: p.add(window.wp.sub(p).sub(logo.getDims().mulf(s)).divf(2)),
-			s: th.vf2f(s)})
+			loadedFont.draw(
+				lines[i],
+				th.Vf2{
+					(window.wp.x - loadedFont.measure(lines[i]).x * s) / 2,
+					p.y},
+				fg, s)
+			p.y += 16 * s
+		}
 	}
+
+
+	if input.isJustPressed(input.key_enter) {
+		if th.platform == th.PlatformWindows {
+			std.system("explorer \"https://th.mrms.cz/\"")
+		} else if th.platform == th.PlatformLinux {
+			std.system("xdg-open https://th.mrms.cz/")
+		}
+	}
+
+	const s = 1.5
+	logo.draw(th.Transform{
+		p: p.add(window.wp.sub(p).sub(logo.getDims().mulf(s)).divf(2)),
+		s: th.vf2f(s)})
 }
+
+fn init*() {
+	window.setup("Hello world", 600, 600)
+	window.setViewport(th.Vf2{ 100, 100 })
+	
+	loadedFont = font.load("etc/roboto.ttf", 16, 2)
+	if !loadedFont.validate() {
+		error("could not load font")
+	}
+
+	logo = image.load("etc/logo/logo-normal-white.png")
+
+	fg = 0xadadd5ff
+	bg = 0x262626ff
+
+	lines = []str {
+		"WELCOME TO",
+		"TOPHAT",
+		"",
+		"EXAMPLES ARE IN",
+		"THE examples/",
+		"DIRECTORY",
+		"",
+		"PRESS ENTER TO",
+		"OPEN THE",
+		"HOMEPAGE" }
+
+	window.onFrame.register(onFrame, null)
+}
+

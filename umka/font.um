@@ -8,8 +8,8 @@ import (
 
 //~~Filtering constants
 const (
-	filterBilinear* = 0
-	filterNearest* = 1
+	filterNearest* = 0
+	filterLinear* = 1
 )
 //~~
 
@@ -20,7 +20,7 @@ type Font* = struct { _: ^struct{} }
 
 fn umth_font_load(path: str, size: th.fu, filter: uint32): ^struct{}
 //~~fn load
-fn load*(path: str, size: th.fu, filter: uint32 = filterBilinear): Font {
+fn load*(path: str, size: th.fu, filter: uint32 = filterLinear): Font {
 //~~
 	return Font{umth_font_load(path, size, filter)}
 }

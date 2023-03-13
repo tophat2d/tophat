@@ -1,13 +1,17 @@
 -Ilib/miniaudio
 -Ilib/glad
 -Ilib/stb
+-Ilib/umprof
 -Ilib/umka/src
 -Ilib/rawdraw
 -Ilib/chew
 -Ilib/umpr
+-Ilib/sokol
 -Wall
 -Wextra
 -Wno-unused-parameter
 -Wno-sign-compare
 -Wno-old-style-declaration
 -Wno-implicit-fallthroughof
+-DTH_VERSION=""
+-DTH_GITVER=""

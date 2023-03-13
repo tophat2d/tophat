@@ -8,16 +8,23 @@ import (
 	"input.um"
 	"canvas.um"
 	"window.um"
+	"signal.um"
 )
 
-fn main() {
+var (
+	r: ray.Ray
+	e : ent.Ent
+	cam: rect.Rect
+)
+
+fn init*() {
 	window.setup("raycast test", 400, 400)
-	cam := rect.mk(0, 0, window.wp.x, window.wp.y)
+	cam = rect.mk(0, 0, window.wp.x, window.wp.y)
 
-	r := ray.mk(th.Vf2{}, 60, 0)
-	e := ent.mk(image.load("etc/test.png"), th.Transform{s: th.Vf2{4, 4}})
+	r = ray.mk(th.Vf2{}, 60, 0)
+	e = ent.mk(image.load("etc/test.png"), th.Transform{s: th.Vf2{4, 4}})
 
-	for window.cycle() {
+	window.onFrame.register(signal.Callback{
 		r.pos = cam.toWorld(input.getMousePos())
 
 		if input.isPressed(input.mouse1) {
@@ -38,5 +45,5 @@ fn main() {
 
 		r.draw(cam, th.green, 2)
 		e.draw(cam)
-	}
+	}, null)
 }

@@ -44,13 +44,13 @@ fn init*() {
 }
 
 fn handle*() {
-	if input.isPressed('a') {
+	if input.isPressedc('A') {
 		e.t.p.x -= speed * th.delta
 		if e.t.p.x < -e.r.w {
 			e.t.p.x = window.wp.x
 		}
 	}
-	if input.isPressed('d') {
+	if input.isPressedc('D') {
 		e.t.p.x += speed * th.delta
 		if e.t.p.x > window.wp.x {
 			e.t.p.x = -e.r.w
@@ -59,7 +59,7 @@ fn handle*() {
 
 	e.animate(4, &frames, th.time)
 
-	if input.isJustPressed(' ') && th.time - lastShot >= shootTimeout {
+	if input.isJustPressedc(' ') && th.time - lastShot >= shootTimeout {
 		sound.shoot.start()
 		b := bulletPrefab
 		b.t.p = th.Vf2{e.t.p.x + 1, e.t.p.y - bulletPrefab.r.h}

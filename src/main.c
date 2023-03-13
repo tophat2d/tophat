@@ -11,10 +11,9 @@
 #ifdef _WIN32
 #include <windows.h>
 #endif
+#include <sokol_app.h>
 
 th_global *thg;
-int destroyfunc;
-int dead = 0;
 
 extern char *th_em_modulenames[];
 extern char *th_em_modulesrc[];
@@ -25,64 +24,13 @@ static void warning(UmkaError *error) {
 	fprintf(stderr, "Warning %s (%d, %d): %s\n", error->fileName, error->line, error->pos, error->msg);
 }
 
-static void die() {
-	if (dead) return;
-	
-	th_audio_deinit();
-	th_font_deinit();
-	th_image_deinit();
-	th_shader_deinit();
-	if (destroyfunc) {
-		umkaCall(thg->umka, destroyfunc, 0, NULL, NULL);
-	}
-
-	umkaFree(thg->umka);
-	dead = 1;
-}
-
-#if defined(_WIN32)
-
-static char **win32_argv(int *out_argc) {
-  LPWSTR *argv_wide;
-  int argc;
-
-  argv_wide = CommandLineToArgvW(GetCommandLineW(), &argc);
-  LPCSTR *argv = malloc(sizeof(LPCSTR)*(argc+1));
-  for (int i = 0; i < argc; i++) {
-    argv[i] = malloc(2048);
-    wcstombs(argv[i], argv_wide[i], 2048);
-  }
-  argv[argc] = NULL;
-
-  *out_argc = argc;
-
-	LocalFree(argv_wide);
-  return argv;
-}
-
-void win32_argv_free(char **argv) {
-  for (int i = 0; argv[i]; i++)
-    free(argv[i]);
-  free(argv);
-}
-
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow) {
-	if (AttachConsole(ATTACH_PARENT_PROCESS)) {
-		freopen("CON", "w", stdout);
-		freopen("CON", "w", stderr);
-		freopen("CON", "w", stdin);
-	}
-	int argc;
-  char **argv = win32_argv(&argc);
-#else
-int main(int argc, char *argv[]) {
-#endif
-	th_global thg_ = {0};
-	thg = &thg_;
+static int th_main(int argc, char *argv[]) {
+	thg = malloc(sizeof(th_global));
+	*thg = (th_global){0};
 
 	thg->umka = umkaAlloc();
 	int umkaOK;
-	strcpy(thg->respath, "");
+	strncpy(thg->respath, "", sizeof thg->respath);
 	const char *scriptpath = "main.um";
 	bool check = false;
 	bool prof = false;
@@ -90,66 +38,66 @@ int main(int argc, char *argv[]) {
 
 	int argOffset = 1;
 	while ((argc-argOffset) > 0) {
-		if (strcmp(argv[argOffset], "check") == 0) {
+		if (strcmp(argv[argOffset], "-check") == 0) {
 			check = true;
 			argOffset += 1;
-		} else if (strcmp(argv[argOffset], "silent") == 0) {
+		} else if (strcmp(argv[argOffset], "-silent") == 0) {
 			silent = true;
 			argOffset += 1;
-		} else if (strcmp(argv[argOffset], "modsrc") == 0) {
+		} else if (strcmp(argv[argOffset], "-modsrc") == 0) {
 			if ((argc-argOffset) < 2) {
 				printf("modsrc takes one argument\n");
-				return 1;
+				exit(1);
 			}
 			
 			for (int i=0; i < th_em_modulenames_count; i++) {
 				if (strcmp(argv[argOffset+1], th_em_modulenames[i]) == 0) {
-					printf("%s\n", th_em_modulesrc[i]);
-					return 0;
+					th_info("%s\n", th_em_modulesrc[i]);
+					exit(0);
 				}
 			}
 
-			printf("No module named %s\n", argv[argOffset+1]);
+			th_error("No module named %s\n", argv[argOffset+1]);
 			argOffset += 2;
-		} else if (strcmp(argv[argOffset], "license") == 0) {
-			printf("%s\n", th_em_misc[0]);
-			return 0;
-		} else if (strcmp(argv[argOffset], "main") == 0) {
+		} else if (strcmp(argv[argOffset], "-license") == 0) {
+			th_info("%s\n", th_em_misc[0]);
+			exit(0);
+		} else if (strcmp(argv[argOffset], "-main") == 0) {
 			if ((argc-argOffset) < 2) {
-				printf("main takes one argument - path to the main module\n");
-				return 1;
+				th_error("main takes one argument - path to the main module\n");
+				exit(1);
 			}
 
 			scriptpath = argv[argOffset+1];
 			argOffset += 2;
-		} else if (strcmp(argv[argOffset], "version") == 0) {
-			printf("%s\n", th_em_misc[1]);
-			return 0;
-		} else if (strcmp(argv[argOffset], "dir") == 0) {
+		} else if (strcmp(argv[argOffset], "-version") == 0) {
+			th_info(TH_VERSION "-" TH_GITVER ", built on " __DATE__ " " __TIME__ "\n%s\n", umkaGetVersion());
+			exit(0);
+		} else if (strcmp(argv[argOffset], "-dir") == 0) {
 			if ((argc-argOffset) < 2) {
-				printf("dir takes 1 argument.\n");
-				return 1;
+				th_error("dir takes 1 argument.\n");
+				exit(1);
 			}
 
-			strcpy(thg->respath, argv[argOffset+1]);
+			strncpy(thg->respath, argv[argOffset+1], sizeof thg->respath);
 			argOffset += 2;
-		} else if (strcmp(argv[argOffset], "help") == 0) {
-			printf(
+		} else if (strcmp(argv[argOffset], "-help") == 0) {
+			th_info(
 				"tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um\n"
 				"Available modes:\n"
-				"  check - only check the program for errors\n"
-				"  dir - specify the resource directory (. by default)\n"
-				"  help - show this help\n"
-				"  license - print the license\n"
-				"  main - specify the main file (dir/main.um by default)\n"
-				"  modsrc <module name> - print source of a builtin module\n"
-				"  prof - use the profiler\n"
-				"  silent - omit warnings\n"
-				"  version - print the version\n"
+				"  -check - only check the program for errors\n"
+				"  -dir - specify the resource directory (. by default)\n"
+				"  -help - show this help\n"
+				"  -license - print the license\n"
+				"  -main - specify the main file (dir/main.um by default)\n"
+				"  -modsrc <module name> - print source of a builtin module\n"
+				"  -prof - use the profiler\n"
+				"  -silent - omit warnings\n"
+				"  -version - print the version\n"
 				"Visit th.mrms.cz for more info.\n");
-			return 0;
-		} else if (strcmp(argv[argOffset], "prof") == 0) {
+			exit(0);
+		} else if (strcmp(argv[argOffset], "-prof") == 0) {
 			prof = true;
 			argOffset += 1;
 		} else {
@@ -166,11 +114,22 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	
-	umkaOK = umkaInit(thg->umka, scriptpath, NULL, 1024 * 1024, NULL,
+	char *mainmod_fmt =
+"import (\"window.um\"; mainmod = \"%s\")\n"
+"fn main() {}\n"
+"fn __th_init*() {\n"
+"  mainmod.init()\n"
+"}\n";
+	char mainmod[sizeof(mainmod_fmt) + BUFSIZ];
+	snprintf(
+		mainmod,
+		sizeof(mainmod),
+		mainmod_fmt,
+		scriptpath);
+
+	umkaOK = umkaInit(thg->umka, "tophat_main.um", mainmod, 1024 * 1024, NULL,
 		argc - argOffset, argv + argOffset, true, true, silent ? NULL : warning);
 	if (prof) umprofInit(thg->umka);
-
-	th_audio_init();
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");
@@ -183,7 +142,7 @@ int main(int argc, char *argv[]) {
 	if (!umkaOK) {
 		UmkaError error;
 		umkaGetError(thg->umka, &error);
-		th_error("%s (%d, %d): %s\n", error.fileName, error.line, error.pos, error.msg);
+		th_error("%s (%d, %d): %s", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}
 
@@ -192,43 +151,14 @@ int main(int argc, char *argv[]) {
 		return 0;
 	}
 
-	destroyfunc = umkaGetFunc(thg->umka, NULL, "windowdestroy");
 	thg->scaling = 1;
 
-	umkaOK = umkaRun(thg->umka);
-
-	if (!umkaOK) {
-		UmkaError error;
-		umkaGetError(thg->umka, &error);
-		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
-		fprintf(stderr, "\tStack trace:\n");
-
-		for (int depth = 0; depth < 10; depth++) {
-			char fnName[UMKA_MSG_LEN + 1];
-			char file[UMKA_MSG_LEN + 1];
-			int line, offset;
-
-			if (!umkaGetCallStack(thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
-				break;
-				fprintf(stderr, "\t\t...\n");
-			}
-
-#ifndef _WIN32
-			fprintf(stderr, "\033[34m");
-#endif
-			fprintf(stderr, "\t\t%s:%06d: ", file, line);
-#ifndef _WIN32
-			fprintf(stderr, "\033[0m");
-#endif
-			fprintf(stderr, "%s\n", fnName);
-		}
-	} else if (prof) {
-		UmprofInfo info[2048] = {0};
-		int len = umprofGetInfo(info, 2048);
-		umprofPrintInfo(stderr, info, len);
-	}
-
-	die();
-
 	return 0;
+}
+
+
+sapp_desc sokol_main(int argc, char *argv[]) {
+	if (th_main(argc, argv))
+		exit(1);
+	return th_window_sapp_desc();
 }

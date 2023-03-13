@@ -5,12 +5,13 @@ import (
 	"image.um"
 	"placeholders.um"
 	"rect.um"
+	"signal.um"
 	"std.um"
 	"th.um"
 )
 
 var (
-	start, end, clockOffset: real
+	start, clockOffset: real
 	fpsLimit: int = 60
 )
 
@@ -24,12 +25,12 @@ var (
 var wp*: th.Vf2
 //~~
 
+//~~signal OnFrame
+var onFrame*: signal.Signal
+//~~
+
 fn umth_window_setup(title: str, w, h: int)
-fn umth_window_clear_frame()
 fn umth_window_get_dimensions(w, h: ^int32)
-fn umth_window_swap_buffers()
-fn umth_window_handle(): bool
-fn umth_window_sleep(ms: int)
 
 fn umth_window_set_viewport(dm: th.Vf2)
 //~~fn setViewport
@@ -44,20 +45,28 @@ fn setViewport*(dm: th.Vf2) {
 	umth_window_set_viewport(dm)
 }
 
+fn setIcon*(img: image.Image)
+
+// 0 = other/unknown
+// 2 = linux
+// 3 = windows
+// 4 = macos (unsupported currently)
+// 5 = emscripten
+fn umth_window_get_platform_id(): int
+
 //~~fn setup
 // Sets up the engine and opens a window.
 fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 //~~
 	w, h = width, height
 	umth_window_setup(title, width, height)
-	umth_window_clear_frame()
 
-	if std.getenv("HOME") == "" {
-		th.platform = "windows"
-	}
+	th.platform = umth_window_get_platform_id()
 
 	audio.__setup()
 	placeholders.__setup()
+
+	setIcon(placeholders.icon)
 
 	clockOffset = std.clock() * 1000
 	start = std.clock() * 1000
@@ -68,48 +77,35 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 //~~fn cycle
 // Cycle needs to be called every cycle for the window to work. If the window
 // was closed, it returns false.
-fn cycle*(): bool {
+fn cycle(delta: real) {
 //~~
 	umth_window_set_viewport(wp)
-	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
-	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
-	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
-	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
 
-	umth_window_swap_buffers()
-
-	end = std.clock()*1000
-	th.delta = round(end - start)
-	if 1000/fpsLimit - th.delta > 0 {
-		umth_window_sleep(1000/fpsLimit - th.delta)
-		th.delta = round(std.clock()*1000 - start)
+	th.delta = trunc(delta*1000.0)
+	if th.delta == 0 {
+		th.delta = 1
 	}
 
 	start = std.clock()*1000
 	th.time = round(start - clockOffset)
 
-	running := umth_window_handle()
-	umth_window_clear_frame()
 	umth_window_get_dimensions(&w, &h)
 
 	audio.__cycle()
-	return running
 }
 
-fn umth_window_begin_scissor(x, y: int, w, h: uint)
-fn umth_window_end_scissor()
-//~~fn beginScissorRect
-// Disable rendering outside of rect `r`
-fn beginScissorRect*(r: rect.Rect) {
-//~~
-	umth_window_begin_scissor(trunc(r.x), trunc(r.y), trunc(r.w), trunc(r.h))
+fn drawClear() {
+	canvas.drawRect(th.white, rect.mk(0, 0, wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
+	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
+	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
 }
 
-//~~fn endScissor
-// Stops cropping
-fn endScissor*() {
-//~~
-	umth_window_end_scissor();
+fn umth_frame_callback*(delta: real) {
+	cycle(delta)
+	drawClear()
+	onFrame.emit(null)
 }
 
 fn umth_window_set_fullscreen(fullscreen: bool)
@@ -136,19 +132,23 @@ fn getDims*(): th.Vf2 {
 	return th.Vf2{w, h}
 }
 
+fn umth_window_set_target_fps(fps: int)
+
 //~~fn setTargetFps
 // Sets the fps limit.
 // 
 // `fps`
 // : amount of fps the limit should be set to
+//	 
 fn setTargetFps*(fps: int) {
 //~~
 	fpsLimit = fps
+	umth_window_set_target_fps(fps)
 }
 
 fn umth_window_set_dims(dm: th.Vf2)
 //~~fn setDims
-// Sets the dimensions of the window, linux only.
+// Sets the dimensions of the window.
 // 
 // `dm`
 // : the target dimensions in screen pixels
@@ -159,7 +159,7 @@ fn setDims*(dm: th.Vf2) {
 
 fn umth_window_set_icon(img: image.Image)
 //~~fn setIcon
-// Sets the window icon, linux only.
+// Sets the window icon.
 fn setIcon*(img: image.Image) {
 //~~
 	umth_window_set_icon(img)
@@ -176,8 +176,9 @@ fn showCursor*(show: bool) {
 fn umth_window_freeze_cursor(freeze: bool)
 //~~fn freezeCursor
 // Freezes the cursor in place. `input.getMouseDelta` will still report mouse
-// movements. Linux only.
+// movements.  The cursor will be automatically hidden.
 fn freezeCursor*(freeze: bool) {
 //~~
+	showCursor(freeze)
 	umth_window_freeze_cursor(freeze)
 }
