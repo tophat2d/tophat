@@ -38,66 +38,66 @@ static int th_main(int argc, char *argv[]) {
 
 	int argOffset = 1;
 	while ((argc-argOffset) > 0) {
-		if (strcmp(argv[argOffset], "check") == 0) {
+		if (strcmp(argv[argOffset], "-check") == 0) {
 			check = true;
 			argOffset += 1;
-		} else if (strcmp(argv[argOffset], "silent") == 0) {
+		} else if (strcmp(argv[argOffset], "-silent") == 0) {
 			silent = true;
 			argOffset += 1;
-		} else if (strcmp(argv[argOffset], "modsrc") == 0) {
+		} else if (strcmp(argv[argOffset], "-modsrc") == 0) {
 			if ((argc-argOffset) < 2) {
 				printf("modsrc takes one argument\n");
-				return 1;
+				exit(1);
 			}
 			
 			for (int i=0; i < th_em_modulenames_count; i++) {
 				if (strcmp(argv[argOffset+1], th_em_modulenames[i]) == 0) {
 					printf("%s\n", th_em_modulesrc[i]);
-					return 0;
+					exit(0);
 				}
 			}
 
 			printf("No module named %s\n", argv[argOffset+1]);
 			argOffset += 2;
-		} else if (strcmp(argv[argOffset], "license") == 0) {
+		} else if (strcmp(argv[argOffset], "-license") == 0) {
 			printf("%s\n", th_em_misc[0]);
-			return 0;
-		} else if (strcmp(argv[argOffset], "main") == 0) {
+			exit(0);
+		} else if (strcmp(argv[argOffset], "-main") == 0) {
 			if ((argc-argOffset) < 2) {
 				printf("main takes one argument - path to the main module\n");
-				return 1;
+				exit(1);
 			}
 
 			scriptpath = argv[argOffset+1];
 			argOffset += 2;
-		} else if (strcmp(argv[argOffset], "version") == 0) {
-			printf("%s\n", th_em_misc[1]);
-			return 0;
-		} else if (strcmp(argv[argOffset], "dir") == 0) {
+		} else if (strcmp(argv[argOffset], "-version") == 0) {
+			printf(TH_VERSION "-" TH_GITVER ", built on " __DATE__ " " __TIME__ "\n%s\n", umkaGetVersion());
+			exit(0);
+		} else if (strcmp(argv[argOffset], "-dir") == 0) {
 			if ((argc-argOffset) < 2) {
 				printf("dir takes 1 argument.\n");
-				return 1;
+				exit(1);
 			}
 
 			strncpy(thg->respath, argv[argOffset+1], sizeof thg->respath);
 			argOffset += 2;
-		} else if (strcmp(argv[argOffset], "help") == 0) {
+		} else if (strcmp(argv[argOffset], "-help") == 0) {
 			printf(
 				"tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um\n"
 				"Available modes:\n"
-				"  check - only check the program for errors\n"
-				"  dir - specify the resource directory (. by default)\n"
-				"  help - show this help\n"
-				"  license - print the license\n"
-				"  main - specify the main file (dir/main.um by default)\n"
-				"  modsrc <module name> - print source of a builtin module\n"
-				"  prof - use the profiler\n"
-				"  silent - omit warnings\n"
-				"  version - print the version\n"
+				"  -check - only check the program for errors\n"
+				"  -dir - specify the resource directory (. by default)\n"
+				"  -help - show this help\n"
+				"  -license - print the license\n"
+				"  -main - specify the main file (dir/main.um by default)\n"
+				"  -modsrc <module name> - print source of a builtin module\n"
+				"  -prof - use the profiler\n"
+				"  -silent - omit warnings\n"
+				"  -version - print the version\n"
 				"Visit th.mrms.cz for more info.\n");
-			return 0;
-		} else if (strcmp(argv[argOffset], "prof") == 0) {
+			exit(0);
+		} else if (strcmp(argv[argOffset], "-prof") == 0) {
 			prof = true;
 			argOffset += 1;
 		} else {
@@ -142,7 +142,6 @@ static int th_main(int argc, char *argv[]) {
 	if (!umkaOK) {
 		UmkaError error;
 		umkaGetError(thg->umka, &error);
-		int val = 42;
 		th_error("%s (%d, %d): %s", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}

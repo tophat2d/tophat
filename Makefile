@@ -32,7 +32,9 @@ ifeq ($(SHORT_PLATFORM), MINGW64_NT)
 	CFLAGS += -mwindows
 endif
 
-DEFS += -DUMKA_STATIC -DUMKA_EXT_LIBS
+DEFS += -DUMKA_STATIC -DUMKA_EXT_LIBS \
+	-DTH_GITVER=\"$(shell git rev-parse --short HEAD)\" \
+	-DTH_VERSION=\"$(shell cat version)\"
 WARNS = -Wall -Wextra -Wno-unused-parameter -Wno-sign-compare \
 	-Wno-old-style-declaration -Wno-implicit-fallthrough -Wno-switch
 
