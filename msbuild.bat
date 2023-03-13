@@ -13,7 +13,7 @@ if %ERRORLEVEL% NEQ 0 (
     exit /b
 )
 
-set target=Debug
+set target=Release
 
 md bin
 cd bin

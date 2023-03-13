@@ -90,7 +90,7 @@ static void assert_image(th_image *img) {
 	}
 }
 
-th_render_target *th_image_create_render_target(int width, int height) {
+th_render_target *th_image_create_render_target(int width, int height, int filter) {
 	th_render_target *t = th_render_target_alloc();
 
   sg_image_desc img_desc = {
@@ -98,8 +98,8 @@ th_render_target *th_image_create_render_target(int width, int height) {
     .width = width,
     .height = height,
     .pixel_format = SG_PIXELFORMAT_RGBA8,
-    .mag_filter = SG_FILTER_NEAREST,
-		.min_filter = SG_FILTER_NEAREST,
+    .mag_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
+		.min_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
 		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,

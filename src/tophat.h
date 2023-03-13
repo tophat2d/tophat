@@ -332,7 +332,7 @@ th_image *th_image_alloc();
 void th_image_init();
 void th_image_deinit();
 
-th_render_target *th_image_create_render_target(int width, int height);
+th_render_target *th_image_create_render_target(int width, int height, int filter);
 void th_image_set_as_render_target(th_render_target *t);
 void th_image_remove_render_target(th_render_target *t, th_vf2 wp);
 

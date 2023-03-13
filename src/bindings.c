@@ -377,11 +377,12 @@ void umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umth_image_create_render_target(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_render_target **result = p[2].ptrVal;
-	int height = p[0].intVal;
-	int width = p[1].intVal;
+	th_render_target **result = p[3].ptrVal;
+	int filter = p[0].intVal;
+	int height = p[1].intVal;
+	int width = p[2].intVal;
 
-	*result = th_image_create_render_target(width, height);
+	*result = th_image_create_render_target(width, height, filter);
 }
 
 void umth_image_render_target_to_image(UmkaStackSlot *p, UmkaStackSlot *r) {

@@ -11,29 +11,44 @@ type Image* = struct{ _: ^struct{} }
 //~~
 
 //~~opaque RenderTarget
-// An image you can render to
+// An image you can render to.
 type RenderTarget* = struct { _: ^struct{} }
 //~~
 
-fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int)
-fn createRenderTarget*(size: th.Vf2): RenderTarget {
+fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: int)
+//~~fn createRenderTarget
+// Creates a render target you can draw to, like to a window.
+// Filter specifies specfifies filtering for resulting image.
+// Image can be retrieved via `toImage`. 
+fn createRenderTarget*(size: th.Vf2, filter: int): RenderTarget {
+//~~
 	rt := RenderTarget{}
-	umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y))
+	umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y), filter)
 	return rt
 }
 
 fn umth_image_render_target_begin(rt: RenderTarget)
+//~~fn RenderTarget.end
+// Begins the render target rendering pass.
 fn (rt: ^RenderTarget) begin*() {
+//~~
 	umth_image_render_target_begin(rt^)
 }
 
 fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2)
+//~~fn RenderTarget.end
+// Ends the render target rendering pass.
 fn (rt: ^RenderTarget) end*(wp: th.Vf2) {
+//~~
 	umth_image_render_target_end(rt^, wp)
 }
 
 fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
+//~~fn RenderTarget.toImage
+// Returns the image of the render target.
+// Do not call `setfilter` on the resulting image. 
 fn (rt: ^RenderTarget) toImage*(): Image {
+//~~
 	img := Image{}
 	umth_image_render_target_to_image(&img, rt^)
 	return img
@@ -164,7 +179,7 @@ fn (i: ^Image) copy*(): Image {
 
 fn umth_image_set_filter(data: Image, filter: int)
 //~~fn Image.setfilter
-// Sets a mag/min filter. 0 is linear, others are nearest.
+// Sets a mag/min filter. 0 is nearest, others are linear.
 // This function will regenerate the texture. This means it shouldn't be
 // used in a loop.
 // https://learnopengl.com/img/getting-started/texture_filtering.png

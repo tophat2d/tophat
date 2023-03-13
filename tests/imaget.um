@@ -45,7 +45,7 @@ fn init*() {
 	//img2 := image.mk(data, dm)
 	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
 
-	target = image.createRenderTarget(th.Vf2{10, 10})
+	target = image.createRenderTarget(th.Vf2{10, 10}, 0)
 
 	window.onFrame.register(signal.Callback{
 		p := th.Vf2{1, 1}
