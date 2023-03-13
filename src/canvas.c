@@ -189,7 +189,7 @@ static th_image white_img;
 void th_canvas_init() {
 	thg->canvas_bind = (sg_bindings){0};
 
-	sg_shader_desc *shd_desc = th_shader_desc(sg_query_backend());
+	const sg_shader_desc *shd_desc = th_shader_desc(sg_query_backend());
 	if (shd_desc == NULL) {
 		th_error("shader is null!");
 	}

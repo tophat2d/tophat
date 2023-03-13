@@ -13,3 +13,5 @@
 -Wno-sign-compare
 -Wno-old-style-declaration
 -Wno-implicit-fallthroughof
+-DTH_VERSION=""
+-DTH_GITVER=""

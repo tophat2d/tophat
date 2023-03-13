@@ -291,6 +291,8 @@ void th_image_set_as_render_target(th_render_target *t) {
 	thg->has_render_target = true;
 	
 	th_calculate_scaling(t->image->dm.w, t->image->dm.y);
+	thg->offset.x = 0;
+	thg->offset.y = 0;
 }
 
 

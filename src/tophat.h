@@ -343,6 +343,7 @@ void th_input_cycle();
 
 // misc
 void th_error(char *text, ...);
+void th_info(char *text, ...);
 void th_calculate_scaling(float camw, float camh);
 
 // navmesh

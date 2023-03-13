@@ -52,37 +52,37 @@ static int th_main(int argc, char *argv[]) {
 			
 			for (int i=0; i < th_em_modulenames_count; i++) {
 				if (strcmp(argv[argOffset+1], th_em_modulenames[i]) == 0) {
-					printf("%s\n", th_em_modulesrc[i]);
+					th_info("%s\n", th_em_modulesrc[i]);
 					exit(0);
 				}
 			}
 
-			printf("No module named %s\n", argv[argOffset+1]);
+			th_error("No module named %s\n", argv[argOffset+1]);
 			argOffset += 2;
 		} else if (strcmp(argv[argOffset], "-license") == 0) {
-			printf("%s\n", th_em_misc[0]);
+			th_info("%s\n", th_em_misc[0]);
 			exit(0);
 		} else if (strcmp(argv[argOffset], "-main") == 0) {
 			if ((argc-argOffset) < 2) {
-				printf("main takes one argument - path to the main module\n");
+				th_error("main takes one argument - path to the main module\n");
 				exit(1);
 			}
 
 			scriptpath = argv[argOffset+1];
 			argOffset += 2;
 		} else if (strcmp(argv[argOffset], "-version") == 0) {
-			printf(TH_VERSION "-" TH_GITVER ", built on " __DATE__ " " __TIME__ "\n%s\n", umkaGetVersion());
+			th_info(TH_VERSION "-" TH_GITVER ", built on " __DATE__ " " __TIME__ "\n%s\n", umkaGetVersion());
 			exit(0);
 		} else if (strcmp(argv[argOffset], "-dir") == 0) {
 			if ((argc-argOffset) < 2) {
-				printf("dir takes 1 argument.\n");
+				th_error("dir takes 1 argument.\n");
 				exit(1);
 			}
 
 			strncpy(thg->respath, argv[argOffset+1], sizeof thg->respath);
 			argOffset += 2;
 		} else if (strcmp(argv[argOffset], "-help") == 0) {
-			printf(
+			th_info(
 				"tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um\n"
 				"Available modes:\n"

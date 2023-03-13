@@ -3,7 +3,7 @@ project(tophat)
 
 
 if(MSVC)
-    set(umka_dir  ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka/umka_windows_msvc)
+    set(umka_dir ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka/umka_windows_msvc)
     set(umka_lib_path  ${umka_dir}/libumka_static.lib)
     
     execute_process(COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmd/win-buildmodules.bat WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} RESULT_VARIABLE ret)
@@ -30,6 +30,12 @@ if(MSVC)
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/umka/src
         ${CMAKE_CURRENT_SOURCE_DIR}/lib/sokol
     )
+
+    file(READ ${CMAKE_CURRENT_SOURCE_DIR}/version ver)
+    execute_process(COMMAND git rev-parse --short HEAD OUTPUT_VARIABLE gitver)
+    string(STRIP "${ver}" ver)
+    string(STRIP "${gitver}" gitver)
+    target_compile_definitions(tophat PUBLIC -DTH_VERSION=\"${ver}\" -DTH_GITVER=\"${gitver}\")
 
     target_link_libraries(tophat gdi32 opengl32 user32 ${umka_lib_path})
 else()
