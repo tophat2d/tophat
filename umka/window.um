@@ -95,11 +95,11 @@ fn cycle(delta: real) {
 }
 
 fn drawClear() {
+	canvas.drawRect(th.white, rect.mk(0, 0, wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
 	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
-	canvas.drawRect(th.white, rect.mk(0, 0, wp.x, wp.y))
 }
 
 fn umth_frame_callback*(delta: real) {

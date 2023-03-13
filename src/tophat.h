@@ -187,6 +187,7 @@ typedef struct {
 	fu scaling;
 	th_vf2 offset;
 	th_vf2 viewport;
+	th_vf2 target_size;
 	void *umka;
 
 	uu pressed[512];

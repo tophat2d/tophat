@@ -244,8 +244,7 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 		q.v[i].y = trunc(q.v[i].y * thg->scaling + thg->offset.y);
 	}
 
-	int sw, sh;
-	th_window_get_dimensions(&sw, &sh);
+	float sw = thg->target_size.x, sh = thg->target_size.y;
 
 	float colors[4];
 		for (int i=0; i < 4; ++i)
@@ -290,11 +289,12 @@ void th_image_set_as_render_target(th_render_target *t) {
 
 	thg->has_render_target = true;
 	
-	th_calculate_scaling(t->image->dm.w, t->image->dm.y);
+	thg->scaling = 1;
 	thg->offset.x = 0;
 	thg->offset.y = 0;
+	thg->viewport = t->image->dm;
+	thg->target_size = t->image->dm;
 }
-
 
 void th_image_remove_render_target(th_render_target *t, th_vf2 wp) {
 	if (!thg->has_render_target) {
@@ -310,6 +310,10 @@ void th_image_remove_render_target(th_render_target *t, th_vf2 wp) {
 
 	th_calculate_scaling(wp.x, wp.y);
 	
+	int window_width, window_height;
+	th_window_get_dimensions(&window_width, &window_height);
+	thg->target_size = (th_vf2){window_width, window_height};
+
 	thg->has_render_target = false;
 }
 
