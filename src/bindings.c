@@ -749,15 +749,6 @@ void umth_canvas_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_canvas_end_scissor();
 }
 
-void umth_utf8_get_next_rune(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int idx = p[0].intVal;
-	char *str = p[1].ptrVal;
-
-	uint32_t rune;
-	th_utf8_decode(&rune, &str[idx]);
-	r->uintVal = rune;
-}
-
 void umth_transform_rect(UmkaStackSlot *p, UmkaStackSlot *_) {
 	th_quad *ret = p[2].ptrVal;
 	th_rect *r = p[1].ptrVal;
@@ -958,9 +949,6 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_canvas_draw_quad", &umth_canvas_draw_quad);
 	umkaAddFunc(umka, "umth_canvas_begin_scissor_rect", &umth_canvas_begin_scissor_rect);
 	umkaAddFunc(umka, "umth_canvas_end_scissor", &umth_canvas_end_scissor);
-
-	// utf8
-	umkaAddFunc(umka, "umth_utf8_get_next_rune", &umth_utf8_get_next_rune);
 
 	// transform
 	umkaAddFunc(umka, "umth_transform_rect", &umth_transform_rect);

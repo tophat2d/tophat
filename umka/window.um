@@ -92,10 +92,10 @@ fn cycle(delta: real) {
 	umth_window_get_dimensions(&w, &h)
 
 	audio.__cycle()
+	canvas.drawRect(th.white, rect.mk(0, 0, wp.x, wp.y))
 }
 
 fn drawClear() {
-	canvas.drawRect(th.white, rect.mk(0, 0, wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
 	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
@@ -104,8 +104,8 @@ fn drawClear() {
 
 fn umth_frame_callback*(delta: real) {
 	cycle(delta)
-	drawClear()
 	onFrame.emit(null)
+	drawClear()
 }
 
 fn umth_window_set_fullscreen(fullscreen: bool)
