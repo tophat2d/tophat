@@ -4,6 +4,7 @@ import (
 	"ent.um"
 	"std.um"
 	"image.um"
+	"window.um"
 	"sound.um"
 	"global.um"
 	"effects.um"
@@ -29,13 +30,13 @@ fn init*() {
 
 	prefab = ent.mk(
 		image.load("gfx/enemy.png"),
-		th.Transform{p: th.Vf2{y: -global.cam.h - 20}, s: th.Vf2{1, 1}})
+		th.Transform{p: th.Vf2{y: -window.wp.y - 20}, s: th.Vf2{1, 1}})
 }
 
 fn spawn*() {
 	e := prefab
-	e.t.p.x = std.rand()%round(global.cam.w - e.r.w * 2) - global.cam.w/2 + e.r.w
-	e.t.p.y -= std.rand()%round(global.cam.h/6)
+	e.t.p.x = std.rand()%round(window.wp.x - e.r.w * 2) + e.r.w
+	e.t.p.y -= std.rand()%round(window.wp.y * 0.8)
 
 	m := std.rand()%2
 	if m == 0 {
@@ -62,7 +63,7 @@ fn handle*() {
 		e := &enemies[i]
 
 		e.ent.t.p.y += speed.y * th.delta
-		if e.ent.t.p.y > global.cam.h/2 {
+		if e.ent.t.p.y > window.wp.y {
 			enemies = delete(enemies, i)
 			i--
 			effects.damage()
@@ -86,8 +87,8 @@ fn handle*() {
 		}
 
 		e.ent.t.p.x += speed.x * th.delta * e.motion
-		if e.ent.t.p.x < -global.cam.w/2 ||
-			e.ent.t.p.x > global.cam.w/2 - e.ent.r.w {
+		if e.ent.t.p.x < 0 ||
+			e.ent.t.p.x > window.wp.x - e.ent.r.w {
 			e.motion *= -1
 			// prevent enemies from getting stuck in a loop
 			e.ent.t.p.x += e.motion

@@ -1,0 +1,34 @@
+#!/bin/sh
+
+TH_DIR=$( dirname -- "$0"; )/../
+
+mkdir -p $TH_DIR
+if [ ! -f $TH_DIR/th_emscripten.a ]; then
+	echo "Tophat emscripten build was not found. Downloading it from https://th.mrms.cz/dl/th_emscripten.a"
+	curl https://th.mrms.cz/dl/th_emscripten.a -o $TH_DIR/th_emscripten.a
+fi
+
+if [ ! -f $TH_DIR/shell.html ]; then
+	echo "shell.html was not found. Downloading it from https://th.mrms.cz/dl/shell.html"
+	curl https://th.mrms.cz/dl/shell.html -o $TH_DIR/shell.html
+fi
+
+mkdir -p wasm-out
+
+FILES=""
+
+for f in $@; do
+	FILES="$FILES --preload-file $f"
+done
+
+emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
+	$TH_DIR/th_emscripten.a \
+	-s ALLOW_MEMORY_GROWTH=1 \
+	-s STACK_SIZE=2MB \
+	-lc \
+	-lm \
+	-s MINIFY_HTML=0 \
+	-s EXPORTED_FUNCTIONS="['_malloc', '_free', '_main']" \
+	--shell-file=$TH_DIR/shell.html \
+	$FILES \
+	-o wasm-out/index.html

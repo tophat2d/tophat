@@ -1,0 +1,25 @@
+
+import (
+    "image.um"
+    "signal.um"
+    "window.um"
+)
+
+var (
+    img: image.Image
+)
+
+fn init*() {
+    window.setup("get image data test", 640, 480)
+
+    img = image.load("etc/test.png")
+    
+    d := img.getData()
+
+    for i in d {
+        printf("%x\n", d[i])
+    }
+
+    window.onFrame.register(signal.Callback{
+    }, null)
+}

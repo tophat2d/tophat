@@ -1,10 +1,12 @@
 // UTF-8 utilities
 
-type (
-	Rune* = int32
-)
+//~~type Rune
+type Rune* = int32
+//~~
 
+//~~fn Rune.size
 fn (r: ^Rune) size*(): int {
+//~~
 	if r^ <= 0x7f {
 		return 1
 	}
@@ -24,7 +26,9 @@ fn (r: ^Rune) size*(): int {
 	return 0
 }
 
+//~~fn Rune.encode
 fn (r: ^Rune) encode*(): str {
+//~~
 	s := r.size()
 
 	if s == 1 {
@@ -50,9 +54,16 @@ fn (r: ^Rune) encode*(): str {
 	return str(out)
 }
 
-fn getNextRune*(a: str, pos: int): Rune
+fn umth_utf8_get_next_rune*(a: str, pos: int): Rune
+//~~fn getNextRune
+fn getNextRune*(a: str, pos: int): Rune {
+//~~
+	return umth_utf8_get_next_rune(a, pos)
+}
 
+//~~fn decode
 fn decode*(s: str): []Rune {
+//~~
 	runes := make([]Rune, len(s))
 	runeCount := 0
 
@@ -66,7 +77,9 @@ fn decode*(s: str): []Rune {
 	return slice(runes, 0, runeCount)
 }
 
+//~~fn realLength
 fn realLength*(s: str): int {
+//~~
 	rl := 0
 	l := len(s)
 	for i := 0; i < l; rl++ {

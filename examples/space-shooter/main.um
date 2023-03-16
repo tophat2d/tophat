@@ -1,10 +1,12 @@
 
 import (
+	"th.um"
 	"std.um"
 	"rect.um"
 	"window.um"
 	"canvas.um"
-	
+	"signal.um"
+
 	"game.um"
 	"menu.um"
 	"star.um"
@@ -12,9 +14,10 @@ import (
 	"global.um"
 )
 
-fn main() {
+fn init*() {
 	window.setup("title", 1280, 720)
 
+	window.setViewport(th.Vf2{92, 168})
 	global.cam = rect.mk(0, 0, 92, 168)
 	global.scene = global.MENU
 
@@ -30,9 +33,9 @@ fn main() {
 		std.fclose(f)
 	}
 
-	for window.cycle(global.cam) {
+	window.onFrame.register(signal.Callback{
 		canvas.drawRect(0x000022ff, global.cam)
-		
+
 		star.handle()
 		star.draw()
 
@@ -42,7 +45,7 @@ fn main() {
 		case global.GAME:
 			game.handle()
 		case global.NONE:
-			break
+			exit()
 		}
-	}
+	}, null)
 }

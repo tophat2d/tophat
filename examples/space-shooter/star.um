@@ -5,11 +5,12 @@ import (
 	"rect.um"
 	"global.um"
 	"canvas.um"
+	"window.um"
 )
 
 const (
 	starNum = 200
-	speed = 0.04
+	speed = 0.01
 )
 
 var (
@@ -20,11 +21,11 @@ fn init*() {
 	stars = make([]rect.Rect, starNum)
 
 	for i:=0; i < len(stars); i++ {
-		stars[i].y = -std.rand()%round(global.cam.h)
-		stars[i].x = std.rand()%round(global.cam.w)
+		stars[i].y = -std.rand()%round(window.wp.y)
+		stars[i].x = std.rand()%round(window.wp.x)
 
-		stars[i].w = 1
-		stars[i].h = 2
+		stars[i].w = 0.1
+		stars[i].h = 0.2
 	}
 }
 
@@ -36,9 +37,9 @@ fn handle*() {
 		}
 		stars[i].y += s * th.delta
 
-		if stars[i].y > global.cam.h {
-			stars[i].y = -std.rand()%round(global.cam.h/8)
-			stars[i].x = std.rand()%round(global.cam.w)
+		if stars[i].y > window.wp.y {
+			stars[i].y = -std.rand()%round(window.wp.y/8)
+			stars[i].x = std.rand()%round(window.wp.x)
 		}
 	}
 }

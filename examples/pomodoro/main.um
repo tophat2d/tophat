@@ -270,6 +270,7 @@ var (
 
   isDark: bool = true
   v_colorscheme: Colorscheme = c_colorschemeDark
+  v_lastTime: int
   v_countdown: Countdown
   v_countdownNumber: int
   v_alarm: th_audio.Sound
@@ -377,7 +378,8 @@ fn getCountdown(num: int): Countdown {
 }
 
 fn updateCountdown() {
-  v_countdown.time -= th.delta/1000.0
+  v_countdown.time -= (th.time - v_lastTime) / 1000.0
+  v_lastTime = th.time
   for v_countdown.time <= 0 {
     diff := -v_countdown.time
     v_countdownNumber += 1
@@ -387,105 +389,116 @@ fn updateCountdown() {
   }
 }
 
-fn main() {
-  screen := th_rect.mk(0, 0, 512, 512)
+screen := th_rect.Rect{0, 0, 512, 512}
+started := false
+debug := false
+var (state: ^ElemState; gui: Gui)
+
+fn onFrame(cctx, uctx: any) {
+  if isDark {
+    v_colorscheme = c_colorschemeDark
+  } else {
+    v_colorscheme = c_colorschemeLight
+  }
+
+  if th_input.isJustPressed(th_input.key_escape) {
+    debug = !debug
+  }
+
+  if started {
+    updateCountdown()
+  }
+  
+  screen.w = th_window.w
+  screen.h = th_window.h
+  th_window.setViewport(th.Vf2{screen.w, screen.h})
+
+  th_canvas.drawRect(v_colorscheme.background, screen)
+
+  guiPushRect(&gui, screen)
+    guiSetElement(&gui, "ROOT").color = v_colorscheme.background
+    putGuiRect(&gui)
+
+  elementCount := th_window.h/36-2
+    for i := 0; i < elementCount; i++ {
+      guiPushRect(&gui, guiCutRect(&gui, cutSideTop, th.Vf2{0, 32}))
+        id := "ENTRY"+repr(i+v_countdownNumber)
+        state = guiSetElement(&gui, id)
+
+        if i == 0 {
+          state.color = v_colorscheme.current
+          putGuiCountdown(id, &gui, v_countdown)
+        } else {
+          state.color = (v_colorscheme.text & 0xFFFFFF00) + trunc(0x000000FF * (elementCount-int(i))/elementCount)
+          putGuiCountdown(id, &gui, getCountdown(i+v_countdownNumber))
+        }
+      guiPopRect(&gui)
+    }
+
+    guiPushRect(&gui, guiCutRect(&gui, cutSideBottom, th.Vf2{0, 40}))
+      guiSetElement(&gui, "TOOLBAR").color = v_colorscheme.background&0xFFFFFFFF
+
+      if started {
+        if putGuiButton(&gui, "START", "Stop").pressed {
+          started = false
+        }
+      } else {
+        if putGuiButton(&gui, "START", "Start").pressed {
+          started = true
+        }
+      }
+
+      if putGuiButton(&gui, "RESET", "Reset").pressed {
+        started = false
+        v_countdownNumber = 0
+        v_countdown = getCountdown(0)
+      }
+
+      if putGuiButton(&gui, "SKIP", "Skip").pressed {
+    guiGetElement(&gui, "ENTRY"+repr(v_countdownNumber)).targetState.color = 0xFFFFFF00
+        v_countdownNumber += 1
+        v_countdown = getCountdown(v_countdownNumber)
+      }
+
+      if debug && putGuiButton(&gui, "EMPTY", "Empty").pressed {
+        v_countdown.time = 0.01
+      }
+
+      currentThemeName := "Dark"
+      if !isDark {
+        currentThemeName = "Light"
+      }
+
+      if putGuiButton(&gui, "THEME_TOGGLE", currentThemeName, cutSideRight).pressed {
+        isDark = !isDark
+      }
+    guiPopRect(&gui)
+  guiPopRect(&gui)
+
+  guiUpdate(&gui, real(th.delta/1000.0))
+
+  if debug {
+    drawGuiElementFrames(&gui)
+  }
+
+  v_mainFont.draw(sprintf("fps: %d", 1000/(th.delta)), th.Vf2{5, 5}, th.red)
+
+  v_lastTime = th.time
+}
+
+fn init*() {
+  v_lastTime = th.time
   th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
+	th_window.setViewport(th.Vf2{screen.w, screen.h})
   v_mainFont = th_font.load("Font.ttf", 32, 1)
   v_mainFontSmall = th_font.load("Font.ttf", 20, 1)
   v_countdown = getCountdown(0)
   v_alarm = th_audio.load("Alarm.wav")
   v_rectBase = th_image.load("rectbase.png")
 
-  gui := guiInit()
-  started := false
-  debug := false
+  gui = guiInit()
+
   gui.padding = 2
-  var (state: ^ElemState)
 
-  for th_window.cycle(screen) {
-    if isDark {
-      v_colorscheme = c_colorschemeDark
-    } else {
-      v_colorscheme = c_colorschemeLight
-    }
-
-    if th_input.isJustPressed(th_input.key_escape) {
-      debug = !debug
-    }
-
-    if started {
-      updateCountdown()
-    }
-
-    screen.w = th_window.w
-    screen.h = th_window.h
-
-	th_canvas.drawRect(v_colorscheme.background, screen)
-
-    guiPushRect(&gui, screen)
-      guiSetElement(&gui, "ROOT").color = v_colorscheme.background
-      putGuiRect(&gui)
-	
-	  elementCount := th_window.h/36-2
-      for i := 0; i < elementCount; i++ {
-        guiPushRect(&gui, guiCutRect(&gui, cutSideTop, th.Vf2{0, 32}))
-          id := "ENTRY"+repr(i+v_countdownNumber)
-          state = guiSetElement(&gui, id)
-
-          if i == 0 {
-            state.color = v_colorscheme.current
-            putGuiCountdown(id, &gui, v_countdown)
-          } else {
-            state.color = (v_colorscheme.text & 0xFFFFFF00) + trunc(0x000000FF * (elementCount-int(i))/elementCount)
-            putGuiCountdown(id, &gui, getCountdown(i+v_countdownNumber))
-          }
-        guiPopRect(&gui)
-      }
-
-      guiPushRect(&gui, guiCutRect(&gui, cutSideBottom, th.Vf2{0, 40}))
-        guiSetElement(&gui, "TOOLBAR").color = v_colorscheme.background&0xFFFFFFFF
-
-        if started {
-          if putGuiButton(&gui, "START", "Stop").pressed {
-            started = false
-          }
-        } else {
-          if putGuiButton(&gui, "START", "Start").pressed {
-            started = true
-          }
-        }
-
-        if putGuiButton(&gui, "RESET", "Reset").pressed {
-          started = false
-          v_countdownNumber = 0
-          v_countdown = getCountdown(0)
-        }
-
-        if putGuiButton(&gui, "SKIP", "Skip").pressed {
-		  guiGetElement(&gui, "ENTRY"+repr(v_countdownNumber)).targetState.color = 0xFFFFFF00
-          v_countdownNumber += 1
-          v_countdown = getCountdown(v_countdownNumber)
-        }
-
-				if debug && putGuiButton(&gui, "EMPTY", "Empty").pressed {
-					v_countdown.time = 0.01
-				}
-
-        currentThemeName := "Dark"
-        if !isDark {
-          currentThemeName = "Light"
-        }
-
-        if putGuiButton(&gui, "THEME_TOGGLE", currentThemeName, cutSideRight).pressed {
-          isDark = !isDark
-        }
-      guiPopRect(&gui)
-    guiPopRect(&gui)
-
-    guiUpdate(&gui, real(th.delta/1000.0))
-
-    if debug {
-      drawGuiElementFrames(&gui)
-    }
-  }
+  th_window.onFrame.register(onFrame, null)
 }

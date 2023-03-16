@@ -10,6 +10,9 @@ void th_calculate_scaling(float camw, float camh) {
 	int w, h;
 	th_window_get_dimensions(&w, &h);
 
+	if (w * h * camw * camh == 0)
+		return;
+
 	if ((float)w/camw < (float)h/camh) {
 		thg->scaling = ((float)w/camw);
 	} else {
@@ -43,8 +46,22 @@ void th_error(char *text, ...) {
 	va_end(args);
 }
 
+void th_info(char *text, ...) {
+	va_list args;
+	va_start(args, text);
+#ifdef _WIN32
+#include <winuser.h>
+	char buf[4096];
+	vsnprintf(buf, 4096, text, args);
+	MessageBox(NULL, buf, "information", 0x40);
+#endif
+	vfprintf(stderr, text, args);
+	fprintf(stderr, "\n");
+	va_end(args);
+}
+
 void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
-	const float angle = (rot * M_PI)/180;
+	const float angle = (rot * PI)/180;
 
 	const fu cosa = cos(angle);
 	const fu sina = sin(angle);

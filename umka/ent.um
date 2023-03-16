@@ -5,6 +5,7 @@ import (
 	"th.um"
 )
 
+//~~struct Ent
 // Entity is the main game object. It features drawing and collisions.
 // Every entity has an image used for drawing and a rectangle used
 // for collisions. It also has a transform used for transforming it's image
@@ -19,25 +20,29 @@ type Ent* = struct {
 	// used as a color of the rect and a color filter for the image
 	c: uint32
 }
+//~~
 
+//~~struct Coll
 // Value returned by get coll. It contains a position where the collision
 // happened and the index of the entity involved in said collision.
 type Coll* = struct {
 	index: th.uu
 	pos: th.Vf2
 }
+//~~
 
-fn centdraw(e: ^Ent, c: ^rect.Rect)
-
+fn umth_ent_draw(e: ^Ent, c: ^rect.Rect)
+//~~fn Ent.draw
 // Draws the entity onto the screen in relaction to camera c.
 fn (e: ^Ent) draw*(c: rect.Rect) {
-	centdraw(e, &c)
+//~~
+	umth_ent_draw(e, &c)
 }
 
-fn cgetcoll(coll: ^Coll, collC: ^int, maxCount: th.uu, count: int32, e: ^Ent, s: ^^Ent)
-
+//~~fn mk
 // ent's constructor
 fn mk*(img: image.Image = image.Image{}, t: th.Transform = th.Transform{ s: th.Vf2{1, 1} }): Ent {
+//~~
 	var e: Ent
 	e.i = img
 	e.t = t
@@ -55,9 +60,13 @@ fn mk*(img: image.Image = image.Image{}, t: th.Transform = th.Transform{ s: th.V
 	return e
 }
 
+fn umth_ent_getcoll(coll: ^Coll, collC: ^int, maxCount: th.uu, count: int32,
+	e: ^Ent, s: ^^Ent)
+//~~fn Ent.getColl
 // Checks collisions of e with entities in s. Checks at max maxColl collisions.
 // If s contains e, the collision won't be returned.
 fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
+//~~
 	if len(s) == 0 {
 		return []Coll{}
 	}
@@ -72,22 +81,16 @@ fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
 
 	colls := make([]Coll, maxColls)
 	count := 0
-	cgetcoll(&colls[0], &count, maxColls, len(s), e, &s[0])
+	umth_ent_getcoll(&colls[0], &count, maxColls, len(s), e, &s[0])
 
 	return slice(colls, 0, count)
 }
 
+//~~fn Ent.animate
 // Animates the entity's image with one of the `anim` array. <b>Won't</b> begin on
 // the first frame. If you want that, use anim.Anim.
 fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
+//~~
 	e.i = frames^[(round(real(t)/(1000/fps)) % len(frames^))]
 }
 
-fn centysort(e: ^ent.Ent, count: int)
-
-// Performs an y sort on entities.
-fn ysort*(ents: ^[]ent.Ent) {
-	if len(ents^) > 0 {
-		centysort(&ents[0], len(ents^))
-	}
-}

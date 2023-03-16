@@ -1,0 +1,105 @@
+
+import (
+	"canvas.um"
+	"rect.um"
+	"th.um"
+)
+
+//~~struct Mesh
+// Mesh is a 2d array of bool cells.  If a cell is true, the cell can be used
+// in a path.  The mesh is located in a world using the `r` field.  A cell can
+// have an arbitrary size as specified by `s`.
+// 
+// The mesh can be edited using the `addQuad` method, but it should be trivial
+// to add your own, similar methods.
+// 
+// Please use the `mk` constructor to construct a `Mesh`, unless you really
+// know what you're doing.
+type Mesh* = struct {
+	// The mesh data.
+	d: []bool
+	// The dimensions and position of the mesh, r.w == w * s
+	r: rect.Rect
+	// Width of the mesh.  Used to adress the mesh data.
+	w: th.uu
+	// Scale of one cell (cell is a square)
+	s: th.fu
+}
+//~~
+
+//~~fn mk
+// Creates a new nav mesh. The dimensions must be divisible by the scale.
+// `r`
+// : the rectangle of the mask
+// 's'
+// : the scale of the mask
+fn mk*(r: rect.Rect, s: th.fu): Mesh {
+//~~
+	if r.w % s != 0 || r.h % s != 0 {
+		error("The mask dimensions must be divisible by the scale")
+	}
+
+	m := Mesh{}
+
+	m.d = make([]bool, trunc(r.w/s * r.h/s))
+	for i in m.d {
+		m.d[i] = true
+	}
+
+	m.w = trunc(r.w/s)
+	m.s = s
+	m.r = r
+
+	return m
+}
+
+fn umth_nav_mesh_add_quad(m: ^Mesh, q: ^th.Quad)
+//~~fn Mesh.addQuad
+// Sets mask's fields overlapping `q` to `false`.
+fn (m: ^Mesh) addQuad*(q: th.Quad) {
+//~~
+	umth_nav_mesh_add_quad(m, &q)
+}
+
+fn umth_nav_mesh_nav(cameFrom: ^th.Vf2, m: ^Mesh, p1, p2: th.Vf2)
+//~~fn Mesh.nav
+// Navigates between `p1` and `p2`. Returns the path as an array of `th.Vf2`s.
+// If it doesn't find any path, or one of the points is outside of the mask,
+// returns an empty array.
+fn (m: ^Mesh) nav*(p1, p2: th.Vf2): []th.Vf2 {
+//~~
+	cameFrom := make([]th.Vf2, len(m.d))
+	for i in cameFrom {
+		cameFrom[i] = th.Vf2{-1, -1}
+	}
+
+	umth_nav_mesh_nav(&cameFrom[0], m, p1, p2)
+	
+	path := []th.Vf2{p2}
+	p := p2
+	p.x = trunc((p.x - m.r.x) / m.s)
+	p.y = trunc((p.y - m.r.y) / m.s)
+
+	p1.x = trunc((p1.x - m.r.x) / m.s)
+	p1.y = trunc((p1.y - m.r.y) / m.s)
+	for (p.x != p1.x || p.y != p1.y) && p.x >= 0 && p.y >= 0 {
+		p = cameFrom[trunc(p.x + p.y*m.w)]
+
+		path = append(path, th.Vf2{
+			p.x * m.s + m.r.x + m.s/2,
+			p.y * m.s + m.r.y + m.s/2 })
+	}
+
+	for i:=0; i < len(path)/2; i++ {
+		t := path[i]
+		path[i] = path[len(path) - i - 1]
+		path[len(path) - i - 1] = t
+	}
+
+	// path not found is the first element is [-1; -1]
+	if len(path) > 0 && path[0].x < m.r.x {
+		return []th.Vf2{}
+	}
+
+	return path
+}

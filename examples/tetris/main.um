@@ -1,4 +1,5 @@
 import (
+	"rect.um"
 	"window.um"
 	"canvas.um"
 	"gameplay.um"
@@ -10,27 +11,32 @@ import (
 	"falling_piece.um"
 	"background.um"
 	"crazytext.um"
+	"signal.um"
 )
 
-fn main() {
+bgPlaying := true
+var (
+	scoreText: ^crazytext.Entry
+)
+
+fn init*() {
 	window.setup("bricks lol", 640, 480)
 
 	global.initAudio()
 	global.audioBackground.play()
-	bgPlaying := true
 
 	background.init()
 	fx.init()
 	field.setClearCallback(fx.clearEffect)
 	gameplay.init()
 	crazytext.init()
-	scoreText := crazytext.putText("SCORE: 0", crazytext.lifetimeForever)
+	scoreText = crazytext.putText("SCORE: 0", crazytext.lifetimeForever)
 	crazytext.putText("ARROW KEYS - MOVE", crazytext.lifetimeForever, false)
 	crazytext.putText("Z, X, C - ROTATE", crazytext.lifetimeForever, false)
 	crazytext.putText("M - MUTE", crazytext.lifetimeForever, false)
 
-	for window.cycle(global.cam) {
-		if input.isJustPressed('m') {
+	window.onFrame.register(signal.Callback{
+		if input.isJustPressedc('M') {
 			if bgPlaying {
 				global.audioBackground.seekToFrame(std.rand() % global.audioBackground.frameCount())
 				global.audioBackground.play()
@@ -42,9 +48,9 @@ fn main() {
 		scoreText.text = "SCORE: "+repr(global.score)
 		gameplay.update()
 		falling_piece.update()
-		canvas.drawRect(0x000000FF, global.cam)
+		canvas.drawRect(0x000000FF, rect.mk(0, 0, window.wp.x, window.wp.y))
 		background.update()
 		background.draw()
 		fx.draw()
-	}
+	}, null)
 }

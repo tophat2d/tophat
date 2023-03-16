@@ -1,19 +1,33 @@
+#include <math.h>
 #include <string.h>
 #include <stdint.h>
 
-#include "openglapi.h"
+#include <assert.h>
 #include <stb_image.h>
 
-#include "tophat.h"
+#include <sokol_gfx.h>
 
-#ifndef GL_UNSIGNED_INT_8_8_8_8 
-#define GL_UNSIGNED_INT_8_8_8_8 0x8035
+#include "tophat.h"
+#include "umka_api.h"
+#ifdef __EMSCRIPTEN__
+#include <GLES2/gl2.h>
+#include <GLES2/gl2ext.h>
+#else 
+#include <GL/gl.h>
+#endif
+
+#ifndef GL_RGBA
+#define GL_RGBA 0x1908
+#endif
+#ifndef GL_UNSIGNED_INT_8_8_8_8_REV
+#define GL_UNSIGNED_INT_8_8_8_8_REV 0x8367
 #endif
 
 extern th_global *thg;
 
 void th_image_free(th_image *img) {
-	glDeleteTextures(1, &img->gltexture);
+	sg_uninit_image(img->tex);
+	sg_dealloc_image(img->tex);
 }
 
 static void th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -24,56 +38,122 @@ th_image *th_image_alloc() {
 	return umkaAllocData(thg->umka, sizeof(th_image), th_image_free_umka);
 }
 
-static
-uint32_t *th_rdimg(th_image *img, unsigned char *data) {
-	uint32_t *rd = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-
-	for (int i=0; i < img->dm.w * img->dm.h; i++) {
-		switch (img->channels) {
-		case 3:
-			rd[i] = 0;
-			for (int j=0; j < 3; j++) {
-				rd[i] |= data[i*3 + j] << j*8;
-			}
-			rd[i] |= 0xff << 3*8;
-			break;
-		case 4:
-			rd[i] = 0;
-			for (int j=0; j < 4; j++)
-				rd[i] |= data[i*4 + j] << j*8;
-			break;
-		default:
-			th_error("tophat can't load this image.");
-			break;
-		}
-	}
-
-	return rd;
+static void th_image_free_render_target(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_render_target *t = p[0].ptrVal;
+	sg_destroy_pass(t->pass);
+	sg_destroy_image(t->depth);
+	th_image_free(t->image);
 }
 
-uint32_t *th_image_get_data(th_image *img, bool rgba) {
-	uint32_t *data = malloc(sizeof(uint32_t) * img->dm.w * img->dm.h);
-	glBindTexture(GL_TEXTURE_2D, img->gltexture);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+th_render_target *th_render_target_alloc() {
+	th_render_target *t = umkaAllocData(thg->umka, sizeof(th_render_target), th_image_free_render_target);
+	t->image = calloc(sizeof(th_image), 1);
+	return t;
+}
 
-	if (rgba)
-		for (int i=0; i < img->dm.w * img->dm.h; ++i) {
-			uint32_t c = data[i];
-			data[i] = 
-				(c >> 0*8 & 0xff) << 3*8 |
-				(c >> 1*8 & 0xff) << 2*8 |
-				(c >> 2*8 & 0xff) << 1*8 |
-				(c >> 3*8 & 0xff) << 0*8;
-		}
-			
+uint32_t *th_image_get_data(th_image *img) {
+	size_t size = sizeof(uint32_t) * img->dm.w * img->dm.h;
+	uint32_t *data = malloc(size);
+	
+	GLuint tex = th_sg_get_gl_image(img->tex);
+
+#ifdef __EMSCRIPTEN__
+	glBindTexture(GL_TEXTURE_2D, tex);
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo); 
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
+
+	glReadPixels(0, 0, img->dm.w, img->dm.h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &fbo);
+#else
+	void glBindTexture(GLenum target, GLuint texture);
+	GLenum glGetError();
+	void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *pixels);
+
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+	glGetError();
+#endif
 
 	return data;
+}
+
+static void assert_image(th_image *img) {
+	sg_resource_state creation_status = sg_query_image_state(img->tex);
+	if (creation_status != SG_RESOURCESTATE_VALID) {
+		assert(creation_status != SG_RESOURCESTATE_INVALID && "gen_tex: INVALID");
+		assert(creation_status != SG_RESOURCESTATE_FAILED && "gen_tex: FAILED");
+		assert(false && "gen_tex: Unknown error");
+	}
+}
+
+th_render_target *th_image_create_render_target(int width, int height, int filter) {
+	th_render_target *t = th_render_target_alloc();
+
+  sg_image_desc img_desc = {
+    .render_target = true,
+    .width = width,
+    .height = height,
+    .pixel_format = SG_PIXELFORMAT_RGBA8,
+    .mag_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
+		.min_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
+		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+    .sample_count = 1,
+	};
+
+	t->image->dm.w = width;
+	t->image->dm.h = height;
+	t->image->channels = 4;
+	t->image->filter = SG_FILTER_NEAREST;
+	t->image->crop = (th_quad){
+		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
+		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
+	t->image->flipv = 0;
+	t->image->fliph = 1;
+	t->image->tex = sg_make_image(&img_desc);
+	assert_image(t->image);
+
+	img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
+	t->depth = sg_make_image(&img_desc);
+
+	t->pass = sg_make_pass(&(sg_pass_desc){
+		.color_attachments[0].image = t->image->tex,
+		.depth_stencil_attachment.image = t->depth,
+		.label = "offscreen-pass"
+	});
+
+	return t;
+}
+
+static void gen_tex(th_image *img, uint32_t *data) {
+	img->tex = sg_make_image(&(sg_image_desc){
+		.width = img->dm.w,
+		.height = img->dm.h,
+		.data.subimage[0][0] = (sg_range) {
+			.ptr = data,
+			.size = img->dm.w * img->dm.h * sizeof(uint32_t)
+		},
+		.pixel_format = SG_PIXELFORMAT_RGBA8,
+		.mag_filter = img->filter,
+		.min_filter = img->filter,
+		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
+		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+		.usage = SG_USAGE_IMMUTABLE
+	});
+
+	assert_image(img);
 }
 
 th_image *th_load_image(char *path) {
 	int w, h, c;
 
-	unsigned char *data = stbi_load(path, &w, &h, &c, 0);
+	unsigned char *data = stbi_load(path, &w, &h, &c, STBI_rgb_alpha);
 	if (!data) {
 		th_error("Could not load an image at path %s.", path);
 		return NULL;
@@ -83,32 +163,21 @@ th_image *th_load_image(char *path) {
 	img->dm.w = w;
 	img->dm.h = h;
 	img->channels = c;
-	img->filter = 1;
+	img->filter = SG_FILTER_NEAREST;
 	img->crop = (th_quad){
 		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
 		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
 	img->flipv = 0;
 	img->fliph = 0;
 
-	uint32_t *udata = th_rdimg(img, data);
-	stbi_image_free(data);
+	gen_tex(img, (uint32_t *)data);
 
-	img->gltexture = th_gen_texture(udata, img->dm, img->filter);
-	free(udata);
+	stbi_image_free(data);
 
 	return img;
 }
 
 void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
-	for (int i=0; i < dm.w * dm.h; ++i) {
-		uint32_t c = data[i];
-		data[i] = 
-			(c >> 0*8 & 0xff) << 3*8 |
-			(c >> 1*8 & 0xff) << 2*8 |
-			(c >> 2*8 & 0xff) << 1*8 |
-			(c >> 3*8 & 0xff) << 0*8;
-	}
-
 	img->dm = dm;
 	img->flipv = 0;
 	img->fliph = 0;
@@ -116,63 +185,28 @@ void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm) {
 		(th_vf2){{0, 0}}, (th_vf2){{1, 0}},
 		(th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
 	img->channels = 4;
-	img->filter = 1;
+	img->filter = SG_FILTER_NEAREST;
 
-	img->gltexture = th_gen_texture(data, dm, img->filter);
+	gen_tex(img, data);
 }
 
-void th_image_set_filter(th_image *img, int filter) {
-	uint32_t *data = th_image_get_data(img, false);
+void th_image_set_filter(th_image *img, sg_filter filter) {
+	uint32_t *data = th_image_get_data(img);
+	img->filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST;
 
-	img->filter = filter;
-	glDeleteTextures(1, &img->gltexture);
-	img->gltexture = th_gen_texture(data, img->dm, img->filter);
+	sg_uninit_image(img->tex);
+	sg_dealloc_image(img->tex);
+	gen_tex(img, data);
 
 	free(data);
 }
 
 void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm) {
-	for (int i=0; i < img->dm.w * img->dm.h; ++i) {
-		uint32_t c = data[i];
-		data[i] = 
-			(c >> 0*8 & 0xff) << 3*8 |
-			(c >> 1*8 & 0xff) << 2*8 |
-			(c >> 2*8 & 0xff) << 1*8 |
-			(c >> 3*8 & 0xff) << 0*8;
-	}
-
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, img->gltexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dm.w, dm.h, 0, GL_RGBA,
-		GL_UNSIGNED_BYTE, data);
+	sg_uninit_image(img->tex);
+	sg_dealloc_image(img->tex);
 
 	img->dm = dm;
-}
-
-unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter) {
-	GLuint tex;
-
-	glGenTextures(1, &tex);
-	glEnable(GL_TEXTURE_2D);
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, tex);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-
-	if (filter)
-		filter = GL_NEAREST;
-	else
-		filter = GL_LINEAR;
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter);
-
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, dm.w, dm.h, 0,  GL_RGBA,
-		GL_UNSIGNED_BYTE, data);
-
-	return (unsigned int)tex;
+	gen_tex(img, data);
 }
 
 void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br) {
@@ -202,216 +236,120 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 	th_blit_tex(img, q, color);
 }
 
-#define SWAP(a, b) { th_vf2 t = a; b = a; a = t; }
+#define SWAP(a, b) { th_vf2 t = b; b = a; a = t; }
 
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
-	th_canvas_flush();
-	if (img->gltexture != thg->batch_tex || thg->blit_batch_size >= BATCH_SIZE - 1)
-		th_image_flush();
-	thg->batch_tex = img->gltexture;
-
 	for (uu i=0; i < 4; i++) {
-		q.v[i].x *= thg->scaling;
-		q.v[i].x += thg->offset.x;
-		q.v[i].y *= thg->scaling;
-		q.v[i].y += thg->offset.y;
+		q.v[i].x = trunc(q.v[i].x * thg->scaling + thg->offset.x);
+		q.v[i].y = trunc(q.v[i].y * thg->scaling + thg->offset.y);
 	}
 
-	int sw, sh;
-	th_gl_get_viewport_max(&sw, &sh);
+	float sw = thg->target_size.x, sh = thg->target_size.y;
 
 	float colors[4];
 		for (int i=0; i < 4; ++i)
 			colors[3 - i] = ((color >> (8 * i)) & 0xff) / (float)0xff;
 
 	th_quad bounds = img->crop;
-	if (img->flipv) {
+	if (img->fliph) {
 		SWAP(bounds.tl, bounds.bl);
 		SWAP(bounds.tr, bounds.br);
 	}
 
-	if (img->fliph) {
+	if (img->flipv) {
 		SWAP(bounds.tl, bounds.tr);
 		SWAP(bounds.bl, bounds.br);
 	}
 
-	const float yoff = thg->has_framebuffer ? -1.0 : 1.0;
-	const float verts[] = {
-		q.tl.x / sw - 1.0, q.tl.y / sh + yoff, bounds.tl.x, bounds.tl.y,
-		q.tr.x / sw - 1.0, q.tr.y / sh + yoff, bounds.tr.x, bounds.tr.y,
-		q.br.x / sw - 1.0, q.br.y / sh + yoff, bounds.br.x, bounds.br.y,
-		q.tl.x / sw - 1.0, q.tl.y / sh + yoff, bounds.tl.x, bounds.tl.y,
-		q.br.x / sw - 1.0, q.br.y / sh + yoff, bounds.br.x, bounds.br.y,
-		q.bl.x / sw - 1.0, q.bl.y / sh + yoff, bounds.bl.x, bounds.bl.y};
+	float verts[] = {
+		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
+		q.tr.x / sw, q.tr.y / sh, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,
+		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
+		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
+		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
+		q.bl.x / sw, q.bl.y / sh, bounds.bl.x, bounds.bl.y, 0, 0, 0, 0};
 
-	float *ptr = &thg->blit_batch[thg->blit_batch_size * 6 * (2 + 2 + 4)];
-	for (uu i=0; i < 6; i++) {
-		memcpy(ptr, &verts[i * (2 + 2)], (2 + 2) * sizeof(float));
-		ptr += 2 + 2;
-		memcpy(ptr, colors, 4 * sizeof(float));
-		ptr += 4;
-	}
+	for (uu i=0; i < 6; i++)
+		memcpy(verts + (i * 8) + 4, colors, 4 * sizeof(float));
 
-	++thg->blit_batch_size;
+	th_canvas_batch_push_auto_flush(img, verts, sizeof(verts) / sizeof(verts[0]));
 }
 
-void th_image_flush() {
-	if (!thg->blit_batch_size) return;
-
-	glBindBuffer(GL_ARRAY_BUFFER, thg->blit_vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, thg->blit_batch_size * 6 * (4 + 2 + 2) * sizeof(float), thg->blit_batch);
-
-	glUniform1i(thg->blit_prog_tex, 0);
-	glBindTexture(GL_TEXTURE_2D, thg->batch_tex);
-
-	glUseProgram(thg->blit_prog);
-	glBindVertexArray(thg->blit_vao);
-	glDrawArrays(GL_TRIANGLES, 0, thg->blit_batch_size * 6);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	thg->blit_batch_size = 0;
-}
-
-void th_image_set_as_render_target(th_image *img) {
-	if (thg->has_framebuffer) {
-		th_error("Another image is alredy selected as the render target.");
+void th_image_set_as_render_target(th_render_target *t) {
+	if (thg->has_render_target) {
+		th_error("There already is a render target set!");
 		return;
 	}
-		
-	if (img->dm.w >= RENDER_TARGET_MAX_SIZE || img->dm.h >= RENDER_TARGET_MAX_SIZE) {
-		th_error("Render target can be atmost %dx%d big.",
-			RENDER_TARGET_MAX_SIZE, RENDER_TARGET_MAX_SIZE);
-		return;
-	}
-
-	th_image_flush();
+	
 	th_canvas_flush();
+	sg_end_pass();
 
+	sg_begin_pass(t->pass, &thg->offscreen_pass_action);
+	sg_apply_pipeline(thg->image_pip);
+
+	thg->has_render_target = true;
+	
 	thg->scaling = 1;
 	thg->offset.x = 0;
 	thg->offset.y = 0;
-	thg->viewport = img->dm;
-	thg->has_framebuffer = 1;
-
-	glBindFramebuffer(GL_FRAMEBUFFER, thg->framebuffer);
-	
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, img->gltexture, 0);
-
-	GLenum drawBuffer = GL_COLOR_ATTACHMENT0;
-	glDrawBuffers(1, &drawBuffer);
-
-	glViewport(0, 0, img->dm.w, img->dm.h);
-
-	glUseProgram(thg->blit_prog);
-	glUniform1i(thg->framebuffer_uniform, 1);
-
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-		th_error("Could not setup image render target %x, %x.", glGetError(), glCheckFramebufferStatus(GL_FRAMEBUFFER));
+	thg->viewport = t->image->dm;
+	thg->target_size = t->image->dm;
 }
 
-void th_image_remove_render_target(th_image *img, th_rect *cam) {
-	if (!thg->has_framebuffer) {
+void th_image_remove_render_target(th_render_target *t, th_vf2 wp) {
+	if (!thg->has_render_target) {
 		th_error("No render target is set.");
 		return;
 	}
 
 	th_canvas_flush();
-	th_image_flush();
+	sg_end_pass();
+	
+	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
+	sg_apply_pipeline(thg->canvas_pip);
 
-	th_calculate_scaling(cam->w, cam->h);
+	th_calculate_scaling(wp.x, wp.y);
+	
+	int window_width, window_height;
+	th_window_get_dimensions(&window_width, &window_height);
+	thg->target_size = (th_vf2){window_width, window_height};
 
-	/*glBindTexture(GL_TEXTURE_2D, img->gltexture);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, img->data);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, img->dm.w, img->dm.h, 0, GL_RGBA,
-		GL_UNSIGNED_INT_8_8_8_8, img->data);*/
-
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-	glUseProgram(thg->blit_prog);
-	glUniform1i(thg->framebuffer_uniform, 0);
-
-	int w,h;
-	th_window_get_dimensions(&w, &h);
-	glViewport(0, 0, w, h);
-	thg->viewport.w = w;
-	thg->viewport.h = h;
-	thg->has_framebuffer = 0;
-}
-
-int th_image_compile_shader(char *frag, char *vert) {
-	const char *attribs[] = {
-		"th_vert", "th_tex_vert", "th_color"
-	};
-
-	return th_shader_compile(frag, vert,
-		"attribute vec2 th_vert;\n"
-		"attribute vec2 th_tex_vert;\n"
-		"attribute vec4 th_color;\n"
-		"varying vec2 th_tc;\n"
-		"varying vec4 th_vcolor;\n"
-
-		"vec2 th_vertex(vec2 vert);\n"
-
-		"void main() {\n"
-		"  th_vcolor = th_color;\n"
-		"  gl_Position = vec4( th_vertex(th_vert), 0, 1 );\n"
-		"  th_tc = th_tex_vert;\n"
-		"}\n",
-
-		"uniform int th_has_framebuffer;\n"
-		"uniform sampler2D th_tex;\n"
-		"varying vec2 th_tc;\n"
-		"varying vec4 th_vcolor;\n"
-
-		"vec4 th_fragment(sampler2D tex, vec2 coord);\n"
-
-		"void main() {\n"
-		"  gl_FragColor = th_fragment(th_tex, th_tc) * th_vcolor; \n"
-		"}\n",
-		attribs, 3);
+	thg->has_render_target = false;
 }
 
 void th_image_init() {
-	thg->blit_prog = *th_get_shader_err(th_image_compile_shader(
-		"vec2 th_vertex(vec2 vert) { return vert; }",
-		"vec4 th_fragment(sampler2D tex, vec2 coord) { return texture2D(tex, coord); }"));
+	thg->offscreen_pass_action = (sg_pass_action) {
+		.colors[0] = { .action = SG_ACTION_CLEAR, .value = {0, 0, 0, 0} }
+	};
+	thg->image_pip = sg_make_pipeline(&(sg_pipeline_desc){
+		.shader = thg->main_shader,
+		.layout = {
+			.attrs = {
+				[0].format = SG_VERTEXFORMAT_FLOAT2, // X, Y
+				[1].format = SG_VERTEXFORMAT_FLOAT2, // U, V
+				[2].format = SG_VERTEXFORMAT_FLOAT4  // R, G, B, A
+			}
+		},
+		.depth = {
+			.pixel_format = SG_PIXELFORMAT_DEPTH,
+			.compare = SG_COMPAREFUNC_LESS_EQUAL,
+			.write_enabled = true,
+		},
+		.colors[0].blend = {
+			.enabled = true,
+			.src_factor_alpha = SG_BLENDFACTOR_ONE,
+			.dst_factor_alpha = SG_BLENDFACTOR_ZERO,
+			.op_alpha = SG_BLENDOP_ADD,
+			.src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+			.dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
+			.op_rgb = SG_BLENDOP_ADD,
+		},
+		.label = "image-pip"
+	});
 
-	thg->blit_prog_tex = glGetUniformLocation(thg->blit_prog, "th_tex");
-	thg->framebuffer_uniform = glGetUniformLocation(thg->blit_prog, "th_has_framebuffer");
-
-	glGenVertexArrays(1, &thg->blit_vao);
-	glGenBuffers(1, &thg->blit_vbo);
-
-	glBindVertexArray(thg->blit_vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, thg->blit_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(thg->blit_batch), thg->blit_batch, GL_DYNAMIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), NULL);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(2 * sizeof(float)));
-	glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void *)(4 * sizeof(float)));
-	glEnableVertexAttribArray(0);
-	glEnableVertexAttribArray(1);
-	glEnableVertexAttribArray(2);
-
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-
-	glGenFramebuffers(1, &thg->framebuffer);
-	glBindFramebuffer(GL_FRAMEBUFFER, thg->framebuffer);
-		glGenRenderbuffers(1, &thg->depthbuffer);
-		glBindRenderbuffer(GL_RENDERBUFFER, thg->depthbuffer);
-			glRenderbufferStorage(
-				GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
-				RENDER_TARGET_MAX_SIZE, RENDER_TARGET_MAX_SIZE
-			);
-
-			glFramebufferRenderbuffer(
-				GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-				GL_RENDERBUFFER, thg->depthbuffer
-			);
-		glBindRenderbuffer(GL_RENDERBUFFER, 0);
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	return;
 }
 
-void th_image_deinit() { }
+void th_image_deinit() {
+	return;
+}

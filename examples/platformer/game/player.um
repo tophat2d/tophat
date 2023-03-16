@@ -9,7 +9,6 @@ import (
 	"image.um"
 	"input.um"
 	"canvas.um"
-	"shader.um"
 	"signal.um"
 	"window.um"
 	"tilemap.um"
@@ -52,7 +51,7 @@ fn move() {
 		plYMotion += gravity * th.delta
 	}
 
-	if input.isJustPressed(' ') && canJump {
+	if input.isJustPressedc(' ') && canJump {
 		body.t.p.y -= 1
 		plYMotion = jumpForce
 		canJump = false
@@ -60,12 +59,10 @@ fn move() {
 
 	if input.isPressed(input.key_left) {
 		mot.x = -1
-		body.i.fliph(false)
 	}
 
 	if input.isPressed(input.key_right) {
 		mot.x = 1
-		body.i.fliph(true)
 	}
 
 	mot.x *= th.delta * moveSpeed
@@ -143,7 +140,7 @@ fn handle*() {
 	if !dying && body.t.p.distanceTo(env.end) < global.tileSize {
 		signal.emit("finish", null)
 	}
-	
+
 	if colls := body.getColl(env.coins, 1); len(colls) != 0 {
 		env.coins = delete(env.coins, colls[0].index)
 		env.score++
@@ -157,8 +154,8 @@ fn handle*() {
 		body.t.p = env.spawn
 	}
 
-	global.cam.x += (body.t.p.x - global.cam.x) * th.delta/1000.0 * 10.0
-	global.cam.y += (body.t.p.y - global.cam.y) * th.delta/1000.0 * 10.0
+	global.cam.x += (body.t.p.x + body.r.w*body.t.s.x - global.cam.x) - global.cam.w/2
+	global.cam.y += (body.t.p.y + body.r.h*body.t.s.y - global.cam.y) - global.cam.h/2
 }
 
 fn draw*() {

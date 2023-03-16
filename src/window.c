@@ -1,394 +1,233 @@
 #include "tophat.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
+
+#include <umka_api.h>
+#include <sokol_app.h>
+#include <sokol_log.h>
+#include <sokol_gfx.h>
+#include <sokol_glue.h>
 
 extern th_global *thg;
 
-static bool window_active = false;
+static int umth_frame_callback = 0;
 
-#ifdef linux
-#include <X11/Xlib.h>
-#include <X11/XKBlib.h>
-#include <GL/glx.h>
+static void print_umka_error_and_quit() {
+	UmkaError error;
+	umkaGetError(thg->umka, &error);
+	th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
+	fprintf(stderr, "\tStack trace:\n");
 
-static Atom wm_delete_message;
-static Display *th_dpy = NULL;
-static Window th_win;
-static Window th_root_win;
-static XWindowAttributes th_win_attribs;
-static GLXContext th_ctx;
+	for (int depth = 0; depth < 10; depth++) {
+		char fnName[UMKA_MSG_LEN + 1];
+		char file[UMKA_MSG_LEN + 1];
+		int line, offset;
 
-static XkbDescPtr desc;
-static XIC xic;
-
-static void th_window_deinit() {
-	XDestroyWindow(th_dpy, th_win);
-	XCloseDisplay(th_dpy);
-}
-
-void th_window_setup(char *name, int w, int h) {
-	if (window_active) {
-		th_error("Window already created.");
-		return;
-	}
-
-	th_dpy = XOpenDisplay(NULL);
-	if (!th_dpy) {
-		th_error("Could not open X display.");
-		return;
-	}
-	wm_delete_message = XInternAtom(th_dpy, "WM_DELETE_WINDOW", False);
-
-	int screen = DefaultScreen(th_dpy);
-	th_root_win = DefaultRootWindow(th_dpy);
-
-	int gl_attribs[] = {
-		GLX_RGBA,
-		GLX_DOUBLEBUFFER,
-		None
-	};
-
-	XVisualInfo *vi = glXChooseVisual(th_dpy, screen, gl_attribs);
-	if (!vi) {
-		th_error("No visual found.");
-		return;
-	}
-
-	XSetWindowAttributes attribs;
-	attribs.background_pixel = 0;
-	attribs.colormap = XCreateColormap(th_dpy, th_root_win, vi->visual, AllocNone);
-	th_win = XCreateWindow(th_dpy, th_root_win, 0, 0, w, h, 0, vi->depth, InputOutput,
-		vi->visual, CWBorderPixel | CWColormap, &attribs);
-	
-	XSetWMProtocols(th_dpy, th_win, &wm_delete_message, 1);
-
-	XMapWindow(th_dpy, th_win);
-	XStoreName(th_dpy, th_win, name);
-	th_ctx = glXCreateContext(th_dpy, vi, NULL, GL_TRUE);
-	if (!th_ctx) {
-		th_error("Could not create a context.");
-		return;
-	}
-	glXMakeCurrent(th_dpy, th_win, th_ctx);
-
-	XGetWindowAttributes(th_dpy, th_win, &th_win_attribs);
-	XSelectInput(th_dpy, th_win, KeyPressMask | KeyReleaseMask | ButtonPressMask | ButtonReleaseMask | ExposureMask | PointerMotionMask);
-	atexit(th_window_deinit);
-
-	glDisable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	XkbComponentNamesRec names = {};
-	names.symbols = "us";
-	desc = XkbGetKeyboardByName(th_dpy, XkbUseCoreKbd, &names, XkbAllComponentsMask, XkbAllComponentsMask, false);
-
-	XIM xim = XOpenIM(th_dpy, 0, 0, 0);
-	if (!xim) {
-		th_error("Could not open XIM.");
-		return;
-	}
-
-	xic = XCreateIC(xim, XNInputStyle, XIMPreeditNothing | XIMStatusNothing, NULL);
-	if (!xic) {
-		th_error("Could not create XIC");
-		return;
-	}
-
-	window_active = true;
-	XGetWindowAttributes(th_dpy, th_win, &th_win_attribs);
-	glViewport(0, 0, th_win_attribs.width, th_win_attribs.height);
-	thg->viewport.w = th_win_attribs.width;
-	thg->viewport.h = th_win_attribs.height;
-}
-
-void th_window_get_dimensions(int *w, int *h) {
-	*w = th_win_attribs.width;
-	*h = th_win_attribs.height;
-}
-
-int th_window_handle() {
-	if (!window_active) {
-		th_error("No window was created.");
-		return 0;
-	}
-
-	th_input_key(4, 0);
-	th_input_key(5, 0);
-
-	XEvent ev;
-	while (XPending(th_dpy)) {
-		XNextEvent(th_dpy, &ev);
-
-		int keyDir = 1;
-		switch (ev.type) {
-		case Expose:
-			XGetWindowAttributes(th_dpy, th_win, &th_win_attribs);
-			glViewport(0, 0, th_win_attribs.width, th_win_attribs.height);
-
-			thg->viewport.w = th_win_attribs.width;
-			thg->viewport.h = th_win_attribs.height;
+		if (!umkaGetCallStack(thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
 			break;
-		case KeyPress:; // FALLTHROUGH
-			KeySym _;
-			Status status;
-			thg->input_string_len += Xutf8LookupString(xic, &ev.xkey,
-				thg->input_string + thg->input_string_len,
-				INPUT_STRING_SIZE - thg->input_string_len,
-				&_, &status);
-
-		case KeyRelease:;
-			// modifiers are not used for this kind of input
-			unsigned mods = 0;
-			
-			// translate to a qwerty key
-			KeySym sym;
-			XkbTranslateKeyCode(desc, ev.xkey.keycode, mods, &mods, &sym);
-			if (!sym)
-				sym = XLookupKeysym(&ev.xkey, 0);
-
-			th_input_key(sym, ev.type == KeyPress);
-			break;
-		case ButtonRelease:
-			keyDir = 0;
-			if (ev.xbutton.button > 3) break;
-		case ButtonPress:
-			th_input_key(ev.xbutton.button, keyDir);
-			break;
-		case MotionNotify:
-			thg->mouse = (th_vf2){ .x = ev.xmotion.x, .y = ev.xmotion.y };
-			break;
-		case ClientMessage:
-			if (ev.xclient.data.l[0] == wm_delete_message) {
-				return 0;
-			}
-			break;
+			fprintf(stderr, "\t\t...\n");
 		}
-	}
-
-	return 1;
-}
-
-void th_window_clear_frame() {
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void th_window_swap_buffers() {
-	th_canvas_flush();
-	th_image_flush();
-	th_input_cycle();
-
-	glXSwapBuffers(th_dpy, th_win);
-
-	thg->input_string_len = 0;
-}
-#elif _WIN32
-#include <windows.h>
-#include <wingdi.h>
-#include <windowsx.h>
-
-static HWND th_win;
-static HDC th_hdc;
-static RECT th_win_rect;
-static int should_close = 0;
-static th_vf2 win_size;
-
-LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
-	if (msg == WM_DESTROY)
-		should_close = 1;
-	return DefWindowProc(hwnd, msg, wParam, lParam);
-}
-
-static HKL hkl;
-
-void th_window_setup(char *name, int w, int h) {
-	if (window_active) {
-		th_error("Window already created.");
-		return;
-	}
-
-	const char CLASS_NAME[] = "tophat";
-
-	HINSTANCE hInstance = GetModuleHandle(NULL);
-
-	WNDCLASS wc = {
-		.lpfnWndProc = WndProc,
-		.hInstance = hInstance,
-		.hCursor = LoadCursor(NULL, IDC_ARROW),
-		.lpszClassName = CLASS_NAME
-	};
-
-	RegisterClass(&wc);
-
-	th_win = CreateWindow(
-		CLASS_NAME,
-		name,
-		WS_OVERLAPPEDWINDOW,
-		CW_USEDEFAULT,
-		CW_USEDEFAULT,
-		w, h,
-		NULL, NULL,
-		hInstance, NULL);
-	GetWindowRect(th_win, &th_win_rect);
-	win_size.x = th_win_rect.right;
-	win_size.y = th_win_rect.bottom;
-
-	if (th_win == NULL) {
-		th_error("could not create a window");
-		exit(1);
-	}
-
-	PIXELFORMATDESCRIPTOR pfd = {
-		sizeof(PIXELFORMATDESCRIPTOR), 1,
-		PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
-		PFD_TYPE_RGBA,
-		24,
-		8, 0, 8, 8, 8, 16, 
-		8,
-		24,
-		32,
-		8, 8, 8, 8,
-		16,
-		0,
-		0,
-		PFD_MAIN_PLANE,
-		0,
-		0, 0, 0
-	};
-
-	th_hdc = GetDC(th_win);
-	GLuint pf = ChoosePixelFormat(th_hdc, &pfd);
-	if (!SetPixelFormat(th_hdc, pf, &pfd)) {
-		th_error("couldn't choose pixel format");
-		exit(1);
-	}
-	HGLRC ctx = wglCreateContext(th_hdc);
-	if (!ctx) {
-		th_error("couldn't create an opengl context");
-		exit(1);
-	}
-	wglMakeCurrent(th_hdc, ctx);
-	th_gl_init();
-
-	glDisable(GL_DEPTH_TEST);
-	glDepthMask(GL_FALSE);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	ShowWindow(th_win, 1);
-
-	hkl = LoadKeyboardLayout("00000409", 0);
-
-	window_active = true;
-	thg->viewport.w = w;
-	thg->viewport.h = h;
-}
-
-void th_window_get_dimensions(int *w, int *h) {
-	*w = th_win_rect.right - th_win_rect.left;
-	*h = th_win_rect.bottom - th_win_rect.top;
-}
-
-int th_window_handle() {
-	if (!window_active) {
-		th_error("No window was created.");
-		return 0;
-	}
-
-	MSG msg;
-	th_input_key(4, 0);
-	th_input_key(5, 0);
-
-	while (PeekMessage(&msg, NULL, 0, 0, 1)) {
-		TranslateMessage(&msg);
-
-		// i found a list of these on the wine website, but not on MSDN -_-
-		switch (msg.message) {
-		case WM_KEYDOWN:; // FALLTHROUGH
-			char key_state[256];
-			GetKeyboardState(key_state);
-
-			wchar_t buf[256];
-			int v = ToUnicode(msg.wParam, MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), key_state, buf, 256, 0);
-			if (v == 1) // only supports one character for now
-				thg->input_string_len += th_utf8_encode(thg->input_string + thg->input_string_len, buf[0]);
-
-		case WM_KEYUP:;
-			uint32_t key = tolower(MapVirtualKeyEx(msg.wParam, MAPVK_VK_TO_CHAR, hkl));
-			if (key == 0 || iscntrl(key))
-				key = MapVirtualKeyEx(MapVirtualKey(msg.wParam, MAPVK_VK_TO_VSC), MAPVK_VSC_TO_VK, hkl) + 0x7f;
-
-			th_input_key(key, msg.message == WM_KEYDOWN);
-			break;
-		case WM_LBUTTONDOWN:
-		case WM_LBUTTONUP:
-			th_input_key(1, msg.message == WM_LBUTTONDOWN);
-			break;
-		case WM_MBUTTONDOWN:
-		case WM_MBUTTONUP:
-			th_input_key(2, msg.message == WM_MBUTTONDOWN);
-			break;
-		case WM_RBUTTONDOWN:
-		case WM_RBUTTONUP:
-			th_input_key(3, msg.message == WM_RBUTTONDOWN);
-			break;
-		case WM_MOUSEMOVE:
-			thg->mouse = (th_vf2){ .x = GET_X_LPARAM(msg.lParam), .y = GET_Y_LPARAM(msg.lParam) };
-			break;
-		case WM_MOUSEWHEEL:
-			th_input_key(GET_WHEEL_DELTA_WPARAM(msg.wParam) < 0 ? 5 : 4, 1);
-			break;
-		default:
-			DispatchMessage(&msg);
-			break;
-		}
-	}
-	GetClientRect(th_win, &th_win_rect);
-	glViewport(0, 0, th_win_rect.right, th_win_rect.bottom);
-	thg->viewport.w = th_win_rect.right - th_win_rect.left;
-	thg->viewport.h = th_win_rect.bottom - th_win_rect.top;
-
-	return !should_close;
-}
-
-void th_window_swap_buffers() {
-	th_canvas_flush();
-	th_image_flush();
-	th_input_cycle();
-	SwapBuffers(th_hdc);
-
-	thg->input_string_len = 0;
-}
-
-void th_window_clear_frame() {
-	glClearColor(1, 1, 1, 1);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-#else
-#error tophat cant create a window on this platform yet
+#ifndef _WIN32
+		fprintf(stderr, "\033[34m");
 #endif
-
-void th_window_begin_scissor(int x, int y, size_t w, size_t h) {
-	// NOTE(skejeton): The flush is necessary because all the previous render calls
-	//				   shouldn't be cut out using the rectangle.
-	th_canvas_flush();
-	th_image_flush();
-
-	x *= thg->scaling;
-	y *= thg->scaling;
-	w *= thg->scaling;
-	h *= thg->scaling;
-	glEnable(GL_SCISSOR_TEST);
-	int dimX, dimY;
-	th_window_get_dimensions(&dimX, &dimY);
-	glScissor(x+thg->offset.x, (dimY-(int)h)-y-thg->offset.y, w, h);
+		fprintf(stderr, "\t\t%s:%06d: ", file, line);
+#ifndef _WIN32
+		fprintf(stderr, "\033[0m");
+#endif
+		fprintf(stderr, "%s\n", fnName);
+	}
+	exit(-1);
 }
 
-void th_window_end_scissor() {
-	th_canvas_flush();
-	th_image_flush();
-	glDisable(GL_SCISSOR_TEST);
+static void init() {
+	th_audio_init();
+	sg_setup(&(sg_desc){
+		.context = sapp_sgcontext(),
+		.logger.func = slog_func
+	});
+
+	th_canvas_init();
+
+	umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
+
+	UmkaStackSlot s;
+
+	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
+		print_umka_error_and_quit();
+	}
 }
 
+static void frame() {
+	thg->pass_action = (sg_pass_action) {
+		.colors[0] = { .action = SG_ACTION_LOAD }
+	};
+	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
+	sg_apply_pipeline(thg->canvas_pip);
+	th_input_sync_fake_keys();
+	int window_width, window_height;
+	th_window_get_dimensions(&window_width, &window_height);
+	thg->target_size = (th_vf2){window_width, window_height};
+
+	UmkaStackSlot s;
+	if (umth_frame_callback != -1) {
+		s.realVal = sapp_frame_duration();
+
+		if (!umkaCall(thg->umka, umth_frame_callback, 1, &s, &s)) {
+			print_umka_error_and_quit();
+		}
+	}
+	
+	th_input_cycle();
+	th_canvas_flush();
+	th_canvas_end_frame();
+	sg_end_pass();
+	sg_commit();
+}
+
+static void event(const sapp_event *ev) {
+	switch (ev->type) {
+	case SAPP_EVENTTYPE_MOUSE_MOVE:
+		thg->mouse_delta = (th_vf2){ .x = ev->mouse_dx, .y = ev->mouse_dy };
+		thg->mouse = (th_vf2){ .x = ev->mouse_x, .y = ev->mouse_y };
+		break;
+	case SAPP_EVENTTYPE_CHAR:
+		thg->input_string_len = th_utf8_encode(thg->input_string, ev->char_code);
+		break;
+	case SAPP_EVENTTYPE_KEY_DOWN:
+	case SAPP_EVENTTYPE_KEY_UP:
+		th_input_repeated(ev->key_code, ev->type == SAPP_EVENTTYPE_KEY_DOWN);
+		if (ev->key_repeat)
+			break;
+
+		th_input_key(ev->key_code, ev->type == SAPP_EVENTTYPE_KEY_DOWN);
+		break;
+	case SAPP_EVENTTYPE_MOUSE_SCROLL:
+		thg->mouse_wheel.x = ev->scroll_x;
+		thg->mouse_wheel.y = ev->scroll_y;
+		break;
+	case SAPP_EVENTTYPE_MOUSE_DOWN:
+	case SAPP_EVENTTYPE_MOUSE_UP:
+		th_input_key(ev->mouse_button+1, ev->type == SAPP_EVENTTYPE_MOUSE_DOWN);
+		break;
+	}
+}
+
+static void cleanup() {
+	th_audio_deinit();
+	th_font_deinit();
+	th_image_deinit();
+
+	umkaFree(thg->umka);
+	
+	sg_shutdown();
+}
+
+sapp_desc th_window_sapp_desc() {
+  return (sapp_desc){
+    .init_cb = init,
+    .frame_cb = frame,
+    .cleanup_cb = cleanup,
+    .event_cb = event,
+    .width = 640,
+    .height = 480,
+    .gl_force_gles2 = true,
+    .window_title = "Tophat",
+    .icon.sokol_default = true,
+		.logger.func = slog_func
+  };
+}
+
+void th_window_setup(char *name, int w, int h) {
+	sapp_set_window_title(name);
+	th_window_set_dims((th_vf2){{w, h}});
+}
+
+void th_window_get_dimensions(int *w, int *h) {
+	*w = sapp_width();
+	*h = sapp_height();
+}
+
+bool th_window_is_fullscreen() {
+	return sapp_is_fullscreen();
+}
+
+void th_window_set_fullscreen(bool fullscreen) {
+	if (sapp_is_fullscreen() != fullscreen) {
+		sapp_toggle_fullscreen();
+	}
+}
+
+void th_window_set_icon(th_image *img) {
+	uint32_t *pixels = th_image_get_data(img);
+
+	sapp_set_icon(&(sapp_icon_desc){
+		.images = {
+			(sapp_image_desc){
+				.width = img->dm.x,
+				.height = img->dm.y,
+				.pixels = (sapp_range){
+					.ptr = pixels,
+					.size = img->dm.x * img->dm.y * sizeof(uint32_t)
+				}
+			}
+		}
+	});
+	
+	free(pixels);
+}
+
+void th_window_show_cursor(bool show) {
+	sapp_show_mouse(show);
+}
+
+void th_window_freeze_cursor(bool freeze) {
+	sapp_lock_mouse(freeze);
+}
+
+// ---- PLATFORM DEPENDENT CODE
+
+#ifdef _WIN32
+th_window_handle th_get_window_handle() {
+	return sapp_win32_get_hwnd();
+}
+
+void w32_get_client_window_size(int *w, int *h) {
+	RECT rect = {0};
+	rect.right = *w;
+	rect.bottom = *h;
+	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
+	*w = rect.right-rect.left;
+	*h = rect.bottom-rect.top;
+}
+
+void th_window_set_dims(th_vf2 dm) {
+	RECT r;
+	int w = dm.x, h = dm.y;
+	w32_get_client_window_size(&w, &h);
+	HWND hwnd = th_get_window_handle();
+	if (GetWindowRect(hwnd, &r)) {
+		SetWindowPos(hwnd, HWND_TOP, r.left, r.top, w, h, 0);
+	}
+}
+#elif __linux__
+extern Window *th_sapp_win;
+extern Display **th_sapp_dpy;
+th_window_handle th_get_window_handle() {
+	return th_sapp_win;
+}
+
+void th_window_set_dims(th_vf2 dm) {
+	XResizeWindow(*th_sapp_dpy, *th_sapp_win, dm.x, dm.y);
+}
+#elif defined(__EMSCRIPTEN__)
+th_window_handle th_get_window_handle() {
+	return 0;
+}
+
+void th_window_set_dims(th_vf2 dm) {
+	// FIXME: FAKE
+}
+#else
+#error Unsupported platform
+#endif

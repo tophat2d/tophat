@@ -12,6 +12,7 @@ import (
 	"input.um"
 	"lerp.um"
 	"misc.um"
+	"nav.um"
 	"particles.um"
 	"ray.um"
 	"rect.um"

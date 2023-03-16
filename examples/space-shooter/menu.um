@@ -5,6 +5,7 @@ import (
 	"std.um"
 	"hud.um"
 	"rect.um"
+	"window.um"
 	"global.um"
 	"ui/grid.um"
 	"ui/label.um"
@@ -50,8 +51,8 @@ fn init*() {
 	exitButton.get().grid(0, 4)
 
 	maingrid = grid.mk(1, 5)
-	maingrid.g.r.w = global.cam.w
-	maingrid.g.r.h = global.cam.h
+	maingrid.g.r.w = window.wp.x
+	maingrid.g.r.h = window.wp.y
 	maingrid.elements = []ui.Element{title, score, playButton, exitButton}
 }
 

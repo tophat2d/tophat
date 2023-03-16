@@ -34,7 +34,7 @@ int get_particle_rotation(th_particles *p, _th_particle pa, int t) {
 }
 
 void th_particles_draw(th_particles *p, th_rect cam, int t) {
-	int camx = cam.x - cam.w/2, camy = cam.y - cam.h/2;
+	int camx = cam.x, camy = cam.y;
 	p->active = false;
 
 	for (int i=0; i < umkaGetDynArrayLen(&p->particles); i++) {
@@ -46,7 +46,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 
 		if ((p->angle.y - p->angle.x) + p->angle.x == 0)
 			p->angle.x++;
-		double direction = (rand() % (long)(p->angle.y - p->angle.x + 1) + p->angle.x) * M_PI / 180;
+		double direction = (rand() % (long)(p->angle.y - p->angle.x + 1) + p->angle.x) * PI / 180;
 
 		fu vx = p->velocity * cos(direction);
 		fu vy = p->velocity * sin(direction);

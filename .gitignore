@@ -3,6 +3,7 @@
 build
 tophat
 tophat.exe
+tophatnc.exe
 src/umkalibs.h
 lib/stb_image.h
 lib/miniaudio.h
@@ -11,6 +12,8 @@ tophat-win.zip
 src/*.o
 src/*.d
 **/gmon.out
+**/wasm-out
+th_emscripten.a
 
 # Windows:
 .obj

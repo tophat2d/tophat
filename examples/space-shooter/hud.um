@@ -4,6 +4,7 @@ import (
 	"font.um"
 	"image.um"
 	"global.um"
+	"window.um"
 )
 
 var (
@@ -24,9 +25,9 @@ fn draw*() {
 	for i:=0; i < global.hp; i++ {
 		hearth.draw(
 			th.Transform{
-				p: th.Vf2{global.cam.w - ((dm.x + 1) * (i + 1) + 1), 1},
+				p: th.Vf2{window.wp.x - ((dm.x + 1) * (i + 1) + 1), 1},
 				s: th.Vf2{1, 1}}, th.white)
 	}
 
-	mainFont.draw(repr(global.score), th.Vf2{1, 1}, th.white, 1.0)
+	mainFont.draw(repr(global.score), th.Vf2{1, 1}, th.white, 0.2)
 }

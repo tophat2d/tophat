@@ -1,17 +1,22 @@
-// Particles allow for <i>performant</i> and random particle systems.
+//~~
+// Particles allow for *performant* and random particle systems.
 // TODO: a better constructor
+//~~
 
 import (
 	"th.um"
 	"rect.um"
 )
 
+//~~struct Particle
 // Particle struct. You can tweak the start_time for godot-like explossivness.
 type Particle* = struct {
+//~~
 	start_time: uint
 	seed: int32
 }
 
+//~~struct Emitter
 // Emitter. This is where everything is configured.
 type Emitter* = struct {
 	pos: th.Vf2 // position
@@ -40,14 +45,16 @@ type Emitter* = struct {
 	
 	particles: []Particle // list of particles
 }
+//~~
 
-fn c_particles_draw(p: ^Emitter, cam: ^rect.Rect, t: int32)
-
+fn umth_particles_draw(p: ^Emitter, cam: ^rect.Rect, t: int32)
+//~~fn Emitter.draw
 // Draws and updates the particles.
 fn (e: ^Emitter) draw*(cam: rect.Rect, t: int32) {
+//~~
 	if len(e.colors) <= 0 || len(e.particles) <= 0 {
 		return
 	}
 
-	c_particles_draw(e, &cam, t)
+	umth_particles_draw(e, &cam, t)
 }

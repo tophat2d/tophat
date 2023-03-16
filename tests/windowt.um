@@ -5,12 +5,33 @@ import (
 	"input.um"
 	"canvas.um"
 	"window.um"
+	"signal.um"
+	"placeholders.um"
 )
 
-fn main() {
-	window.setup("input test", 400, 400)
+cursorShow := true
+cursorFreeze := false
 
-	for window.cycle(rect.mk(0, 0, 400, 400)) {
-	
-	}
+fn init*() {
+	window.setup("input test", 400, 400)
+	window.setViewport(th.Vf2{100, 100})
+
+	window.setDims(th.Vf2{500, 400})
+	window.setIcon(placeholders.test)
+
+	window.onFrame.register(signal.Callback{
+		canvas.drawLine(th.black, th.Vf2{0, 0}, th.Vf2{100, 100}, 1)
+		canvas.drawLine(th.red, input.getMousePos(),
+			input.getMousePos().sub(input.getMouseDelta()), 1)
+
+		if input.isJustPressedc('C') {
+			cursorShow = !cursorShow
+			window.showCursor(cursorShow)
+		}
+
+		if input.isJustPressedc('F') {
+			cursorFreeze = !cursorFreeze
+			window.freezeCursor(cursorFreeze)
+		}
+	}, null)
 }
