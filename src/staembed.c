@@ -2262,7 +2262,7 @@ const char *th_em_modulesrc[] = {
 "\t\t}\n"
 "\t}\n"
 "\n"
-"\treturn max.sub(min)\n"
+"\treturn max.sub(min).abs()\n"
 "}\n"
 "\n"
 "fn umth_th_getglobal(): ^struct{}\n"

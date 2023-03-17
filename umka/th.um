@@ -274,7 +274,7 @@ fn (q: ^Quad) getDims*(): Vf2 {
 		}
 	}
 
-	return max.sub(min)
+	return max.sub(min).abs()
 }
 
 fn umth_th_getglobal(): ^struct{}
