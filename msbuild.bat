@@ -20,3 +20,4 @@ cd bin
 cmake -DCMAKE_BUILD_TYPE=%target% .. && msbuild tophat.sln /property:Configuration=%target%
 cd ..
 copy bin\%target%\tophat.exe tophat.exe
+
