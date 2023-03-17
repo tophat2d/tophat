@@ -33,7 +33,6 @@ static int th_main(int argc, char *argv[]) {
 	strncpy(thg->respath, "", sizeof thg->respath);
 	const char *scriptpath = "main.um";
 	bool check = false;
-	bool prof = false;
 	bool silent = false;
 
 	int argOffset = 1;
@@ -93,12 +92,16 @@ static int th_main(int argc, char *argv[]) {
 				"  -main - specify the main file (dir/main.um by default)\n"
 				"  -modsrc <module name> - print source of a builtin module\n"
 				"  -prof - use the profiler\n"
+				"  -profjson - output profiler stuff as json\n"
 				"  -silent - omit warnings\n"
 				"  -version - print the version\n"
 				"Visit th.mrms.cz for more info.\n");
 			exit(0);
 		} else if (strcmp(argv[argOffset], "-prof") == 0) {
-			prof = true;
+			thg->prof = true;
+			argOffset += 1;
+		} else if (strcmp(argv[argOffset], "-profjson") == 0) {
+			thg->profJson = true;
 			argOffset += 1;
 		} else {
 			break; // NOTE(skejeton): This is for arguments in the game itself
@@ -129,7 +132,7 @@ static int th_main(int argc, char *argv[]) {
 
 	umkaOK = umkaInit(thg->umka, "tophat_main.um", mainmod, 1024 * 1024, NULL,
 		argc - argOffset, argv + argOffset, true, true, silent ? NULL : warning);
-	if (prof) umprofInit(thg->umka);
+	if (thg->prof) umprofInit(thg->umka);
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");

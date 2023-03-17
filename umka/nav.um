@@ -1,6 +1,7 @@
 
 import (
 	"canvas.um"
+	"color.um"
 	"rect.um"
 	"th.um"
 )
@@ -28,20 +29,17 @@ type Mesh* = struct {
 //~~
 
 //~~fn mk
-// Creates a new nav mesh. The dimensions must be divisible by the scale.
+// Creates a new nav mesh.
 // `r`
 // : the rectangle of the mask
 // 's'
 // : the scale of the mask
 fn mk*(r: rect.Rect, s: th.fu): Mesh {
 //~~
-	if r.w % s != 0 || r.h % s != 0 {
-		error("The mask dimensions must be divisible by the scale")
-	}
 
 	m := Mesh{}
 
-	m.d = make([]bool, trunc(r.w/s * r.h/s))
+	m.d = make([]bool, ceil(r.w/s) * ceil(r.h/s))
 	for i in m.d {
 		m.d[i] = true
 	}
@@ -102,4 +100,20 @@ fn (m: ^Mesh) nav*(p1, p2: th.Vf2): []th.Vf2 {
 	}
 
 	return path
+}
+
+//~~fn Mesh.draw
+// Draws the mesh for debugging purposes.
+fn (m: ^Mesh) draw*(alpha: real32 = 1.0) {
+//~~
+	for x:=0; x < m.w; x++ {
+		for y:=0; y < len(m.d)/m.w; y += 1 {
+			c := th.cyan
+			if m.d[x + y*m.w] {
+				c = th.black
+			}
+			c = color.alpha(c, alpha)
+			canvas.drawRect(c, rect.mk(m.r.x + x*m.s, m.r.y + y*m.s, m.s, m.s))
+		}
+	}
 }

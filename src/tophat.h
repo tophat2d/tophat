@@ -222,6 +222,9 @@ typedef struct {
 	th_rect scissors[MAX_SCISSORS];
 	uu scissor;
 
+	bool prof;
+	bool profJson;
+
 	ma_engine audio_engine;
 } th_global;
 

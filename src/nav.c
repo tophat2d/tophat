@@ -20,14 +20,29 @@ void th_navmesh_add_quad(th_navmesh *m, th_quad *q) {
 		q->v[i] = vf2_to_loc(m, q->v[i]);
 
 	th_rect r = th_quad_bounding_box(*q);
+	if (r.x - r.w == 0 || r.y - r.h == 0)
+		return;
+	if (!th_rect_to_rect(&r, &(th_rect){
+		.x = 0, .y = 0,
+		.w = m->r.w / m->s, .h = m->r.h / m->s
+	}))
+		return;
+
+	const int dlen = umkaGetDynArrayLen(&m->d);
 
 	th_vf2 ic = {0};
 	// NOTE(~mrms): this is slow and could be implemented better with some magic,
 	// but it will work for now.
-	for (fu x = r.x + 0.5f; x < r.x + r.w; ++x)
-		for (fu y = r.y + 0.5f; y < r.y + r.h; ++y)
+	for (fu x = r.x + 0.5f; x < r.x + r.w; ++x) {
+		for (fu y = r.y + 0.5f; y < r.y + r.h; ++y) {
+			const uu idx = (uu)x + (uu)y*m->w;
+			if (idx > dlen)
+				continue;
+
 			if (th_point_to_quad((th_vf2){.x=x, .y=y}, q, &ic))
-				m->d.data[(uu)x + (uu)y*m->w] = 0;
+				m->d.data[idx] = 0;
+		}
+	}
 }
 
 // euclidian distance

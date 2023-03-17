@@ -9,6 +9,8 @@
 #include <sokol_gfx.h>
 #include <sokol_glue.h>
 
+#include <umprof.h>
+
 extern th_global *thg;
 
 static int umth_frame_callback = 0;
@@ -117,6 +119,18 @@ static void cleanup() {
 	th_audio_deinit();
 	th_font_deinit();
 	th_image_deinit();
+
+	if (thg->prof) {
+		if (thg->profJson) {
+			FILE *f = fopen("prof.json", "w");
+			umprofPrintEventsJSON(f);
+			fclose(f);
+		} else {
+			UmprofInfo arr[BUFSIZ] = {0};
+			size_t len = umprofGetInfo(arr, BUFSIZ);
+			umprofPrintInfo(stdout, arr, len);
+		}
+	}
 
 	umkaFree(thg->umka);
 	

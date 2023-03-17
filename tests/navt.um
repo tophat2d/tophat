@@ -62,15 +62,7 @@ fn init*() {
 			p = update(&m, s, e)
 		}
 
-		for x:=0; x < m.w; x++ {
-			for y:=0; y < len(m.d)/m.w; y += 1 {
-				c := th.cyan
-				if m.d[x + y*m.w] {
-					c = th.black
-				}
-				canvas.drawRect(c, rect.mk(m.r.x + x*m.s, m.r.y + y*m.s, m.s, m.s))
-			}
-		}
+		m.draw()
 
 		for i:=1; i < len(p); i += 1 {
 			canvas.drawLine(th.red, p[i-1], p[i], 1)
