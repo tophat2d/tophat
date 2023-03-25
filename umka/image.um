@@ -90,15 +90,15 @@ fn (i: ^Image) draw*(t: th.Transform, color: uint32 = th.white) {
 }
 
 fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: ^rect.Rect,
-	color: uint32)
+	color: uint32, scale: real)
 //~~fn Image.drawNinepatch
 // Draws "nine-patch" image. 
 // `outer` specifies the texture coordinates of the outer rect of source image,
 // `inner` specifies coordinates of inner rect of source image, positioned relative to `outer`.
 // You can tint with `color`.
-fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect.Rect, color: uint32 = th.white) {
+fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect.Rect, color: uint32 = th.white, scale: real = 1.0) {
 //~~
-	umth_image_draw_nine_patch(i^, &outer, &inner, &dest, color)
+	umth_image_draw_nine_patch(i^, &outer, &inner, &dest, color, scale)
 }
 
 fn umth_image_draw_on_quad(img: Image, color: uint32, q: th.Quad)

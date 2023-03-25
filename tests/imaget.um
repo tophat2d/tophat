@@ -104,6 +104,14 @@ fn init*() {
 		target.end(window.wp)
 
 		target.toImage().draw(th.Transform{s: th.Vf2{10, 10}, p: p})
+		p.y += target.toImage().getDims().y*10
+		canvas.drawText("nine patch:", p, th.black, 2)
+		p.y += 12
+
+		placeholders.button.drawNinepatch(rect.mk(0, 0, 5, 5), rect.mk(1, 1, 2, 2), rect.mk(0, p.y, 64, 64), 0xFFAAFFFF)
+		placeholders.button.drawNinepatch(rect.mk(0, 0, 5, 5), rect.mk(1, 1, 2, 2), rect.mk(64+2, p.y, 128, 128), 0xFFFFFFFF, 4)
+		placeholders.button.drawNinepatch(rect.mk(5, 0, 5, 5), rect.mk(2, 2, 1, 1), rect.mk(128+2+64+2, p.y, 64, 64), 0xCCCCCCFF, 2)
+		p.y += 32
 
 		if input.isJustPressedc('Q') { exit() }
 	}, null)

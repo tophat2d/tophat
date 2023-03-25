@@ -323,15 +323,16 @@ void umth_image_draw_on_quad(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *img = p[4].ptrVal;
+	th_image *img = p[5].ptrVal;
 	if (!img) return;
 	
 	th_rect
-		outer = *(th_rect*)p[3].ptrVal,
-		inner = *(th_rect*)p[2].ptrVal,
-		dest  = *(th_rect*)p[1].ptrVal;
+		outer = *(th_rect*)p[4].ptrVal,
+		inner = *(th_rect*)p[3].ptrVal,
+		dest  = *(th_rect*)p[2].ptrVal;
 
-	uint32_t tint = p[0].uintVal;
+	uint32_t tint = p[1].uintVal;
+	fu scale = p[0].realVal;
 
 	if (dest.w < 0) {
     dest.x += dest.w;
@@ -344,7 +345,7 @@ void umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r) {
   }
 
   th_vf2 stepSrc[3] = {{{inner.x, inner.y}}, {{inner.w, inner.h}}, {{outer.w-(inner.x+inner.w), outer.h-(inner.y+inner.h)}}};
-  th_vf2 stepDst[3] = {{{stepSrc[0].x, stepSrc[0].y}}, {{dest.w-stepSrc[0].x-stepSrc[2].x, dest.h-stepSrc[0].y-stepSrc[2].y}}, {{stepSrc[2].x, stepSrc[2].y}}};
+  th_vf2 stepDst[3] = {{{stepSrc[0].x*scale, stepSrc[0].y*scale}}, {{dest.w-stepSrc[0].x*scale-stepSrc[2].x*scale, dest.h-stepSrc[0].y*scale-stepSrc[2].y*scale}}, {{stepSrc[2].x*scale, stepSrc[2].y*scale}}};
 
   th_vf2 src = {{outer.x, outer.y}};
   th_vf2 dst = {{dest.x, dest.y}};
