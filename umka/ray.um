@@ -1,4 +1,3 @@
-// This module will undergo changes.
 
 import (
 	"th.um"
@@ -8,22 +7,29 @@ import (
 	"tilemap.um"
 )
 
-// Ray type.
+//~~struct Ray
+// Ray is a line specified by an origin, length and a rotation.
 type Ray* = struct {
 	pos: th.Vf2
 	l: th.fu // length
 	r: th.fu // rotation
 }
+//~~
 
-// Makes a ray.
+//~~fn mk
+// Ray constructor
 fn mk*(pos: th.Vf2, l: th.fu, r: th.fu = 0.0): Ray {
+//~~
 	return Ray{pos, l, r}
 }
 
 fn umth_ray_getcoll(colls: ^ent.Coll, count: ^int, maxCount,
 	sceneLen: int, r: ^Ray, scene: ^^ent.Ent)
-// Same as ent.getcoll. Same changes will apply.
+//~~fn Ray.getColl
+// Checks the ray's collisions with a scene of ents. Similar to
+// `ent.Ent.getColl`
 fn (r: ^Ray) getColl*(s: []^ent.Ent, maxColls: th.uu): []ent.Coll {
+//~~
 	if len(s) == 0 {
 		return []ent.Coll{}
 	}
@@ -39,13 +45,25 @@ fn (r: ^Ray) getColl*(s: []^ent.Ent, maxColls: th.uu): []ent.Coll {
 }
 
 fn umth_ray_get_tilemap_coll(r: ^Ray, t: ^tilemap.Tilemap, ic: ^th.Vf2): bool
+//~~fn Ray.getTilemapColl
 // Gets ray's collision to a tilemap.
 fn (r: ^Ray) getTilemapColl*(t: tilemap.Tilemap, ic: ^th.Vf2): bool {
+//~~
 	return umth_ray_get_tilemap_coll(r, &t, ic)
 }
 
+//~~fn Ray.getEnd
+// Returns the other point of the ray.
+fn (r: ^Ray) getEnd*(): th.Vf2 {
+//~~
+	return r.pos.add(th.Vf2{ 0, r.l }.rotated(th.Vf2{}, r.r))
+}
+
+//~~fn Ray.draw
+// Draws the ray using a camera.
 fn (r: ^Ray) draw*(cam: rect.Rect, color: uint32, thickness: th.fu) {
+//~~
 	p1 := cam.toScreen(r.pos)
-	p2 := cam.toScreen(r.pos.add(th.Vf2{0, r.l}.rotated(th.Vf2{}, r.r)))
+	p2 := cam.toScreen(r.getEnd())
 	canvas.drawLine(color, p1, p2, thickness)
 }

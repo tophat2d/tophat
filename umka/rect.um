@@ -23,6 +23,13 @@ fn mk*(x, y, w, h: th.fu): Rect {
 	return r
 }
 
+//~~fn mk
+// Creates a rect from two Vf2s - the position and the dimensions.
+fn fromVf2*(p: th.Vf2, dm: th.Vf2): Rect {
+//~~
+	return mk(p.x, p.y, dm.x, dm.y)
+}
+
 //~~fn Rect.toWorld
 // translates screen coordinates to world coordinates with cam r
 fn (r: ^Rect) toWorld*(p: th.Vf2): th.Vf2 {
@@ -91,3 +98,20 @@ fn (r: ^Rect) scale*(p: th.Vf2): Rect {
 //~~
 	return Rect{ r.x, r.y, r.w * p.x, r.h * p.y }
 }
+
+//~~fn Rect.center
+// Returns the position, which is the center of the rect.
+fn (r: ^Rect) center*(): th.Vf2 {
+//~~
+	return r.getPos().add(r.getDims().divf(2))
+}
+
+//~~fn Rect.centerWithinRect
+// Centers `child` with the rect `r`.
+fn (r: ^Rect) centerWithinRect(child: Rect): Rect {
+//~~
+	child.x = r.x + (r.w - child.w)/2
+	child.y = r.y + (r.h - child.h)/2
+	return child
+}
+

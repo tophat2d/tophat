@@ -137,6 +137,21 @@ fn (i: ^Image) crop*(tl, br: th.Vf2) {
 	umth_image_crop(i^, tl, br)
 }
 
+//fn Image.cropPx
+// Same as `Image.crop`, but the positions are in pixels.
+fn (i: ^Image) cropPx*(tr, br: th.Vf2) {
+//~~
+	dm := i.getDims()
+	umth_image_crop(i^, tr.div(dm), br.div(dm))
+}
+
+//fn Image.cropRect
+// Same as `Image.crop`, but uses a rect instead of two positions.
+fn (i: ^Image) cropRect*(r: rect.Rect) {
+//~~
+	umth_image_crop(i^, r.getPos(), r.getEnd())
+}
+
 fn umth_image_crop_quad(img: Image, q: ^th.Quad)
 //~~fn Image.cropQuad
 // Crop an image using a quad.
