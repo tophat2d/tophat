@@ -5,7 +5,7 @@ set module_names=%modules:umka/=%
 set umka=lib\umka\umka_windows_msvc\umka.exe
 set em_target=src\staembed.c
 set run=%umka% cmd\buildhelper.um
-set images=etc/test.ff etc/icon.ff
+set images=etc/test.ff etc/icon.ff etc/button.ff
 
 echo. > %em_target%
 echo #include "tophat.h" > %em_target%
