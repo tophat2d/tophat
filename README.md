@@ -2,8 +2,8 @@
 
 Tophat is a friendly 2d game library for the
 [Umka](https://github.com/vtereshkov/umka-lang) programming language.  Visit
-the [homepage](https://th.mrms.cz/) for more info.  You can browse the API
-reference [here](https://th.mrms.cz/thdocs)
+the [homepage](https://tophat2d.dev) for more info.  You can browse the API
+reference [here](https://docs.tophat2d.dev)
 
 ## screenshots
 

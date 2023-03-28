@@ -28,7 +28,7 @@ fn damage*() {
 }
 
 fn enemyDestroy*(pos: th.Vf2) {
-	const particlec = 2000
+	const particlec = 200
 	e := particles.Emitter{
 		pos, th.Vf2{0, 0},
 		th.Vf2{0.1, 0.1}, false, true,
@@ -36,7 +36,7 @@ fn enemyDestroy*(pos: th.Vf2) {
 		th.Vf2{0, 360},
 		200, 0.4,
 		0.4, 0.2,
-		0.4, 0.2, 2,
+		0.2, 0.1, 4,
 		0, 0, 0,
 		[]uint32{0xFFA500ff, 0xe9330caa},
 		make([]particles.Particle, particlec)}
