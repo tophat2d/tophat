@@ -9,19 +9,19 @@ reference [here](https://docs.tophat2d.dev)
 
 <p align="center">
 	<img
-		src="https://th.mrms.cz/images/space-shooter.png"
+		src="https://tophat2d.dev/img/space-shooter.png"
 		alt="space shooter example"
 	>
 	<img
-		src="https://th.mrms.cz/images/logs-together.png"
+		src="https://img.itch.zone/aW1hZ2UvMTA4MzEwMS82MjA4NzA5LnBuZw==/347x500/qNlZNI.png"
 		alt="logs together jam game"
 	>
 	<img
-		src="https://th.mrms.cz/images/tetris.png"
+		src="https://tophat2d.dev/img/tetris.png"
 		alt="tetris game"
 	>
 	<img
-		src="https://th.mrms.cz/images/pomodoro.png"
+		src="https://tophat2d.dev/img/pomodoro.png"
 		alt="pomodoro app"
 	>
 </p>
@@ -31,17 +31,17 @@ reference [here](https://docs.tophat2d.dev)
 Creating a moving rectangle is as easy as this:
 
 ```go
-import ("th.um"; "rect.um"; "input.um"; "canvas.um"; "window.um")
+import ("th.um"; "rect.um"; "input.um"; "canvas.um"; "window.um"; "signal.um")
 
-fn main() {
+pos := th.Vf2{100, 100}
+
+fn init*() {
 	const speed = 100
 
 	window.setup("my game", 400, 400)
 	window.setViewport(th.Vf2{200, 200})
 
-	pos := th.Vf2{100, 100}
-
-	for window.cycle() {
+	window.onFrame.register(signal.Callback{
 		var change: th.Vf2
 
 		// Handle input
@@ -55,21 +55,24 @@ fn main() {
 
 		// Draw!
 		canvas.drawRect(th.green, rect.mk(pos.x, pos.y, 10, 10))
-	}
+	}, null)
 }
 ```
 
 Draw an image to the screen using this:
 
 ```go
-import ("window.um"; "image.um"; "th.um")
-fn main() {
-    window.setup("image drawing", 400, 400)
-    img := image.load("my-image.png")
-    
-    for window.cycle() {
-        img.draw(th.mkTransform(th.Vf2{ 0, 0 }))
-    }
+import ("window.um"; "image.um"; "th.um"; "signal.um")
+
+var img: image.Image
+
+fn init*() {
+	window.setup("image drawing", 400, 400)
+	img = image.load("my-image.png")
+	
+	window.onFrame.register(signal.Callback{
+		img.draw(th.mkTransform(th.Vf2{ 0, 0 }))
+	}, null)
 }
 ```
 
