@@ -6,12 +6,12 @@
 
 #include "tophat.h"
 
-#define FRAND (double)rand()/0x7FFFFFFF
+#define FRAND() (double)rand()/0x7FFFFFFF
 
 extern th_global *thg;
 
 static
-int interp(int start, int start_val, int end, int end_val, int t) {
+float interp(float start, float start_val, float end, float end_val, int t) {
 	return (start_val + (t - start) * ((end_val - start_val)/(end-start)));
 }
 
@@ -22,15 +22,15 @@ uint32_t get_particle_color(th_particles *p, _th_particle pa, int t) {
 }
 
 static
-double get_particle_size(th_particles *p, _th_particle pa, int t) {
+float get_particle_size(th_particles *p, _th_particle pa, int t) {
 	int x0 = pa.start_time;
 	int x1 = pa.start_time + p->lifetime;
-	return interp(x0, p->size * 100, x1, p->max_size * 100, t) / 100.0;
+	return interp(x0, p->size, x1, p->max_size, t);
 }
 
 static
 int get_particle_rotation(th_particles *p, _th_particle pa, int t) {
-	return interp(0, p->rotation * 1000, p->lifetime, p->max_rotation * 1000, t - pa.start_time) / 1000;
+	return interp(0, p->rotation, p->lifetime, p->max_rotation, t - pa.start_time);
 }
 
 void th_particles_draw(th_particles *p, th_rect cam, int t) {
@@ -46,13 +46,13 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 
 		if ((p->angle.y - p->angle.x) + p->angle.x == 0)
 			p->angle.x++;
-		double direction = (rand() % (long)(p->angle.y - p->angle.x + 1) + p->angle.x) * PI / 180;
+		float direction = (rand() % (long)(p->angle.y - p->angle.x + 1) + p->angle.x) * PI / 180;
 
 		fu vx = p->velocity * cos(direction);
 		fu vy = p->velocity * sin(direction);
 		if (p->velocity_randomness != 0) {
-				vx += FRAND*(p->velocity*p->velocity_randomness);
-				vy += FRAND*(p->velocity*p->velocity_randomness);
+			vx += FRAND()*p->velocity*p->velocity_randomness;
+			vy += FRAND()*p->velocity*p->velocity_randomness;
 		}
 
 		vx *= p->gravity.x;
@@ -67,7 +67,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 		if (p->size != p->max_size)
 			size = get_particle_size(p, p->particles.data[i], t);
 
-		size += FRAND * (p->size * p->size_randomness);
+		size += FRAND() * p->size * p->size_randomness;
 
 		uint32_t col = 0xff;
 		if (umkaGetDynArrayLen(&p->colors) > 0)
@@ -78,7 +78,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 			if (p->rotation != p->max_rotation)
 				rot = get_particle_rotation(p, p->particles.data[i], t);
       
-			rot += FRAND * (p->size * p->rotation_randomness);
+			rot += FRAND() * p->size * p->rotation_randomness;
       
 			th_vf2 p[4] = {
 				{ .x = px, .y = py},
@@ -90,7 +90,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 				p[i].x = (p[i].x - camx) * thg->scaling;
 				p[i].y = (p[i].y - camy) * thg->scaling;
 			}
-      
+
 			th_canvas_triangle(col, p[0], p[1], p[2]);
 			th_canvas_triangle(col, p[0], p[2], p[3]);
 		} else { // optimize drawing without rotations
@@ -102,7 +102,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 			th_canvas_rect(col, (th_rect){ x - camx, y - camy, w, h });
 		}
 
-		int lt = p->lifetime + FRAND*(p->lifetime * p->lifetime_randomness);
+		int lt = p->lifetime + FRAND()*p->lifetime * p->lifetime_randomness;
 		if (t - p->particles.data[i].start_time >= lt) {
 			if (p->repeat) {
 				p->particles.data[i].start_time = t - rand()%(p->lifetime / 4);
