@@ -9,19 +9,19 @@ reference [here](https://docs.tophat2d.dev)
 
 <p align="center">
 	<img
-		src="https://th.mrms.cz/images/space-shooter.png"
+		src="https://tophat2d.dev/img/space-shooter.png"
 		alt="space shooter example"
 	>
 	<img
-		src="https://th.mrms.cz/images/logs-together.png"
+		src="https://img.itch.zone/aW1hZ2UvMTA4MzEwMS82MjA4NzA5LnBuZw==/347x500/qNlZNI.png"
 		alt="logs together jam game"
 	>
 	<img
-		src="https://th.mrms.cz/images/tetris.png"
+		src="https://tophat2d.dev/img/tetris.png"
 		alt="tetris game"
 	>
 	<img
-		src="https://th.mrms.cz/images/pomodoro.png"
+		src="https://tophat2d.dev/img/pomodoro.png"
 		alt="pomodoro app"
 	>
 </p>
