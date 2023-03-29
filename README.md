@@ -41,7 +41,7 @@ fn init*() {
 	window.setup("my game", 400, 400)
 	window.setViewport(th.Vf2{200, 200})
 
-  window.onFrame.register(signal.Callback{
+	window.onFrame.register(signal.Callback{
 		var change: th.Vf2
 
 		// Handle input
@@ -55,7 +55,7 @@ fn init*() {
 
 		// Draw!
 		canvas.drawRect(th.green, rect.mk(pos.x, pos.y, 10, 10))
-  }, null)
+	}, null)
 }
 ```
 
