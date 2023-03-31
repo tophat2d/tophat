@@ -3164,7 +3164,7 @@ int th_em_modulenames_count = 28;
 const char *th_em_misc[] = {
 "BSD 3-Clause License\n"
 "\n"
-"Copyright (c) 2021, Marek Maskarinec\n"
+"Copyright (c) 2023, Marek Maskarinec\n"
 "All rights reserved.\n"
 "\n"
 "Redistribution and use in source and binary forms, with or without\n"
