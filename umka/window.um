@@ -28,6 +28,9 @@ var wp*: th.Vf2
 //~~signal OnFrame
 var onFrame*: signal.Signal
 //~~
+//~~signal OnDestroy
+var onDestroy*: signal.Signal
+//~~
 
 fn umth_window_setup(title: str, w, h: int)
 fn umth_window_get_dimensions(w, h: ^int32)
@@ -106,6 +109,10 @@ fn umth_frame_callback*(delta: real) {
 	cycle(delta)
 	onFrame.emit(null)
 	drawClear()
+}
+
+fn umth_destroy_callback*() {
+  onDestroy.emit(null)
 }
 
 fn umth_window_set_fullscreen(fullscreen: bool)
