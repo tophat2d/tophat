@@ -152,6 +152,9 @@ void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2) {
 			cameFrom[idx] = p;
 		}
 	}
+	
+	while (q)
+		q = pop(q);
 
 	free(hcost);
 	free(cost);
