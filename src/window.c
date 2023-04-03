@@ -14,6 +14,7 @@
 extern th_global *thg;
 
 static int umth_frame_callback = 0;
+static int umth_destroy_callback = 0;
 
 static void print_umka_error_and_quit() {
 	UmkaError error;
@@ -52,6 +53,7 @@ static void init() {
 	th_canvas_init();
 
 	umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
+	umth_destroy_callback = umkaGetFunc(thg->umka, "window.um", "umth_destroy_callback");
 
 	UmkaStackSlot s;
 
@@ -121,6 +123,8 @@ static void event(const sapp_event *ev) {
 }
 
 static void cleanup() {
+	UmkaStackSlot s;
+  umkaCall(thg->umka, umth_destroy_callback, 0, &s, &s);
 	th_audio_deinit();
 	th_font_deinit();
 	th_image_deinit();
