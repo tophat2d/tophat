@@ -124,7 +124,7 @@ static void event(const sapp_event *ev) {
 
 static void cleanup() {
 	UmkaStackSlot s;
-  umkaCall(thg->umka, umth_destroy_callback, 0, &s, &s);
+	umkaCall(thg->umka, umth_destroy_callback, 0, &s, &s);
 	th_audio_deinit();
 	th_font_deinit();
 	th_image_deinit();
@@ -141,6 +141,7 @@ static void cleanup() {
 		}
 	}
 
+	umkaRun(thg->umka);
 	umkaFree(thg->umka);
 	
 	sg_shutdown();
