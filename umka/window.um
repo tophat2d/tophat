@@ -182,3 +182,11 @@ fn freezeCursor*(freeze: bool) {
 	showCursor(freeze)
 	umth_window_freeze_cursor(freeze)
 }
+
+fn umth_window_quit()
+//~~fn quit
+// Exits the application. Use this instead of umka's default `exit`.
+fn quit*() {
+//~~
+	umth_window_quit()
+}

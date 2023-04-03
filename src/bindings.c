@@ -614,6 +614,10 @@ void umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_canvas_init();
 }
 
+void umth_window_quit(UmkaStackSlot *p, UmkaStackSlot *r) {
+	thg->need_quit = 1;
+}
+
 // draws text
 void umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r) {
 	fu size = p[0].real32Val;
@@ -942,6 +946,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_window_freeze_cursor", &umth_window_freeze_cursor);
 	umkaAddFunc(umka, "umth_window_set_target_fps", &umth_window_set_target_fps);
 	umkaAddFunc(umka, "umth_window_get_platform_id", &umth_window_get_platform_id);
+	umkaAddFunc(umka, "umth_window_quit", &umth_window_quit);
 
 	// canvas
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);

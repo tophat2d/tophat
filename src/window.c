@@ -61,6 +61,11 @@ static void init() {
 }
 
 static void frame() {
+	if (thg->need_quit) {
+		sapp_quit();
+		return;
+	}
+
 	thg->pass_action = (sg_pass_action) {
 		.colors[0] = { .action = SG_ACTION_LOAD }
 	};
