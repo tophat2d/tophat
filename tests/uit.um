@@ -15,9 +15,15 @@ fn init*() {
 
 	window.onFrame.register(signal.Callback{
 		layout := ui.LayoutFn{
-			gui.vBox(30)
+			gui.box(ui.BoxConfig{
+				dimension: 30,
+				growType: ui.BoxGrowDimension,
+				dir: ui.BoxDirectionUp })
 			{
-				gui.row(3)
+				gui.box(ui.BoxConfig{
+					subdivisions: 3,
+					growType: ui.BoxGrowSubdivision,
+					dir: ui.BoxDirectionRight })
 				{
 					for i := 0; i < 3; i++ {
 						if gui.qbutton(sprintf("Button %d", i+1)) {

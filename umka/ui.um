@@ -91,79 +91,120 @@ fn (this: ^Gui) draw*(layout: LayoutFn) {
 	layout(this)
 }
 
-type VBoxConfig* = struct { }
+type BoxGrow = uint
+const (
+	BoxGrowDimension*   = BoxGrow(0)
+	BoxGrowSubdivision* = BoxGrow(1)
+)
 
-type VBox* = struct {
-	rowH: th.fu
-	dm: rect.Rect
-	cfg: VBoxConfig
-}
+type BoxDirection = uint
+const (
+	BoxDirectionDown*  = BoxDirection(0)
+	BoxDirectionRight* = BoxDirection(1)
+	BoxDirectionUp*    = BoxDirection(2)
+	BoxDirectionLeft*  = BoxDirection(3)
+)
 
-fn (this: ^VBox) pushRect(r: rect.Rect): rect.Rect {
-	r.x = this.dm.x
-	r.y = this.dm.y
-
-	if r.h == 0 {
-		r.h = this.rowH
-	}
-
-	if r.w == 0 {
-		r.w = this.dm.w
-	}
-
-	this.dm.y += r.h
-	return r
-}
-
-fn (this: ^VBox) getDims(): rect.Rect {
-	return this.dm
-}
-
-fn (gui: ^Gui) vBox*(rowH: th.fu, cfg: VBoxConfig = VBoxConfig{}) {
-	gui.pushContainer(VBox{
-		rowH: rowH,
-		dm: gui.pushRect(rect.Rect{}),
-		cfg: cfg })
-}
-
-
-type RowConfig* = struct { }
-
-type Row* = struct {
+type BoxConfig* = struct {
+	dimension: th.fu
 	subdivisions: uint
-	dm: rect.Rect
-	cfg: RowConfig
+	growType: BoxGrow
+	dir: BoxDirection
 }
 
-fn (this: ^Row) pushRect(r: rect.Rect): rect.Rect {
-	r.x = this.dm.x
-	r.y = this.dm.y
+type Box* = struct {
+	grow: th.fu
+	dm: rect.Rect
+	cfg: BoxConfig
+}
 
-	step := this.dm.w/this.subdivisions
-	r.w = step
+fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
+	switch this.cfg.dir {
+	case BoxDirectionDown:
+		r.x = this.dm.x
+		r.y = this.dm.y
 
-	if r.h == 0 {
-		r.h = this.dm.h
+		if r.h == 0 {
+			r.h = this.grow
+		}
+
+		if r.w == 0 {
+			r.w = this.dm.w
+		}
+
+		this.dm.y += r.h
+	case BoxDirectionRight:
+		r.x = this.dm.x
+		r.y = this.dm.y
+
+		if r.h == 0 {
+			r.h = this.dm.h
+		}
+
+		if r.w == 0 {
+			r.w = this.grow
+		}
+
+		this.dm.x += r.w
+	case BoxDirectionUp:
+		if r.h == 0 {
+			r.h = this.grow
+		}
+
+		if r.w == 0 {
+			r.w = this.dm.w
+		}
+
+		this.dm.h -= r.h
+		r.x = this.dm.x
+		r.y = this.dm.y + this.dm.h
+	case BoxDirectionLeft:
+		if r.h == 0 {
+			r.h = this.dm.h
+		}
+
+		if r.w == 0 {
+			r.w = this.grow
+		}
+
+		this.dm.w -= r.w
+		r.x = this.dm.x + this.dm.w
+		r.y = this.dm.y
 	}
 
-	this.dm.x += step
 	return r
 }
 
-fn (this: ^Row) getDims(): rect.Rect {
+fn (this: ^Box) getDims(): rect.Rect {
 	return this.dm
 }
 
-fn (gui: ^Gui) row*(subdivisions: uint, cfg: RowConfig = RowConfig{}) {
-	if (subdivisions == 0) {
-		error("Invalid subdivision count")
-	}
-	gui.pushContainer(Row{
-		subdivisions: subdivisions,
-		dm: gui.pushRect(rect.Rect{}),
-		cfg: cfg })
-}
+fn (gui: ^Gui) box*(cfg: BoxConfig = BoxConfig{
+	dimension: 30,
+	growType: BoxGrowDimension,
+	dir: BoxDirectionDown }) {
 
+	b := Box{}
+	b.dm = gui.pushRect(rect.Rect{})
+	b.cfg = cfg
+	switch cfg.growType {
+	case BoxGrowDimension:
+		b.grow = cfg.dimension
+	case BoxGrowSubdivision:
+		if cfg.subdivisions == 0 {
+			error("Invalid subdivision count")
+		}
+
+		dm := b.dm.h
+		if cfg.dir == BoxDirectionRight || cfg.dir == BoxDirectionLeft {
+			dm = b.dm.w
+		}
+
+		b.grow = dm / cfg.subdivisions
+	}
+
+	gui.pushContainer(b)
+}
 
 type StackConfig* = struct { }
 
