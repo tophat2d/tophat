@@ -14,20 +14,24 @@ fn init*() {
 	gui = ui.mk(rect.mk(0, 0, 200, 200))
 
 	window.onFrame.register(signal.Callback{
+    
 		layout := ui.LayoutFn{
-			gui.vBox(5)
-
-				if gui.button() {
-					printf("click 1\n")
+			gui.vBox(30)
+      {
+        gui.row(3)
+        {
+          for i := 0; i < 3; i++ {
+            if gui.qbutton(sprintf("Button %d", i+1)) {
+              printf("click %d\n", i+1)
+            }
+          }
 				}
+        gui.popContainer()
 
-				gui.popContainer()
-
-				if gui.button() {
-					printf("click 2\n")
+				if gui.qbutton("Next row button.") {
+					printf("click next row button\n")
 				}
-				gui.popContainer()
-
+      }
 			gui.popContainer()
 		}
 
