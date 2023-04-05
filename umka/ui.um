@@ -27,7 +27,7 @@ type Gui* = struct {
 	// contains more unexported fields
 //~~
 	idx: int
-	
+
 	isEval: bool
 	style: []Style
 	container: []Container
@@ -130,7 +130,7 @@ fn (gui: ^Gui) vBox*(rowH: th.fu, cfg: VBoxConfig = VBoxConfig{}) {
 type RowConfig* = struct { }
 
 type Row* = struct {
-  subdivisions: uint
+	subdivisions: uint
 	dm: rect.Rect
 	cfg: RowConfig
 }
@@ -138,15 +138,15 @@ type Row* = struct {
 fn (this: ^Row) pushRect(r: rect.Rect): rect.Rect {
 	r.x = this.dm.x
 	r.y = this.dm.y
-    
-  step := this.dm.w/this.subdivisions
-  r.w = step
+
+	step := this.dm.w/this.subdivisions
+	r.w = step
 
 	if r.h == 0 {
 		r.h = this.dm.h
 	}
 
-  this.dm.x += step
+	this.dm.x += step
 	return r
 }
 
@@ -155,15 +155,14 @@ fn (this: ^Row) getDims(): rect.Rect {
 }
 
 fn (gui: ^Gui) row*(subdivisions: uint, cfg: RowConfig = RowConfig{}) {
-  if (subdivisions == 0) {
-    error("Invalid subdivision count")
-  }
+	if (subdivisions == 0) {
+		error("Invalid subdivision count")
+	}
 	gui.pushContainer(Row{
-    subdivisions: subdivisions,
+		subdivisions: subdivisions,
 		dm: gui.pushRect(rect.Rect{}),
 		cfg: cfg })
 }
-
 
 
 type StackConfig* = struct { }
@@ -199,46 +198,44 @@ fn (gui: ^Gui) button*(cfg: ButtonConfig = ButtonConfig{}): bool {
 		}
 		return false
 	} else {
-    canvas.drawRectLines(gui.getStyle().primaryColor,
-      gui.rectToScreen(r),
-      gui.scale)
-  }
+		canvas.drawRectLines(gui.getStyle().primaryColor, gui.rectToScreen(r), gui.scale);
+	}
 
 	return false
 }
 
 type LabelConfig* = struct {
-  centerX: bool
-  centerY: bool
-  scale: th.fu
+	centerX: bool
+	centerY: bool
+	scale: th.fu
 }
 
 fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{scale: 1}) {
-  gui.stack()
+	gui.stack()
 	r := gui.getContainer().getDims()
-  style := gui.getStyle()
+	style := gui.getStyle()
 
-  x := r.x
-  y := r.y
-  txtSize := canvas.textSize(text, cfg.scale)
-  if cfg.centerX {
-    x += (r.w-txtSize.x)/2.0
-  }
-  if cfg.centerY {
-    y += (r.h-txtSize.y)/2.0
-  }
-  
-  if gui.isEval {
-    canvas.drawText(text, th.Vf2{x, y}, 0x000000FF, cfg.scale)
-  }
-  gui.popContainer()
+	x := r.x
+	y := r.y
+	txtSize := canvas.textSize(text, cfg.scale)
+	if cfg.centerX {
+		x += (r.w-txtSize.x)/2.0
+	}
+	if cfg.centerY {
+		y += (r.h-txtSize.y)/2.0
+	}
+
+	if gui.isEval {
+		canvas.drawText(text, th.Vf2{x, y}, 0x000000FF, cfg.scale)
+	}
+	gui.popContainer()
 }
 
 fn (gui: ^Gui) qbutton*(text: str, cfg: ButtonConfig = ButtonConfig{}): bool {
-  pressed := gui.button()
-  gui.label(text, LabelConfig{scale: 1, centerX: true, centerY: true})
-  gui.popContainer()
-  return pressed;
+	pressed := gui.button()
+	gui.label(text, LabelConfig{scale: 1, centerX: true, centerY: true})
+	gui.popContainer()
+	return pressed;
 }
 
 fn mk*(r: rect.Rect): Gui {
