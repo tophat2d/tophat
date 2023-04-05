@@ -112,7 +112,7 @@ static int th_main(int argc, char *argv[]) {
 	if ((f = fopen(scriptpath, "r"))) {
 		fclose(f);
 	} else {
-		th_error("Could not find main.um. Make sure you are in a proper directory, or specify it using the dir flag.");
+		th_error("Could not find %s. Make sure you are in a proper directory, or specify it using the dir flag.", scriptpath);
 
 		return 1;
 	}
