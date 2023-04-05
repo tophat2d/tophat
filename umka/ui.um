@@ -1,125 +1,180 @@
 
 import (
-	"th.um"
-	"utf8.um"
-	"rect.um"
-	"input.um"
 	"canvas.um"
+	"coll.um"
+	"input.um"
+	"rect.um"
+	"th.um"
 )
 
-const (
-	eventUnknown* = 0
-	eventHover*
-	eventPress*
-	eventJustPress*
-	eventRelease*
-)
-
-type Theme* = struct {
-	fg, bg: uint32
-
-	borderColor: uint32
-	borderSize: th.fu
+type Style* = struct {
+	backgroundColor: uint32
+	textColor: uint32
+	primaryColor: uint32
 }
 
-// A structure all elements have to contain. t can be set manually by the user,
-// s being the dimensions, or it can be set by another elements. onEvent is an
-// event callback. It will pass whatever is set in the ctx field.
-// Event types:
-// eventUnknown
-// eventHover
-// eventPress
-// eventJustPress
-// eventRelease
-type Generic* = struct {
-	r: rect.Rect
-	gridPos: th.Vf2
-	gridSpan: th.Vf2
-	theme: Theme
-
-	ctx: interface{}
-	onEvent: fn(eventType: th.uu, ctx: interface{})
-	pressed: bool
-	selected: bool
+type Container* = interface {
+	pushRect(r: rect.Rect): rect.Rect
+	getDims(): rect.Rect
 }
 
-// An interface every ui element has to implements.
-type Element* = interface {
-	handle()
-	draw()
-	get(): ^Generic
-}
+//~~struct Gui
+type Gui* = struct {
+	ctx: any
+	scale: th.fu
 
-// Interface used anywhere, where text is rendered.
-type TextRenderer* = interface {
-	draw(text: str, pos: th.Vf2, color: uint32, scale: th.fu = 1.0)
-	measure(text: str): th.Vf2
-}
-
-// Bindings around canvas's font rendering functions to make them usable
-// with the TextRenderer interface.
-type PixelFont* = struct { }
-fn (pf: ^PixelFont) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu = 1.0) {
-	canvas.drawText(text, pos, color, scale)
-}
-fn (pf: ^PixelFont) measure*(text: str): th.Vf2 {
-	return canvas.textSize(text, 1)
-}
-
-fn mkGeneric*(): Generic {
-	g := Generic{}
-	g.onEvent = fn(eventType: th.uu, ctx: interface{}) { }
-	return g
-}
-
-// Functions that sets the grid pos of a Generic
-fn (g: ^Generic) grid*(x, y: th.uu): ^Generic {
-	g.gridPos.x = x
-	g.gridPos.y = y
-	return g
-}
-
-// Function setting the grid span of a Generic
-fn (g: ^Generic) span*(x, y: th.uu): ^Generic {
-	g.gridSpan.x = x
-	g.gridSpan.y = y
-	return g
-}
-
-// Generic's handle function. It checks for events. If you create your own
-// ui element and want to have more control over how events are fired, you
-// don't have to use it.
-fn (g: ^Generic) handle*() {
-	m := input.getMousePos()
-	if m.x < g.r.x || m.y < g.r.y ||
-		m.x > g.r.x + g.r.w || m.y > g.r.y + g.r.h {
-		if g.pressed {
-			g.pressed = false
-			g.onEvent(eventRelease, g.ctx)
-		}
-		return
-	}
+	selection: int
+	// contains more unexported fields
+//~~
+	idx: int
 	
-	g.onEvent(eventHover, g.ctx)
-	
-	if input.isPressed(input.mouse1) {
-		input.clear(input.mouse1)
+	isEval: bool
+	style: []Style
+	container: []Container
+}
 
-		if !g.pressed {
-			g.onEvent(eventJustPress, g.ctx)
-		}
+type LayoutFn* = fn(gui: ^Gui)
 
-		g.onEvent(eventPress, g.ctx)
-		g.pressed = true
-	} else if g.pressed {
-		g.pressed = false
-		g.onEvent(eventRelease, g.ctx)
+fn (this: ^Gui) pushStyle*(s: Style) {
+	this.style = append(this.style, s)
+}
+
+fn (this: ^Gui) popStyle*() {
+	if len(this.style) > 1 {
+		this.style = slice(this.style, 0, len(this.style) - 1)
 	}
 }
 
-fn drawBorder*(p, d: th.Vf2, t: Theme) {
-	canvas.drawRect(t.borderColor, rect.mk(p.x, p.y, t.borderSize, d.y))
-	canvas.drawRect(t.borderColor, rect.mk(p.x, p.y, d.x, t.borderSize))
-	canvas.drawRect(t.borderColor, rect.mk(p.x + d.x - t.borderSize, p.y, t.borderSize, d.y))
-	canvas.drawRect(t.borderColor, rect.mk(p.x, p.y + d.y - t.borderSize, d.x, t.borderSize))
+fn (this: ^Gui) getStyle*(): Style {
+	return this.style[len(this.style) - 1]
+}
+
+fn (this: ^Gui) pushContainer*(c: Container) {
+	this.container = append(this.container, c)
+}
+
+fn (this: ^Gui) popContainer*() {
+	if len(this.container) > 1 {
+		this.container =
+			slice(this.container, 0, len(this.container) - 1)
+	}
+}
+
+fn (this: ^Gui) getContainer*(): Container {
+	return this.container[len(this.container) - 1]
+}
+
+fn (this: ^Gui) pushRect*(r: rect.Rect): rect.Rect {
+	return this.getContainer().pushRect(r)
+}
+
+fn (this: ^Gui) getDims*(): rect.Rect {
+	return this.getContainer().getDims()
+}
+
+fn (this: ^Gui) rectToScreen(r: rect.Rect): rect.Rect {
+	return rect.fromVf2(r.getPos().mulf(this.scale),
+		r.getDims().mulf(this.scale))
+}
+
+fn (this: ^Gui) hover(r: rect.Rect): bool {
+	return coll.vf2ToRect(input.getMousePos(), r)
+}
+
+fn (this: ^Gui) eval*(layout: LayoutFn) {
+	this.isEval = true
+	layout(this)
+}
+
+fn (this: ^Gui) draw*(layout: LayoutFn) {
+	this.isEval = false
+	layout(this)
+}
+
+type VBoxConfig* = struct { }
+
+type VBox* = struct {
+	rowH: th.fu
+	dm: rect.Rect
+	cfg: VBoxConfig
+}
+
+fn (this: ^VBox) pushRect(r: rect.Rect): rect.Rect {
+	r.x = this.dm.x
+	r.y = this.dm.y
+
+	if r.h == 0 {
+		r.h = this.rowH
+	}
+
+	if r.w == 0 {
+		r.w = this.dm.w
+	}
+
+	this.dm.y += r.h
+	return r
+}
+
+fn (this: ^VBox) getDims(): rect.Rect {
+	return this.dm
+}
+
+fn (gui: ^Gui) vBox*(rowH: th.fu, cfg: VBoxConfig = VBoxConfig{}) {
+	gui.pushContainer(VBox{
+		rowH: rowH,
+		dm: gui.pushRect(rect.Rect{}),
+		cfg: cfg })
+}
+
+type StackConfig* = struct { }
+
+type Stack* = struct {
+	dm: rect.Rect
+	cfg: StackConfig
+}
+
+fn (this: ^Stack) pushRect(r: rect.Rect): rect.Rect {
+	return this.dm
+}
+
+fn (this: ^Stack) getDims(): rect.Rect {
+	return this.dm
+}
+
+fn (gui: ^Gui) stack*(cfg: StackConfig = StackConfig{}) {
+	gui.pushContainer(Stack{
+		dm: gui.pushRect(rect.Rect{}),
+		cfg: cfg })
+}
+
+type ButtonConfig* = struct {}
+
+fn (gui: ^Gui) button*(cfg: ButtonConfig = ButtonConfig{}): bool {
+	gui.stack()
+	r := gui.getContainer().getDims()
+
+	if gui.isEval {
+		if gui.hover(r) && input.isJustReleased(input.mouse1) {
+			return true
+		}
+		return false
+	}
+
+	canvas.drawRectLines(gui.getStyle().primaryColor,
+		gui.rectToScreen(r),
+		gui.scale)
+
+	return false
+}
+
+fn mk*(r: rect.Rect): Gui {
+	gui := Gui{}
+	gui.scale = 1
+	gui.pushStyle(Style{
+		backgroundColor: 0xcccccc,
+		textColor: 0x0000000,
+		primaryColor: th.blue })
+	gui.container = []Container{ Stack{ dm: r } }
+
+	return gui
 }

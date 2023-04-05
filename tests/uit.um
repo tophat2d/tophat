@@ -1,83 +1,37 @@
+
 import (
-	"anim.um"
-	"audio.um"
-	"csv.um"
-	"ent.um"
-	"font.um"
-	"image.um"
-	"input.um"
-	"lerp.um"
-	"misc.um"
-	"particles.um"
-	"canvas.um"
-	"ray.um"
 	"rect.um"
-	"th.um"
-	"tilemap.um"
+	"signal.um"
 	"window.um"
 	"ui.um"
-	"ui/grid.um"
-	"ui/label.um"
-	"ui/imagebox.um"
-
-	"std.um"
 )
 
-fn main() { 
-	window.setup("test game", 100, 100)
-	window.setViewport(th.Vf2{250, 250})
+var gui: ui.Gui
 
-	theme := ui.Theme{
-		fg: th.blue,
-		bg: th.red,
-		borderColor: th.blue,
-		borderSize: 3}
+fn init*() {
+	window.setup("gui test", 200, 200)
 
-	l := label.mk(ui.PixelFont{}, "Hello world", theme, 2)
-	l.get().grid(0, 0).span(3, 1)
-	l.g.ctx = &l
-	l.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
-		l := ^label.Label(ctx)
-		if eventType == ui.eventPress {
-			l.g.theme.bg = th.cyan
-		} else if eventType == ui.eventRelease {
-			l.g.theme.bg = th.red
+	gui = ui.mk(rect.mk(0, 0, 200, 200))
+
+	window.onFrame.register(signal.Callback{
+		layout := ui.LayoutFn{
+			gui.vBox(5)
+
+				if gui.button() {
+					printf("click 1\n")
+				}
+
+				gui.popContainer()
+
+				if gui.button() {
+					printf("click 2\n")
+				}
+				gui.popContainer()
+
+			gui.popContainer()
 		}
-	}
-	l.center = true
 
-	iBox := imagebox.mk(image.load("etc/test.png"))
-	iBox.get().grid(2, 1).span(1, 1)
-	iBox.g.onEvent = fn(eventType: th.uu, ctx: interface{}) { }
-	iBox.image.crop(th.Vf2{0.5, 1.0/12}, th.Vf2{1, 1})
-	iBox.image.flipv(true)
-
-	cf := font.load("examples/space-shooter/gfx/marediv-regular.ttf", 32, font.filterNearest)
-
-	rl := label.mk(&cf, "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis est sed lectus ultrices, nec pellentesque ipsum lacinia. Donec sodales.", theme, 0.5)
-	rl.get().grid(0, 1).span(2, 2)
-	rl.center = true
-	rl.wrapping = true
-	
-	g := grid.mk(3, 3)
-	g.g.r.w = window.wp.x
-	g.g.r.h = window.wp.y
-	g.elements = []ui.Element{&l, &iBox, &rl}
-	g.border = 10	
-
-	for window.cycle() {
-		canvas.drawRect(th.white, rect.mk(0, 0, window.wp.x, window.wp.y))
-
-		if th.delta == 0 {
-			th.delta = 16
-		}
-		canvas.drawText(repr(1000/th.delta), th.Vf2{0, 0}, th.black, 1)
-
-		g.handle()
-		g.draw()
-	}
-}
-
-fn windowdestroy() {
-	printf("destroying window\n")
+		gui.eval(layout)
+		gui.draw(layout)
+	}, null)
 }
