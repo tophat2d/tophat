@@ -7,6 +7,7 @@ import (
 )
 
 var gui: ui.Gui
+var tb: ui.TextBox
 
 fn init*() {
 	window.setup("gui test", 200, 200)
@@ -35,13 +36,14 @@ fn init*() {
 
 				gui.pushRect(rect.mk(0, 0, 0, 2))
 				gui.label("I'm just a label", ui.LabelConfig{
-					scale: 1,
 					centerX: true })
 				gui.pushRect(rect.mk(0, 0, 0, 2))
 
 				if gui.qbutton("Next row button.") {
 					printf("click next row button\n")
 				}
+
+				gui.textBox(&tb)
 			}
 			gui.popContainer()
 		}

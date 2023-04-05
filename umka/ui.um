@@ -2,12 +2,16 @@
 import (
 	"canvas.um"
 	"coll.um"
+	"font.um"
 	"input.um"
 	"rect.um"
 	"th.um"
 )
 
 type Style* = struct {
+	ft: font.Font
+	ftScale: th.fu
+
 	backgroundColor: uint32
 	textColor: uint32
 	primaryColor: uint32
@@ -82,11 +86,13 @@ fn (this: ^Gui) hover(r: rect.Rect): bool {
 }
 
 fn (this: ^Gui) eval*(layout: LayoutFn) {
+	this.idx = 0
 	this.isEval = true
 	layout(this)
 }
 
 fn (this: ^Gui) draw*(layout: LayoutFn) {
+	this.idx = 0
 	this.isEval = false
 	layout(this)
 }
@@ -255,11 +261,9 @@ type LabelConfig* = struct {
 	centerY: bool
 	stretchX: bool
 	stretchY: bool
-	scale: th.fu
 }
 
 fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
-	scale: 1,
 	stretchX: true,
 	stretchY: true }) {
 
@@ -268,12 +272,12 @@ fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
 	if cfg.centerX { cfg.stretchX = true }
 	if cfg.centerY { cfg.stretchY = true }
 
-	txtSize := canvas.textSize(text, cfg.scale)
+	style := gui.getStyle()
+	txtSize := style.ft.measure(text).mulf(style.ftScale * gui.scale)
 	r := rect.fromVf2(th.Vf2{}, txtSize)
 	if cfg.stretchX { r.w = 0 }
 	if cfg.stretchY { r.h = 0 }
 	r = gui.pushRect(r)
-	style := gui.getStyle()
 
 	x := r.x
 	y := r.y
@@ -284,20 +288,116 @@ fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
 		y += (r.h-txtSize.y)/2.0
 	}
 
-	canvas.drawText(text, th.Vf2{x, y}, style.textColor, cfg.scale * gui.scale)
+	style.ft.draw(text, th.Vf2{x, y}.mulf(gui.scale),
+		style.textColor, style.ftScale * gui.scale)
 }
 
 fn (gui: ^Gui) qbutton*(text: str, cfg: ButtonConfig = ButtonConfig{}): bool {
 	pressed := gui.button()
-	gui.label(text, LabelConfig{scale: 1, centerX: true, centerY: true})
+	gui.label(text, LabelConfig{centerX: true, centerY: true})
 	gui.popContainer()
 	return pressed;
+}
+
+type TextBoxConfig* = struct {}
+
+type TextBox* = struct {
+	buffer: str
+	cursor: int
+}
+
+fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = TextBoxConfig{}) {
+	gui.idx++
+
+	r := gui.pushRect(rect.Rect{})
+
+	hover := gui.hover(r)
+
+	if gui.isEval {
+		if input.isJustPressed(input.mouse1) && hover {
+			gui.selection = gui.idx
+		}
+
+		if input.isJustPressed(input.mouse1) && !hover &&
+			gui.selection == gui.idx {
+				gui.selection = 0
+		}
+
+		if gui.selection != gui.idx {
+			return
+		}
+
+		if input.isJustPressed(input.key_left) {
+			if tb.cursor > 0 { tb.cursor-- }
+		}
+
+		if input.isJustPressed(input.key_right) {
+			if tb.cursor < len(tb.buffer) { tb.cursor++ }
+		}
+
+		if input.isJustPressed(input.key_backspace) {
+			if tb.cursor > 0 {
+				tb.buffer = slice(tb.buffer, 0, tb.cursor - 1) +
+					slice(tb.buffer, tb.cursor)
+				tb.cursor--
+			}
+		}
+
+		s := input.getStr()
+		v := true
+		for i in s {
+			if int(s[i]) < int(' ') || int(s[i]) == int('z') + 1 {
+				v = false
+			}
+		}
+		if len(s) > 0 && v {
+			tb.buffer = slice(tb.buffer, 0, tb.cursor) + s +
+				slice(tb.buffer, tb.cursor)
+			tb.cursor += len(s)
+		}
+
+		return
+	}
+
+
+	style := gui.getStyle()
+
+	r = gui.rectToScreen(r)
+	canvas.drawRectLines(style.primaryColor, r, gui.scale)
+	canvas.beginScissorRect(r)
+
+	dm := style.ft.measure(tb.buffer).mulf(gui.scale).mulf(style.ftScale)
+
+	p := th.Vf2{}
+	p.y = r.y + r.h/2 - dm.y/2
+	c := th.Vf2{}
+	c.y = p.y
+
+	cdmx := style.ft.measure(slice(tb.buffer, 0, tb.cursor)).x *
+		gui.scale*style.ftScale
+	if cdmx < r.w - 2*gui.scale {
+		p.x = r.x + gui.scale
+		c.x = p.x + cdmx
+	} else {
+		c.x = r.x + r.w - gui.scale
+		p.x = c.x - cdmx
+	}
+
+	style.ft.draw(tb.buffer, p, style.textColor, gui.scale * style.ftScale)
+	if gui.selection == gui.idx && th.time/500 % 2 == 0 {
+		canvas.drawRect(style.textColor,
+			rect.mk(c.x, c.y, 1*gui.scale, dm.y))
+	}
+
+	canvas.endScissor()
 }
 
 fn mk*(r: rect.Rect): Gui {
 	gui := Gui{}
 	gui.scale = 1
 	gui.pushStyle(Style{
+		ft: font.load("etc/roboto.ttf", 64),
+		ftScale: 0.1,
 		backgroundColor: 0xccccccff,
 		textColor: 0x000000ff,
 		primaryColor: th.blue })
