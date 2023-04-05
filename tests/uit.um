@@ -27,12 +27,18 @@ fn init*() {
 				}
 				gui.popContainer()
 
+				gui.pushRect(rect.mk(0, 0, 0, 2))
+				gui.label("I'm just a label", ui.LabelConfig{
+					scale: 1,
+					centerX: true })
+				gui.pushRect(rect.mk(0, 0, 0, 2))
+
 				if gui.qbutton("Next row button.") {
 					printf("click next row button\n")
 				}
 			}
+			gui.popContainer()
 		}
-		gui.popContainer()
 
 		gui.eval(layout)
 		gui.draw(layout)

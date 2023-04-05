@@ -173,7 +173,12 @@ type Stack* = struct {
 }
 
 fn (this: ^Stack) pushRect(r: rect.Rect): rect.Rect {
-	return this.dm
+	if r.x == 0 { r.x = this.dm.x }
+	if r.y == 0 { r.y = this.dm.y }
+	if r.w == 0 { r.w = this.dm.w }
+	if r.h == 0 { r.h = this.dm.h }
+
+	return r
 }
 
 fn (this: ^Stack) getDims(): rect.Rect {
@@ -207,17 +212,30 @@ fn (gui: ^Gui) button*(cfg: ButtonConfig = ButtonConfig{}): bool {
 type LabelConfig* = struct {
 	centerX: bool
 	centerY: bool
+	stretchX: bool
+	stretchY: bool
 	scale: th.fu
 }
 
-fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{scale: 1}) {
-	gui.stack()
-	r := gui.getContainer().getDims()
+fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
+	scale: 1,
+	stretchX: true,
+	stretchY: true }) {
+
+	if gui.isEval { return }
+
+	if cfg.centerX { cfg.stretchX = true }
+	if cfg.centerY { cfg.stretchY = true }
+
+	txtSize := canvas.textSize(text, cfg.scale)
+	r := rect.fromVf2(th.Vf2{}, txtSize)
+	if cfg.stretchX { r.w = 0 }
+	if cfg.stretchY { r.h = 0 }
+	r = gui.pushRect(r)
 	style := gui.getStyle()
 
 	x := r.x
 	y := r.y
-	txtSize := canvas.textSize(text, cfg.scale)
 	if cfg.centerX {
 		x += (r.w-txtSize.x)/2.0
 	}
@@ -225,10 +243,7 @@ fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{scale: 1}) {
 		y += (r.h-txtSize.y)/2.0
 	}
 
-	if gui.isEval {
-		canvas.drawText(text, th.Vf2{x, y}, 0x000000FF, cfg.scale)
-	}
-	gui.popContainer()
+	canvas.drawText(text, th.Vf2{x, y}, style.textColor, cfg.scale * gui.scale)
 }
 
 fn (gui: ^Gui) qbutton*(text: str, cfg: ButtonConfig = ButtonConfig{}): bool {
