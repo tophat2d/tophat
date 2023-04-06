@@ -5,6 +5,7 @@ import (
 	"signal.um"
 	"window.um"
 	"ui.um"
+	"font.um"
 )
 
 var gui, win: ui.Gui
@@ -14,9 +15,13 @@ fn init*() {
 	window.setup("gui test", 600, 600)
 	window.setViewport(th.Vf2{ 200, 200 })
 
-	gui = ui.mk(rect.mk(0, 0, 200, 200))
+	ft := font.load("etc/roboto.ttf", 64)
 
-	win = ui.mk(rect.mk(100, 100, 50, 50))
+	gui = ui.mk(rect.mk(0, 0, 200, 200), ft)
+	gui.style[0].ftScale = 0.1
+
+	win = ui.mk(rect.mk(100, 100, 50, 50), ft)
+	win.style[0].ftScale = 0.1
 
 	window.onFrame.register(signal.Callback{
 		layout := ui.LayoutFn{

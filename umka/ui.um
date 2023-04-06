@@ -123,6 +123,7 @@ type BoxConfig* = struct {
 	subdivisions: uint
 	growType: BoxGrow
 	dir: BoxDirection
+	rect: rect.Rect
 }
 
 type Box* = struct {
@@ -198,7 +199,7 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = BoxConfig{
 	dir: BoxDirectionDown }) {
 
 	b := Box{}
-	b.dm = gui.pushRect(rect.Rect{})
+	b.dm = gui.pushRect(cfg.rect)
 	b.cfg = cfg
 	switch cfg.growType {
 	case BoxGrowDimension:
@@ -219,7 +220,9 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = BoxConfig{
 	gui.pushContainer(b)
 }
 
-type StackConfig* = struct { }
+type StackConfig* = struct {
+	rect: rect.Rect
+}
 
 type Stack* = struct {
 	dm: rect.Rect
@@ -241,14 +244,16 @@ fn (this: ^Stack) getDims(): rect.Rect {
 
 fn (gui: ^Gui) stack*(cfg: StackConfig = StackConfig{}) {
 	gui.pushContainer(Stack{
-		dm: gui.pushRect(rect.Rect{}),
+		dm: gui.pushRect(cfg.rect),
 		cfg: cfg })
 }
 
-type ButtonConfig* = struct {}
+type ButtonConfig* = struct {
+	rect: rect.Rect
+}
 
 fn (gui: ^Gui) button*(cfg: ButtonConfig = ButtonConfig{}): bool {
-	gui.stack()
+	gui.stack(StackConfig{ rect: cfg.rect })
 	r := gui.getContainer().getDims()
 
 	if gui.isEval {
@@ -268,6 +273,7 @@ type LabelConfig* = struct {
 	centerY: bool
 	stretchX: bool
 	stretchY: bool
+	rect: rect.Rect
 }
 
 fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
@@ -277,9 +283,12 @@ fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
 	if cfg.centerX { cfg.stretchX = true }
 	if cfg.centerY { cfg.stretchY = true }
 
+	r := cfg.rect
 	style := gui.getStyle()
 	txtSize := style.ft.measure(text).mulf(style.ftScale)
-	r := rect.fromVf2(th.Vf2{}, txtSize)
+	if r.w == 0 { r.w = txtSize.x }
+	if r.h == 0 { r.h = txtSize.y }
+
 	if cfg.stretchX { r.w = 0 }
 	if cfg.stretchY { r.h = 0 }
 	r = gui.pushRect(r)
@@ -300,13 +309,15 @@ fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
 }
 
 fn (gui: ^Gui) qbutton*(text: str, cfg: ButtonConfig = ButtonConfig{}): bool {
-	pressed := gui.button()
+	pressed := gui.button(cfg)
 	gui.label(text, LabelConfig{centerX: true, centerY: true})
 	gui.popContainer()
 	return pressed;
 }
 
-type TextBoxConfig* = struct {}
+type TextBoxConfig* = struct {
+	rect: rect.Rect
+}
 
 type TextBox* = struct {
 	buffer: str
@@ -316,7 +327,7 @@ type TextBox* = struct {
 fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = TextBoxConfig{}) {
 	gui.idx++
 
-	r := gui.pushRect(rect.Rect{})
+	r := gui.pushRect(cfg.rect)
 
 	hover := gui.hover(r)
 
@@ -397,11 +408,11 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = TextBoxConfig{}) {
 	canvas.endScissor()
 }
 
-fn mk*(r: rect.Rect): Gui {
+fn mk*(r: rect.Rect, f: font.Font): Gui {
 	gui := Gui{}
 	gui.pushStyle(Style{
-		ft: font.load("etc/roboto.ttf", 64),
-		ftScale: 0.1,
+		ft: f,
+		ftScale: 1,
 		backgroundColor: 0xccccccff,
 		textColor: 0x000000ff,
 		primaryColor: th.blue })

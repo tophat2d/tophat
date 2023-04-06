@@ -1,6 +1,6 @@
 
 import (
-	"th.um"	
+	"th.um"
 )
 
 //~~struct Rect
@@ -108,7 +108,7 @@ fn (r: ^Rect) center*(): th.Vf2 {
 
 //~~fn Rect.centerWithinRect
 // Centers `child` with the rect `r`.
-fn (r: ^Rect) centerWithinRect(child: Rect): Rect {
+fn (r: ^Rect) centerWithinRect*(child: Rect): Rect {
 //~~
 	child.x = r.x + (r.w - child.w)/2
 	child.y = r.y + (r.h - child.h)/2
