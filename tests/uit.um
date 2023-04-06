@@ -1,18 +1,22 @@
 
 import (
+	"th.um"
 	"rect.um"
 	"signal.um"
 	"window.um"
 	"ui.um"
 )
 
-var gui: ui.Gui
+var gui, win: ui.Gui
 var tb: ui.TextBox
 
 fn init*() {
-	window.setup("gui test", 200, 200)
+	window.setup("gui test", 600, 600)
+	window.setViewport(th.Vf2{ 200, 200 })
 
 	gui = ui.mk(rect.mk(0, 0, 200, 200))
+
+	win = ui.mk(rect.mk(100, 100, 50, 50))
 
 	window.onFrame.register(signal.Callback{
 		layout := ui.LayoutFn{
@@ -48,7 +52,24 @@ fn init*() {
 			gui.popContainer()
 		}
 
+		layout2 := ui.LayoutFn{
+			gui.box(ui.BoxConfig{
+				subdivisions: 2,
+				growType: ui.BoxGrowSubdivision,
+				dir: ui.BoxDirectionDown })
+			{
+				gui.label("I'm a window\n", ui.LabelConfig{
+					centerX: true, centerY: true })
+				if gui.qbutton("Click me!") {
+					printf("Clicked button in window\n")
+				}
+			}
+			gui.popContainer()
+		}
+
+		win.eval(layout2)
 		gui.eval(layout)
 		gui.draw(layout)
+		win.draw(layout2)
 	}, null)
 }
