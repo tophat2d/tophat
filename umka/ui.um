@@ -407,15 +407,19 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			return
 		}
 
-		if input.isJustPressed(input.key_left) {
+		if input.isJustPressed(input.key_left) ||
+			input.isPressedRepeat(input.key_left) {
 			if tb.cursor > 0 { tb.cursor-- }
 		}
 
-		if input.isJustPressed(input.key_right) {
+		if input.isJustPressed(input.key_right) ||
+			input.isPressedRepeat(input.key_right) {
 			if tb.cursor < len(tb.buffer) { tb.cursor++ }
 		}
 
-		if input.isJustPressed(input.key_backspace) {
+		if input.isJustPressed(input.key_backspace) ||
+			input.isPressedRepeat(input.key_backspace) {
+
 			if tb.cursor > 0 {
 				tb.buffer = slice(tb.buffer, 0, tb.cursor - 1) +
 					slice(tb.buffer, tb.cursor)
@@ -463,8 +467,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 
 	style.ft.draw(tb.buffer, p, style.ftColor, style.ftScale)
 	if gui.selection == gui.idx && th.time/500 % 2 == 0 {
-		canvas.drawRect(style.ftColor,
-			rect.mk(c.x, c.y, 1, dm.y))
+		canvas.drawRect(style.ftColor, rect.mk(c.x, c.y, 1, dm.y))
 	}
 
 	canvas.endScissor()
