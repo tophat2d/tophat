@@ -171,6 +171,7 @@ type BoxConfig* = struct {
 	growType: BoxGrow
 	dir: BoxDirection
 	rect: rect.Rect
+	padding: th.fu
 }
 
 type Box* = struct {
@@ -193,7 +194,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 			r.w = this.dm.w
 		}
 
-		this.dm.y += r.h
+		this.dm.y += r.h + this.cfg.padding
 	case BoxDirectionRight:
 		r.x = this.dm.x
 		r.y = this.dm.y
@@ -206,7 +207,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 			r.w = this.grow
 		}
 
-		this.dm.x += r.w
+		this.dm.x += r.w + this.cfg.padding
 	case BoxDirectionUp:
 		if r.h == 0 {
 			r.h = this.grow
@@ -216,7 +217,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 			r.w = this.dm.w
 		}
 
-		this.dm.h -= r.h
+		this.dm.h -= r.h + this.cfg.padding
 		r.x = this.dm.x
 		r.y = this.dm.y + this.dm.h
 	case BoxDirectionLeft:
@@ -228,7 +229,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 			r.w = this.grow
 		}
 
-		this.dm.w -= r.w
+		this.dm.w -= r.w + this.cfg.padding
 		r.x = this.dm.x + this.dm.w
 		r.y = this.dm.y
 	}
@@ -260,6 +261,7 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = BoxConfig{
 		if cfg.dir == BoxDirectionRight || cfg.dir == BoxDirectionLeft {
 			dm = b.dm.w
 		}
+		dm += b.cfg.padding
 
 		b.grow = dm / cfg.subdivisions
 	}
@@ -273,6 +275,7 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = BoxConfig{
 
 type StackConfig* = struct {
 	rect: rect.Rect
+	padding: th.fu
 }
 
 type Stack* = struct {
@@ -281,10 +284,10 @@ type Stack* = struct {
 }
 
 fn (this: ^Stack) pushRect(r: rect.Rect): rect.Rect {
-	if r.x == 0 { r.x = this.dm.x }
-	if r.y == 0 { r.y = this.dm.y }
-	if r.w == 0 { r.w = this.dm.w }
-	if r.h == 0 { r.h = this.dm.h }
+	if r.x == 0 { r.x = this.dm.x + this.cfg.padding }
+	if r.y == 0 { r.y = this.dm.y + this.cfg.padding }
+	if r.w == 0 { r.w = this.dm.w - 2*this.cfg.padding }
+	if r.h == 0 { r.h = this.dm.h - 2*this.cfg.padding }
 
 	return r
 }

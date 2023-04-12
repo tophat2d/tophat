@@ -20,13 +20,15 @@ fn init*() {
 	gui = ui.mk(rect.mk(0, 0, 200, 200), ui.getDefaultStyle())
 
 	win = ui.mk(rect.mk(100, 100, 80, 50), ui.getDefaultStyle())
+	win.getStyle().containerBox.color = 0x88aa88ff
 
 	window.onFrame.register(signal.Callback{
 		layout := ui.LayoutFn{
 			gui.box(ui.BoxConfig{
 				dimension: 30,
 				growType: ui.BoxGrowDimension,
-				dir: ui.BoxDirectionUp })
+				dir: ui.BoxDirectionUp,
+				padding: 5 })
 			{
 				gui.box(ui.BoxConfig{
 					subdivisions: 3,
@@ -41,10 +43,8 @@ fn init*() {
 				}
 				gui.popContainer()
 
-				gui.pushRect(rect.mk(0, 0, 0, 2))
 				gui.label("I'm just a label", ui.LabelConfig{
 					centerX: true })
-				gui.pushRect(rect.mk(0, 0, 0, 2))
 
 				if gui.qbutton("Next row button.") {
 					printf("click next row button\n")
@@ -56,6 +56,7 @@ fn init*() {
 		}
 
 		layout2 := ui.LayoutFn{
+			gui.stack({ padding: 3 })
 			gui.box(ui.BoxConfig{
 				subdivisions: 2,
 				growType: ui.BoxGrowSubdivision,
@@ -67,6 +68,7 @@ fn init*() {
 					printf("Clicked button in window\n")
 				}
 			}
+			gui.popContainer()
 			gui.popContainer()
 		}
 
