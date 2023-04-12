@@ -19,7 +19,7 @@ struct {
 	sg_buffer *buffers;
 	size_t buffers_count;
 	size_t buffers_cap;
-	size_t current_buffer; 	
+	size_t current_buffer;
 	size_t starting_buffer; // buffer to start flush at
 }
 typedef buffer_cache_t;
@@ -176,7 +176,7 @@ void th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n) {
 	push_image_phase(img);
 	thg->canvas_image = img;
 
-	if (!th_canvas_batch_push(array, n)) { 
+	if (!th_canvas_batch_push(array, n)) {
 		// if buffer is too small
 		th_canvas_flush();
 	}
@@ -315,6 +315,9 @@ void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness) {
 }
 
 void th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size) {
+	if (text == NULL)
+		return;
+
 	fu dx = p.x;
 
 	for (;*text; text++) {

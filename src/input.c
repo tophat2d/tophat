@@ -20,8 +20,7 @@ void th_input_sync_fake_keys() {
 
 void th_input_key(int keycode, int bDown) {
 	if (!bDown) {
-		if (thg->pressed[keycode])
-			thg->just_released[keycode] = 1;
+		thg->just_released[keycode] = 1;
 		thg->pressed[keycode] = 0;
 		thg->just_pressed[keycode] = 0;
 		return;

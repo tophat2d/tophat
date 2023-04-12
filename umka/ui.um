@@ -3,18 +3,44 @@ import (
 	"canvas.um"
 	"coll.um"
 	"font.um"
+	"image.um"
 	"input.um"
+	"placeholders.um"
 	"rect.um"
 	"th.um"
 )
 
-type Style* = struct {
-	ft: font.Font
-	ftScale: th.fu
+type BoxStyle* = struct {
+	img: image.Image
+	crop: rect.Rect
+	outer, inner: rect.Rect
+	scale: th.fu
+	color: uint32
+}
 
-	backgroundColor: uint32
-	textColor: uint32
-	primaryColor: uint32
+type Font* = interface {
+	draw(text: str, pos: th.Vf2, color: uint32, scale: th.fu)
+	measure(test: str): th.Vf2
+}
+
+type Style* = struct {
+	ft: Font
+	ftScale: th.fu
+	ftColor: uint32
+
+	posBox: BoxStyle
+	negBox: BoxStyle
+	containerBox: BoxStyle
+}
+
+type PixelFont* = struct { }
+
+fn (this: ^PixelFont) draw*(t: str, p: th.Vf2, c: uint32, s: th.fu) {
+	canvas.drawText(t, p, c, s)
+}
+
+fn (this: ^PixelFont) measure*(t: str): th.Vf2 {
+	return canvas.textSize(t, 1)
 }
 
 type Container* = interface {
@@ -31,12 +57,29 @@ type Gui* = struct {
 //~~
 	idx: int
 
+	m1Pressed: bool
+	m2Pressed: bool
+	m3Pressed: bool
+
 	isEval: bool
 	style: []Style
 	container: []Container
 }
 
 type LayoutFn* = fn(gui: ^Gui)
+
+fn (this: ^BoxStyle) draw*(r: rect.Rect) {
+	if !this.img.validate() {
+		canvas.drawRect(this.color, r)
+		return
+	}
+
+	this.img.crop(
+		this.crop.getPos().div(this.img.getDims()),
+		this.crop.getDims().div(this.img.getDims()))
+	this.img.drawNinepatch(this.outer, this.inner, r, this.color,
+		this.scale)
+}
 
 fn (this: ^Gui) pushStyle*(s: Style) {
 	this.style = append(this.style, s)
@@ -48,8 +91,12 @@ fn (this: ^Gui) popStyle*() {
 	}
 }
 
-fn (this: ^Gui) getStyle*(): Style {
-	return this.style[len(this.style) - 1]
+fn (this: ^Gui) getStyle*(): ^Style {
+	return &this.style[len(this.style) - 1]
+}
+
+fn (this: ^Gui) dupStyle*() {
+	this.pushStyle(this.getStyle()^)
 }
 
 fn (this: ^Gui) pushContainer*(c: Container) {
@@ -80,21 +127,21 @@ fn (this: ^Gui) hover(r: rect.Rect): bool {
 }
 
 fn (this: ^Gui) eval*(layout: LayoutFn) {
+	if input.isJustPressed(input.mouse1) { this.m1Pressed = true }
+	if input.isJustReleased(input.mouse1) { this.m1Pressed = false }
+	if input.isJustPressed(input.mouse2) { this.m2Pressed = true }
+	if input.isJustReleased(input.mouse2) { this.m2Pressed = false }
+	if input.isJustPressed(input.mouse3) { this.m3Pressed = true }
+	if input.isJustReleased(input.mouse3) { this.m3Pressed = false }
+
 	this.idx = 0
 	this.isEval = true
 	layout(this)
+
 	if this.hover(this.container[0].getDims()) {
-		if input.isJustReleased(input.mouse1) {
 			input.clear(input.mouse1)
-		}
-
-		if input.isJustReleased(input.mouse2) {
 			input.clear(input.mouse2)
-		}
-
-		if input.isJustReleased(input.mouse3) {
 			input.clear(input.mouse3)
-		}
 	}
 }
 
@@ -217,6 +264,10 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = BoxConfig{
 		b.grow = dm / cfg.subdivisions
 	}
 
+	if !gui.isEval {
+		gui.getStyle().containerBox.draw(b.dm)
+	}
+
 	gui.pushContainer(b)
 }
 
@@ -246,6 +297,10 @@ fn (gui: ^Gui) stack*(cfg: StackConfig = StackConfig{}) {
 	gui.pushContainer(Stack{
 		dm: gui.pushRect(cfg.rect),
 		cfg: cfg })
+
+	if !gui.isEval {
+		gui.getStyle().containerBox.draw(gui.getContainer().getDims())
+	}
 }
 
 type ButtonConfig* = struct {
@@ -262,7 +317,11 @@ fn (gui: ^Gui) button*(cfg: ButtonConfig = ButtonConfig{}): bool {
 		}
 		return false
 	} else {
-		canvas.drawRectLines(gui.getStyle().primaryColor, r, 1);
+		if gui.hover(r) && gui.m1Pressed {
+			gui.getStyle().negBox.draw(r)
+		} else {
+			gui.getStyle().posBox.draw(r)
+		}
 	}
 
 	return false
@@ -276,7 +335,7 @@ type LabelConfig* = struct {
 	rect: rect.Rect
 }
 
-fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
+fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = {
 	stretchX: true,
 	stretchY: true }) {
 
@@ -305,10 +364,10 @@ fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = LabelConfig{
 	}
 
 	style.ft.draw(text, th.Vf2{x, y},
-		style.textColor, style.ftScale)
+		style.ftColor, style.ftScale)
 }
 
-fn (gui: ^Gui) qbutton*(text: str, cfg: ButtonConfig = ButtonConfig{}): bool {
+fn (gui: ^Gui) qbutton*(text: str, cfg: ButtonConfig = {}): bool {
 	pressed := gui.button(cfg)
 	gui.label(text, LabelConfig{centerX: true, centerY: true})
 	gui.popContainer()
@@ -324,7 +383,7 @@ type TextBox* = struct {
 	cursor: int
 }
 
-fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = TextBoxConfig{}) {
+fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 	gui.idx++
 
 	r := gui.pushRect(cfg.rect)
@@ -332,11 +391,11 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = TextBoxConfig{}) {
 	hover := gui.hover(r)
 
 	if gui.isEval {
-		if input.isJustReleased(input.mouse1) && hover {
+		if input.isJustPressed(input.mouse1) && hover {
 			gui.selection = gui.idx
 		}
 
-		if input.isJustReleased(input.mouse1) && !hover &&
+		if input.isJustPressed(input.mouse1) && !hover &&
 			gui.selection == gui.idx {
 				gui.selection = 0
 		}
@@ -380,7 +439,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = TextBoxConfig{}) {
 
 	style := gui.getStyle()
 
-	canvas.drawRectLines(style.primaryColor, r, 1)
+	style.negBox.draw(r)
 	canvas.beginScissorRect(r)
 
 	dm := style.ft.measure(tb.buffer).mulf(style.ftScale)
@@ -399,23 +458,42 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = TextBoxConfig{}) {
 		p.x = c.x - cdmx
 	}
 
-	style.ft.draw(tb.buffer, p, style.textColor, style.ftScale)
+	style.ft.draw(tb.buffer, p, style.ftColor, style.ftScale)
 	if gui.selection == gui.idx && th.time/500 % 2 == 0 {
-		canvas.drawRect(style.textColor,
+		canvas.drawRect(style.ftColor,
 			rect.mk(c.x, c.y, 1, dm.y))
 	}
 
 	canvas.endScissor()
 }
 
-fn mk*(r: rect.Rect, f: font.Font): Gui {
-	gui := Gui{}
-	gui.pushStyle(Style{
-		ft: f,
+fn getDefaultStyle*(): Style {
+	return {
+		ft: PixelFont{},
 		ftScale: 1,
-		backgroundColor: 0xccccccff,
-		textColor: 0x000000ff,
-		primaryColor: th.blue })
+		ftColor: th.black,
+
+		posBox: {
+			img: placeholders.button,
+			crop: { 0, 0, 5, 5 },
+			outer: { 0, 0, 5, 5 },
+			inner: { 2, 2, 1, 1 },
+			scale: 1,
+			color: th.white },
+		negBox: {
+			img: placeholders.button,
+			crop: { 0, 0, 5, 5 },
+			outer: { 5, 0, 5, 5 },
+			inner: { 2, 2, 1, 1 },
+			scale: 1,
+			color: th.white },
+		containerBox: {
+			color: 0x888888ff } }
+}
+
+fn mk*(r: rect.Rect, s: Style): Gui {
+	gui := Gui{}
+	gui.pushStyle(s)
 	gui.container = []Container{ Stack{ dm: r } }
 
 	return gui
