@@ -19,7 +19,7 @@ fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, 
 //~~fn createRenderTarget
 // Creates a render target you can draw to, like to a window.
 // Filter specifies specfifies filtering for resulting image.
-// Image can be retrieved via `toImage`. 
+// Image can be retrieved via `toImage`.
 fn createRenderTarget*(size: th.Vf2, filter: int): RenderTarget {
 //~~
 	rt := RenderTarget{}
@@ -46,7 +46,7 @@ fn (rt: ^RenderTarget) end*(wp: th.Vf2) {
 fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
 //~~fn RenderTarget.toImage
 // Returns the image of the render target.
-// Do not call `setfilter` on the resulting image. 
+// Do not call `setfilter` on the resulting image.
 fn (rt: ^RenderTarget) toImage*(): Image {
 //~~
 	img := Image{}
@@ -92,10 +92,11 @@ fn (i: ^Image) draw*(t: th.Transform, color: uint32 = th.white) {
 fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: ^rect.Rect,
 	color: uint32, scale: real)
 //~~fn Image.drawNinepatch
-// Draws "nine-patch" image. 
+// Draws "nine-patch" image.
 // `outer` specifies the texture coordinates of the outer rect of source image,
 // `inner` specifies coordinates of inner rect of source image, positioned relative to `outer`.
 // You can tint with `color`.
+// ![](img/ninepatch.png)
 fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect.Rect, color: uint32 = th.white, scale: real = 1.0) {
 //~~
 	umth_image_draw_nine_patch(i^, &outer, &inner, &dest, color, scale)
@@ -188,7 +189,7 @@ fn (i: ^Image) copy*(): Image {
 //~~
 	img := Image{}
 	umth_image_copy(&img, i^)
-	
+
 	return img
 }
 

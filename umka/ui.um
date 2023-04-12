@@ -1,3 +1,8 @@
+//~~
+// `ui.um` offers an immediate GUI library suitable both for simple game menus
+// and more complex applications.  See the [tutorial](/tut/spritesheet.html)
+// for example usage.
+//~~
 
 import (
 	"canvas.um"
@@ -10,30 +15,32 @@ import (
 	"th.um"
 )
 
+//~~struct BoxStyle
+// `BoxStyle` describes how a box within the GUI is styled.  In this case box
+// can be anything, ranging from a button to a container.  By default the box
+// is drawn using the `image.Image.drawNinepatch` method.  However if the image
+// is invalid, a rectangle with color `color` is drawn.
 type BoxStyle* = struct {
 	img: image.Image
-	crop: rect.Rect
 	outer, inner: rect.Rect
 	scale: th.fu
 	color: uint32
 }
+//~~
 
+//~~interface Font
+// This interface is used by all elements that draw text. A `font.Font`
+// implements this interface.
 type Font* = interface {
 	draw(text: str, pos: th.Vf2, color: uint32, scale: th.fu)
 	measure(test: str): th.Vf2
 }
+//~~
 
-type Style* = struct {
-	ft: Font
-	ftScale: th.fu
-	ftColor: uint32
-
-	posBox: BoxStyle
-	negBox: BoxStyle
-	containerBox: BoxStyle
-}
-
+//~~struct PixelFont
+// This struct implement the `Font` interface using the `canvas.um` pixel font.
 type PixelFont* = struct { }
+//~~
 
 fn (this: ^PixelFont) draw*(t: str, p: th.Vf2, c: uint32, s: th.fu) {
 	canvas.drawText(t, p, c, s)
@@ -43,16 +50,46 @@ fn (this: ^PixelFont) measure*(t: str): th.Vf2 {
 	return canvas.textSize(t, 1)
 }
 
+//~~struct Style
+// `Style` is used as a global state for styling the GUI.
+type Style* = struct {
+	// current font
+	ft: Font
+	// font scale
+	ftScale: th.fu
+	// text color
+	ftColor: uint32
+
+	// Positive box - i. e. unpressed button
+	posBox: BoxStyle
+	// Negative box - i. e. pressed button, text box
+	negBox: BoxStyle
+	// Used to draw containers
+	containerBox: BoxStyle
+}
+//~~
+
+//~~interface Container
+// Containers are used to layout elements or other containers.
 type Container* = interface {
+	// This adds a rectangle to the container, and returns the rectangle
+	// which was actually added (the container can modify the rectangle).
+	// See individual containers for further documentation.
 	pushRect(r: rect.Rect): rect.Rect
 	getDims(): rect.Rect
 }
+//~~
 
 //~~struct Gui
+// This is the main struct of any UI.  Styles and containers are in a stack.
 type Gui* = struct {
+	// user context passed to layout functions
 	ctx: any
 
+	// the index of the current selection. TODO implement properly
 	selection: int
+	// true, if the layout is being evaluated, not drawn
+	isEval: bool
 	// contains more unexported fields
 //~~
 	idx: int
@@ -61,64 +98,99 @@ type Gui* = struct {
 	m2Pressed: bool
 	m3Pressed: bool
 
-	isEval: bool
 	style: []Style
 	container: []Container
 }
 
-type LayoutFn* = fn(gui: ^Gui)
+//~~fn mk
+// Creates a new gui spanning `r`, with style `s`.
+fn mk*(r: rect.Rect, s: Style): Gui
+//~~
 
+//~~type LayoutFn
+// The layout function calls different element or container methods to create
+// the user interface itself.  It is called in the `eval` and `draw`.
+type LayoutFn* = fn(gui: ^Gui)
+//~~
+
+//~~fn BoxStyle.draw
+// Draws a rectangle using a BoxStyle
 fn (this: ^BoxStyle) draw*(r: rect.Rect) {
+//~~
 	if !this.img.validate() {
 		canvas.drawRect(this.color, r)
 		return
 	}
 
-	this.img.crop(
-		this.crop.getPos().div(this.img.getDims()),
-		this.crop.getDims().div(this.img.getDims()))
 	this.img.drawNinepatch(this.outer, this.inner, r, this.color,
 		this.scale)
 }
 
+//~~fn Gui.pushStyle
+// Pushes a style onto the style stack.
 fn (this: ^Gui) pushStyle*(s: Style) {
+//~~
 	this.style = append(this.style, s)
 }
 
+//~~fn Gui.popStyle
+// Pops a style from the style stack.
 fn (this: ^Gui) popStyle*() {
+//~~
 	if len(this.style) > 1 {
 		this.style = slice(this.style, 0, len(this.style) - 1)
 	}
 }
 
+//~~fn Gui.getStyle
+// Returns a pointer to the style atop the style stack.
 fn (this: ^Gui) getStyle*(): ^Style {
+//~~
 	return &this.style[len(this.style) - 1]
 }
 
+//~~fn Gui.dupStyle
+// Duplicates the current style.
 fn (this: ^Gui) dupStyle*() {
+//~~
 	this.pushStyle(this.getStyle()^)
 }
 
+//~~fn Gui.pushContainer
+// Pushes a container onto the container stack.
 fn (this: ^Gui) pushContainer*(c: Container) {
+//~~
 	this.container = append(this.container, c)
 }
 
+//~~fn Gui.popContainer
+// Pops a container from the container stack.
 fn (this: ^Gui) popContainer*() {
+//~~
 	if len(this.container) > 1 {
 		this.container =
 			slice(this.container, 0, len(this.container) - 1)
 	}
 }
 
+//~~fn Gui.getContainer
+// Returns the container atop the container stack.
 fn (this: ^Gui) getContainer*(): Container {
+//~~
 	return this.container[len(this.container) - 1]
 }
 
+//~~fn Gui.pushRect
+// Shortcut to `this.getContainer().pushRect(r)`
 fn (this: ^Gui) pushRect*(r: rect.Rect): rect.Rect {
+//~~
 	return this.getContainer().pushRect(r)
 }
 
+//~~fn Gui.getDims
+// Shortcut to `this.getContainer().getDims(r)`
 fn (this: ^Gui) getDims*(): rect.Rect {
+//~~
 	return this.getContainer().getDims()
 }
 
@@ -126,7 +198,10 @@ fn (this: ^Gui) hover(r: rect.Rect): bool {
 	return coll.vf2ToRect(input.getMousePos(), r)
 }
 
+//~~fn Gui.eval
+// Runs the evaluation phase on `layout`.
 fn (this: ^Gui) eval*(layout: LayoutFn) {
+//~~
 	if input.isJustPressed(input.mouse1) { this.m1Pressed = true }
 	if input.isJustReleased(input.mouse1) { this.m1Pressed = false }
 	if input.isJustPressed(input.mouse2) { this.m2Pressed = true }
@@ -145,40 +220,67 @@ fn (this: ^Gui) eval*(layout: LayoutFn) {
 	}
 }
 
+//~~fn Gui.draw
+// Runs the draw phase on `layout`.
 fn (this: ^Gui) draw*(layout: LayoutFn) {
+//~~
 	this.idx = 0
 	this.isEval = false
 	layout(this)
 }
 
-type BoxGrow = uint
+//~~enum BoxGrow
+// The different types of "growing" the box can do.
+type BoxGrow* = uint
 const (
+	// Increments by an amount set by the user.
 	BoxGrowDimension*   = BoxGrow(0)
+	// Divides the container into `n` equal parts.
 	BoxGrowSubdivision* = BoxGrow(1)
 )
+//~~
 
-type BoxDirection = uint
+//~~enum BoxDirection
+// Direction in which the box will grow.
+type BoxDirection* = uint
 const (
 	BoxDirectionDown*  = BoxDirection(0)
 	BoxDirectionRight* = BoxDirection(1)
 	BoxDirectionUp*    = BoxDirection(2)
 	BoxDirectionLeft*  = BoxDirection(3)
 )
+//~~
 
+//~~struct BoxConfig
+// Configuration of the `Box` container.
 type BoxConfig* = struct {
+	// dimension to grow by if `BoxGrowDimension` is used
 	dimension: th.fu
+	// number of subdivisions if `BoxGrowSubdivisions` is used
 	subdivisions: uint
+	// the grow type
 	growType: BoxGrow
+	// the grow direction
 	dir: BoxDirection
+	// rect passed to the current container
 	rect: rect.Rect
+	// padding inserted after each element
 	padding: th.fu
 }
+//~~
 
+//~~struct Box
+// `Box` is the main layout.  It puts the elements next to each other,
+// according to the config.
+//
+// If the dimensions of the rect passed to `pushRect` are non zero, they will
+// be kept. Position is always forced.
 type Box* = struct {
 	grow: th.fu
 	dm: rect.Rect
 	cfg: BoxConfig
 }
+//~~
 
 fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 	switch this.cfg.dir {
@@ -241,10 +343,13 @@ fn (this: ^Box) getDims(): rect.Rect {
 	return this.dm
 }
 
-fn (gui: ^Gui) box*(cfg: BoxConfig = BoxConfig{
+//~~fn Gui.box
+// Adds the `Box` container to the gui.
+fn (gui: ^Gui) box*(cfg: BoxConfig = {
 	dimension: 30,
 	growType: BoxGrowDimension,
 	dir: BoxDirectionDown }) {
+//~~
 
 	b := Box{}
 	b.dm = gui.pushRect(cfg.rect)
@@ -273,15 +378,26 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = BoxConfig{
 	gui.pushContainer(b)
 }
 
+//~~struct StackConfig
+// Configuration for the `Stack` container.
 type StackConfig* = struct {
 	rect: rect.Rect
 	padding: th.fu
 }
+//~~
 
+//~~struct Stack
+// The stack container puts elements on top of each other.
+// If a property of the rect passed to `pushRect` is zero, it will be changed
+// to an equivalent property of the containers' dimensions (minus the padding),
+// else it will stay the same.  This means stack can be used either to put
+// multiple elements/containers on top of each other, or for absolutely
+// positioned elements.
 type Stack* = struct {
 	dm: rect.Rect
 	cfg: StackConfig
 }
+//~~
 
 fn (this: ^Stack) pushRect(r: rect.Rect): rect.Rect {
 	if r.x == 0 { r.x = this.dm.x + this.cfg.padding }
@@ -296,7 +412,10 @@ fn (this: ^Stack) getDims(): rect.Rect {
 	return this.dm
 }
 
-fn (gui: ^Gui) stack*(cfg: StackConfig = StackConfig{}) {
+//~~fn Gui.stack
+// Adds the `Stack` container to the gui.
+fn (gui: ^Gui) stack*(cfg: StackConfig = {}) {
+//~~
 	gui.pushContainer(Stack{
 		dm: gui.pushRect(cfg.rect),
 		cfg: cfg })
@@ -306,11 +425,19 @@ fn (gui: ^Gui) stack*(cfg: StackConfig = StackConfig{}) {
 	}
 }
 
+//~~struct ButtonConfig
+// Configuration for the button.
 type ButtonConfig* = struct {
 	rect: rect.Rect
 }
+//~~
 
-fn (gui: ^Gui) button*(cfg: ButtonConfig = ButtonConfig{}): bool {
+//~~fn Gui.button
+// Adds a button to the gui.  The button acts like a `Stack` container, but it
+// is drawn using the pos/nexBox styles and handles clicks. If the button is
+// pressed and the gui is in the eval phase, the return value will be true.
+fn (gui: ^Gui) button*(cfg: ButtonConfig = {}): bool {
+//~~
 	gui.stack(StackConfig{ rect: cfg.rect })
 	r := gui.getContainer().getDims()
 
@@ -330,15 +457,27 @@ fn (gui: ^Gui) button*(cfg: ButtonConfig = ButtonConfig{}): bool {
 	return false
 }
 
+//~~struct LabelConfig
 type LabelConfig* = struct {
+	// centers the label along the X axis, enables `stretchX`
 	centerX: bool
+	// centers the label along the Y axis, enables `stretchY`
 	centerY: bool
+	// if false, the rect passed to `pushRect` will have the width of
+	// the text, else it will be 0
 	stretchX: bool
+	// if false, the rect passed to `pushRect` will have the height of
+	// the text, else it will be 0
 	stretchY: bool
+	// forces the rectangle the label will use
 	rect: rect.Rect
 }
+//~~
 
+//~~fn Gui.label
+// Draws a label using the current font style.
 fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = {
+//~~
 	stretchX: true,
 	stretchY: true }) {
 
@@ -370,23 +509,42 @@ fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = {
 		style.ftColor, style.ftScale)
 }
 
+//~~fn Gui.qbutton
+// Adds a button with a label to gui.
 fn (gui: ^Gui) qbutton*(text: str, cfg: ButtonConfig = {}): bool {
+//~~
 	pressed := gui.button(cfg)
 	gui.label(text, LabelConfig{centerX: true, centerY: true})
 	gui.popContainer()
 	return pressed;
 }
 
+//~~struct TextBoxConfig
 type TextBoxConfig* = struct {
+	// force the rect of the text box
 	rect: rect.Rect
 }
+//~~
 
+//~~struct TextBox
 type TextBox* = struct {
+	// the content of the textbox
 	buffer: str
+	// index of the cursor
 	cursor: int
 }
+//~~
 
+//~~fn Gui.textBox
+// Adds a single line textbox to the gui.
+// TODO:
+// * unicode is not supported.
+// * no selection
+// * multiline
+// * copy paste
+// * stuff like home and end
 fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
+//~~
 	gui.idx++
 
 	r := gui.pushRect(cfg.rect)
@@ -473,7 +631,10 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 	canvas.endScissor()
 }
 
+//~~fn getDefaultStyle
+// Returns the default tophat ui style.
 fn getDefaultStyle*(): Style {
+//~~
 	return {
 		ft: PixelFont{},
 		ftScale: 1,
@@ -481,14 +642,12 @@ fn getDefaultStyle*(): Style {
 
 		posBox: {
 			img: placeholders.button,
-			crop: { 0, 0, 5, 5 },
 			outer: { 0, 0, 5, 5 },
 			inner: { 2, 2, 1, 1 },
 			scale: 1,
 			color: th.white },
 		negBox: {
 			img: placeholders.button,
-			crop: { 0, 0, 5, 5 },
 			outer: { 5, 0, 5, 5 },
 			inner: { 2, 2, 1, 1 },
 			scale: 1,
