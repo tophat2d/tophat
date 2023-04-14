@@ -128,8 +128,8 @@ void th_canvas_begin_scissor_rect(th_rect rect) {
 	rect.w *= thg->scaling;
 	rect.h *= thg->scaling;
 
-	rect.x += thg->offset.x;
-	rect.y += thg->offset.y;
+	rect.x += thg->offset.x - thg->wp_offset.x;
+	rect.y += thg->offset.y - thg->wp_offset.y;
 
 	push_phase((phase){
 		.scissor_stage = SCISSOR_START,
@@ -272,9 +272,9 @@ void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
 	float sw = thg->target_size.x, sh = thg->target_size.y;
 
 	float verts[] = {
-		(a.x + thg->offset.x) / sw, (a.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0, // NOTE: Temporarily uvs are zeroed out
-	 	(b.x + thg->offset.x) / sw, (b.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0,
-		(c.x + thg->offset.x) / sw, (c.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0
+		(a.x + thg->offset.x - thg->wp_offset.x) / sw, (a.y + thg->offset.y - thg->wp_offset.y) / sh, 0, 0, 0, 0, 0, 0, // NOTE: Temporarily uvs are zeroed out
+	 	(b.x + thg->offset.x - thg->wp_offset.x) / sw, (b.y + thg->offset.y - thg->wp_offset.y) / sh, 0, 0, 0, 0, 0, 0,
+		(c.x + thg->offset.x - thg->wp_offset.x) / sw, (c.y + thg->offset.y - thg->wp_offset.y) / sh, 0, 0, 0, 0, 0, 0
 	};
 
 	for (int i = 0; i < 3; ++i) {

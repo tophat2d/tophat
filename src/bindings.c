@@ -595,6 +595,17 @@ void umth_ray_get_tilemap_coll(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // misc
 
+void umth_window_set_viewport_shift(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 s = *(th_vf2 *)&p[0];
+	thg->wp_offset = *(th_vf2 *)&p[0];
+}
+
+void umth_window_get_viewport_shift(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *o = p[0].ptrVal;
+
+	*o = thg->wp_offset;
+}
+
 void umth_window_set_clipboard(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *str = p[0].ptrVal;
 
@@ -947,6 +958,8 @@ void _th_umka_bind(void *umka) {
 		&umth_sound_set_stop_time_ms);
 
 	// window
+	umkaAddFunc(umka, "umth_window_set_viewport_shift", &umth_window_set_viewport_shift);
+	umkaAddFunc(umka, "umth_window_get_viewport_shift", &umth_window_get_viewport_shift);
 	umkaAddFunc(umka, "umth_window_set_clipboard", &umth_window_set_clipboard);
 	umkaAddFunc(umka, "umth_window_get_clipboard", &umth_window_get_clipboard);
 	umkaAddFunc(umka, "umth_window_get_fullscreen", &umth_window_get_fullscreen);

@@ -98,11 +98,17 @@ fn cycle(delta: real) {
 	canvas.drawRect(th.white, rect.mk(0, 0, wp.x, wp.y))
 }
 
+fn setViewportOffset*(s: th.Vf2)
+fn getViewportOffset*(): th.Vf2
+
 fn drawClear() {
+	of := getViewportOffset()
+	setViewportOffset({})
 	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
 	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
 	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
+	setViewportOffset(of)
 }
 
 fn umth_frame_callback*(delta: real) {
@@ -210,7 +216,26 @@ fn umth_window_get_clipboard(s: ^char)
 //~~fn getClipboard
 // Gets a string from the system clipboard.
 fn getClipboard*(): str {
+//~~
 	buf := make([]char, 8192)
 	umth_window_get_clipboard(&buf[0])
 	return str(buf)
+}
+
+fn umth_window_set_viewport_shift(s: th.Vf2)
+//~~fn setViewportShift
+// Sets the offset of the viewport.
+fn setViewportOffset*(s: th.Vf2) {
+//~~
+	umth_window_set_viewport_shift(s)
+}
+
+fn umth_window_get_viewport_shift(s: ^th.Vf2)
+//~~fn getViewportShift
+// Gets the offset of the viewport (as set by `setViewportShift`)
+fn getViewportOffset*(): th.Vf2 {
+	o := th.Vf2{}
+
+	umth_window_get_viewport_shift(&o)
+	return o
 }

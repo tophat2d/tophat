@@ -187,6 +187,7 @@ typedef struct {
 	fu scaling;
 	th_vf2 offset;
 	th_vf2 viewport;
+	th_vf2 wp_offset;
 	th_vf2 target_size;
 	bool need_quit;
 	void *umka;
@@ -204,7 +205,7 @@ typedef struct {
 
 	char input_string[INPUT_STRING_SIZE];
 	uu input_string_len;
-	
+
 	float canvas_batch[BATCH_LENGTH];
 	uu canvas_batch_size;
 
@@ -217,7 +218,7 @@ typedef struct {
 
 	sg_pass_action offscreen_pass_action;
 	sg_pipeline image_pip;
-	
+
 	bool has_render_target;
 
 	th_rect scissors[MAX_SCISSORS];

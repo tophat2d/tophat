@@ -1,9 +1,10 @@
 import (
-	"th.um"
-	"rect.um"
-	"image.um"
 	"canvas.um"
+	"image.um"
+	"input.um"
+	"rect.um"
 	"signal.um"
+	"th.um"
 	"window.um"
 )
 
@@ -27,5 +28,25 @@ fn init*() {
 				th.Vf2{106, 120}, th.Vf2{95, 110}})
 
 		img.draw(th.Transform{p: th.Vf2{10, 40}, s: th.Vf2{1, 1}}, th.white)
+
+		if input.isPressed(input.key_right) {
+			window.setViewportOffset(
+				window.getViewportOffset().add({ th.delta * 0.2, 0 }))
+		}
+
+		if input.isPressed(input.key_left) {
+			window.setViewportOffset(
+				window.getViewportOffset().sub({ th.delta * 0.2, 0 }))
+		}
+
+		if input.isPressed(input.key_down) {
+			window.setViewportOffset(
+				window.getViewportOffset().add({ 0, th.delta * 0.2 }))
+		}
+
+		if input.isPressed(input.key_up) {
+			window.setViewportOffset(
+				window.getViewportOffset().sub({ 0, th.delta * 0.2 }))
+		}
 	}, null)
 }

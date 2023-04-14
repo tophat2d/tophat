@@ -12,7 +12,7 @@
 #ifdef __EMSCRIPTEN__
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
-#else 
+#else
 #include <GL/gl.h>
 #endif
 
@@ -54,13 +54,13 @@ th_render_target *th_render_target_alloc() {
 uint32_t *th_image_get_data(th_image *img) {
 	size_t size = sizeof(uint32_t) * img->dm.w * img->dm.h;
 	uint32_t *data = malloc(size);
-	
+
 	GLuint tex = th_sg_get_gl_image(img->tex);
 
 #ifdef __EMSCRIPTEN__
 	glBindTexture(GL_TEXTURE_2D, tex);
 	GLuint fbo;
-	glGenFramebuffers(1, &fbo); 
+	glGenFramebuffers(1, &fbo);
 	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
 
@@ -240,8 +240,8 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	for (uu i=0; i < 4; i++) {
-		q.v[i].x = trunc(q.v[i].x * thg->scaling + thg->offset.x);
-		q.v[i].y = trunc(q.v[i].y * thg->scaling + thg->offset.y);
+		q.v[i].x = trunc(q.v[i].x * thg->scaling + thg->offset.x - thg->wp_offset.x);
+		q.v[i].y = trunc(q.v[i].y * thg->scaling + thg->offset.y - thg->wp_offset.y);
 	}
 
 	float sw = thg->target_size.x, sh = thg->target_size.y;
@@ -262,15 +262,12 @@ void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	}
 
 	float verts[] = {
-		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
-		q.tr.x / sw, q.tr.y / sh, bounds.tr.x, bounds.tr.y, 0, 0, 0, 0,
-		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
-		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, 0, 0, 0, 0,
-		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, 0, 0, 0, 0,
-		q.bl.x / sw, q.bl.y / sh, bounds.bl.x, bounds.bl.y, 0, 0, 0, 0};
-
-	for (uu i=0; i < 6; i++)
-		memcpy(verts + (i * 8) + 4, colors, 4 * sizeof(float));
+		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, colors[0], colors[1], colors[2], colors[3],
+		q.tr.x / sw, q.tr.y / sh, bounds.tr.x, bounds.tr.y, colors[0], colors[1], colors[2], colors[3],
+		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, colors[0], colors[1], colors[2], colors[3],
+		q.tl.x / sw, q.tl.y / sh, bounds.tl.x, bounds.tl.y, colors[0], colors[1], colors[2], colors[3],
+		q.br.x / sw, q.br.y / sh, bounds.br.x, bounds.br.y, colors[0], colors[1], colors[2], colors[3],
+		q.bl.x / sw, q.bl.y / sh, bounds.bl.x, bounds.bl.y, colors[0], colors[1], colors[2], colors[3]};
 
 	th_canvas_batch_push_auto_flush(img, verts, sizeof(verts) / sizeof(verts[0]));
 }
@@ -280,7 +277,7 @@ void th_image_set_as_render_target(th_render_target *t) {
 		th_error("There already is a render target set!");
 		return;
 	}
-	
+
 	th_canvas_flush();
 	sg_end_pass();
 
@@ -288,7 +285,7 @@ void th_image_set_as_render_target(th_render_target *t) {
 	sg_apply_pipeline(thg->image_pip);
 
 	thg->has_render_target = true;
-	
+
 	thg->scaling = 1;
 	thg->offset.x = 0;
 	thg->offset.y = 0;
@@ -304,12 +301,12 @@ void th_image_remove_render_target(th_render_target *t, th_vf2 wp) {
 
 	th_canvas_flush();
 	sg_end_pass();
-	
+
 	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
 	sg_apply_pipeline(thg->canvas_pip);
 
 	th_calculate_scaling(wp.x, wp.y);
-	
+
 	int window_width, window_height;
 	th_window_get_dimensions(&window_width, &window_height);
 	thg->target_size = (th_vf2){window_width, window_height};
