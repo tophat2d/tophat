@@ -86,7 +86,7 @@ static void frame() {
 			print_umka_error_and_quit();
 		}
 	}
-	
+
 	th_input_cycle();
 	th_canvas_flush();
 	th_canvas_end_frame();
@@ -143,23 +143,25 @@ static void cleanup() {
 
 	umkaRun(thg->umka);
 	umkaFree(thg->umka);
-	
+
 	sg_shutdown();
 }
 
 sapp_desc th_window_sapp_desc() {
-  return (sapp_desc){
-    .init_cb = init,
-    .frame_cb = frame,
-    .cleanup_cb = cleanup,
-    .event_cb = event,
-    .width = 640,
-    .height = 480,
-    .gl_force_gles2 = true,
-    .window_title = "Tophat",
-    .icon.sokol_default = true,
+	return (sapp_desc){
+		.init_cb = init,
+		.frame_cb = frame,
+		.cleanup_cb = cleanup,
+		.event_cb = event,
+		.width = 640,
+		.height = 480,
+		.gl_force_gles2 = true,
+		.window_title = "Tophat",
+		.enable_clipboard = true,
+		.clipboard_size = 8192,
+		.icon.sokol_default = true,
 		.logger.func = slog_func
-  };
+	};
 }
 
 void th_window_setup(char *name, int w, int h) {
@@ -197,7 +199,7 @@ void th_window_set_icon(th_image *img) {
 			}
 		}
 	});
-	
+
 	free(pixels);
 }
 

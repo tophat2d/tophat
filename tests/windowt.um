@@ -33,5 +33,13 @@ fn init*() {
 			cursorFreeze = !cursorFreeze
 			window.freezeCursor(cursorFreeze)
 		}
+
+		if input.isJustPressedc('N') {
+			window.setClipboard("Current time: " + repr(th.time))
+		}
+
+		if input.isJustPressedc('M') {
+			printf("%s\n", window.getClipboard())
+		}
 	}, null)
 }

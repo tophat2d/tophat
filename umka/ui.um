@@ -32,7 +32,7 @@ type BoxStyle* = struct {
 // This interface is used by all elements that draw text. A `font.Font`
 // implements this interface.
 type Font* = interface {
-	draw(text: str, pos: th.Vf2, color: uint32, scale: th.fu)
+	draw(text: str, pos: th.Vf2, color: uint32, scale: th.fu = 1.0)
 	measure(test: str): th.Vf2
 }
 //~~
@@ -42,7 +42,7 @@ type Font* = interface {
 type PixelFont* = struct { }
 //~~
 
-fn (this: ^PixelFont) draw*(t: str, p: th.Vf2, c: uint32, s: th.fu) {
+fn (this: ^PixelFont) draw*(t: str, p: th.Vf2, c: uint32, s: th.fu = 1.0) {
 	canvas.drawText(t, p, c, s)
 }
 

@@ -94,7 +94,7 @@ static void umth_placeholder_fetch(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////////
 // FONT
 
-// fn umth_font_load((2) path: str, (1) size: real, (0) filter: uint32) 
+// fn umth_font_load((2) path: str, (1) size: real, (0) filter: uint32)
 static void umth_font_load(UmkaStackSlot *p, UmkaStackSlot *r) {
 	uint32_t filter = p[0].uintVal;
 	double size = p[1].real32Val;
@@ -250,7 +250,7 @@ void umth_image_copy(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	th_image *img2 = th_image_alloc();
 	if (!img2) return;
-	
+
 	uint32_t *data = th_image_get_data(img1);
 
 	th_image_from_data(img2, data, img1->dm);
@@ -317,7 +317,7 @@ void umth_image_draw_on_quad(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_quad q;
 	q = *(th_quad *)&p[0];
 	uint32_t filter = p[4].uintVal;
-	th_image *img = p[5].ptrVal;	
+	th_image *img = p[5].ptrVal;
 
 	th_blit_tex(img, q, filter);
 }
@@ -325,7 +325,7 @@ void umth_image_draw_on_quad(UmkaStackSlot *p, UmkaStackSlot *r) {
 void umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image *img = p[5].ptrVal;
 	if (!img) return;
-	
+
 	th_rect
 		outer = *(th_rect*)p[4].ptrVal,
 		inner = *(th_rect*)p[3].ptrVal,
@@ -595,6 +595,19 @@ void umth_ray_get_tilemap_coll(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // misc
 
+void umth_window_set_clipboard(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char *str = p[0].ptrVal;
+
+	sapp_set_clipboard_string(str);
+}
+
+void umth_window_get_clipboard(UmkaStackSlot *p, UmkaStackSlot *r) {
+	char *str = p[0].ptrVal;
+
+	const char *str2 = sapp_get_clipboard_string();
+	strcpy(str, str2);
+}
+
 void umth_window_get_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	r->uintVal = th_window_is_fullscreen();
 }
@@ -703,7 +716,7 @@ void umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r) {
 // 3 = macos (unsupported currently)
 // 4 = emscripten
 void umth_window_get_platform_id(UmkaStackSlot *p, UmkaStackSlot *r) {
-#ifdef _WIN32 
+#ifdef _WIN32
 	r->intVal = 2;
 #elif __linux__
 	r->intVal = 1;
@@ -934,6 +947,8 @@ void _th_umka_bind(void *umka) {
 		&umth_sound_set_stop_time_ms);
 
 	// window
+	umkaAddFunc(umka, "umth_window_set_clipboard", &umth_window_set_clipboard);
+	umkaAddFunc(umka, "umth_window_get_clipboard", &umth_window_get_clipboard);
 	umkaAddFunc(umka, "umth_window_get_fullscreen", &umth_window_get_fullscreen);
 	umkaAddFunc(umka, "umth_window_set_fullscreen", &umth_window_set_fullscreen);
 	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);

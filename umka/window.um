@@ -39,7 +39,7 @@ fn umth_window_set_viewport(dm: th.Vf2)
 //~~fn setViewport
 // Sets the dimensions of the viewport. The dimensions are saved in the `wp`
 // variable.
-// 
+//
 // `dm`
 // : dimension of the viewport
 fn setViewport*(dm: th.Vf2) {
@@ -126,7 +126,7 @@ fn setFullscreen*(fullscreen: bool) {
 }
 
 //~~fn isFullscreen
-// Returns true if window is fullscreen 
+// Returns true if window is fullscreen
 fn isFullscreen*(): bool {
 //~~
 	return umth_window_get_fullscreen()
@@ -143,10 +143,10 @@ fn umth_window_set_target_fps(fps: int)
 
 //~~fn setTargetFps
 // Sets the fps limit.
-// 
+//
 // `fps`
 // : amount of fps the limit should be set to
-//	 
+//
 fn setTargetFps*(fps: int) {
 //~~
 	fpsLimit = fps
@@ -156,7 +156,7 @@ fn setTargetFps*(fps: int) {
 fn umth_window_set_dims(dm: th.Vf2)
 //~~fn setDims
 // Sets the dimensions of the window.
-// 
+//
 // `dm`
 // : the target dimensions in screen pixels
 fn setDims*(dm: th.Vf2) {
@@ -196,4 +196,21 @@ fn umth_window_quit()
 fn quit*() {
 //~~
 	umth_window_quit()
+}
+
+fn umth_window_set_clipboard(s: str)
+//~~fn setClipboard
+// Puts a string to the system clipboard.
+fn setClipboard*(s: str) {
+//~~
+	umth_window_set_clipboard(s)
+}
+
+fn umth_window_get_clipboard(s: ^char)
+//~~fn getClipboard
+// Gets a string from the system clipboard.
+fn getClipboard*(): str {
+	buf := make([]char, 8192)
+	umth_window_get_clipboard(&buf[0])
+	return str(buf)
 }
