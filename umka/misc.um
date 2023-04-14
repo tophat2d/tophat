@@ -4,7 +4,7 @@
 
 import (
 	"th.um"
-	"std.um"							
+	"std.um"
 )
 
 //~~fn readall
@@ -33,4 +33,18 @@ fn stepify*(val, step: th.fu): th.fu {
 		val = floor(val / step + 0.5) * step
 	}
 	return val
+}
+
+//~~fn maxf
+fn maxf*(a, b: th.fu): th.fu {
+//~~
+	if a > b { return a }
+	return b
+}
+
+//~~fn minf
+fn minf*(a, b: th.fu): th.fu {
+//~~
+	if a > b { return b }
+	return a
 }

@@ -4,8 +4,9 @@
 //~~
 
 import (
-	"th.um"
+	"misc.um"
 	"rect.um"
+	"th.um"
 )
 
 fn umth_canvas_draw_text(text: str, pos: th.Vf2, color: uint32, size: th.fu)
@@ -24,7 +25,7 @@ fn textSize*(text: str, scale: th.fu): th.Vf2 {
 	w = 0
 	maxw = 0
 	h = 1
-	
+
 	for i in text {
 		if text[i] == "\n" {
 			h += 1
@@ -83,18 +84,34 @@ fn drawQuad*(color: uint32, q: th.Quad) {
 	umth_canvas_draw_quad(color, &q)
 }
 
+var scissor: []rect.Rect
+
 fn umth_canvas_begin_scissor_rect(x, y, w, h: real)
 fn umth_canvas_end_scissor()
 //~~fn beginScissorRect
 // Disable rendering outside of rect `r`
 fn beginScissorRect*(r: rect.Rect) {
 //~~
-	umth_canvas_begin_scissor_rect(r.x, r.y, r.w, r.h)
+	r2 := r
+	if len(scissor) == 0 {
+		scissor = { r }
+	} else {
+		s := scissor[len(scissor) - 1]
+		r2.x = misc.maxf(r.x, s.x)
+		r2.y = misc.maxf(r.y, s.y)
+		r2.w = misc.minf(r.x + r.w, s.x + s.w) - r.x
+		r2.h = misc.minf(r.y + r.h, s.y + s.h) - r.y
+	}
+
+	umth_canvas_begin_scissor_rect(r2.x, r2.y, r2.w, r2.h)
 }
 
 //~~fn endScissor
 // Stops cropping
 fn endScissor*() {
 //~~
+	if len(scissor) > 0 {
+		scissor = delete(scissor, len(scissor) - 1)
+	}
 	umth_canvas_end_scissor();
 }
