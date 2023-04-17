@@ -631,6 +631,56 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 	canvas.endScissor()
 }
 
+//~~struct ImageConfig
+// Configuration for the images element. Behaves similarly to labels.
+type ImageConfig* = struct {
+	stretchX, stretchY: bool
+	centerX, centerY: bool
+	color: uint32
+	scale: th.Vf2
+	rect: rect.Rect
+}
+//~~
+
+//~~fn Gui.image
+// Draws an image.
+fn (gui: ^Gui) image*(i: image.Image, cfg: ImageConfig = {
+	stretchX: true,
+	stretchY: true,
+	color: th.white,
+	scale: { 1, 1 } }) {
+//~~
+
+	if cfg.centerX { cfg.stretchX = true }
+	if cfg.centerY { cfg.stretchY = true }
+
+	r := cfg.rect
+	dm := i.getDims().mul(cfg.scale)
+	if r.w == 0 { r.w = dm.x }
+	if r.h == 0 { r.h = dm.y }
+
+	if cfg.stretchX { r.w = 0 }
+	if cfg.stretchY { r.h = 0 }
+
+	r = gui.pushRect(r)
+
+	if gui.isEval { return }
+
+	x := r.x
+	y := r.y
+	if cfg.centerX {
+		x += (r.w - dm.x) / 2
+	}
+
+	if cfg.centerY {
+		y += (r.h - dm.y) / 2
+	}
+
+	i.draw(th.Transform{
+		p: { x, y },
+		s: cfg.scale }, cfg.color)
+}
+
 //~~fn getDefaultStyle
 // Returns the default tophat ui style.
 fn getDefaultStyle*(): Style {
