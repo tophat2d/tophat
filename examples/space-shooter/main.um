@@ -15,10 +15,10 @@ import (
 )
 
 fn init*() {
-	window.setup("title", 1280, 720)
+	window.setup("title", 960, 1280)
 
-	window.setViewport(th.Vf2{92, 168})
-	global.cam = rect.mk(0, 0, 92, 168)
+	window.setViewport(th.Vf2{96, 128})
+	global.cam = rect.mk(0, 0, 96, 128)
 	global.scene = global.MENU
 
 	game.init()
@@ -45,7 +45,7 @@ fn init*() {
 		case global.GAME:
 			game.handle()
 		case global.NONE:
-			exit()
+			window.quit()
 		}
 	}, null)
 }

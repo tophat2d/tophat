@@ -1,65 +1,71 @@
 
 import (
-	"th.um"
-	"ui.um"
-	"std.um"
+	"global.um"
 	"hud.um"
 	"rect.um"
+	"std.um"
+	"th.um"
+	"ui.um"
 	"window.um"
-	"global.um"
-	"ui/grid.um"
-	"ui/label.um"
 )
 
-var (
-	maingrid: grid.Grid
-
-	theme: ui.Theme = ui.Theme{
-		fg: th.white}
-)
+var gui: ui.Gui
 
 fn init*() {
-	title := label.mk(&hud.mainFont, "SPACE SHOOTER", theme, 0.8)
-	title.center = true
-	title.wrapping = true
-	title.get().span(1, 2)
-
-	score := label.mk(&hud.mainFont, "", theme, 0.3)
-	score.center = true
-	score.wrapping = true
-	score.get().grid(0, 2)
-
-	playButton := label.mk(&hud.mainFont, "PLAY", theme, 0.5)
-	playButton.center = true
-	playButton.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
-		if eventType != ui.eventRelease {
-			return
-		}
-		global.score = 0
-		global.scene = global.GAME
-	}
-	playButton.get().grid(0, 3)
-
-	exitButton := label.mk(&hud.mainFont, "EXIT", theme, 0.5)
-	exitButton.center = true
-	exitButton.g.onEvent = fn(eventType: th.uu, ctx: interface{}) {
-		if eventType != ui.eventRelease {
-			return
-		}
-		global.scene = global.NONE
-	}
-	exitButton.get().grid(0, 4)
-
-	maingrid = grid.mk(1, 5)
-	maingrid.g.r.w = window.wp.x
-	maingrid.g.r.h = window.wp.y
-	maingrid.elements = []ui.Element{title, score, playButton, exitButton}
+	gui = ui.mk(global.cam, ui.getDefaultStyle())
+	gui.getStyle().containerBox.color = 0
+	gui.getStyle().ftColor = th.white
+	gui.getStyle().ft = hud.mainFont
+	gui.getStyle().ftScale = 0.1
 }
 
 fn handle*() {
-	^label.Label(maingrid.elements[1]).text =
-		std.rtrim("TOP " + repr(global.hi) + " SCORE " + repr(global.score))
+	layout := ui.LayoutFn{
+		gui.stack({ padding: 2 })
+		gui.box({
+			dimension: 10,
+			padding: 2 })
 
-	maingrid.handle()
-	maingrid.draw()
+			gui.dupStyle()
+			gui.getStyle().ftScale *= 4
+
+				gui.label("SPACE", { centerX: true })
+				gui.label("SHOOTER", { centerX: true })
+
+			gui.popStyle()
+
+			gui.pushRect({ h: 10 })
+
+			gui.label(sprintf("%d : %d", global.score, global.hi),
+				{ centerX: true })
+
+
+		gui.popContainer()
+
+		gui.dupStyle()
+		gui.getStyle().ftColor = th.black
+
+		gui.box({
+			dimension: 10,
+			padding: 2,
+			dir: ui.BoxDirectionUp })
+
+			if gui.qbutton("EXIT") {
+				global.scene = global.NONE
+			}
+
+			if gui.qbutton("PLAY") {
+				global.score = 0
+				global.scene = global.GAME
+			}
+
+		gui.popContainer()
+
+		gui.popStyle()
+
+		gui.popContainer()
+	}
+
+	gui.eval(layout)
+	gui.draw(layout)
 }
