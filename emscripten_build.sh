@@ -11,6 +11,8 @@ cc () {
 		-Ilib/stb \
 		-Ilib/umka/src \
 		-Ilib/umprof \
+		-DTH_GITVER=\"$(git rev-parse --short HEAD)\" \
+		-DTH_VERSION=\"$(cat version)\" \
 		-c $1
 }
 

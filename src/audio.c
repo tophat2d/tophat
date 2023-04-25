@@ -17,20 +17,19 @@ static
 void sound_free(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_sound *s = (th_sound *)p[0].ptrVal;
 
-	// NOTE(@marekmaskarinec): for some reason ma doesn't free this in my
-	// case which results in a memory leak, however produces double with
-	// the original sounds. FIXME
-	/*ma_resource_manager_data_source_uninit(s->inst.pResourceManagerDataSource);
+	ma_sound_uninit(&s->inst);
+
+	if (!s->copied) return;
+	ma_resource_manager_data_source_uninit(s->inst.pResourceManagerDataSource);
 	ma_free(
 		s->inst.pResourceManagerDataSource,
 		&s->inst.engineNode.pEngine->allocationCallbacks
-	);*/
-
-	ma_sound_uninit(&s->inst);
+	);
 }
 
 th_sound *th_audio_load(char *path) {
 	th_sound *s = umkaAllocData(thg->umka, sizeof(th_sound), sound_free);
+	s->copied = 0;
 
 	if (ma_sound_init_from_file(
 		&thg->audio_engine,
@@ -49,6 +48,7 @@ th_sound *th_audio_load(char *path) {
 
 th_sound *th_sound_copy(th_sound *s) {
 	th_sound *r = umkaAllocData(thg->umka, sizeof(th_sound), sound_free);
+	r->copied = true;
 	
 	if (ma_sound_init_copy(
 		&thg->audio_engine,

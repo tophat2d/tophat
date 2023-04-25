@@ -74,6 +74,7 @@ typedef struct {
 
 typedef struct {
 	ma_sound inst;
+	bool copied;
 } th_sound;
 
 typedef struct {

@@ -18,12 +18,12 @@ else
 endif
 endif
 
-CFLAGS ?= -s -O3 -pipe
+CFLAGS ?= -g -fsanitize=address -pipe
 CFLAGS += -Ilib/stb/ \
-		-Isrc \
-	  -Ilib/miniaudio/ \
-	  -Ilib/umprof/ \
-		-Ilib/sokol/
+	-Isrc \
+	-Ilib/miniaudio/ \
+	-Ilib/umprof/ \
+	-Ilib/sokol/
 
 # NOTE(skejeton): @vtereshkov here you might need to fix the flags
 # 								try adding -mwin32 and -municode, or removing them in permutations

@@ -18,7 +18,7 @@ mkdir -p wasm-out
 FILES=""
 
 for f in $@; do
-	FILES="$FILES --preload-file '$f'"
+	FILES="$FILES --preload-file $f"
 done
 
 emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
