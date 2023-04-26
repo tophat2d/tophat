@@ -227,6 +227,15 @@ typedef struct {
 
 	bool prof;
 	bool profJson;
+	
+	int argc;
+	char **argv;
+	int argOffset;
+	bool silent;
+	bool check;
+	
+	int umth_destroy_callback;
+	int umth_frame_callback;
 
 	ma_engine audio_engine;
 } th_global;
@@ -352,6 +361,8 @@ void th_input_cycle();
 void th_error(char *text, ...);
 void th_info(char *text, ...);
 void th_calculate_scaling(float camw, float camh);
+int th_init(const char *scriptpath, const char *script_path);
+void th_deinit();
 
 // navmesh
 void th_navmesh_add_quad(th_navmesh *m, th_quad *q);

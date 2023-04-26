@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
+    <title>Emscripten-Generated Code</title>
+    <style>
+        body { margin: 0; background-color: black }
+        .game {
+          border: 0;
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          display: block;
+          image-rendering: optimizeSpeed;
+          image-rendering: -moz-crisp-edges;
+          image-rendering: -o-crisp-edges;
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: optimize-contrast;
+          image-rendering: crisp-edges;
+          image-rendering: pixelated;
+          -ms-interpolation-mode: nearest-neighbor;
+        }
+        
+        .grid {
+          display: grid;
+          grid-template-columns: 400px 1fr;
+          grid-template-areas: "i g" "i g" "o g";
+        }
+        
+        textarea {
+          width: 100%;
+          height: 100%;
+          resize: none;
+          z-index: 1;
+        }
+        
+        #inputArea {
+          grid-area: i;
+        }
+        
+        #outputArea {
+          grid-area: o;
+        }
+        
+        .game {
+          grid-area: g;
+        }
+    </style>
+  </head>
+  <body>
+    <button id="runButton">Run</button>
+    <div class="grid">
+      <textarea id="inputArea"></textarea>
+      <textarea id="outputArea" readonly></textarea>
+      <canvas class="game" id="canvas" width="640" height="480" oncontextmenu="event.preventDefault()"></canvas>
+    </div>
+    <script type='text/javascript'>
+      var runButton = document.getElementById('runButton');
+      var inputArea = document.getElementById('inputArea');
+      var outputArea = document.getElementById('outputArea');
+
+      var Module = {
+        postRun: [],
+        print: (function() {
+          return function(text) {
+            outputArea.value += text + '\n';
+          };
+        })(),
+        printErr: (function() {
+          return function(text) {
+            outputArea.value += text + '\n';
+          };
+        })(),
+        canvas: (function() {
+          var canvas = document.getElementById('canvas');
+
+          canvas.addEventListener("webglcontextlost", function(e) { alert('WebGL context lost. You will need to reload the page.'); e.preventDefault(); }, false);
+
+          return canvas;
+        })(),
+      };
+
+      /*window.addEventListener("resize", (e) => {
+        var canvas = document.getElementById('canvas')
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      })
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;*/
+      
+      window.onerror = function() {
+        Module.setStatus('Exception thrown, see JavaScript console');
+        //spinnerElement.style.display = 'none';
+        Module.setStatus = function(text) {
+          if (text) console.error('[post-exception status] ' + text);
+        };
+      };
+      
+      runButton.onclick = (ev) => {
+        run_playground = Module.cwrap('run_playground', 'undefined', ['string']);
+        run_playground(inputArea.value);
+      };
+    </script>
+    {{{ SCRIPT }}}
+  </body>
+</html>

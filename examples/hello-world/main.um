@@ -11,8 +11,10 @@ fn init*() {
 	window.setup("title", 400, 400)
 	window.setViewport(th.Vf2{400, 400})
 
+	printf("here\n")
 	window.onFrame.register(signal.Callback{
 		canvas.drawRect(th.blue, rect.mk(0, 0, window.wp.x, window.wp.y))
+		printf("here2\n")
 
 		canvas.drawText("hello world", th.Vf2{2, 2}, th.white, 4)
 	}, null)

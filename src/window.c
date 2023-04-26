@@ -13,9 +13,6 @@
 
 extern th_global *thg;
 
-static int umth_frame_callback = 0;
-static int umth_destroy_callback = 0;
-
 static void print_umka_error_and_quit() {
 	UmkaError error;
 	umkaGetError(thg->umka, &error);
@@ -52,11 +49,7 @@ static void init() {
 
 	th_canvas_init();
 
-	umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
-	umth_destroy_callback = umkaGetFunc(thg->umka, "window.um", "umth_destroy_callback");
-
 	UmkaStackSlot s;
-
 	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
 		print_umka_error_and_quit();
 	}
@@ -79,10 +72,10 @@ static void frame() {
 	thg->target_size = (th_vf2){window_width, window_height};
 
 	UmkaStackSlot s;
-	if (umth_frame_callback != -1) {
+	if (thg->umth_frame_callback != -1) {
 		s.realVal = sapp_frame_duration();
 
-		if (!umkaCall(thg->umka, umth_frame_callback, 1, &s, &s)) {
+		if (!umkaCall(thg->umka, thg->umth_frame_callback, 1, &s, &s)) {
 			print_umka_error_and_quit();
 		}
 	}
@@ -123,28 +116,7 @@ static void event(const sapp_event *ev) {
 }
 
 static void cleanup() {
-	UmkaStackSlot s;
-	umkaCall(thg->umka, umth_destroy_callback, 0, &s, &s);
-
-	umkaRun(thg->umka);
-	umkaFree(thg->umka);
-
-	th_audio_deinit();
-	th_font_deinit();
-	th_image_deinit();
-
-	if (thg->prof) {
-		if (thg->profJson) {
-			FILE *f = fopen("prof.json", "w");
-			umprofPrintEventsJSON(f);
-			fclose(f);
-		} else {
-			UmprofInfo arr[BUFSIZ] = {0};
-			size_t len = umprofGetInfo(arr, BUFSIZ);
-			umprofPrintInfo(stdout, arr, len);
-		}
-	}
-
+	th_deinit();
 	sg_shutdown();
 }
 
