@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 # run make to do all the necessary embedding stuff
 make

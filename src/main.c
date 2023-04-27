@@ -117,7 +117,15 @@ int run_playground(const char *src) {
 	umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
 	umkaFree(thg->umka);
 	
-	th_init("playground_main.um", src);
+	if (th_init("playground_main.um", src)) {
+		return 1;
+	}
+
+	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
+		th_print_umka_error_and_quit();
+	}
+
+	fprintf(stderr, "inited\n");
 }
 
 #endif

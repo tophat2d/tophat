@@ -13,7 +13,7 @@
 
 extern th_global *thg;
 
-static void print_umka_error_and_quit() {
+void th_print_umka_error_and_quit() {
 	UmkaError error;
 	umkaGetError(thg->umka, &error);
 	th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
@@ -51,7 +51,7 @@ static void init() {
 
 	UmkaStackSlot s;
 	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
-		print_umka_error_and_quit();
+		th_print_umka_error_and_quit();
 	}
 }
 
@@ -76,7 +76,7 @@ static void frame() {
 		s.realVal = sapp_frame_duration();
 
 		if (!umkaCall(thg->umka, thg->umth_frame_callback, 1, &s, &s)) {
-			print_umka_error_and_quit();
+			th_print_umka_error_and_quit();
 		}
 	}
 

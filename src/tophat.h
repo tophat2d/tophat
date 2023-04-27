@@ -363,6 +363,7 @@ void th_info(char *text, ...);
 void th_calculate_scaling(float camw, float camh);
 int th_init(const char *scriptpath, const char *script_path);
 void th_deinit();
+void th_print_umka_error_and_quit();
 
 // navmesh
 void th_navmesh_add_quad(th_navmesh *m, th_quad *q);
