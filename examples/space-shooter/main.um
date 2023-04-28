@@ -15,7 +15,7 @@ import (
 )
 
 fn init*() {
-	window.setup("title", 960, 1280)
+	window.setup("Space Shooter", 960, 1280)
 
 	window.setViewport(th.Vf2{96, 128})
 	global.cam = rect.mk(0, 0, 96, 128)
