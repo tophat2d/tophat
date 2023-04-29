@@ -299,7 +299,7 @@ void umth_image_render_target_begin(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umth_image_render_target_end(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_image *t = p[1].ptrVal;
+	th_render_target *t = p[1].ptrVal;
 	th_vf2 wp = *(th_vf2 *)&p[0];
 
 	th_image_remove_render_target(t, wp);
@@ -596,7 +596,6 @@ void umth_ray_get_tilemap_coll(UmkaStackSlot *p, UmkaStackSlot *r) {
 // misc
 
 void umth_window_set_viewport_shift(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_vf2 s = *(th_vf2 *)&p[0];
 	thg->wp_offset = *(th_vf2 *)&p[0];
 }
 

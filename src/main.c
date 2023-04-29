@@ -137,7 +137,7 @@ static int th_main(int argc, char *argv[]) {
 	thg->argc = argc;
 	thg->argv = argv;
 
-	strncpy(thg->respath, "", sizeof thg->respath);
+	strncpy(thg->respath, "", sizeof thg->respath - 1);
 	const char *scriptpath = "main.um";
 
 	thg->argOffset = 1;

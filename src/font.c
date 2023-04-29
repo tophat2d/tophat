@@ -191,7 +191,7 @@ static void* read_font_data(char *path) {
 		return NULL;
 	}
 
-	fread(buf, size, 1, f);
+	size = fread(buf, size, 1, f);
 	fclose(f);
 
 	return buf;

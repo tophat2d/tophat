@@ -69,7 +69,7 @@ static void frame() {
 	th_input_sync_fake_keys();
 	int window_width, window_height;
 	th_window_get_dimensions(&window_width, &window_height);
-	thg->target_size = (th_vf2){window_width, window_height};
+	thg->target_size = (th_vf2){ .w = window_width, .h = window_height};
 
 	UmkaStackSlot s;
 	if (thg->umth_frame_callback != -1) {
