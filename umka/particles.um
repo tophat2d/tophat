@@ -1,11 +1,11 @@
 //~~
 // Particles allow for *performant* and random particle systems.
-// TODO: a better constructor
 //~~
 
 import (
-	"th.um"
 	"rect.um"
+	"std.um"
+	"th.um"
 )
 
 //~~struct Particle
@@ -24,7 +24,7 @@ type Emitter* = struct {
 	gravity: th.Vf2 // gravity
 	repeat: bool // if false, particle won't be renewed
 	active: bool // false, if there aren't any active particles anymore
-	
+
 	angle: th.Vf2 // angle in which particles are emitted
 
 	lifetime: th.uu // lifetime of particles
@@ -42,7 +42,7 @@ type Emitter* = struct {
 	maxRotation: th.fu
 
 	colors: []uint32 // array of colors, which are interpolated between
-	
+
 	particles: []Particle // list of particles
 }
 //~~
@@ -57,4 +57,26 @@ fn (e: ^Emitter) draw*(cam: rect.Rect, t: int32) {
 	}
 
 	umth_particles_draw(e, &cam, t)
+}
+
+//~~fn Emitter.genParticles
+// Generates particles for an emitter. The time specifies the time the first
+// particles is emitted. The explosiveness argument specifies the interval at
+// which particles are emitted using this formula:
+/// ```umka
+/// e.lifetime / count * explosiveness
+/// ```
+fn (e: ^Emitter) genParticles*(time, count: uint, explosiveness: th.fu = 0.0) {
+//~~
+	p := make([]Particle, count)
+
+	step := real32(e.lifetime) / count * explosiveness
+	t := real32(time)
+
+	for i in p {
+		p[i] = { trunc(t), std.rand() }
+		t += step
+	}
+
+	e.particles = p
 }
