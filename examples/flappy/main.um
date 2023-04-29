@@ -1,0 +1,225 @@
+
+import (
+	"canvas.um"
+	"ent.um"
+	"input.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+// constants for jumping mechanics
+const (
+	gravity = 0.0015
+	jumpForce = -0.35
+)
+
+// The game has two states - menu and game.
+const (
+	StateMenu = 0
+	StateGame
+)
+
+var (
+	// the player entity
+	bird: ent.Ent
+	// motion of the bird
+	motion: th.Vf2
+
+	// this is the base for the pillars
+	pillarPrefab: ent.Ent
+	// an array of the pillars
+	pillars: []^ent.Ent
+
+	// the current state (either StateMenu or StateGame)
+	state: int
+
+	// the frequency of the pillars in px
+	pillarFreq: real32
+	// the player's x position when a pillar was last spawner
+	lastPillar: real32
+
+	score: int
+	highScore: int
+)
+
+fn rand(min, max: int): int {
+	return trunc(std.rand()/real32(std.randMax) * (max - min) + min)
+}
+
+fn spawnPillar(x: real32) {
+	// the size of the opening between the two pillars
+	hole := rand(trunc(window.wp.y * 0.5), trunc(window.wp.y * 0.2))
+	// how much offset the hole is from the middle
+	offset := rand(
+		trunc(window.wp.y * 0.05),
+		trunc(window.wp.y * 0.95 - hole))
+
+	// spawn the to pillar
+	e1 := new(ent.Ent)
+	e1 ^= pillarPrefab
+	e1.t.p.x = x
+	e1.t.p.y = -window.wp.y * 1.5 + offset
+
+	// spawn the bottom pillar
+	e2 := new(ent.Ent)
+	e2 ^= pillarPrefab
+	e2.c = th.cyan
+	e2.t.p.x = x
+	// it's position is the bottom of the top pillar + size of the hole
+	e2.t.p.y = e1.t.p.y + window.wp.y + hole
+
+	// append the pillars to the pillars array
+	pillars = append(pillars, []^ent.Ent{ e1, e2 })
+}
+
+// Returns the current score
+fn getScore(): int {
+	return trunc(bird.t.p.x / 100)
+}
+
+// Used to end the game
+fn die() {
+	score = getScore()
+	if score > highScore {
+		highScore = score
+	}
+
+	state = StateMenu
+}
+
+// Used to start the game
+fn play() {
+	state = StateGame
+	pillars = []^ent.Ent{}
+	bird.t.p = { }
+}
+
+// A simple utility function to write the canvas text to the middle of the
+// screen
+fn drawCenteredText(t: str, y: th.fu, c: uint32, s: th.fu): th.fu {
+	canvas.drawText(t, { (window.wp.x - canvas.textSize(t, s).x)/2, y }, c, s)
+	return canvas.textSize(t, s).y
+}
+
+fn menu() {
+	// check all the known keys for a press
+	for i:=0; i <= input.key_menu; i++ {
+		if input.isJustPressed(i) {
+			play()
+		}
+	}
+
+	// Here the menu is drawn. First the height of the menu is detemined,
+	// which is then used to center the menu. Then all the text is drawn.
+
+	const c = th.black
+
+	height := canvas.textSize("FLAPPY", 10).y +
+		20 + canvas.textSize("0 : 0", 4).y + 20 +
+		canvas.textSize("Press any key", 4).y
+
+	y := (window.wp.y - height) / 2
+
+	y += drawCenteredText("FLAPPY", y, c, 10)
+	y += 20
+	y += drawCenteredText(sprintf("%d : %d", score, highScore), y, c, 4)
+	y += 20
+
+	if (th.time / 400) % 2 == 0 { // make the text blink
+		y += drawCenteredText("Press any key", y, c, 4)
+	}
+}
+
+fn game() {
+	// bird motion
+	// every frame we add some constant gravity to the bird motion to
+	// simulate falling
+	motion.y += gravity * th.delta
+	// limit the falling force
+	if motion.y > jumpForce * -1 {
+		motion.y = jumpForce * -1
+	}
+
+	// jumping means setting the y motion to the jumpForce
+	if input.isJustPressedc(' ') || input.isJustPressed(input.mouse1) {
+		motion.y = jumpForce
+	}
+
+	// add the motion to the bird position. The motion is multiplied by
+	// frame delta to make sure the movement is FPS independent
+	bird.t.p = bird.t.p.add(motion.mulf(th.delta))
+
+	// pillar despawning
+	// if the first pillar is not visible, we can delete it
+	if len(pillars) > 0 && pillars[0].t.p.x + pillars[0].r.w < -window.wp.x/4 {
+		pillars = slice(pillars, 2)
+	}
+
+	// pillar spawning
+	// if the px travelled from the last pillar is more than the pillar
+	// frequency, we can spawn a pillar and set the lastPillar variable.
+	if bird.t.p.x - lastPillar > pillarFreq {
+		lastPillar = bird.t.p.x
+		spawnPillar(bird.t.p.x + window.wp.x)
+	}
+
+	// collisions
+	// getColl returns an array of all collisions. We are only interested
+	// in whether the bird collided or not. That means the lenght of the
+	// array can just be checked.
+	if len(bird.getColl(pillars, 1)) > 0 {
+		die()
+	}
+
+	// draw
+	// This offsets all the coordinates.
+	window.setViewportOffset(th.Vf2{
+		-bird.t.p.x + window.wp.x/4,
+		window.wp.y/2 }.mulf(-1))
+
+	// draw the bird with the default camera (we use viewport offset
+	// instead cameras).
+	bird.draw({ })
+
+	// draw the pillars
+	for i,p in pillars {
+		p.draw({ })
+	}
+
+	// reset the viewport offset as HUD stays in place
+	window.setViewportOffset({ })
+
+	// HUD
+	canvas.drawText(repr(getScore()), { 4, 4 }, th.black, 4)
+}
+
+fn init*() {
+	// setup the window
+	window.setup("flappy", 480, 640)
+
+	// setup the x motion
+	motion = { 0.2, 0 }
+
+	// setup bird entity
+	bird = ent.mk({})
+	bird.r = { 0, 0, 50, 25 }
+	bird.c = th.green
+
+	// setup pillar prefab entity
+	pillarPrefab = ent.mk({})
+	pillarPrefab.r = { 0, 0, 40, window.wp.y }
+	pillarPrefab.c = th.red
+
+	pillarFreq = 260
+
+	window.onFrame.register({
+		// launch the correct function based on the current state
+		switch state {
+		case StateMenu:
+			menu()
+		case StateGame:
+			game()
+		}
+	}, null)
+}
