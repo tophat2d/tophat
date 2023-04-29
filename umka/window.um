@@ -223,7 +223,7 @@ fn getClipboard*(): str {
 }
 
 fn umth_window_set_viewport_shift(s: th.Vf2)
-//~~fn setViewportShift
+//~~fn setViewportOffset
 // Sets the offset of the viewport.
 fn setViewportOffset*(s: th.Vf2) {
 //~~
@@ -231,7 +231,7 @@ fn setViewportOffset*(s: th.Vf2) {
 }
 
 fn umth_window_get_viewport_shift(s: ^th.Vf2)
-//~~fn getViewportShift
+//~~fn getViewportOffset
 // Gets the offset of the viewport (as set by `setViewportShift`)
 fn getViewportOffset*(): th.Vf2 {
 	o := th.Vf2{}
