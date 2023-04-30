@@ -870,6 +870,27 @@ void umth_nav_mesh_nav(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_navmesh_nav(cameFrom, m, p1, p2);
 }
 
+void umth_quad_min(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *o = (th_vf2 *)p[1].ptrVal;
+	th_quad *q = (th_quad *)p[0].ptrVal;
+	
+	*o = th_quad_min(*q);
+}
+
+void umth_quad_max(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_vf2 *o = (th_vf2 *)p[1].ptrVal;
+	th_quad *q = (th_quad *)p[0].ptrVal;
+	
+	*o = th_quad_max(*q);
+}
+
+void umth_quad_bounding_box(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_rect *o = (th_rect *)p[1].ptrVal;
+	th_quad *q = (th_quad *)p[0].ptrVal;
+	
+	*o = th_quad_bounding_box(*q);
+}
+
 void _th_umka_bind(void *umka) {
 	// etc
 	umkaAddFunc(umka, "umth_fopen", &umth_fopen);
@@ -1000,6 +1021,11 @@ void _th_umka_bind(void *umka) {
 	// nav
 	umkaAddFunc(umka, "umth_nav_mesh_add_quad", &umth_nav_mesh_add_quad);
 	umkaAddFunc(umka, "umth_nav_mesh_nav", &umth_nav_mesh_nav);
+	
+	// quad
+	umkaAddFunc(umka, "umth_quad_min", &umth_quad_min);
+	umkaAddFunc(umka, "umth_quad_max", &umth_quad_max);
+	umkaAddFunc(umka, "umth_quad_bounding_box", &umth_quad_bounding_box);
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);

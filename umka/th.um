@@ -236,18 +236,24 @@ fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
 type Quad* = [4]Vf2
 //~~
 
-fn umth_transform_quad(q: ^Quad, t: ^Transform)
-//~~fn Quad.transformed
-// Transforms a quad into another quad.
-// Order:
-// 	1. scale
-// 	2. rotation
-// 	3. position
-fn (q: ^Quad) transformed*(t: Transform): Quad {
+fn umth_quad_max(o: ^Vf2, q: ^Quad)
+//~~fn Quad.getMax
+// Gets the maximum coordinate.
+fn (q: ^Quad) getMax*(): Vf2 {
 //~~
-	ret := q^
-	umth_transform_quad(&ret, &t)
-	return ret
+	o := Vf2{}
+	umth_quad_max(&o, q)
+	return o
+}
+
+fn umth_quad_min(o: ^Vf2, q: ^Quad)
+//~~fn Quad.getMin
+// Gets the minimum coordinate.
+fn (q: ^Quad) getMin*(): Vf2 {
+//~~
+	o := Vf2{}
+	umth_quad_min(&o, q)
+	return o
 }
 
 //~~fn Quad.getDims
