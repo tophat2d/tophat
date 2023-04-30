@@ -230,6 +230,11 @@ fn game() {
 		die()
 	}
 
+	// check whether the bird is inside the screen
+	if bird.t.p.y > window.wp.y/2 || bird.t.p.y < -window.wp.y/2 {
+		die()
+	}
+
 	// draw
 	// This offsets all the coordinates.
 	window.setViewportOffset(th.Vf2{
