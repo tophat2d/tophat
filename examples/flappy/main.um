@@ -1,6 +1,7 @@
 
 import (
 	"atlas.um"
+	"audio.um"
 	"canvas.um"
 	"ent.um"
 	"font.um"
@@ -62,6 +63,9 @@ var (
 
 	ft: font.Font
 
+	jumpSound: audio.Sound
+	dieSound: audio.Sound
+
 	score: int
 	highScore: int
 )
@@ -117,6 +121,7 @@ fn getScore(): int {
 
 // Used to end the game
 fn die() {
+	dieSound.play()
 	score = getScore()
 	if score > highScore {
 		highScore = score
@@ -193,6 +198,7 @@ fn game() {
 	// jumping means setting the y motion to the jumpForce
 	if input.isJustPressedc(' ') || input.isJustPressed(input.mouse1) {
 		motion.y = jumpForce
+		jumpSound.play()
 	}
 
 	// add the motion to the bird position. The motion is multiplied by
@@ -296,6 +302,12 @@ fn init*() {
 	buttonImgInner = { 4, 4, 24, 24 }
 
 	ft = font.load("ComicNeue-Regular.ttf", 64)
+
+	jumpSound = audio.load("sfx/jump.wav")
+	jumpSound.setVol(0.1)
+
+	dieSound = audio.load("sfx/hitHurt.wav")
+	dieSound.setVol(0.6)
 
 	pillarFreq = 260
 	lastPillar = -window.wp.x/2
