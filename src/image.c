@@ -240,8 +240,8 @@ void th_image_render_transformed(th_image *img, th_transform trans, uint32_t col
 
 void th_blit_tex(th_image *img, th_quad q, uint32_t color) {
 	for (uu i=0; i < 4; i++) {
-		q.v[i].x = trunc(q.v[i].x * thg->scaling + thg->offset.x - thg->wp_offset.x);
-		q.v[i].y = trunc(q.v[i].y * thg->scaling + thg->offset.y - thg->wp_offset.y);
+		q.v[i].x = trunc((q.v[i].x - thg->wp_offset.x) * thg->scaling + thg->offset.x);
+		q.v[i].y = trunc((q.v[i].y - thg->wp_offset.y) * thg->scaling + thg->offset.y);
 	}
 
 	float sw = thg->target_size.x, sh = thg->target_size.y;

@@ -257,6 +257,12 @@ void th_canvas_flush() {
 }
 
 void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c) {
+	a.x -= thg->wp_offset.x;
+	a.y -= thg->wp_offset.y;
+	b.x -= thg->wp_offset.x;
+	b.y -= thg->wp_offset.y;
+	c.x -= thg->wp_offset.x;
+	c.y -= thg->wp_offset.y;
 	a.x *= thg->scaling;
 	a.y *= thg->scaling;
 	b.x *= thg->scaling;
