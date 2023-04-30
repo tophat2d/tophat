@@ -179,9 +179,8 @@ void th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n) {
 	if (!th_canvas_batch_push(array, n)) {
 		// if buffer is too small
 		th_canvas_flush();
+		th_canvas_batch_push(array, n);
 	}
-
-	th_canvas_batch_push(array, n);
 }
 
 static th_image white_img;

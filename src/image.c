@@ -309,7 +309,7 @@ void th_image_remove_render_target(th_render_target *t, th_vf2 wp) {
 
 	int window_width, window_height;
 	th_window_get_dimensions(&window_width, &window_height);
-	thg->target_size = (th_vf2){ .w = window_width, .h = window_height};
+	thg->target_size = (th_vf2){ .w = window_width, .h = window_height };
 
 	thg->has_render_target = false;
 }
