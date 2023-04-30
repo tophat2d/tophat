@@ -1,8 +1,12 @@
 
 import (
+	"atlas.um"
 	"canvas.um"
 	"ent.um"
+	"font.um"
+	"image.um"
 	"input.um"
+	"rect.um"
 	"std.um"
 	"th.um"
 	"window.um"
@@ -20,7 +24,15 @@ const (
 	StateGame
 )
 
+// The different frames for the bird
+const (
+	BirdAnimJump = th.Vf2{ 0, 0 }
+	BirdAnimFall = th.Vf2{ 1, 0 }
+)
+
 var (
+	// atlas containing the bird textures
+	birdAtlas: atlas.Atlas
 	// the player entity
 	bird: ent.Ent
 	// motion of the bird
@@ -28,8 +40,17 @@ var (
 
 	// this is the base for the pillars
 	pillarPrefab: ent.Ent
+	pillarImg: image.Image
+	pillarImgOuter, pillarImgInner: rect.Rect
 	// an array of the pillars
 	pillars: []^ent.Ent
+
+	// the image used for the background
+	backgroundImg: image.Image
+
+	// the image used as a background in the menu
+	buttonImg: image.Image
+	buttonImgOuter, buttonImgInner: rect.Rect
 
 	// the current state (either StateMenu or StateGame)
 	state: int
@@ -38,6 +59,8 @@ var (
 	pillarFreq: real32
 	// the player's x position when a pillar was last spawner
 	lastPillar: real32
+
+	ft: font.Font
 
 	score: int
 	highScore: int
@@ -73,6 +96,20 @@ fn spawnPillar(x: real32) {
 	pillars = append(pillars, []^ent.Ent{ e1, e2 })
 }
 
+// Draws a background image, with parallax
+fn drawBackground(i: image.Image, y: th.fu, speed: th.fu) {
+	// calculate the x coordinate on the screen
+	x := (-bird.t.p.x * speed) % window.wp.x
+
+	// draw the images
+	i.draw({
+		p: { x, y },
+		s: th.vf2f(1) })
+	i.draw({
+		p: { x + window.wp.x, y },
+		s: th.vf2f(1) })
+}
+
 // Returns the current score
 fn getScore(): int {
 	return trunc(bird.t.p.x / 100)
@@ -92,14 +129,15 @@ fn die() {
 fn play() {
 	state = StateGame
 	pillars = []^ent.Ent{}
+	lastPillar = -window.wp.x/2
 	bird.t.p = { }
 }
 
 // A simple utility function to write the canvas text to the middle of the
 // screen
 fn drawCenteredText(t: str, y: th.fu, c: uint32, s: th.fu): th.fu {
-	canvas.drawText(t, { (window.wp.x - canvas.textSize(t, s).x)/2, y }, c, s)
-	return canvas.textSize(t, s).y
+	ft.draw(t, { (window.wp.x - ft.measure(t).x * s)/2, y }, c, s)
+	return ft.measure(t).y * s
 }
 
 fn menu() {
@@ -115,19 +153,30 @@ fn menu() {
 
 	const c = th.black
 
-	height := canvas.textSize("FLAPPY", 10).y +
-		20 + canvas.textSize("0 : 0", 4).y + 20 +
-		canvas.textSize("Press any key", 4).y
+	const titleS = 1
+	const textS = 0.4
+
+	height := ft.measure("FLAPPY").y * titleS +
+		20 + ft.measure("0 : 0").y * textS + 20 +
+		ft.measure("Press any key").y * textS
+	width := ft.measure("FLAPPY").x * titleS
+
+	const padding = 20
+	buttonImg.drawNinepatch(buttonImgOuter, buttonImgInner, {
+		(window.wp.x - width - padding*2) / 2,
+		(window.wp.y - height - padding*2) / 2,
+		width+padding*2,
+		height+padding*2 })
 
 	y := (window.wp.y - height) / 2
 
-	y += drawCenteredText("FLAPPY", y, c, 10)
+	y += drawCenteredText("FLAPPY", y, c, titleS)
 	y += 20
-	y += drawCenteredText(sprintf("%d : %d", score, highScore), y, c, 4)
+	y += drawCenteredText(sprintf("%d : %d", score, highScore), y, c, textS)
 	y += 20
 
 	if (th.time / 400) % 2 == 0 { // make the text blink
-		y += drawCenteredText("Press any key", y, c, 4)
+		y += drawCenteredText("Press any key", y, c, textS)
 	}
 }
 
@@ -147,8 +196,11 @@ fn game() {
 	}
 
 	// add the motion to the bird position. The motion is multiplied by
-	// frame delta to make sure the movement is FPS independent
-	bird.t.p = bird.t.p.add(motion.mulf(th.delta))
+	// frame delta to make sure the movement is FPS independent. It is also
+	// multiplied by a function of the score, which makes the game
+	// gradually faster.
+	bird.t.p = bird.t.p.
+		add(motion.mulf(th.delta).mulf(getScore() * 0.008 + 1))
 
 	// pillar despawning
 	// if the first pillar is not visible, we can delete it
@@ -178,20 +230,30 @@ fn game() {
 		-bird.t.p.x + window.wp.x/4,
 		window.wp.y/2 }.mulf(-1))
 
+	// set the bird texture
+	if motion.y < 0 {
+		birdAtlas.cropSource(BirdAnimJump)
+	} else {
+		birdAtlas.cropSource(BirdAnimFall)
+	}
+
 	// draw the bird with the default camera (we use viewport offset
 	// instead cameras).
 	bird.draw({ })
 
 	// draw the pillars
 	for i,p in pillars {
-		p.draw({ })
+		// if the pillar index is odd, the pillar is on the top, so it
+		// must be flipped
+		pillarImg.drawNinepatch(pillarImgOuter, pillarImgInner,
+			rect.fromVf2(p.t.p.add(p.r.getPos()), p.r.getDims()))
 	}
 
 	// reset the viewport offset as HUD stays in place
 	window.setViewportOffset({ })
 
 	// HUD
-	canvas.drawText(repr(getScore()), { 4, 4 }, th.black, 4)
+	ft.draw(repr(getScore()), { 4, 4 }, th.black, 0.4)
 }
 
 fn init*() {
@@ -202,18 +264,49 @@ fn init*() {
 	motion = { 0.2, 0 }
 
 	// setup bird entity
-	bird = ent.mk({})
-	bird.r = { 0, 0, 50, 25 }
-	bird.c = th.green
+	birdAtlas = atlas.mk(image.load("gfx/bird.png"), { 2, 1 })
+	// create the entity using the atlas's image
+	bird = ent.mk(birdAtlas.i)
+	// the collider is automatically set to the dimensions of the whole
+	// image, but we need to set it to the dimensions of one atlas cell
+	bird.r = rect.fromVf2({}, birdAtlas.cs)
+	// This shrinks the collider a bit, since the bird doesn't fill the
+	// entire image. It also makes the game a bit more forgiving.
+	bird.r = bird.r.shrink(th.vf2f(8))
 
-	// setup pillar prefab entity
+	// setup pillar prefab entity. We don't use any image for since
+	// a nine-patch image is used to draw the pipes.
 	pillarPrefab = ent.mk({})
-	pillarPrefab.r = { 0, 0, 40, window.wp.y }
+	pillarPrefab.r = { 2, 0, 52, window.wp.y }
 	pillarPrefab.c = th.red
 
+	// setup the pillar nine-patch
+	pillarImg = image.load("gfx/pipe.png")
+	// the outer rectangle is the whole image
+	pillarImgOuter = rect.fromVf2({}, pillarImg.getDims())
+	// These coordinates are hardcoded.
+	pillarImgInner = { 9, 32, 46, 1 }
+
+	// load the background image
+	backgroundImg = image.load("gfx/bg.png")
+
+	// load and setup the button image
+	buttonImg = image.load("gfx/button.png")
+	buttonImgOuter = rect.fromVf2({}, buttonImg.getDims())
+	buttonImgInner = { 4, 4, 24, 24 }
+
+	ft = font.load("ComicNeue-Regular.ttf", 64)
+
 	pillarFreq = 260
+	lastPillar = -window.wp.x/2
 
 	window.onFrame.register({
+		// draw the parallax background
+		backgroundImg.cropPx({ 0, 0 }, { 480, 300 })
+		drawBackground(backgroundImg, 0, 0.25)
+		backgroundImg.cropPx({ 0, 300 }, { 480, 600 })
+		drawBackground(backgroundImg, 300, 0.5)
+
 		// launch the correct function based on the current state
 		switch state {
 		case StateMenu:
@@ -221,5 +314,9 @@ fn init*() {
 		case StateGame:
 			game()
 		}
+
+		// the bottom part of the background is in the foreground
+		backgroundImg.cropPx({ 0, 600 }, { 480, 640 })
+		drawBackground(backgroundImg, 600, 1)
 	}, null)
 }
