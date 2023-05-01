@@ -7,26 +7,27 @@
 
 extern th_global *thg;
 
-void th_tmap_draw(th_tmap *t, th_rect *cam) {
+void th_tmap_draw(th_tmap *t) {
 	th_image *a = t->a.i;
 	if (!a) return;
-
-	int camx = cam->x;
-	int camy = cam->y;
 
 	int
 		tw = t->w,
 		th = umkaGetDynArrayLen(&t->cells) / t->w; 
+	
+	/*fu
+		camx = thg->wp_offset.x,
+		camy = thg->wp_offset.y;
 
 	if (camx > t->pos.x + tw*t->scale * t->a.cs.x)
 		return;
 	if (camy > t->pos.y + th*t->scale * t->a.cs.y)
-		return;
+		return;*/
 
-	int sx = fabs((fabs(t->pos.x)-abs(camx))) / (t->scale * t->a.cs.x);
+	/*int sx = fabs((fabs(t->pos.x)-abs(camx))) / (t->scale * t->a.cs.x);
 	int sy = fabs((fabs(t->pos.y)-abs(camy))) / (t->scale * t->a.cs.y);
-	int sw = cam->w/(t->scale * t->a.cs.x) * 2;
-	int sh = cam->h/(t->scale * t->a.cs.y) * 2;
+	int sw = thg->viewport.x/(t->scale * t->a.cs.x) * 2;
+	int sh = thg->viewport.y/(t->scale * t->a.cs.y) * 2;
 
 	if (t->pos.x>=camx)
 		sx = 0;
@@ -36,7 +37,7 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 	if (sw > tw)
 		sw = tw - sx;
 	if (sh > th)
-		sh = th - sy;
+		sh = th - sy;*/
 
 	for (int i=0; i < tw; i++) for (int j=0; j < th; j++) {
 		if (t->cells.data[j*t->w+i] == 0) continue;
@@ -45,8 +46,8 @@ void th_tmap_draw(th_tmap *t, th_rect *cam) {
 		const float
 			w = t->a.cs.x * t->scale,
 			h = t->a.cs.y * t->scale,
-			x = t->pos.x - camx + w * i,
-			y = t->pos.y - camy + h * j;
+			x = t->pos.x + w * i,
+			y = t->pos.y + h * j;
 	
 
 		th_transform tt = {0};

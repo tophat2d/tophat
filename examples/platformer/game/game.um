@@ -1,9 +1,10 @@
 
 import (
-	"th.um"
-	"input.um"
 	"canvas.um"
+	"input.um"
 	"signal.um"
+	"th.um"
+	"window.um"
 
 	"env.um"
 	"bees.um"
@@ -64,17 +65,22 @@ fn draw*() {
 	env.draw()
 	bees.draw()
 	player.draw()
-  
+
+	wpoff := window.getViewportOffset()
+	window.setViewportOffset({})
+
 	switch state {
 	case stateGame:
-		canvas.drawText(repr(env.score) + "\n" + global.timeStr(th.time - env.start), th.Vf2{1, 1}, th.black, 2)
+		canvas.drawText(repr(env.score) + "\n" + global.timeStr(th.time - env.start), th.Vf2{1, 1}, 0xddddddff, 2)
 	case stateFinished:
 		canvas.drawText(
 			"TIME: " + global.timeStr(finishTime) +
 			"\nNUMBER OF DEATHS: " + repr(deathCount) +
 			"\nSCORE: " + repr(env.score) +
 			"\nPRESS ENTER\nTO TRY AGAIN",
-			th.Vf2{}, th.black, 2)
+			th.Vf2{}, 0xddddddff, 2)
 	}
+
+	window.setViewportOffset(wpoff)
 }
 

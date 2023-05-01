@@ -18,7 +18,6 @@ fn init*() {
 	window.setup("Space Shooter", 960, 1280)
 
 	window.setViewport(th.Vf2{96, 128})
-	global.cam = rect.mk(0, 0, 96, 128)
 	global.scene = global.MENU
 
 	game.init()
@@ -34,7 +33,7 @@ fn init*() {
 	}
 
 	window.onFrame.register(signal.Callback{
-		canvas.drawRect(0x000022ff, global.cam)
+		canvas.drawRect(0x000022ff, rect.fromVf2({}, window.wp))
 
 		star.handle()
 		star.draw()

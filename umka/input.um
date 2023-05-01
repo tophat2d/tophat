@@ -5,8 +5,9 @@
 //~~
 
 import (
-    "th.um"
     "rect.um"
+    "th.um"
+    "window.um"
 )
 
 //~~Keycode constants
@@ -163,9 +164,9 @@ fn getMousePos*(): th.Vf2 {
 
 //~~fn getGlobalMousePos
 // Returns the position of mouse cursor in relation to cam.
-fn getGlobalMousePos*(cam: rect.Rect): th.Vf2 {
+fn getGlobalMousePos*(): th.Vf2 {
 //~~
-	return cam.toWorld(getMousePos())
+	return getMousePos().add(window.getViewportOffset())
 }
 
 fn umth_input_is_pressed(keycode: int): int32

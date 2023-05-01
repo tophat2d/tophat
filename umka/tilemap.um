@@ -51,14 +51,14 @@ fn (t: ^Tilemap) edit*(x, y, tile: int) {
 	t.cells[y*t.w + x] = tile
 }
 
-fn umth_tilemap_draw(ct: ^Tilemap, cam: ^rect.Rect)
+fn umth_tilemap_draw(ct: ^Tilemap)
 //~~fn Tilemap.draw
 // Draws the tilemap.
-fn (t: ^Tilemap) draw*(cam: rect.Rect) {
+fn (t: ^Tilemap) draw*() {
 //~~
 	if len(t.cells) == 0 { return }
 
-	umth_tilemap_draw(t, &cam)
+	umth_tilemap_draw(t)
 }
 
 fn umth_tilemap_getcoll(pos: ^th.Vf2, vert: ^th.uu, t: ^Tilemap, e: ^ent.Ent): int32

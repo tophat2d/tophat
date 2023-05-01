@@ -101,10 +101,10 @@ fn handle*() {
 }
 
 fn draw*() {
-	e.draw(global.cam)
+	e.draw()
 
 	for i:=0; i < len(bullets); i++ {
-		bullets[i].draw(global.cam)
+		bullets[i].draw()
 	}
 }
 

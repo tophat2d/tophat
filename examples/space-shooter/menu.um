@@ -12,7 +12,7 @@ import (
 var gui: ui.Gui
 
 fn init*() {
-	gui = ui.mk(global.cam, ui.getDefaultStyle())
+	gui = ui.mk(rect.fromVf2({}, window.wp), ui.getDefaultStyle())
 	gui.getStyle().containerBox.color = 0
 	gui.getStyle().ftColor = th.white
 	gui.getStyle().ft = hud.mainFont

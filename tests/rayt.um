@@ -19,13 +19,12 @@ var (
 
 fn init*() {
 	window.setup("raycast test", 400, 400)
-	cam = rect.mk(0, 0, window.wp.x, window.wp.y)
 
 	r = ray.mk(th.Vf2{}, 60, 0)
 	e = ent.mk(image.load("etc/test.png"), th.Transform{s: th.Vf2{4, 4}})
 
 	window.onFrame.register(signal.Callback{
-		r.pos = cam.toWorld(input.getMousePos())
+		r.pos = input.getGlobalMousePos()
 
 		if input.isPressed(input.mouse1) {
 			r.r -= 0.1 * th.delta
@@ -36,14 +35,14 @@ fn init*() {
 		}
 
 		if colls := r.getColl([]^ent.Ent{&e}, 1); len(colls) != 0 {
-			p := cam.toScreen(colls[0].pos)
+			p := colls[0].pos
 			canvas.drawRect(th.red, rect.mk(p.x, p.y, 3, 3))
 			e.c = 0xffffff88
 		} else {
 			e.c = th.white
 		}
 
-		r.draw(cam, th.green, 2)
-		e.draw(cam)
+		r.draw(th.green, 2)
+		e.draw()
 	}, null)
 }

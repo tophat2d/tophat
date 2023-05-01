@@ -8,10 +8,6 @@ const (
 	tileSize* = 16
 )
 
-var (
-	cam*: rect.Rect
-)
-
 fn readall*(path: str): str {
 	f := std.fopen(path, "r")
 	const blockSize = 16

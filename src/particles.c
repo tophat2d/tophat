@@ -33,8 +33,7 @@ int get_particle_rotation(th_particles *p, _th_particle pa, int t) {
 	return interp(0, p->rotation, p->lifetime, p->max_rotation, t - pa.start_time);
 }
 
-void th_particles_draw(th_particles *p, th_rect cam, int t) {
-	int camx = cam.x, camy = cam.y;
+void th_particles_draw(th_particles *p, int t) {
 	p->active = false;
 
 	for (int i=0; i < umkaGetDynArrayLen(&p->particles); i++) {
@@ -87,8 +86,8 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 				{ .x = px, .y = py + size}};
 			for (int i=0; i < 4; i++) {
 				th_rotate_point(&p[i], (th_vf2){{px + size/2, py+size/2}}, rot);
-				p[i].x = (p[i].x - camx) * thg->scaling;
-				p[i].y = (p[i].y - camy) * thg->scaling;
+				p[i].x = p[i].x * thg->scaling;
+				p[i].y = p[i].y * thg->scaling;
 			}
 
 			th_canvas_triangle(col, p[0], p[1], p[2]);
@@ -99,7 +98,7 @@ void th_particles_draw(th_particles *p, th_rect cam, int t) {
 			fu w = size;
 			fu h = size;
 
-			th_canvas_rect(col, (th_rect){ x - camx, y - camy, w, h });
+			th_canvas_rect(col, (th_rect){ x, y, w, h });
 		}
 
 		int lt = p->lifetime + FRAND()*p->lifetime * p->lifetime_randomness;

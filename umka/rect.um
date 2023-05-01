@@ -30,20 +30,6 @@ fn fromVf2*(p: th.Vf2, dm: th.Vf2): Rect {
 	return mk(p.x, p.y, dm.x, dm.y)
 }
 
-//~~fn Rect.toWorld
-// translates screen coordinates to world coordinates with cam r
-fn (r: ^Rect) toWorld*(p: th.Vf2): th.Vf2 {
-//~~
-	return th.Vf2{ p.x + r.x, p.y + r.y }
-}
-
-//~~fn Rect.toScreen
-// translates world coordinates to screen coordinates with cam r
-fn (r: ^Rect) toScreen*(p: th.Vf2): th.Vf2 {
-//~~
-	return th.Vf2{ p.x - r.x, p.y - r.y }
-}
-
 //~~fn Rect.getPos
 fn (r: ^Rect) getPos*(): th.Vf2 {
 //~~

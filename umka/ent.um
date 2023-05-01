@@ -31,12 +31,12 @@ type Coll* = struct {
 }
 //~~
 
-fn umth_ent_draw(e: ^Ent, c: ^rect.Rect)
+fn umth_ent_draw(e: ^Ent)
 //~~fn Ent.draw
-// Draws the entity onto the screen in relaction to camera c.
-fn (e: ^Ent) draw*(c: rect.Rect) {
+// Draws the entity onto the screen.
+fn (e: ^Ent) draw*() {
 //~~
-	umth_ent_draw(e, &c)
+	umth_ent_draw(e)
 }
 
 //~~fn mk

@@ -18,7 +18,7 @@ THEXT(uu, th_quad_to_quad, th_quad *, th_quad *, th_vf2 *);
 THEXT(uu, th_ent_to_ent, th_ent *, th_ent *, th_vf2 *);
 THEXT(uu, th_line_to_quad, th_vf2, th_vf2, th_quad *q, th_vf2 *);
 
-THEXT(void, th_ent_draw, th_ent *, th_rect *);
+THEXT(void, th_ent_draw, th_ent *);
 THEXT(void, th_ent_getcoll, th_ent *, th_ent **, uu, uu, uu, th_coll *);
 
 THEXT(uint32_t, th_color_rgb, float, float, float, float);
@@ -42,7 +42,7 @@ THEXT(void, th_image_remove_render_target, th_vf2);
 THEXT(void, th_error);
 THEXT(void, th_calculate_scaling, float, float);
 
-THEXT(void, th_particles_draw, th_particles *, th_rect, int);
+THEXT(void, th_particles_draw, th_particles *, int);
 
 THEXT(th_vf2, th_quad_min, th_quad );
 THEXT(th_vf2, th_quad_max, th_quad );
@@ -56,7 +56,7 @@ THEXT(void, th_vector_normalize, float *, float *);
 
 THEXT(void, th_ray_getcoll, th_ray *, th_coll *, int, int *, th_ent **, int);
 
-THEXT(void, th_tmap_draw, th_tmap *, th_rect *);
+THEXT(void, th_tmap_draw, th_tmap *);
 THEXT(void, th_tmap_autotile, uu *, uu *, uu, uu, uu *, uu);
 
 THEXT(void, th_utf8_decode, uint32_t *, const char *);

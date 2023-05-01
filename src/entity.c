@@ -12,17 +12,8 @@ th_quad th_ent_transform(th_ent *e) {
 	return q;
 }
 
-void th_ent_draw(th_ent *o, th_rect *camera) {
+void th_ent_draw(th_ent *o) {
 	th_transform t = o->t;
-	t.pos.x -= camera->x;
-	t.pos.y -= camera->y;
-
-	// this logic is incorrect
-	/*if (q.br.x < 0 || q.br.y < 0)
-		return;
-
-	if (q.tl.x > camera->w || q.tl.y > camera->h)
-		return;*/
 
 	if (!o->img) {
 		th_quad q;

@@ -68,6 +68,6 @@ fn draw*() {
 	rot := th.time/200 % 2 * 45
 	for i:=0; i < len(scn); i++ {
 		scn[i].t.r = rot + scn[i].t.p.angleTo(player.body.t.p)
-		scn[i].draw(global.cam)
+		scn[i].draw()
 	}
 }

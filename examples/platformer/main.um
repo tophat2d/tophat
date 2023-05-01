@@ -19,7 +19,6 @@ import (
 fn init*() {
 	window.setup("tophat platformer", 512, 512)
 	window.setViewport(th.Vf2{16 * 16, 16 * 16})
-	global.cam = rect.mk(0, 0, 16 * 16, 16 * 16)
 
 	game.setup()
 	game.reset()

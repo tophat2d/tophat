@@ -154,10 +154,13 @@ fn handle*() {
 		body.t.p = env.spawn
 	}
 
-	global.cam.x += (body.t.p.x + body.r.w*body.t.s.x - global.cam.x) - global.cam.w/2
-	global.cam.y += (body.t.p.y + body.r.h*body.t.s.y - global.cam.y) - global.cam.h/2
+	wpoff := window.getViewportOffset()
+	window.setViewportOffset(th.Vf2{
+		(body.t.p.x + body.r.w*body.t.s.x - wpoff.x) - window.wp.x/2,
+		(body.t.p.y + body.r.h*body.t.s.y - wpoff.y) - window.wp.y/2 }.
+		add(wpoff))
 }
 
 fn draw*() {
-	body.draw(global.cam)
+	body.draw()
 }

@@ -1,11 +1,13 @@
 
 import (
-	"th.um"
-	"std.um"
-	"lerp.um"
-	"global.um"
 	"canvas.um"
+	"global.um"
+	"lerp.um"
 	"particles.um"
+	"rect.um"
+	"std.um"
+	"th.um"
+	"window.um"
 )
 
 var (
@@ -57,11 +59,11 @@ fn draw*() {
 	if len(dmgEffect) != 0 {
 		val := round(dmgEffect.byDelta(th.delta))
 		if val < 0 { val = 0 }
-		canvas.drawRect(0xaa000000 | val, global.cam)
+		canvas.drawRect(0xaa000000 | val, rect.fromVf2({}, window.wp))
 	}
 
 	for i:=0; i>=0 && i < len(emitters) && len(emitters) != 0; i++ {
-		emitters[i].draw(global.cam, th.time)
+		emitters[i].draw(th.time)
 		if !emitters[i].active {
 			if len(emitters) == 1 {
 				emitters = []particles.Emitter{}

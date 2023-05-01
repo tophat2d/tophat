@@ -316,7 +316,7 @@ uu th_rect_to_rect(th_rect *r1, th_rect *r2);
 
 // entity
 th_quad th_ent_transform(th_ent *e);
-void th_ent_draw(th_ent *o, th_rect *camera);
+void th_ent_draw(th_ent *o);
 void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
 	uu maxColls, th_coll *colls);
 
@@ -370,7 +370,7 @@ void th_navmesh_add_quad(th_navmesh *m, th_quad *q);
 void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2);
 
 // particles
-void th_particles_draw(th_particles *p, th_rect cam, int t);
+void th_particles_draw(th_particles *p, int t);
 
 // quad/transform
 th_vf2 th_quad_min(th_quad q);
@@ -394,7 +394,7 @@ uint32_t th_sg_get_gl_image(sg_image img);
 
 
 // tilemap
-void th_tmap_draw(th_tmap *t, th_rect *cam);
+void th_tmap_draw(th_tmap *t);
 void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 
 // tophat

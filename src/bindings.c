@@ -129,20 +129,18 @@ static void umth_font_measure(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // particles
 void umth_particles_draw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_particles *emitter = (th_particles *)p[2].ptrVal;
-	th_rect *cam = (th_rect *)p[1].ptrVal;
+	th_particles *emitter = (th_particles *)p[1].ptrVal;
 	int t = p[0].intVal;
 
-	th_particles_draw(emitter, *cam, t);
+	th_particles_draw(emitter, t);
 }
 
 ///////////////////////
 // tilemaps
 // draws a tilemap takes a rectangle as a camera and the tilemap itself
 void umth_tilemap_draw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_rect *cam = (th_rect *)p[0].ptrVal;
-	th_tmap *t = (th_tmap *)p[1].ptrVal;
-	th_tmap_draw(t, cam);
+	th_tmap *t = (th_tmap *)p[0].ptrVal;
+	th_tmap_draw(t);
 }
 
 // checks, if tilemap collides with entity.
@@ -456,9 +454,8 @@ void umth_input_get_mouse_scroll(UmkaStackSlot *p, UmkaStackSlot *r) {
 // entities
 // draws an entity
 void umth_ent_draw(UmkaStackSlot *p, UmkaStackSlot *r) {
-	th_rect *rc = (th_rect *)p[0].ptrVal;
-	th_ent *e = (th_ent *)p[1].ptrVal;
-	th_ent_draw(e, rc);
+	th_ent *e = (th_ent *)p[0].ptrVal;
+	th_ent_draw(e);
 }
 
 void umth_ent_getcoll(UmkaStackSlot *p, UmkaStackSlot *r) {

@@ -250,7 +250,7 @@ fn game() {
 
 	// draw the bird with the default camera (we use viewport offset
 	// instead cameras).
-	bird.draw({ })
+	bird.draw()
 
 	// draw the pillars
 	for i,p in pillars {

@@ -98,6 +98,6 @@ fn handle*() {
 
 fn draw*() {
 	for i:=0; i < len(enemies); i++ {
-		enemies[i].ent.draw(global.cam)
+		enemies[i].ent.draw()
 	}
 }

@@ -60,10 +60,8 @@ fn (r: ^Ray) getEnd*(): th.Vf2 {
 }
 
 //~~fn Ray.draw
-// Draws the ray using a camera.
-fn (r: ^Ray) draw*(cam: rect.Rect, color: uint32, thickness: th.fu) {
+// Draws the ray to the screen.
+fn (r: ^Ray) draw*(color: uint32, thickness: th.fu) {
 //~~
-	p1 := cam.toScreen(r.pos)
-	p2 := cam.toScreen(r.getEnd())
-	canvas.drawLine(color, p1, p2, thickness)
+	canvas.drawLine(color, r.pos, r.getEnd(), thickness)
 }
