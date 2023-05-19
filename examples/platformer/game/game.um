@@ -71,14 +71,12 @@ fn draw*() {
 
 	switch state {
 	case stateGame:
-		canvas.drawText(repr(env.score) + "\n" + global.timeStr(th.time - env.start), th.Vf2{1, 1}, 0xddddddff, 2)
+		canvas.drawText(sprintf("%v\n%s", env.score, global.timeStr(th.time - env.start)),th.Vf2{1, 1}, 0xddddddff, 2)
 	case stateFinished:
-		canvas.drawText(
-			"TIME: " + global.timeStr(finishTime) +
-			"\nNUMBER OF DEATHS: " + repr(deathCount) +
-			"\nSCORE: " + repr(env.score) +
-			"\nPRESS ENTER\nTO TRY AGAIN",
-			th.Vf2{}, 0xddddddff, 2)
+		canvas.drawText(sprintf(
+			"TIME: %s\nNUMBER OF DEATHS: %d\nSCORE: %d\nPRESS ENTER\nTO TRY AGAIN",
+			global.timeStr(finishTime), deathCount, env.score),
+			{}, 0xddddddff, 2)
 	}
 
 	window.setViewportOffset(wpoff)

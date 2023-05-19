@@ -95,7 +95,7 @@ fn guiGetButtonState(gui: ^Gui): ButtonState {
   lastRect := guiGetLastRect(gui).rect
   state := ButtonState{}
   state.hovered = rectVsPoint(lastRect, th_input.getMousePos())
-  state.pressed = state.hovered && th_input.isJustPressed(th_input.mouse1) 
+  state.pressed = state.hovered && th_input.isJustPressed(th_input.mouse1)
   return state
 }
 
@@ -120,8 +120,8 @@ fn guiSetElement(gui: ^Gui, name: str): ^ElemState {
   gui.lastElement = name
 
   return &element.targetState
-} 
-  
+}
+
 fn guiCutRect(gui: ^Gui, side: int, by: th.Vf2): th_rect.Rect {
   lastRect := &guiGetLastRect(gui).rect
   rect := th_rect.mk(0, 0, 0, 0)
@@ -219,7 +219,7 @@ fn drawRectLines*(color: uint32, r: th_rect.Rect) {
 
 fn drawGuiElementFrame(name: str, element: ^Elem, mask: uint32, showTitle: bool = true) {
   rect := element.tweenState.rect
-  
+
   drawRectLines(th.red&mask, rect)
 
   if showTitle {
@@ -331,7 +331,7 @@ fn putGuiCountdown(id: str, gui: ^Gui, cd: Countdown) {
     guiSetElement(gui, id+"NAME").color = color
     putGuiText(gui, cd.name)
   guiPopRect(gui)
-  
+
 
   timeRect := guiCutRect(gui, cutSideLeft, v_mainFont.measure(formatTime(cd.time)))
   guiPushRect(gui, th_rect.mk(timeRect.x, lastRect.y, props.rect.w-timeRect.w-timeRect.x-5, props.rect.h))
@@ -408,7 +408,7 @@ fn onFrame(cctx, uctx: any) {
   if started {
     updateCountdown()
   }
-  
+
   screen.w = th_window.w
   screen.h = th_window.h
   th_window.setViewport(th.Vf2{screen.w, screen.h})
@@ -422,7 +422,7 @@ fn onFrame(cctx, uctx: any) {
   elementCount := th_window.h/36-2
     for i := 0; i < elementCount; i++ {
       guiPushRect(&gui, guiCutRect(&gui, cutSideTop, th.Vf2{0, 32}))
-        id := "ENTRY"+repr(i+v_countdownNumber)
+        id := sprintf("ENTRY%v", i+v_countdownNumber)
         state = guiSetElement(&gui, id)
 
         if i == 0 {
@@ -455,7 +455,7 @@ fn onFrame(cctx, uctx: any) {
       }
 
       if putGuiButton(&gui, "SKIP", "Skip").pressed {
-    guiGetElement(&gui, "ENTRY"+repr(v_countdownNumber)).targetState.color = 0xFFFFFF00
+    guiGetElement(&gui, sprintf("ENTRY%v", v_countdownNumber)).targetState.color = 0xFFFFFF00
         v_countdownNumber += 1
         v_countdown = getCountdown(v_countdownNumber)
       }

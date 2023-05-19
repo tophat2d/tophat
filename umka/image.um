@@ -212,7 +212,7 @@ fn umth_image_update_data(img: Image, data: ^uint32, dm: th.Vf2)
 fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
 //~~
 	if dm.x * dm.y != len(data) {
-		error("setData: incorrect dimensions: " + repr(dm.x * dm.y) + "!= " + repr(len(data)))
+		error(sprintf("setData: incorrect dimensions: %v" + "!= %v", dm.x * dm.y, len(data)))
 	}
 
 	if len(data) == 0 {

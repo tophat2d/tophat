@@ -45,7 +45,7 @@ fn init*() {
 			}
 			bgPlaying = !bgPlaying
 		}
-		scoreText.text = "SCORE: "+repr(global.score)
+		scoreText.text = sprintf("SCORE: %d", global.score)
 		gameplay.update()
 		falling_piece.update()
 		canvas.drawRect(0x000000FF, rect.mk(0, 0, window.wp.x, window.wp.y))

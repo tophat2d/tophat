@@ -612,7 +612,7 @@ const char *th_em_modulesrc[] = {
 "fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {\n"
 "//~~\n"
 "\tif dm.x * dm.y != len(data) {\n"
-"\t\terror(\"setData: incorrect dimensions: \" + repr(dm.x * dm.y) + \"!= \" + repr(len(data)))\n"
+"\t\terror(sprintf(\"setData: incorrect dimensions: %v\" + \"!= %v\", dm.x * dm.y, len(data)))\n"
 "\t}\n"
 "\n"
 "\tif len(data) == 0 {\n"
