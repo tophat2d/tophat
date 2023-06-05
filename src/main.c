@@ -69,6 +69,21 @@ int th_init(const char *scriptpath, const char *script_src) {
 		th_error("%s (%d, %d): %s", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}
+	
+	if (thg->print_asm) {
+		char *path = calloc(1, strlen(scriptpath) + 4 + 1);
+		sprintf(path, "%s.asm", scriptpath);
+
+		char *buf = umkaAsm(thg->umka);
+		
+		FILE *f = fopen(path, "w");
+		fprintf(f, "%s\n", buf);
+		fclose(f);
+
+		free(path);
+		free(buf);
+		return 0;
+	}
 
 	// Just check umka file
 	if (thg->check) {
@@ -144,6 +159,9 @@ static int th_main(int argc, char *argv[]) {
 	while ((argc-thg->argOffset) > 0) {
 		if (strcmp(argv[thg->argOffset], "-check") == 0) {
 			thg->check = true;
+			thg->argOffset += 1;
+		} else if (strcmp(argv[thg->argOffset], "-asm") == 0) {
+			thg->print_asm = true;
 			thg->argOffset += 1;
 		} else if (strcmp(argv[thg->argOffset], "-silent") == 0) {
 			thg->silent = true;

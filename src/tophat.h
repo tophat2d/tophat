@@ -233,6 +233,7 @@ typedef struct {
 	int argOffset;
 	bool silent;
 	bool check;
+	bool print_asm;
 	
 	int umth_destroy_callback;
 	int umth_frame_callback;
