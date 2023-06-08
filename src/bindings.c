@@ -484,9 +484,10 @@ void umth_ent_ysort(UmkaStackSlot *p, UmkaStackSlot *r) {
 ///////////////////////
 // audio
 void umth_sound_load(UmkaStackSlot *p, UmkaStackSlot *r) {
-	char *path = (char *)p[0].ptrVal;
+	char *path = (char *)p[1].ptrVal;
+	uint32_t flags = p[0].intVal;
 
-	r->ptrVal = th_audio_load(path);
+	r->ptrVal = th_audio_load(path, flags);
 }
 
 void umth_sound_copy(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -552,6 +553,15 @@ void umth_sound_frame_count(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_sound *s = p[0].ptrVal;
 
 	ma_sound_get_length_in_pcm_frames(&s->inst, (ma_uint64 *)&r->uintVal);
+}
+
+void umth_sound_length_ms(UmkaStackSlot *p, UmkaStackSlot *r) {
+	th_sound *s = p[0].ptrVal;
+
+	float len;
+	ma_sound_get_length_in_seconds(&s->inst, &len);
+
+	r->intVal = len * 1000;
 }
 
 void umth_sound_set_start_time_ms(UmkaStackSlot *p, UmkaStackSlot *r) {
@@ -969,6 +979,7 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_sound_stop", &umth_sound_stop);
 	umkaAddFunc(umka, "umth_sound_seek_to_frame", &umth_sound_seek_to_frame);
 	umkaAddFunc(umka, "umth_sound_frame_count", &umth_sound_frame_count);
+	umkaAddFunc(umka, "umth_sound_length_ms", umth_sound_length_ms);
 	umkaAddFunc(umka, "umth_sound_set_start_time_ms",
 		&umth_sound_set_start_time_ms);
 	umkaAddFunc(umka, "umth_sound_set_stop_time_ms",

@@ -283,7 +283,7 @@ th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell);
 // audio
 void th_audio_init();
 void th_audio_deinit();
-th_sound *th_audio_load(char *path);
+th_sound *th_audio_load(char *path, uint32_t flags);
 th_sound *th_sound_copy(th_sound *s);
 
 // bindings

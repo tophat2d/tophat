@@ -149,6 +149,27 @@ fn (this: ^Gui) getStyle*(): ^Style {
 	return &this.style[len(this.style) - 1]
 }
 
+//~~fn Gui.getContainer
+// Returns the container atop the container stack.
+fn (this: ^Gui) getContainer*(): Container {
+//~~
+	return this.container[len(this.container) - 1]
+}
+
+//~~fn Gui.pushRect
+// Shortcut to `this.getContainer().pushRect(r)`
+fn (this: ^Gui) pushRect*(r: rect.Rect): rect.Rect {
+//~~
+	return this.getContainer().pushRect(r)
+}
+
+//~~fn Gui.getDims
+// Shortcut to `this.getContainer().getDims(r)`
+fn (this: ^Gui) getDims*(): rect.Rect {
+//~~
+	return this.getContainer().getDims()
+}
+
 //~~fn Gui.dupStyle
 // Duplicates the current style.
 fn (this: ^Gui) dupStyle*() {
@@ -171,27 +192,6 @@ fn (this: ^Gui) popContainer*() {
 		this.container =
 			slice(this.container, 0, len(this.container) - 1)
 	}
-}
-
-//~~fn Gui.getContainer
-// Returns the container atop the container stack.
-fn (this: ^Gui) getContainer*(): Container {
-//~~
-	return this.container[len(this.container) - 1]
-}
-
-//~~fn Gui.pushRect
-// Shortcut to `this.getContainer().pushRect(r)`
-fn (this: ^Gui) pushRect*(r: rect.Rect): rect.Rect {
-//~~
-	return this.getContainer().pushRect(r)
-}
-
-//~~fn Gui.getDims
-// Shortcut to `this.getContainer().getDims(r)`
-fn (this: ^Gui) getDims*(): rect.Rect {
-//~~
-	return this.getContainer().getDims()
 }
 
 fn (this: ^Gui) hover(r: rect.Rect): bool {
@@ -422,6 +422,62 @@ fn (gui: ^Gui) stack*(cfg: StackConfig = {}) {
 
 	if !gui.isEval {
 		gui.getStyle().containerBox.draw(gui.getContainer().getDims())
+	}
+}
+
+type ScrollAreaConfig* = struct {
+	rect: rect.Rect
+	speed: real32
+	horizontal: bool
+}
+
+type ScrollArea* = struct {
+	dm: rect.Rect
+	cfg: ScrollAreaConfig
+	scroll: ^real32
+	maxScroll: real32
+}
+
+fn (this: ^ScrollArea) pushRect(r: rect.Rect): rect.Rect {
+	if r.x == 0 { r.x = this.dm.x }
+	if r.y == 0 { r.y = this.dm.y }
+	if this.cfg.horizontal {
+		if r.w == 0 { r.w = this.maxScroll }
+		if r.h == 0 { r.h = this.dm.h }
+		return { r.x - this.scroll^, r.y, r.w, r.h }
+	}
+
+	if r.w == 0 { r.w = this.dm.w }
+	if r.h == 0 { r.h = this.maxScroll }
+	return { r.x, r.y - this.scroll^, r.w, r.h }
+}
+
+fn (this: ^ScrollArea) getDims(): rect.Rect {
+	return this.dm
+}
+
+fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaConfig = {}) {
+	if cfg.speed == 0 {
+		cfg.speed = 1
+	}
+
+	this := ScrollArea{
+		dm: gui.pushRect(cfg.rect),
+		cfg: cfg,
+		scroll: scroll }
+	gui.pushContainer(this)
+		
+	if gui.isEval {
+		v := input.getMouseScroll().y
+		dm := this.dm.h
+		if this.cfg.horizontal {
+			v = input.getMouseScroll().x
+			dm = this.dm.w
+		}
+		   
+		scroll ^= scroll^ - v*th.delta*this.cfg.speed
+		if scroll^ < 0 { scroll^ = 0 }
+		if scroll^ >= maxScroll - dm { scroll^ = maxScroll - dm }
 	}
 }
 

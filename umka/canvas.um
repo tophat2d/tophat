@@ -90,7 +90,7 @@ fn umth_canvas_begin_scissor_rect(x, y, w, h: real)
 fn umth_canvas_end_scissor()
 //~~fn beginScissorRect
 // Disable rendering outside of rect `r`
-fn beginScissorRect*(r: rect.Rect) {
+fn beginScissorRect*(r: rect.Rect, debug: bool = false) {
 //~~
 	r2 := r
 	if len(scissor) == 0 {
@@ -101,8 +101,14 @@ fn beginScissorRect*(r: rect.Rect) {
 		r2.y = misc.maxf(r.y, s.y)
 		r2.w = misc.minf(r.x + r.w, s.x + s.w) - r.x
 		r2.h = misc.minf(r.y + r.h, s.y + s.h) - r.y
+		
+		scissor = append(scissor, r2)
 	}
 
+	if debug {
+		drawRectLines(th.red, r2, 0.1) 
+	}
+	
 	umth_canvas_begin_scissor_rect(r2.x, r2.y, r2.w, r2.h)
 }
 

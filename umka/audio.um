@@ -9,13 +9,22 @@ type Sound* = struct { _: ^struct{} }
 
 var pool: []^Sound
 
-fn umth_sound_load(path: str): ^struct{}
+type LoadFlag = uint32
+const (
+	// Streams the audio, only saving 2 seconds into memory.
+	LoadFlagStream* = LoadFlag(1)
+	// Loads the sound in async. Use `audio.waitForLoad` to wait for the
+	// sounds to load.
+	LoadFlagAsync* = LoadFlag(4)
+)
+
+fn umth_sound_load(path: str, flags: uint32): ^struct{}
 //~~fn load
 // Loads a sounds at path, if there is an error, the underlying pointer
 // will be `NULL` and `validate` will return false.
-fn load*(path: str): Sound {
+fn load*(path: str, flags: LoadFlag = 0): Sound {
 //~~
-	return Sound{umth_sound_load(path)}
+	return Sound{umth_sound_load(path, flags)}
 }
 
 fn umth_sound_copy(s: Sound): ^struct{}
@@ -120,6 +129,14 @@ fn umth_sound_frame_count(s: Sound): uint
 fn (s: ^Sound) frameCount*(): uint {
 //~~
 	return umth_sound_frame_count(s^)
+}
+
+fn umth_sound_length_ms(s: Sound): uint
+//~~fn Sound.lengthMs
+// Returns length of the sound in ms.
+fn (s: ^Sound) lengthMs*(): uint {
+//~~
+	return umth_sound_length_ms(s^)
 }
 
 fn umth_sound_set_start_time_ms(s: Sound, t: uint)
