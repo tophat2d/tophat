@@ -425,18 +425,27 @@ fn (gui: ^Gui) stack*(cfg: StackConfig = {}) {
 	}
 }
 
+//~~struct ScrollAreaConfig
+// Configuration for the scroll area.
 type ScrollAreaConfig* = struct {
 	rect: rect.Rect
+	// scroll speed. Default is 1
 	speed: real32
+	// if true, scrolling will be horizontal
 	horizontal: bool
 }
+//~~
 
+//~~struct ScrollArea
+// Scroll area is a container which allows the user to scroll. It acts as a
+// stack container, but all the elements are shifted by the scroll.
 type ScrollArea* = struct {
 	dm: rect.Rect
 	cfg: ScrollAreaConfig
 	scroll: ^real32
 	maxScroll: real32
 }
+//~~
 
 fn (this: ^ScrollArea) pushRect(r: rect.Rect): rect.Rect {
 	if r.x == 0 { r.x = this.dm.x }
@@ -456,7 +465,11 @@ fn (this: ^ScrollArea) getDims(): rect.Rect {
 	return this.dm
 }
 
+//~~fn Gui.scrollArea
+// Pushes a scroll area. `scroll` is both input and output value. Both `scroll`
+// and `maxScroll` are in pixels.
 fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaConfig = {}) {
+//~~
 	if cfg.speed == 0 {
 		cfg.speed = 1
 	}
@@ -467,7 +480,7 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 		scroll: scroll }
 	gui.pushContainer(this)
 		
-	if gui.isEval {
+	if gui.isEval && gui.hover(this.dm) {
 		v := input.getMouseScroll().y
 		dm := this.dm.h
 		if this.cfg.horizontal {
