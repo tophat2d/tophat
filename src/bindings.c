@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdlib.h>
 #include <string.h>
 
 #include <umka_api.h>
@@ -23,16 +22,21 @@ extern int th_em_modulenames_count;
 
 // FIXME(skejeton): Using this function is an easy buffer overflow.
 static
-char *conv_path(char *out, char *path) {
+char *conv_path(char *path) {
 	const char *RAW_PFX = "raw://";
-	const int RAW_PFX_LEN = strlen("raw://");
+	const int RAW_PFX_LEN = strlen(RAW_PFX);
 
 	if (strncmp(path, RAW_PFX, RAW_PFX_LEN) == 0) {
+		char *out = malloc(strlen(path) - RAW_PFX_LEN + 1);
+		out[strlen(path) - RAW_PFX_LEN] = 0;
 		strcpy(out, path + RAW_PFX_LEN);
-	} else {
-		strcpy(out, thg->respath);
-		strcat(out, path);
+		return out;
 	}
+	
+	size_t len = strlen(thg->respath) + strlen(path);
+	char *out = malloc(len + 1);
+	out[len] = 0;
+	sprintf(out, "%s%s", thg->respath, path);
 	return out;
 }
 
@@ -40,8 +44,9 @@ void umth_fopen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *name = (char *)p[1].ptrVal;
 	const char *mode = (const char *)p[0].ptrVal;
 
-	char path[512];
-	FILE *f = fopen(conv_path(path, name), mode);
+	char *path = conv_path(name);
+	FILE *f = fopen(path, mode);
+	free(path);
 	r->ptrVal = f;
 }
 
@@ -98,12 +103,12 @@ static void umth_placeholder_fetch(UmkaStackSlot *p, UmkaStackSlot *r) {
 static void umth_font_load(UmkaStackSlot *p, UmkaStackSlot *r) {
 	uint32_t filter = p[0].uintVal;
 	double size = p[1].real32Val;
-	char path[1024];
-	conv_path(path, p[2].ptrVal);
+	char *path = conv_path(p[2].ptrVal);
 
 	// NOTE(skejeton): The font load function may return null pointer on fail,
 	//	   				     it would be the responsibility of the user to verify the validity.
 	r->ptrVal = th_font_load(path, size, filter);
+	free(path);
 }
 
 // fn umth_font_draw((5) font: Font, (4) s: str, (3) x: real, (2) y: real, (1) color: uint32, (0) scale: real)
@@ -172,8 +177,9 @@ void umth_image_load(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_image **img = p[1].ptrVal;
 	char *path = (char *)p[0].ptrVal;
 
-	char pathcpy[1024];
-	*img = th_load_image(conv_path(pathcpy, path));
+	char *pathcpy = conv_path(path);
+	*img = th_load_image(pathcpy);
+	free(pathcpy);
 }
 
 // flips image
