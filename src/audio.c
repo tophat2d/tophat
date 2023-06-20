@@ -19,12 +19,13 @@ void sound_free(UmkaStackSlot *p, UmkaStackSlot *r) {
 
 	ma_sound_uninit(&s->inst);
 
-	if (!s->copied) return;
+	// NOTE(~mrms): this causes occasional double-frees
+	/*if (!s->copied) return;
 	ma_resource_manager_data_source_uninit(s->inst.pResourceManagerDataSource);
 	ma_free(
 		s->inst.pResourceManagerDataSource,
 		&s->inst.engineNode.pEngine->allocationCallbacks
-	);
+	);*/
 }
 
 th_sound *th_audio_load(char *path, uint32_t flags) {
