@@ -438,11 +438,8 @@ void umth_input_clear(UmkaStackSlot *p, UmkaStackSlot *r) {
 }
 
 void umth_input_get_str(UmkaStackSlot *p, UmkaStackSlot *r) {
-	char *buf = umkaAllocData(thg->umka, thg->input_string_len + 1, NULL);
-	buf[thg->input_string_len] = 0;
-	memcpy(buf, thg->input_string, thg->input_string_len);
-
-	r->ptrVal = buf;
+	thg->input_string[thg->input_string_len] = 0;
+	r->ptrVal = umkaMakeStr(thg->umka, thg->input_string);
 }
 
 void umth_input_get_mouse_delta(UmkaStackSlot *p, UmkaStackSlot *r) {
