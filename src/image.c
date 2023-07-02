@@ -316,7 +316,7 @@ void th_image_remove_render_target(th_render_target *t, th_vf2 wp) {
 
 void th_image_init() {
 	thg->offscreen_pass_action = (sg_pass_action) {
-		.colors[0] = { .action = SG_ACTION_CLEAR, .value = {0, 0, 0, 0} }
+		.colors[0] = { .store_action = SG_STOREACTION_STORE, .load_action = SG_LOADACTION_CLEAR, .clear_value = {0, 0, 0, 0} }
 	};
 	thg->image_pip = sg_make_pipeline(&(sg_pipeline_desc){
 		.shader = thg->main_shader,

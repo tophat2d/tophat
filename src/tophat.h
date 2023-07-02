@@ -234,7 +234,10 @@ typedef struct {
 	bool silent;
 	bool check;
 	bool print_asm;
+	bool dpi_aware;
 	
+	float dpi_scale_factor;
+
 	int umth_destroy_callback;
 	int umth_frame_callback;
 
@@ -408,6 +411,7 @@ size_t th_utf8_decode(uint32_t *out, const char *s);
 size_t th_utf8_encode(char *out, uint32_t r);
 
 // window
+fu th_window_dpi_scale();
 void th_window_setup(char *name, int w, int h);
 void th_window_get_dimensions(int *w, int *h);
 th_window_handle th_get_window_handle();

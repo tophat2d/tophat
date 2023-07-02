@@ -157,7 +157,10 @@ static int th_main(int argc, char *argv[]) {
 
 	thg->argOffset = 1;
 	while ((argc-thg->argOffset) > 0) {
-		if (strcmp(argv[thg->argOffset], "-check") == 0) {
+		if (strcmp(argv[thg->argOffset], "-dpiaware") == 0) {
+			thg->dpi_aware = true;	
+			thg->argOffset += 1;
+		} else if (strcmp(argv[thg->argOffset], "-check") == 0) {
 			thg->check = true;
 			thg->argOffset += 1;
 		} else if (strcmp(argv[thg->argOffset], "-asm") == 0) {

@@ -47,6 +47,8 @@ static void init() {
 		.logger.func = slog_func
 	});
 
+	thg->dpi_scale_factor = sapp_dpi_scale();
+
 	th_canvas_init();
 
 	UmkaStackSlot s;
@@ -56,13 +58,15 @@ static void init() {
 }
 
 static void frame() {
+	thg->dpi_scale_factor = sapp_dpi_scale();
+
 	if (thg->need_quit) {
 		sapp_quit();
 		return;
 	}
 
 	thg->pass_action = (sg_pass_action) {
-		.colors[0] = { .action = SG_ACTION_LOAD }
+		.colors[0] = { .load_action = SG_LOADACTION_LOAD, .store_action = SG_STOREACTION_STORE }
 	};
 	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
 	sg_apply_pipeline(thg->canvas_pip);
@@ -128,13 +132,17 @@ sapp_desc th_window_sapp_desc() {
 		.event_cb = event,
 		.width = 640,
 		.height = 480,
-		.gl_force_gles2 = true,
 		.window_title = "Tophat",
 		.enable_clipboard = true,
 		.clipboard_size = 8192,
 		.icon.sokol_default = true,
-		.logger.func = slog_func
+		.logger.func = slog_func,
+		.high_dpi = thg->dpi_aware
 	};
+}
+
+fu th_window_dpi_scale() {
+	return thg->dpi_scale_factor;
 }
 
 void th_window_setup(char *name, int w, int h) {
@@ -203,6 +211,7 @@ void w32_get_client_window_size(int *w, int *h) {
 void th_window_set_dims(th_vf2 dm) {
 	RECT r;
 	int w = dm.x, h = dm.y;
+	fu dpi_scale = th_window_dpi_scale();
 	w32_get_client_window_size(&w, &h);
 	HWND hwnd = th_get_window_handle();
 	if (GetWindowRect(hwnd, &r)) {

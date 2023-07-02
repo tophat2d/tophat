@@ -636,6 +636,14 @@ void umth_window_set_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r) {
 	th_window_set_fullscreen(p->uintVal);
 }
 
+void umth_window_is_dpi_enabled(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->intVal = thg->dpi_aware;
+}
+
+void umth_window_get_dpi_scale(UmkaStackSlot *p, UmkaStackSlot *r) {
+	r->realVal = th_window_dpi_scale();
+}
+
 void umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r) {
 	char *title = (char *)p[2].ptrVal;
 	int w = p[1].intVal;
@@ -995,6 +1003,8 @@ void _th_umka_bind(void *umka) {
 	umkaAddFunc(umka, "umth_window_get_clipboard", &umth_window_get_clipboard);
 	umkaAddFunc(umka, "umth_window_get_fullscreen", &umth_window_get_fullscreen);
 	umkaAddFunc(umka, "umth_window_set_fullscreen", &umth_window_set_fullscreen);
+	umkaAddFunc(umka, "umth_window_get_dpi_scale", &umth_window_get_dpi_scale);
+	umkaAddFunc(umka, "umth_window_is_dpi_enabled", &umth_window_is_dpi_enabled);
 	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);
 	umkaAddFunc(umka, "umth_window_get_dimensions", &umth_window_get_dimensions);
 	umkaAddFunc(umka, "umth_window_sleep", &umth_window_sleep);
