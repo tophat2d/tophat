@@ -4,13 +4,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <stdlib.h>
-
-#ifdef __EMSCRIPTEN__
-# include "shader-web.glsl.h"
-#else
-# include "shader.glsl.h"
-#endif
-
+#include "shader.glsl.h"
 #include "pixelfont.h"
 
 extern th_global *thg;
@@ -151,11 +145,7 @@ static void push_image_phase(th_image *img) {
 
 // pushes the vertices onto the batch
 bool th_canvas_batch_push(float *array, size_t n) {
-	if (n % BATCH_UNIT != 0) {
-		// trying to push partial units (triangles), not allowed
-		th_error("odd unit size");
-		return false;
-	}
+	assert(n % BATCH_UNIT == 0 && "odd units");
 
 	if ((thg->canvas_batch_size + n) >= BATCH_LENGTH) {
 		// not enough space
@@ -179,6 +169,9 @@ void th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n) {
 	if (!th_canvas_batch_push(array, n)) {
 		// if buffer is too small
 		th_canvas_flush();
+
+		push_image_phase(img);
+		thg->canvas_image = img;
 		th_canvas_batch_push(array, n);
 	}
 }
