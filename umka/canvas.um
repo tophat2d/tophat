@@ -107,7 +107,7 @@ fn beginScissorRect*(r: rect.Rect, debug: bool = false) {
 		scissor = { r }
 	} else {
 		s := scissor[len(scissor) - 1]
-		r2 := rectDiff(s, r)
+		r2 = rectDiff(s, r)
 		scissor = append(scissor, r2)
 	}
 

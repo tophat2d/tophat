@@ -1095,7 +1095,7 @@ const char *th_em_modulesrc[] = {
 "\t\tscissor = { r }\n"
 "\t} else {\n"
 "\t\ts := scissor[len(scissor) - 1]\n"
-"\t\tr2 := rectDiff(s, r)\n"
+"\t\tr2 = rectDiff(s, r)\n"
 "\t\tscissor = append(scissor, r2)\n"
 "\t}\n"
 "\n"
