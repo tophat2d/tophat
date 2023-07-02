@@ -17,6 +17,8 @@ var (
 	lock_stash: bool = false
 	stash*: int = -1
 	bag*: m_bag.Bag
+	speed*: real
+	places: int
 )
 
 fn kind(): int {
@@ -32,9 +34,16 @@ fn init*() {
 	bag = m_bag.init()
 	falling_piece.init()
 	falling_piece.reset(kind())
+	speed = 1
+	places = 0
 }
 
 fn place() {
+	places += 1
+	if places % 25 == 0 {
+		speed += 0.5
+	}
+
 	tspin := falling_piece.isTspin
 	falling_piece.place()
 	streak := field.clearRows()

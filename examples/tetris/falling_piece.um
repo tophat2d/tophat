@@ -168,9 +168,9 @@ fn init*() {
   rightBtnLatch = latch.initLatch()
 }
 
-fn update*() {
+fn update*(speed: real) {
 	prev := y
-	y += 0.001*th.delta;
+	y += 0.001*th.delta*speed;
 	if invalid() {
 		y = prev
 		placeTimer += th.delta/1000.0
@@ -194,7 +194,7 @@ fn update*() {
 	if (input.isPressed(input.key_down)) {
 		placeTimer += th.delta/1000.0
 		prev := y
-		y += 0.01*th.delta;
+		y += 0.01*th.delta*speed;
 		if invalid() {
 			y = prev
 		}
