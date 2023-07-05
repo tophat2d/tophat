@@ -52,7 +52,7 @@ fn init*() {
 	effects = make([]Effect, 0)
 }
 
-fn clearEffect*(row: int) {
+const clearEffect* = fn(row: int) {
 	effects = append(effects, Effect { EffectClearRow, 1, row })
 }
 

@@ -35,7 +35,7 @@ fn init*() {
 	crazytext.putText("Z, X, C - ROTATE", crazytext.lifetimeForever, false)
 	crazytext.putText("M - MUTE", crazytext.lifetimeForever, false)
 
-	window.onFrame.register(signal.Callback{
+	window.onFrame.register({
 		if input.isJustPressedc('M') {
 			if bgPlaying {
 				global.audioBackground.seekToFrame(std.rand() % global.audioBackground.frameCount())
@@ -52,5 +52,5 @@ fn init*() {
 		background.update()
 		background.draw()
 		fx.draw()
-	}, null)
+	})
 }

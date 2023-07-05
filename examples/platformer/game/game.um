@@ -34,15 +34,15 @@ fn setup*() {
 	bees.setup()
 	player.setup()
 
-	signal.register("die", signal.Callback{
+	signal.register("die", {
 		reset()
 		deathCount++
-	}, null)
+	})
 
-	signal.register("finish", signal.Callback{
+	signal.register("finish", {
 		finishTime = th.time - env.start
 		state = stateFinished
-	}, null)
+	})
 
 	state = stateGame
 }
