@@ -479,7 +479,7 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 		cfg: cfg,
 		scroll: scroll }
 	gui.pushContainer(this)
-		
+
 	if gui.isEval && gui.hover(this.dm) {
 		v := input.getMouseScroll().y
 		dm := this.dm.h
@@ -487,10 +487,11 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 			v = input.getMouseScroll().x
 			dm = this.dm.w
 		}
-		   
+
 		scroll ^= scroll^ - v*th.delta*this.cfg.speed
 		if scroll^ < 0 { scroll^ = 0 }
-		if scroll^ >= maxScroll - dm { scroll^ = maxScroll - dm }
+		if maxScroll > dm && scroll^ >= maxScroll - dm { scroll^ = maxScroll - dm }
+		if maxScroll < dm && scroll^ >= maxScroll { scroll^ = maxScroll }
 	}
 }
 
@@ -603,6 +604,13 @@ type TextBox* = struct {
 	cursor: int
 }
 //~~
+
+//~~fn TextBox.clear
+// Clears the textbox
+fn (this: ^TextBox) clear*() {
+	this.buffer = ""
+	this.cursor = 0
+}
 
 //~~fn Gui.textBox
 // Adds a single line textbox to the gui.
