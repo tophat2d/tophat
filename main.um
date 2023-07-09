@@ -17,7 +17,7 @@ var (
 	loadedFont: font.Font
 )
 
-fn onFrame(cctx, uctx: any) {
+const onFrame = fn (cctx, uctx: any) {
 	canvas.drawRect(bg, rect.mk(0, 0, window.wp.x, window.wp.y))
 
 	p := th.Vf2{ 0, 1 }

@@ -2,7 +2,7 @@
 set -e
 
 # run make to do all the necessary embedding stuff
-make
+# make
 
 cc () {
 	echo EMCC $f
