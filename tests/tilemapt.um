@@ -55,6 +55,6 @@ fn init*() {
 	window.onFrame.register(signal.Callback{
 		canvas.drawRect(th.white, cam)
 
-		t.draw(cam)	
-	}, null)
+		t.draw()	
+	})
 }

@@ -60,6 +60,7 @@ typedef struct {
 	th_vf2 dm;
 	uu channels;
 	sg_image tex;
+	sg_sampler smp;
 	sg_filter filter;
 	th_quad crop;
 	char flipv;

@@ -30,5 +30,5 @@ fn init*() {
 			canvas.drawText("Hey :)", th.Vf2{10, 10}, th.white, 3);
 			canvas.drawRect(th.red, rect.Rect{40, 40, 40, 40});
 		canvas.endScissor()
-	}, null)
+	})
 }

@@ -35,11 +35,11 @@ fn init*() {
 		}
 
 		if input.isJustPressedc('N') {
-			window.setClipboard("Current time: " + repr(th.time))
+			window.setClipboard("Current time: " + sprintf("%v", th.time))
 		}
 
 		if input.isJustPressedc('M') {
 			printf("%s\n", window.getClipboard())
 		}
-	}, null)
+	})
 }

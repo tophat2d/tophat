@@ -26,5 +26,5 @@ fn init*() {
         dpiStr += sprintf("Scale: %g\n", window.getDpiScaleFactor())  
         dpiStr += sprintf("DPI Enabled: %v\n", dpiEnabled)  
 		f.draw(dpiStr, th.Vf2{0, 0}, 0x000000FF, window.getDpiScaleFactor()*0.5)
-	}, null)
+	})
 }

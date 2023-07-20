@@ -69,5 +69,5 @@ fn init*() {
 		}
 
 		m.nav(s, e)
-	}, null)
+	})
 }

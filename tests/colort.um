@@ -20,5 +20,5 @@ fn init*() {
 				canvas.drawRect(color.hsv(t2+x/256.0, y/256.0, t/256.0), rect.mk(x, y, 1, 1))
 			}
 		}
-	}, null)
+	})
 }

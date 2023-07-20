@@ -218,8 +218,9 @@ void th_canvas_init() {
 	uint32_t white = 0xffffffff;
 	th_image_from_data(&white_img, &white, (th_vf2){ .w = 1, .h = 1 });
 
-	thg->canvas_bind.fs_images[SLOT_tex] = white_img.tex;
+	thg->canvas_bind.fs.images[SLOT_tex] = white_img.tex;
 	thg->canvas_image = &white_img;
+	thg->canvas_bind.fs.samplers[SLOT_smp] = white_img.smp;
 }
 
 void th_canvas_deinit() {
@@ -239,7 +240,8 @@ void th_canvas_flush() {
 		phase *phs = &phases[i];
 		switch (phs->scissor_stage) {
 		case SCISSOR_NONE:
-			thg->canvas_bind.fs_images[SLOT_tex] = phs->img->tex;
+			thg->canvas_bind.fs.images[SLOT_tex] = phs->img->tex;
+			thg->canvas_bind.fs.samplers[SLOT_smp] = phs->img->smp;
 			sg_apply_bindings(&thg->canvas_bind);
 			sg_draw(phs->start/BATCH_VERTEX, (phs->end - phs->start)/BATCH_VERTEX, 1);
 			break;
