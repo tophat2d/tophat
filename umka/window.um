@@ -17,7 +17,7 @@ var (
 
 //~~Cursor types
 const (
-	cusorDefault* = 0		// Default system cursor
+	cursorDefault* = 0		// Default system cursor
 	cursorArrow*			// Normal cursor; Arrow cursor
 	cursorIBeam*			// 'I' text cursor; I-Beam
 	cursorCrosshair*		// '+' cursor; Select region cursor

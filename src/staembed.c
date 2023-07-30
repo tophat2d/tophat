@@ -1408,7 +1408,7 @@ const char *th_em_modulesrc[] = {
 "\n"
 "//~~Cursor types\n"
 "const (\n"
-"\tcusorDefault* = 0\t\t// Default system cursor\n"
+"\tcursorDefault* = 0\t\t// Default system cursor\n"
 "\tcursorArrow*\t\t\t// Normal cursor; Arrow cursor\n"
 "\tcursorIBeam*\t\t\t// \'I\' text cursor; I-Beam\n"
 "\tcursorCrosshair*\t\t// \'+\' cursor; Select region cursor\n"
