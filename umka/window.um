@@ -79,7 +79,7 @@ fn isDpiEnabled*(): bool {
 fn umth_window_get_dpi_scale(): th.fu
 
 //~~fn getDpiScaleFactor
-// Returns the DPI scaling of the current window. 
+// Returns the DPI scaling of the current window.
 // If `dpiAware` was not enabled in window setup, this function will return 1.0 (default scaling).
 fn getDpiScaleFactor*(): th.fu {
 //~~
@@ -232,12 +232,13 @@ fn freezeCursor*(freeze: bool) {
 	umth_window_freeze_cursor(freeze)
 }
 
-fn umth_window_set_cursor(cursor: int) 
+fn umth_window_set_cursor(cursor: int)
 //~~fn setCursor
 // Allows you to set the displaying cursor. Refer to the cursors section for available cursors.
 fn setCursor*(cursor: int) {
+//~~
 	umth_window_set_cursor(cursor);
-} 
+}
 
 
 fn umth_window_quit()
