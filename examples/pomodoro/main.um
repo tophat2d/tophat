@@ -394,7 +394,7 @@ started := false
 debug := false
 var (state: ^ElemState; gui: Gui)
 
-fn onFrame(cctx, uctx: any) {
+const onFrame = fn(args: []any) {
   if isDark {
     v_colorscheme = c_colorschemeDark
   } else {
@@ -500,5 +500,5 @@ fn init*() {
 
   gui.padding = 2
 
-  th_window.onFrame.register(onFrame, null)
+  th_window.onFrame.register(onFrame)
 }

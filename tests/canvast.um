@@ -48,5 +48,5 @@ fn init*() {
 			window.setViewportOffset(
 				window.getViewportOffset().sub({ 0, th.delta * 0.2 }))
 		}
-	}, null)
+	})
 }

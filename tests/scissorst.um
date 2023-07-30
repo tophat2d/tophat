@@ -30,6 +30,5 @@ fn init*() {
 				canvas.drawRect(th.red, rect.Rect{40, 40, 40, 40});
 			canvas.endScissor()
 		canvas.endScissor()
-
-	}, null)
+	})
 }

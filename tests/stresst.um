@@ -76,5 +76,5 @@ fn init*() {
 			sprintf("MODE: %d, RECTS: %d, TRIGS: %d, DELTA: %d, FPS: %f",
 				mode, rectCount, rectCount * 2, th.delta, 1000.0 / th.delta),
 			th.Vf2{ 1, window.wp.y - 12 }, th.black, 1.5)
-	}, null)
+	})
 }

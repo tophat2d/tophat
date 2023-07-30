@@ -335,5 +335,5 @@ fn init*() {
 		// the bottom part of the background is in the foreground
 		backgroundImg.cropPx({ 0, 600 }, { 480, 640 })
 		drawBackground(backgroundImg, 600, 1)
-	}, null)
+	})
 }

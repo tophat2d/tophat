@@ -52,9 +52,9 @@ fn init*() {
 
 	t.autotile(src, cfg, 1)
 
-	window.onFrame.register(signal.Callback{
+	window.onFrame.register(|t|{
 		canvas.drawRect(th.white, cam)
 
-		t.draw(cam)	
-	}, null)
+		t.draw()	
+	})
 }

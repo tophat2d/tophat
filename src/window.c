@@ -192,6 +192,16 @@ void th_window_freeze_cursor(bool freeze) {
 	sapp_lock_mouse(freeze);
 }
 
+void th_window_set_cursor(int cursor) {
+	if (cursor < 0 || cursor >= _SAPP_MOUSECURSOR_NUM) {
+		th_error("missing cursor with number: %d\n", cursor);
+		return;
+	}
+
+	// - Cursor IDs in tophat are identical to sokols
+	sapp_set_mouse_cursor(cursor);
+}
+
 // ---- PLATFORM DEPENDENT CODE
 
 #ifdef _WIN32

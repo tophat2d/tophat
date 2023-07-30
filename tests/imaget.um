@@ -30,10 +30,10 @@ fn init*() {
 	window.setViewport(th.Vf2{600, 600})
 
 	img = image.load("etc/test.png")
-	printf("etc/test.png: %s\n", repr(img.validate()))
+	printf("etc/test.png: %v\n", img.validate())
 
 	img2 = img.copy()
-	printf("copy: %s\n", repr(img2.validate()))
+	printf("copy: %v\n", img2.validate())
 	data := img.getData()
 	dm := img.getDims()
 	for i in data {
@@ -113,6 +113,6 @@ fn init*() {
 		placeholders.button.drawNinepatch(rect.mk(5, 0, 5, 5), rect.mk(2, 2, 1, 1), rect.mk(128+2+64+2, p.y, 64, 64), 0xCCCCCCFF, 2)
 		p.y += 32
 
-		if input.isJustPressedc('Q') { exit() }
-	}, null)
+		if input.isJustPressedc('Q') { window.quit() }
+	})
 }

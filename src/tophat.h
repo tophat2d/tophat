@@ -419,9 +419,11 @@ void th_window_set_dims(th_vf2 dm);
 void th_window_set_icon(th_image *img);
 void th_window_show_cursor(bool show);
 void th_window_freeze_cursor(bool freeze);
+void th_window_set_cursor(int cursor);
 bool th_window_is_fullscreen();
 void th_window_set_fullscreen(bool fullscreen);
 sapp_desc th_window_sapp_desc();
+
 
 #endif
 

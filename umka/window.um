@@ -15,6 +15,23 @@ var (
 	fpsLimit: int = 60
 )
 
+//~~Cursor types
+const (
+	cusorDefault* = 0		// Default system cursor
+	cursorArrow*			// Normal cursor; Arrow cursor
+	cursorIBeam*			// 'I' text cursor; I-Beam
+	cursorCrosshair*		// '+' cursor; Select region cursor
+	cursorFinger*			// Index finger pointing cursor; Click cursor
+	cursorSizeEW*			// '<->' cursor; Resize width cursor; Resize horizontally cursor; East-West resize cursor
+	cursorSizeNS*			// Resize height cursor; Resize vertically cursor; North-South resize cursor
+	cursorSizeNWSE*			// Resize width and height from the right side cursor; Northwest-Southeast resize cursor
+	cursorSizeSWNE*			// Resize width and height from the left side cursor; Southwest-Northeast resize cursor
+	cursorSizeAll*			// Resize all cursor; Move cursor
+	cursorNo*				// '(/)' cursor; Disabled cursor; Disallowed cursor
+	cursorCount_*
+)
+//~~
+
 //~~Window dimensions
 var (
 	w*, h*: int32
@@ -214,6 +231,14 @@ fn freezeCursor*(freeze: bool) {
 	showCursor(freeze)
 	umth_window_freeze_cursor(freeze)
 }
+
+fn umth_window_set_cursor(cursor: int) 
+//~~fn setCursor
+// Allows you to set the displaying cursor. Refer to the cursors section for available cursors.
+fn setCursor*(cursor: int) {
+	umth_window_set_cursor(cursor);
+} 
+
 
 fn umth_window_quit()
 //~~fn quit

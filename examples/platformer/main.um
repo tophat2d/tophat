@@ -23,10 +23,10 @@ fn init*() {
 	game.setup()
 	game.reset()
 
-	window.onFrame.register(signal.Callback{
+	window.onFrame.register({
 		game.handle()
 		game.draw()
-	}, null)
+	})
 }
 
 fn main() {}
