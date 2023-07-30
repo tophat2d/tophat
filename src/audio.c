@@ -1,6 +1,6 @@
+#include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
-#include <stdint.h>
 
 #include "tophat.h"
 
@@ -13,8 +13,9 @@ extern th_global *thg;
 
 int allocd = 0, freed = 0;
 
-static
-void sound_free(UmkaStackSlot *p, UmkaStackSlot *r) {
+static void
+sound_free(UmkaStackSlot *p, UmkaStackSlot *r)
+{
 	th_sound *s = (th_sound *)p[0].ptrVal;
 
 	ma_sound_uninit(&s->inst);
@@ -28,18 +29,15 @@ void sound_free(UmkaStackSlot *p, UmkaStackSlot *r) {
 	);*/
 }
 
-th_sound *th_audio_load(char *path, uint32_t flags) {
+th_sound *
+th_audio_load(char *path, uint32_t flags)
+{
 	th_sound *s = umkaAllocData(thg->umka, sizeof(th_sound), sound_free);
 	s->copied = 0;
 
-	if (ma_sound_init_from_file(
-		&thg->audio_engine,
-		path,
-		MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION | flags,
-		NULL,
-		NULL,
-		&s->inst
-	) != MA_SUCCESS) {
+	if (ma_sound_init_from_file(&thg->audio_engine, path,
+		MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION | flags, NULL, NULL,
+		&s->inst) != MA_SUCCESS) {
 		th_error("Could not load sound at path %s.", path);
 		return NULL;
 	}
@@ -47,17 +45,15 @@ th_sound *th_audio_load(char *path, uint32_t flags) {
 	return s;
 }
 
-th_sound *th_sound_copy(th_sound *s) {
+th_sound *
+th_sound_copy(th_sound *s)
+{
 	th_sound *r = umkaAllocData(thg->umka, sizeof(th_sound), sound_free);
 	r->copied = true;
-	
-	if (ma_sound_init_copy(
-		&thg->audio_engine,
-		&s->inst,
-		MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION,
-		NULL,
-		&r->inst
-	) != MA_SUCCESS) {
+
+	if (ma_sound_init_copy(&thg->audio_engine, &s->inst,
+		MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL,
+		&r->inst) != MA_SUCCESS) {
 		th_error("Could not copy a sound.");
 		return NULL;
 	}
@@ -65,14 +61,17 @@ th_sound *th_sound_copy(th_sound *s) {
 	return r;
 }
 
-void th_audio_init(){
+void
+th_audio_init()
+{
 	if (ma_engine_init(NULL, &thg->audio_engine) != MA_SUCCESS) {
 		th_error("Failed to create an audio engine.");
 		return;
 	}
 }
 
-void th_audio_deinit() {
+void
+th_audio_deinit()
+{
 	ma_engine_uninit(&thg->audio_engine);
 }
-

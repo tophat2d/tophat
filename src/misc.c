@@ -1,36 +1,42 @@
-#include <stdio.h>
-#include <stdarg.h>
 #include <math.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 #include "tophat.h"
 
 extern th_global *thg;
 
-void th_calculate_scaling(float camw, float camh) {
+void
+th_calculate_scaling(float camw, float camh)
+{
 	int w, h;
 	th_window_get_dimensions(&w, &h);
 
 	if (w * h * camw * camh == 0)
 		return;
 
-	if ((float)w/camw < (float)h/camh) {
-		thg->scaling = ((float)w/camw);
+	if ((float)w / camw < (float)h / camh) {
+		thg->scaling = ((float)w / camw);
 	} else {
-		thg->scaling = ((float)h/camh);
+		thg->scaling = ((float)h / camh);
 	}
 
-	thg->offset.x = (w - camw*thg->scaling)/2;
-	thg->offset.y = (h - camh*thg->scaling)/2;
+	thg->offset.x = (w - camw * thg->scaling) / 2;
+	thg->offset.y = (h - camh * thg->scaling) / 2;
 }
 
-float th_get_scaling(int w, int h, int camw, int camh) {
-	if ((float)w/camw < (float)h/camh)
-		return (float)w/camw;
+float
+th_get_scaling(int w, int h, int camw, int camh)
+{
+	if ((float)w / camw < (float)h / camh)
+		return (float)w / camw;
 
-	return (float)h/camh;
+	return (float)h / camh;
 }
 
-void th_error(char *text, ...) {
+void
+th_error(char *text, ...)
+{
 	fprintf(stderr, "\x1b[1m\x1b[31merror: \x1b[0m");
 
 	va_list args;
@@ -46,7 +52,9 @@ void th_error(char *text, ...) {
 	va_end(args);
 }
 
-void th_info(char *text, ...) {
+void
+th_info(char *text, ...)
+{
 	va_list args;
 	va_start(args, text);
 #ifdef _WIN32
@@ -60,8 +68,10 @@ void th_info(char *text, ...) {
 	va_end(args);
 }
 
-void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
-	const float angle = (rot * PI)/180;
+void
+th_rotate_point(th_vf2 *p, th_vf2 o, fu rot)
+{
+	const float angle = (rot * PI) / 180;
 
 	const fu cosa = cos(angle);
 	const fu sina = sin(angle);
@@ -76,7 +86,9 @@ void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot) {
 	p->y = o.y + y;
 }
 
-void th_vector_normalize(float *x, float *y) {
+void
+th_vector_normalize(float *x, float *y)
+{
 	if (fabs(*x) > fabs(*y)) {
 		*y /= fabs(*x);
 		*x /= fabs(*x);

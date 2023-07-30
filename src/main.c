@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <string.h>
 
-#include <umka_api.h>
 #include "bindings.h"
 #include "tophat.h"
+#include <umka_api.h>
 
 #include <stdlib.h>
 #define UMPROF_IMPL
@@ -25,31 +25,32 @@ extern char *th_em_modulesrc[];
 extern char *th_em_misc[];
 extern int th_em_modulenames_count;
 
-static void warning(UmkaError *error) {
-	fprintf(stderr, "Warning %s (%d, %d): %s\n", error->fileName, error->line, error->pos, error->msg);
+static void
+warning(UmkaError *error)
+{
+	fprintf(stderr, "Warning %s (%d, %d): %s\n", error->fileName, error->line, error->pos,
+	    error->msg);
 }
 
-int th_init(const char *scriptpath, const char *script_src) {
-	char *mainmod_fmt =
-"import (mainmod = \"%s\"; \"window.um\")\n"
-"fn main() {}\n"
-"fn __th_init*() {\n"
-"  mainmod.init()\n"
-"}\n";
+int
+th_init(const char *scriptpath, const char *script_src)
+{
+	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
+			    "fn main() {}\n"
+			    "fn __th_init*() {\n"
+			    "  mainmod.init()\n"
+			    "}\n";
 	char mainmod[sizeof(mainmod_fmt) + BUFSIZ];
-	snprintf(
-		mainmod,
-		sizeof(mainmod),
-		mainmod_fmt,
-		scriptpath);
+	snprintf(mainmod, sizeof(mainmod), mainmod_fmt, scriptpath);
 
 	int umkaOK;
 
 	thg->umka = umkaAlloc();
 	umkaOK = umkaInit(thg->umka, "tophat_main.um", mainmod, 1024 * 1024, NULL,
-		thg->argc - thg->argOffset, thg->argv + thg->argOffset, true,
-		true, thg->silent ? NULL : warning);
-	if (thg->prof) umprofInit(thg->umka);
+	    thg->argc - thg->argOffset, thg->argv + thg->argOffset, true, true,
+	    thg->silent ? NULL : warning);
+	if (thg->prof)
+		umprofInit(thg->umka);
 
 	if (!umkaOK) {
 		printf("Could not initialize umka.\n");
@@ -57,7 +58,7 @@ int th_init(const char *scriptpath, const char *script_src) {
 	}
 
 	_th_umka_bind(thg->umka);
-	
+
 	if (script_src != NULL)
 		umkaAddModule(thg->umka, scriptpath, script_src);
 
@@ -69,13 +70,13 @@ int th_init(const char *scriptpath, const char *script_src) {
 		th_error("%s (%d, %d): %s", error.fileName, error.line, error.pos, error.msg);
 		return 1;
 	}
-	
+
 	if (thg->print_asm) {
 		char *path = calloc(1, strlen(scriptpath) + 4 + 1);
 		sprintf(path, "%s.asm", scriptpath);
 
 		char *buf = umkaAsm(thg->umka);
-		
+
 		FILE *f = fopen(path, "w");
 		fprintf(f, "%s\n", buf);
 		fclose(f);
@@ -105,7 +106,9 @@ int th_init(const char *scriptpath, const char *script_src) {
 	return 0;
 }
 
-void th_deinit() {
+void
+th_deinit()
+{
 	UmkaStackSlot s;
 	umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
 
@@ -127,23 +130,26 @@ void th_deinit() {
 			umprofPrintInfo(stdout, arr, len);
 		}
 	}
-	
+
 	free(thg);
 	thg = NULL;
 }
 
 #ifdef __EMSCRIPTEN__
 
-int run_playground(const char *src) {
+int
+run_playground(const char *src)
+{
 	UmkaStackSlot s;
 	umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
 	umkaFree(thg->umka);
-	
+
 	if (th_init("playground_main.um", src)) {
 		return 1;
 	}
 
-	if (!umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
+	if (!umkaCall(
+		thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
 		th_print_umka_error_and_quit();
 	}
 
@@ -152,10 +158,12 @@ int run_playground(const char *src) {
 
 #endif
 
-static int th_main(int argc, char *argv[]) {
+static int
+th_main(int argc, char *argv[])
+{
 	thg = malloc(sizeof(th_global));
 	*thg = (th_global){0};
-	
+
 	thg->argc = argc;
 	thg->argv = argv;
 
@@ -163,9 +171,9 @@ static int th_main(int argc, char *argv[]) {
 	const char *scriptpath = "main.um";
 
 	thg->argOffset = 1;
-	while ((argc-thg->argOffset) > 0) {
+	while ((argc - thg->argOffset) > 0) {
 		if (strcmp(argv[thg->argOffset], "-dpiaware") == 0) {
-			thg->dpi_aware = true;	
+			thg->dpi_aware = true;
 			thg->argOffset += 1;
 		} else if (strcmp(argv[thg->argOffset], "-check") == 0) {
 			thg->check = true;
@@ -177,45 +185,46 @@ static int th_main(int argc, char *argv[]) {
 			thg->silent = true;
 			thg->argOffset += 1;
 		} else if (strcmp(argv[thg->argOffset], "-modsrc") == 0) {
-			if ((argc-thg->argOffset) < 2) {
+			if ((argc - thg->argOffset) < 2) {
 				printf("modsrc takes one argument\n");
 				exit(1);
 			}
-			
-			for (int i=0; i < th_em_modulenames_count; i++) {
-				if (strcmp(argv[thg->argOffset+1], th_em_modulenames[i]) == 0) {
+
+			for (int i = 0; i < th_em_modulenames_count; i++) {
+				if (strcmp(argv[thg->argOffset + 1], th_em_modulenames[i]) == 0) {
 					th_info("%s\n", th_em_modulesrc[i]);
 					exit(0);
 				}
 			}
 
-			th_error("No module named %s\n", argv[thg->argOffset+1]);
+			th_error("No module named %s\n", argv[thg->argOffset + 1]);
 			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-license") == 0) {
 			th_info("%s\n", th_em_misc[0]);
 			exit(0);
 		} else if (strcmp(argv[thg->argOffset], "-main") == 0) {
-			if ((argc-thg->argOffset) < 2) {
+			if ((argc - thg->argOffset) < 2) {
 				th_error("main takes one argument - path to the main module\n");
 				exit(1);
 			}
 
-			scriptpath = argv[thg->argOffset+1];
+			scriptpath = argv[thg->argOffset + 1];
 			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-version") == 0) {
-			th_info(TH_VERSION "-" TH_GITVER ", built on " __DATE__ " " __TIME__ "\n%s\n", umkaGetVersion());
+			th_info(TH_VERSION "-" TH_GITVER ", built on " __DATE__ " " __TIME__
+					   "\n%s\n",
+			    umkaGetVersion());
 			exit(0);
 		} else if (strcmp(argv[thg->argOffset], "-dir") == 0) {
-			if ((argc-thg->argOffset) < 2) {
+			if ((argc - thg->argOffset) < 2) {
 				th_error("dir takes 1 argument.\n");
 				exit(1);
 			}
 
-			strncpy(thg->respath, argv[thg->argOffset+1], sizeof(thg->respath) - 1);
+			strncpy(thg->respath, argv[thg->argOffset + 1], sizeof(thg->respath) - 1);
 			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-help") == 0) {
-			th_info(
-				"tophat - a minimalist game engine for making games in umka.\n"
+			th_info("tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um\n"
 				"Available modes:\n"
 				"  -check - only check the program for errors\n"
@@ -245,17 +254,19 @@ static int th_main(int argc, char *argv[]) {
 	if ((f = fopen(scriptpath, "r"))) {
 		fclose(f);
 	} else {
-		th_error("Could not find %s. Make sure you are in a proper directory, or specify it using the dir flag.", scriptpath);
+		th_error("Could not find %s. Make sure you are in a proper directory, or specify "
+			 "it using the dir flag.",
+		    scriptpath);
 
 		return 1;
 	}
-	
 
 	return th_init(scriptpath, NULL);
 }
 
-
-sapp_desc sokol_main(int argc, char *argv[]) {
+sapp_desc
+sokol_main(int argc, char *argv[])
+{
 	if (th_main(argc, argv))
 		exit(1);
 	return th_window_sapp_desc();

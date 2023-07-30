@@ -1,0 +1,20 @@
+﻿---
+AlignAfterOpenBracket: DontAlign
+AlignConsecutiveAssignments: 'false'
+AlignConsecutiveDeclarations: 'false'
+AlignEscapedNewlines: DontAlign
+AlignOperands: 'false'
+AllowAllArgumentsOnNextLine: 'true'
+AllowShortCaseLabelsOnASingleLine: 'true'
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: 'false'
+AlwaysBreakAfterReturnType: All
+BreakBeforeBraces: Mozilla
+ColumnLimit: '100'
+IndentWidth: '8'
+PointerAlignment: Right
+TabWidth: '8'
+UseTab: Always
+
+...
