@@ -31,7 +31,7 @@ static void warning(UmkaError *error) {
 
 int th_init(const char *scriptpath, const char *script_src) {
 	char *mainmod_fmt =
-"import (mainmod = \"%s\")\n"
+"import (mainmod = \"%s\"; \"window.um\")\n"
 "fn main() {}\n"
 "fn __th_init*() {\n"
 "  mainmod.init()\n"
@@ -92,6 +92,13 @@ int th_init(const char *scriptpath, const char *script_src) {
 
 	thg->umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
 	thg->umth_destroy_callback = umkaGetFunc(thg->umka, "window.um", "umth_destroy_callback");
+
+	if (thg->umth_frame_callback == -1) {
+		th_error("Internal error: umth_frame_callback == -1");
+	}
+	if (thg->umth_destroy_callback == -1) {
+		th_error("Internal error: umth_destroy_callback == -1");
+	}
 
 	thg->scaling = 1;
 
