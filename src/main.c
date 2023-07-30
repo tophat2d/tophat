@@ -31,7 +31,7 @@ static void warning(UmkaError *error) {
 
 int th_init(const char *scriptpath, const char *script_src) {
 	char *mainmod_fmt =
-"import (\"window.um\"; mainmod = \"%s\")\n"
+"import (mainmod = \"%s\")\n"
 "fn main() {}\n"
 "fn __th_init*() {\n"
 "  mainmod.init()\n"
@@ -204,7 +204,7 @@ static int th_main(int argc, char *argv[]) {
 				exit(1);
 			}
 
-			strncpy(thg->respath, argv[thg->argOffset+1], sizeof thg->respath);
+			strncpy(thg->respath, argv[thg->argOffset+1], sizeof(thg->respath) - 1);
 			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-help") == 0) {
 			th_info(

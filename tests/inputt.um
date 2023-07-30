@@ -36,8 +36,8 @@ fn init*() {
 			printf("' was just pressed\n")
 		}
 
-		if input.isJustPressed(input.key_right) {
-			printf("key right was just pressed\n")
+		if input.isJustPressed(input.key_escape) {
+			printf("escape was just pressed\n")
 		}
 
 		if input.isPressedRepeatc('q') {

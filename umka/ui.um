@@ -7,7 +7,6 @@
 import (
 	"canvas.um"
 	"coll.um"
-	"font.um"
 	"image.um"
 	"input.um"
 	"placeholders.um"
@@ -637,6 +636,10 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			gui.selection == gui.idx {
 				gui.selection = 0
 		}
+		
+		if input.isJustPressed(input.key_escape) && gui.selection == gui.idx {
+			gui.selection = 0
+		}
 
 		if gui.selection != gui.idx {
 			return
@@ -662,8 +665,14 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			}
 		}
 
-		s := input.getStr()
 		v := true
+
+		if input.isPressed(input.key_ctrl) && input.isJustPressedc('u') {
+			tb.clear()
+			v = false
+		}
+
+		s := input.getStr()
 		for i in s {
 			if int(s[i]) < int(' ') || int(s[i]) == int('z') + 1 {
 				v = false
@@ -688,8 +697,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 
 	p := th.Vf2{}
 	p.y = r.y + r.h/2 - dm.y/2
-	c := th.Vf2{}
-	c.y = p.y
+	c := th.Vf2{r.x, p.y}
 
 	cdmx := style.ft.measure(slice(tb.buffer, 0, tb.cursor)).x * style.ftScale
 	if cdmx < r.w - 2 {
@@ -699,10 +707,12 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 		c.x = r.x + r.w - 1
 		p.x = c.x - cdmx
 	}
+	
+	aW := style.ft.measure("A").x * style.ftScale
 
 	style.ft.draw(tb.buffer, p, style.ftColor, style.ftScale)
-	if gui.selection == gui.idx && th.time/500 % 2 == 0 {
-		canvas.drawRect(style.ftColor, rect.mk(c.x, c.y, 1, dm.y))
+	if gui.selection == gui.idx {
+		canvas.drawRect(style.ftColor, rect.mk(c.x, c.y, aW / 4, dm.y))
 	}
 
 	canvas.endScissor()
