@@ -86,17 +86,20 @@ static void assert_image(th_image *img) {
 th_render_target *th_image_create_render_target(int width, int height, int filter) {
 	th_render_target *t = th_render_target_alloc();
 
-  sg_image_desc img_desc = {
-    .render_target = true,
-    .width = width,
-    .height = height,
-    .pixel_format = SG_PIXELFORMAT_RGBA8,
-    .mag_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
+	sg_image_desc img_desc = {
+		.render_target = true,
+		.width = width,
+		.height = height,
+		.pixel_format = SG_PIXELFORMAT_RGBA8,
+		.sample_count = 1,
+	};
+  
+	sg_sampler_desc smp_desc = {
+		.mag_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
 		.min_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
 		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
-    .sample_count = 1,
 	};
 
 	t->image->dm.w = width;
@@ -109,6 +112,7 @@ th_render_target *th_image_create_render_target(int width, int height, int filte
 	t->image->flipv = 0;
 	t->image->fliph = 1;
 	t->image->tex = sg_make_image(&img_desc);
+	t->image->smp = sg_make_sampler(&smp_desc);
 	assert_image(t->image);
 
 	img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
@@ -132,12 +136,15 @@ static void gen_tex(th_image *img, uint32_t *data) {
 			.size = img->dm.w * img->dm.h * sizeof(uint32_t)
 		},
 		.pixel_format = SG_PIXELFORMAT_RGBA8,
+		.usage = SG_USAGE_IMMUTABLE
+	});
+	
+	img->smp = sg_make_sampler(&(sg_sampler_desc){
 		.mag_filter = img->filter,
 		.min_filter = img->filter,
 		.wrap_u = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_w = SG_WRAP_CLAMP_TO_EDGE,
 		.wrap_v = SG_WRAP_CLAMP_TO_EDGE,
-		.usage = SG_USAGE_IMMUTABLE
 	});
 
 	assert_image(img);
