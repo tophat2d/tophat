@@ -30,6 +30,6 @@ emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
     -sMIN_WEBGL_VERSION=2 \
 	-s MINIFY_HTML=0 \
 	-s EXPORTED_FUNCTIONS="['_malloc', '_free', '_main']" \
-	--shell-file=$TH_DIR/shell.html \
+	--shell-file=$TH_DIR/etc/shell.html \
 	$FILES \
 	-o wasm-out/index.html

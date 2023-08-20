@@ -30,6 +30,6 @@ emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
 	-s MINIFY_HTML=0 \
 	-s EXPORTED_RUNTIME_METHODS=cwrap \
 	-s EXPORTED_FUNCTIONS="['_malloc', '_free', '_main', '_run_playground' ]" \
-	--shell-file=$TH_DIR/playground.html \
+	--shell-file=$TH_DIR/etc/playground.html \
 	$FILES \
 	-o wasm-out/index.html
