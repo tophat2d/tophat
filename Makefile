@@ -46,7 +46,7 @@ all: $(UMKA_LIB) $(TARGET)
 run: $(TARGET)
 	./$(TARGET)
 
-include Makeumka
+include cmd/Makeumka
 include src/Makefile
 
 deepclean:: clean
