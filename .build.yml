@@ -17,8 +17,8 @@ tasks:
         make cross
     - deploy: |
         cd ~/tophat
-        rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@mrms.cz:tophat-web/dl/tophat-linux
-        rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat.exe marek@mrms.cz:tophat-web/dl/tophat-windows.exe
+        rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@mrms.cz:www/tophat-web/dl/tophat-linux
+        rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat.exe marek@mrms.cz:www/tophat-web/dl/tophat-windows.exe
     - event: |
         cd ~/tophat
         ssh -o 'StrictHostKeyChecking no' marek@mrms.cz /home/marek/on-tophat-push
