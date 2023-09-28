@@ -1,25 +1,25 @@
-image: archlinux
+image: debian/bullseye
 packages:
-    - rsync
-    - libx11
-    - libxi
-    - libxcursor
-    - mingw-w64-gcc
-    - mesa
-sources:
-    - https://git.sr.ht/~mrms/tophat
+- rsync
+- xorg-dev
+- libxi-dev
+- libxcursor-dev
+- mingw-w64
+repositories: {}
 secrets:
-    - 09e2cbc4-14d3-473d-9855-d14a906bda1e
+- 09e2cbc4-14d3-473d-9855-d14a906bda1e
+shell: false
+sources:
+- https://git.sr.ht/~mrms/tophat#1568067e5467603e4cd53f324f0824a9509361c0
 tasks:
-    - build: |
-        cd ~/tophat
-        make
-        make cross
-    - deploy: |
-        cd ~/tophat
-        rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@mrms.cz:www/tophat-web/dl/tophat-linux
-        rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat.exe marek@mrms.cz:www/tophat-web/dl/tophat-windows.exe
-    - event: |
-        cd ~/tophat
-        ssh -o 'StrictHostKeyChecking no' marek@mrms.cz /home/marek/on-tophat-push
-
+- build: |
+    cd ~/tophat
+    make
+    make cross
+- deploy: |
+    cd ~/tophat
+    rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@mrms.cz:www/tophat-web/dl/tophat-linux
+    rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat.exe marek@mrms.cz:www/tophat-web/dl/tophat-windows.exe
+- event: |
+    cd ~/tophat
+    ssh -o 'StrictHostKeyChecking no' marek@mrms.cz /home/marek/on-tophat-push
