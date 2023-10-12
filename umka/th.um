@@ -223,7 +223,7 @@ fn umth_transform_vf2(v: ^Vf2, t: ^Transform)
 // 	1. scale
 // 	2. rotation
 // 	3. position
-// 
+//
 // This allows conversion from a relative to an absolute vf2.
 fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
 //~~
@@ -297,6 +297,15 @@ fn umth_th_getfuncs(): ^struct{}
 fn getFuncs*(): ^struct{} {
 //~~
 	return umth_th_getfuncs()
+}
+
+var enableErrors*: bool = true
+fn __error*(msg: str) {
+	if enableErrors {
+		error("error: " + msg)
+	} else {
+		printf("error: %s\n", msg)
+	}
 }
 
 //~~Color constants

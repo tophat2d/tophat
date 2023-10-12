@@ -32,7 +32,7 @@ fn init*() {
 	t = tilemap.mk(make([]th.uu, w * h), w,
 		atlas.mk(image.load("etc/atlas.png"), th.Vf2{4, 4}), 2)
 
-	cfg := make([]th.uu, 16)	
+	cfg := make([]th.uu, 16)
 	cfg[tilemap.top | tilemap.bot] = 1
 	cfg[tilemap.left | tilemap.right] = 2
 	cfg[tilemap.left | tilemap.top] = 3
@@ -55,6 +55,6 @@ fn init*() {
 	window.onFrame.register(|t|{
 		canvas.drawRect(th.white, cam)
 
-		t.draw()	
+		t.draw()
 	})
 }
