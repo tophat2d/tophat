@@ -9,8 +9,6 @@ repositories: {}
 secrets:
 - 09e2cbc4-14d3-473d-9855-d14a906bda1e
 shell: false
-sources:
-- https://git.sr.ht/~mrms/tophat#1568067e5467603e4cd53f324f0824a9509361c0
 tasks:
 - build: |
     cd ~/tophat
