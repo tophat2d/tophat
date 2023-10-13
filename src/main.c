@@ -1,3 +1,5 @@
+#define __USE_MINGW_ANSI_STDIO 1
+
 #include <stdio.h>
 #include <string.h>
 
@@ -109,16 +111,6 @@ th_init(const char *scriptpath, const char *script_src)
 void
 th_deinit()
 {
-	UmkaStackSlot s;
-	umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
-
-	umkaRun(thg->umka);
-	umkaFree(thg->umka);
-
-	th_audio_deinit();
-	th_font_deinit();
-	th_image_deinit();
-
 	if (thg->prof) {
 		if (thg->profJson) {
 			FILE *f = fopen("prof.json", "w");
@@ -130,6 +122,16 @@ th_deinit()
 			umprofPrintInfo(stdout, arr, len);
 		}
 	}
+
+	UmkaStackSlot s;
+	umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
+
+	umkaRun(thg->umka);
+	umkaFree(thg->umka);
+
+	th_audio_deinit();
+	th_font_deinit();
+	th_image_deinit();
 
 	free(thg);
 	thg = NULL;
