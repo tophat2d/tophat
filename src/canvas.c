@@ -300,13 +300,13 @@ th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c)
 
 	float sw = thg->target_size.x, sh = thg->target_size.y;
 
-	float verts[] = {(a.x + thg->offset.x - thg->wp_offset.x) / sw,
-	    (a.y + thg->offset.y - thg->wp_offset.y) / sh, 0, 0, 0, 0, 0,
-	    0, // NOTE: Temporarily uvs are zeroed out
-	    (b.x + thg->offset.x - thg->wp_offset.x) / sw,
-	    (b.y + thg->offset.y - thg->wp_offset.y) / sh, 0, 0, 0, 0, 0, 0,
-	    (c.x + thg->offset.x - thg->wp_offset.x) / sw,
-	    (c.y + thg->offset.y - thg->wp_offset.y) / sh, 0, 0, 0, 0, 0, 0};
+	// clang-format off
+	float verts[] = {
+		(a.x + thg->offset.x) / sw, (a.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0, // NOTE: Temporarily uvs are zeroed out
+		(b.x + thg->offset.x) / sw, (b.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0,
+		(c.x + thg->offset.x) / sw, (c.y + thg->offset.y) / sh, 0, 0, 0, 0, 0, 0
+	};
+	// clang-format on
 
 	for (int i = 0; i < 3; ++i) {
 		// +4 = color
