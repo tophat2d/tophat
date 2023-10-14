@@ -38,6 +38,8 @@ th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic)
 		    (p.x < (n.x - c.x) * (p.y - c.y) / (n.y - c.y) + c.x))
 			coll = !coll;
 	}
+
+	*ic = p;
 	return coll;
 }
 
