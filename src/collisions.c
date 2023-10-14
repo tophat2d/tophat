@@ -82,6 +82,18 @@ th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic)
 }
 
 uu
+th_rect_to_quad(th_rect *r, th_quad *q, th_vf2 *ic)
+{
+	th_quad q2 = {
+	    .tl = {.x = r->x, .y = r->y},
+	    .tr = {.x = r->x + r->w, .y = r->y},
+	    .br = {.x = r->x + r->w, .y = r->y + r->h},
+	    .bl = {.x = r->x, .y = r->y + r->h},
+	};
+	return th_quad_to_quad(&q2, q, ic);
+}
+
+uu
 th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic)
 {
 	th_quad q1, q2;
@@ -133,32 +145,39 @@ th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic)
 
 // This can fail if entity is bigger than a tile. TODO
 uu
-_th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc)
+th_coll_on_tilemap(th_ent *e, th_tmap *t, th_vf2 *ic, th_vf2 *tc)
 {
 	th_quad q = th_ent_transform(e);
+	th_rect bb = th_quad_bounding_box(q);
 
-	int tw = t->w, th = umkaGetDynArrayLen(&t->cells) / t->w;
+	bb.w = (bb.x + bb.w - t->pos.x) / (t->scale * t->a.cs.x);
+	bb.h = (bb.y + bb.h - t->pos.y) / (t->scale * t->a.cs.y);
+	bb.x = trunc((bb.x - t->pos.x) / (t->scale * t->a.cs.x));
+	bb.y = trunc((bb.y - t->pos.y) / (t->scale * t->a.cs.y));
+	bb.w = ceil(bb.w - bb.x);
+	bb.h = ceil(bb.h - bb.y);
 
-	for (uu i = 0; i < 4; i++) {
-		const iu tx = (q.v[i].x - t->pos.x) / (t->scale * t->a.cs.x);
-		const iu ty = (q.v[i].y - t->pos.y) / (t->scale * t->a.cs.y);
+	const int tw = t->w;
+	const int th = umkaGetDynArrayLen(&t->cells) / t->w;
 
-		if (q.v[i].x < t->pos.x || q.v[i].y < t->pos.x)
-			continue;
-		if (tx < 0 || ty < 0)
-			continue;
-		if (tx >= tw || ty >= th)
-			continue;
+	for (int x = bb.x; x < tw && x < bb.x + bb.w; x++) {
+		for (int y = bb.y; y < th && y < bb.y + bb.h; y++) {
+			const int tile = t->cells.data[(tw * y) + x];
+			if (!tile)
+				continue;
+			if (!t->collmask.data[tile - 1])
+				continue;
 
-		const int tile = t->cells.data[(tw * ty) + tx];
-		if (!tile)
-			continue;
-
-		if (t->collmask.data[tile - 1]) {
-			*vert = i;
-			tc->x = tx;
-			tc->y = ty;
-			return 1;
+			th_rect r = {
+			    .x = x * t->scale * t->a.cs.x + t->pos.x,
+			    .y = y * t->scale * t->a.cs.y + t->pos.y,
+			    .w = t->scale * t->a.cs.x,
+			    .h = t->scale * t->a.cs.y,
+			};
+			if (th_rect_to_quad(&r, &q, ic)) {
+				*tc = (th_vf2){.x = x, .y = y};
+				return 1;
+			}
 		}
 	}
 

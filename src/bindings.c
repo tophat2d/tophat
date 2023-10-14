@@ -123,7 +123,7 @@ umth_font_load(UmkaStackSlot *p, UmkaStackSlot *r)
 
 	// NOTE(skejeton): The font load function may return null pointer on fail,
 	//	   				     it would be the responsibility of the user to
-	//verify the validity.
+	// verify the validity.
 	r->ptrVal = th_font_load(path, size, filter);
 	free(path);
 }
@@ -182,10 +182,10 @@ umth_tilemap_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_ent *ent = (th_ent *)p[0].ptrVal;
 	th_tmap *t = (th_tmap *)p[1].ptrVal;
-	uu *vert = (uu *)p[2].ptrVal;
+	th_vf2 *ic = (th_vf2 *)p[2].ptrVal;
 	th_vf2 *tc = (th_vf2 *)p[3].ptrVal;
 
-	r->intVal = _th_coll_on_tilemap(ent, t, vert, tc);
+	r->intVal = th_coll_on_tilemap(ent, t, ic, tc);
 }
 
 void
