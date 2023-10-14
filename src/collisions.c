@@ -160,6 +160,15 @@ th_coll_on_tilemap(th_ent *e, th_tmap *t, th_vf2 *ic, th_vf2 *tc)
 	const int tw = t->w;
 	const int th = umkaGetDynArrayLen(&t->cells) / t->w;
 
+	if (bb.x < 0)
+		bb.x = 0;
+	if (bb.y < 0)
+		bb.y = 0;
+	if (bb.x >= tw)
+		return 0;
+	if (bb.y >= th)
+		return 0;
+
 	for (int x = bb.x; x < tw && x < bb.x + bb.w; x++) {
 		for (int y = bb.y; y < th && y < bb.y + bb.h; y++) {
 			const int tile = t->cells.data[(tw * y) + x];
