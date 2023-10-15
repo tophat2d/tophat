@@ -13,6 +13,7 @@ src/*.o
 src/*.d
 **/gmon.out
 **/wasm-out
+**/th_wasm_data
 th_emscripten.a
 
 # Windows:
