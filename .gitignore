@@ -15,6 +15,7 @@ src/*.d
 **/wasm-out
 **/th_wasm_data
 th_emscripten.a
+umka/**/*.md
 
 # Windows:
 .obj

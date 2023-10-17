@@ -23,6 +23,7 @@
 th_global *thg;
 
 extern char *th_em_modulenames[];
+extern char *th_em_moduledocs[];
 extern char *th_em_modulesrc[];
 extern char *th_em_misc[];
 extern int th_em_modulenames_count;
@@ -201,6 +202,21 @@ th_main(int argc, char *argv[])
 
 			th_error("No module named %s\n", argv[thg->argOffset + 1]);
 			thg->argOffset += 2;
+		} else if (strcmp(argv[thg->argOffset], "-doc") == 0) {
+			if ((argc - thg->argOffset) < 2) {
+				printf("doc takes one argument\n");
+				exit(1);
+			}
+
+			for (int i = 0; i < th_em_modulenames_count; i++) {
+				if (strcmp(argv[thg->argOffset + 1], th_em_modulenames[i]) == 0) {
+					th_info("%s\n", th_em_moduledocs[i]);
+					exit(0);
+				}
+			}
+
+			th_error("No module named %s\n", argv[thg->argOffset + 1]);
+			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-license") == 0) {
 			th_info("%s\n", th_em_misc[0]);
 			exit(0);
@@ -239,7 +255,8 @@ th_main(int argc, char *argv[])
 				"  -profjson - output profiler stuff as json\n"
 				"  -silent - omit warnings\n"
 				"  -version - print the version\n"
-				"Visit th.mrms.cz for more info.\n");
+				"  -doc - print API docs for an umka module\n"
+				"Visit tophat2d.dev for more info.\n");
 			exit(0);
 		} else if (strcmp(argv[thg->argOffset], "-prof") == 0) {
 			thg->prof = true;

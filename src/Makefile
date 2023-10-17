@@ -42,16 +42,23 @@ UMKA_MODULES = \
 	umka/coulau/logs.um \
 	umka/coulau/sort.um \
 	umka/coulau/strings.um
+UMKA_DOCS=$(UMKA_MODULES:.um=.md)
+MMDOC=$(UMKA_BIN) cmd/mmdoc/mmdoc.um
 IMAGES_MOD = umka/placeholders.um
 IMAGES = etc/test.ff etc/icon.ff etc/button.ff
 
-$(EM_TARGET): $(UMKA_MODULES) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(UMKA_BIN) $(IMAGES)
+%.md: %.um
+	@echo BU $@
+	@$(MMDOC) $< > $@
+
+$(EM_TARGET): $(UMKA_MODULES) $(UMKA_DOCS) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(UMKA_BIN) $(IMAGES)
 	@echo EM $@
 	@echo '#include "tophat.h"' > $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_modulesrc $(UMKA_MODULES) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(UMKA_MODULES:umka/%=%) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_misc LICENSE version >> $(EM_TARGET)
-	$(UMKA_BIN) $(HELPER_SCRIPT) placeholders $(IMAGES) >> $(EM_TARGET)
+	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_moduledocs $(UMKA_DOCS) >> $(EM_TARGET)
+	@$(UMKA_BIN) $(HELPER_SCRIPT) placeholders $(IMAGES) >> $(EM_TARGET)
 
 %.o: %.c
 	@echo CC $@

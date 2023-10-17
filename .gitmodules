@@ -16,3 +16,6 @@
 [submodule "umka/coulau"]
 	path = umka/coulau
 	url = https://git.sr.ht/~mrms/coulau
+[submodule "cmd/mmdoc"]
+	path = cmd/mmdoc
+	url = https://git.sr.ht/~mrms/mmdoc
