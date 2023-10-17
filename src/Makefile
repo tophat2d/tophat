@@ -8,7 +8,40 @@ DEPS = $(OBJS:.o=.d)
 
 HELPER_SCRIPT = cmd/buildhelper.um
 EM_TARGET = src/staembed.c
-UMKA_MODULES = umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um umka/input.um umka/misc.um umka/canvas.um umka/ray.um umka/rect.um umka/tilemap.um umka/window.um umka/std/std.um umka/particles.um umka/lerp.um umka/font.um umka/th.um umka/signal.um umka/atlas.um umka/shader.um umka/color.um umka/coll.um umka/placeholders.um umka/nav.um umka/ui.um
+UMKA_MODULES = \
+	umka/anim.um \
+	umka/audio.um \
+	umka/csv.um \
+	umka/ent.um \
+	umka/image.um \
+	umka/input.um \
+	umka/misc.um \
+	umka/canvas.um \
+	umka/ray.um \
+	umka/rect.um \
+	umka/tilemap.um \
+	umka/window.um \
+	umka/std/std.um \
+	umka/particles.um \
+	umka/lerp.um \
+	umka/font.um \
+	umka/th.um \
+	umka/signal.um \
+	umka/atlas.um \
+	umka/shader.um \
+	umka/color.um \
+	umka/coll.um \
+	umka/placeholders.um \
+	umka/nav.um \
+	umka/ui.um \
+	umka/coulau/filepath.um \
+	umka/coulau/fmt.um \
+	umka/coulau/io.um \
+	umka/coulau/json.um \
+	umka/coulau/jsonenc.um \
+	umka/coulau/logs.um \
+	umka/coulau/sort.um \
+	umka/coulau/strings.um
 IMAGES_MOD = umka/placeholders.um
 IMAGES = etc/test.ff etc/icon.ff etc/button.ff
 

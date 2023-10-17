@@ -13,3 +13,6 @@
 [submodule "lib/sokol"]
 	path = lib/sokol
 	url = https://git.sr.ht/~mrms/sokol
+[submodule "umka/coulau"]
+	path = umka/coulau
+	url = https://git.sr.ht/~mrms/coulau
