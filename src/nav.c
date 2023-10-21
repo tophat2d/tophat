@@ -50,7 +50,7 @@ th_navmesh_add_quad(th_navmesh *m, th_quad *q)
 static inline fu
 heuristic(th_vf2 p1, th_vf2 p2)
 {
-	return pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2);
+	return sqrt(pow(p2.x - p1.x, 2) + pow(p2.y - p1.y, 2));
 }
 
 struct qnode
@@ -106,6 +106,9 @@ th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 	p1 = vf2_to_loc(m, p1);
 	p2 = vf2_to_loc(m, p2);
 
+	if (!check_bounds(m, p1, mh) || !check_bounds(m, p2, mh))
+		return;
+
 	struct qnode *q = push(NULL, p1, NULL, 0);
 	/*th_vf2 *cameFrom = calloc(sizeof(th_vf2), umkaGetDynArrayLen((void *)&m->d));
 	for (int i=0; i < umkaGetDynArrayLen((void *)&m->d); ++i) {
@@ -120,7 +123,7 @@ th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 	cost[(uu)(p1.x + p1.y * m->w)] = 0;
 
 	fu *hcost = calloc(sizeof(fu), msiz);
-	hcost[(uu)(p1.x + p2.y * m->w)] = heuristic(p1, p2);
+	hcost[(uu)(p1.x + p1.y * m->w)] = heuristic(p1, p2);
 
 	while (q) {
 		th_vf2 p = q->v;
@@ -143,7 +146,7 @@ th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 			if (!m->d.data[(uu)(nb.x + nb.y * m->w)])
 				continue;
 
-			fu c = cost[(uu)(p.x + p.y * m->w)] + 1;
+			fu c = cost[(uu)(p.x + p.y * m->w)] + heuristic(p, nb);
 			if (cost[idx] < c && cost[idx] != -1)
 				continue;
 
