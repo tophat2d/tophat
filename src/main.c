@@ -41,9 +41,8 @@ th_init(const char *scriptpath, const char *script_src)
 	{
 		thg->res_prefix = strdup(scriptpath);
 		char *fname = strrchr(thg->res_prefix, '/');
-		ssize_t len = fname == NULL ? strlen(thg->res_prefix) : fname - thg->res_prefix + 1;
+		ssize_t len = fname == NULL ? strlen(thg->res_prefix) : strlen(fname) - 1;
 		thg->res_prefix[strlen(thg->res_prefix) - len] = '\0';
-		printf("res pfx: %s\n", thg->res_prefix);
 	}
 
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
