@@ -74,12 +74,12 @@ fn init*() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
 
-	loadedFont = font.load("etc/roboto.ttf", 16, 2)
+	loadedFont = font.load("res://etc/roboto.ttf", 16, 2)
 	if !loadedFont.validate() {
 		error("could not load font")
 	}
 
-	logo = image.load("etc/logo/logo-normal-white.png")
+	logo = image.load("res://etc/logo/logo-normal-white.png")
 
 	fg = 0xadadd5ff
 	bg = 0x262626ff

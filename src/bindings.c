@@ -24,20 +24,43 @@ extern int th_em_modulenames_count;
 static char *
 conv_path(char *path)
 {
-	const char *RAW_PFX = "raw://";
-	const int RAW_PFX_LEN = strlen(RAW_PFX);
+	enum prefix
+	{
+		PFX_RAW,
+		PFX_RES,
+		PFX_DATA,
+	};
 
-	if (strncmp(path, RAW_PFX, RAW_PFX_LEN) == 0) {
-		char *out = malloc(strlen(path) - RAW_PFX_LEN + 1);
-		out[strlen(path) - RAW_PFX_LEN] = 0;
-		strcpy(out, path + RAW_PFX_LEN);
-		return out;
+	const char *prefixes[] = {
+	    [PFX_RAW] = "raw://",
+	    [PFX_RES] = "res://",
+	    [PFX_DATA] = "data://",
+	};
+
+	const ssize_t path_len = strlen(path);
+	enum prefix pfx = PFX_RAW;
+
+	for (int i = 0; i < sizeof(prefixes) / sizeof(prefixes[0]); ++i) {
+		const ssize_t prefix_len = strlen(prefixes[i]);
+		if (path_len >= prefix_len && memcmp(path, prefixes[i], prefix_len) == 0) {
+			pfx = i;
+			path += prefix_len;
+			break;
+		}
 	}
 
-	size_t len = strlen(thg->respath) + strlen(path);
-	char *out = malloc(len + 1);
-	out[len] = 0;
-	sprintf(out, "%s%s", thg->respath, path);
+	char *out = NULL;
+
+	switch (pfx) {
+	case PFX_RAW: out = strdup(path); break;
+	case PFX_RES:
+		out = calloc(1, strlen(thg->res_prefix) + strlen(path) + 1);
+		strcpy(out, thg->res_prefix);
+		strcat(out, path);
+		break;
+	case PFX_DATA: break;
+	}
+
 	return out;
 }
 
