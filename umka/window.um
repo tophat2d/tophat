@@ -211,6 +211,10 @@ fn umth_window_set_icon(img: image.Image)
 // Sets the window icon.
 fn setIcon*(img: image.Image) {
 //~~
+	if !img.validate() {
+		th.__error("invalid image")
+	}	
+
 	umth_window_set_icon(img)
 }
 

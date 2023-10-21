@@ -299,10 +299,13 @@ fn getFuncs*(): ^struct{} {
 	return umth_th_getfuncs()
 }
 
+//~~var enableErrrors
+// If true, errors will result in a call to error(), otherwise printf is used.
 var enableErrors*: bool = true
+//~~
 fn __error*(msg: str) {
 	if enableErrors {
-		error("error: " + msg)
+		error(msg)
 	} else {
 		printf("error: %s\n", msg)
 	}
