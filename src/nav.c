@@ -4,6 +4,8 @@
 #include <math.h>
 #include <stdlib.h>
 
+extern th_global *thg;
+
 static th_vf2
 vf2_to_loc(th_navmesh *m, th_vf2 p)
 {
@@ -95,13 +97,22 @@ check_bounds(th_navmesh *m, th_vf2 p, size_t h)
 	return p.x >= 0 && p.y >= 0 && p.x < m->w && p.y < h;
 }
 
+static void *umka_vf2s = NULL;
+
 void
-th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
+th_navmesh_nav(th_vf2s *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 {
 	const th_vf2 movemap[] = {{{-1, -1}}, {{+0, -1}}, {{+1, -1}}, {{-1, +0}}, {{+1, +0}},
 	    {{-1, +1}}, {{+0, +1}}, {{+1, +1}}};
 	const size_t msiz = umkaGetDynArrayLen((void *)&m->d);
 	const size_t mh = msiz / m->w;
+
+	umkaMakeDynArray(thg->umka, cameFrom, umka_vf2s, msiz);
+
+	for (int i = 0; i < msiz; ++i) {
+		cameFrom->data[i].x = -1;
+		cameFrom->data[i].y = -1;
+	}
 
 	p1 = vf2_to_loc(m, p1);
 	p2 = vf2_to_loc(m, p2);
@@ -110,11 +121,6 @@ th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 		return;
 
 	struct qnode *q = push(NULL, p1, NULL, 0);
-	/*th_vf2 *cameFrom = calloc(sizeof(th_vf2), umkaGetDynArrayLen((void *)&m->d));
-	for (int i=0; i < umkaGetDynArrayLen((void *)&m->d); ++i) {
-		cameFrom[i].x = -1;
-		cameFrom[i].y = -1;
-	}*/
 
 	fu *cost = calloc(sizeof(fu), msiz);
 	for (int i = 0; i < msiz; ++i) {
@@ -152,9 +158,9 @@ th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 
 			cost[idx] = c;
 			hcost[idx] = c + heuristic(nb, p2);
-			if (cameFrom[idx].x < 0)
+			if (cameFrom->data[idx].x < 0)
 				q = push(q, nb, hcost, m->w);
-			cameFrom[idx] = p;
+			cameFrom->data[idx] = p;
 		}
 	}
 
@@ -163,4 +169,11 @@ th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 
 	free(hcost);
 	free(cost);
+}
+
+void
+th_nav_init(void)
+{
+	umka_vf2s = umkaGetType(thg->umka, "nav.um", "Vf2s");
+	printf("%p\n", umka_vf2s);
 }

@@ -2,6 +2,10 @@
 // Module for audio loading and playback.
 //~~
 
+import (
+	"th.um"
+)
+
 //~~opaque Sound
 // Represents an instance of a playable sound. It is an opaque structure.
 type Sound* = struct { _: ^struct{} }

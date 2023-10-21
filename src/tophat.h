@@ -47,6 +47,8 @@ typedef union
 	};
 } th_vf2;
 
+typedef UmkaDynArray(th_vf2) th_vf2s;
+
 typedef struct
 {
 	fu x, y, w, h;
@@ -469,7 +471,9 @@ th_print_umka_error_and_quit();
 void
 th_navmesh_add_quad(th_navmesh *m, th_quad *q);
 void
-th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2);
+th_navmesh_nav(th_vf2s *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2);
+void
+th_nav_init(void);
 
 // particles
 void

@@ -220,10 +220,6 @@ fn umth_image_from_data(ret: ^Image, data: ^uint32, dm: th.Vf2)
 // Creates an image from raw data.
 fn mk*(data: []uint32, dm: th.Vf2): Image {
 //~~
-	if !i.validate() {
-		th.__error("image is invalid")
-	}	
-
 	img := Image{}
 	umth_image_from_data(&img, &data[0], dm)
 
