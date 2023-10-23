@@ -13,9 +13,9 @@ var (
 )
 
 fn init*() {
-	hearth = image.load("gfx/hearth.png")
+	hearth = image.load("res://gfx/hearth.png")
 
-	mainFont = font.load("gfx/marediv-regular.ttf", 64, font.filterNearest)
+	mainFont = font.load("res://gfx/marediv-regular.ttf", 64, font.filterNearest)
 }
 
 fn handle*() { }

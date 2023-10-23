@@ -8,10 +8,10 @@ var (
 )
 
 fn init*() {
-	dmg = audio.load("sfx/dmgsound.wav")
+	dmg = audio.load("res://sfx/dmgsound.wav")
 	dmg.setVol(0.7)
-	explosion = audio.load("sfx/explosion.wav")
+	explosion = audio.load("res://sfx/explosion.wav")
 	explosion.setVol(0.7)
-	shoot = audio.load("sfx/shoot.wav")
+	shoot = audio.load("res://sfx/shoot.wav")
 	shoot.setVol(0.7)
 }

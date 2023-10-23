@@ -26,7 +26,7 @@ fn init*() {
 	sound.init()
 	global.hp = 10
 
-	f := std.fopen("score", "r")
+	f := std.fopen("data://score", "r")
 	if (f != null) {
 		fscanf(f, "%d", &global.hi)
 		std.fclose(f)

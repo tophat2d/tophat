@@ -1,6 +1,9 @@
 #define __USE_MINGW_ANSI_STDIO 1
 
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "bindings.h"
@@ -39,10 +42,46 @@ int
 th_init(const char *scriptpath, const char *script_src)
 {
 	{
-		thg->res_prefix = strdup(scriptpath);
-		char *fname = strrchr(thg->res_prefix, '/');
-		ssize_t len = fname == NULL ? strlen(thg->res_prefix) : strlen(fname) - 1;
-		thg->res_prefix[strlen(thg->res_prefix) - len] = '\0';
+		thg->res_dir = strdup(scriptpath);
+		char *fname = strrchr(thg->res_dir, '/');
+		ssize_t len = fname == NULL ? strlen(thg->res_dir) : strlen(fname) - 1;
+		thg->res_dir[strlen(thg->res_dir) - len] = '\0';
+	}
+
+	{
+		char *abs = realpath(thg->res_dir[0] == '\0' ? "./" : thg->res_dir, NULL);
+		char *dirname = strrchr(abs, '/');
+		ssize_t dirlen = dirname == NULL ? 0 : strlen(dirname);
+
+		bool data_path_allocd = 0;
+#ifdef _WIN32
+		char *data_path = getenv("APPDATA");
+#else
+		char *data_path = getenv("XDG_DATA_HOME");
+		if (data_path == NULL) {
+			data_path = getenv("HOME");
+			if (data_path == NULL) {
+				th_error("Could not find home directory");
+			}
+			data_path_allocd = 1;
+			char *tmp = calloc(1, strlen(data_path) + strlen("/.local/share") + 1);
+			sprintf(tmp, "%s/.local/share", data_path);
+			data_path = tmp;
+		}
+#endif
+
+		thg->data_dir = calloc(1, strlen(data_path) + strlen("/tophat") + dirlen + 1);
+		strcpy(thg->data_dir, data_path);
+
+		strcat(thg->data_dir, "/tophat");
+		mkdir(thg->data_dir, 0777);
+
+		strcat(thg->data_dir, dirname == NULL ? "" : dirname);
+		mkdir(thg->data_dir, 0777);
+
+		if (data_path_allocd)
+			free(data_path);
+		free(abs);
 	}
 
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
@@ -141,7 +180,7 @@ th_deinit()
 	th_font_deinit();
 	th_image_deinit();
 
-	free(thg->res_prefix);
+	free(thg->res_dir);
 
 	free(thg);
 	thg = NULL;

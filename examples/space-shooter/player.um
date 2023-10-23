@@ -28,8 +28,8 @@ var (
 
 fn init*() {
 	frames = []image.Image{
-		image.load("gfx/ship1.png"),
-		image.load("gfx/ship2.png")}
+		image.load("res://gfx/ship1.png"),
+		image.load("res://gfx/ship2.png")}
 
 	e = ent.mk(
 		frames[0],

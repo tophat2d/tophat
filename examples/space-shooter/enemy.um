@@ -29,7 +29,7 @@ fn init*() {
 	enemies = []Enemy{}
 
 	prefab = ent.mk(
-		image.load("gfx/enemy.png"),
+		image.load("res://gfx/enemy.png"),
 		th.Transform{p: th.Vf2{y: -window.wp.y - 20}, s: th.Vf2{1, 1}})
 }
 

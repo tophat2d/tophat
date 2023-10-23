@@ -54,11 +54,15 @@ conv_path(char *path)
 	switch (pfx) {
 	case PFX_RAW: out = strdup(path); break;
 	case PFX_RES:
-		out = calloc(1, strlen(thg->res_prefix) + strlen(path) + 1);
-		strcpy(out, thg->res_prefix);
+		out = calloc(1, strlen(thg->res_dir) + strlen(path) + 1);
+		strcpy(out, thg->res_dir);
 		strcat(out, path);
 		break;
-	case PFX_DATA: break;
+	case PFX_DATA:
+		out = calloc(1, strlen(thg->data_dir) + strlen(path) + 1);
+		strcpy(out, thg->data_dir);
+		strcat(out, path);
+		break;
 	}
 
 	return out;
@@ -69,6 +73,8 @@ umth_fopen(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	char *name = (char *)p[1].ptrVal;
 	const char *mode = (const char *)p[0].ptrVal;
+
+	printf("fopen\n");
 
 	char *path = conv_path(name);
 	FILE *f = fopen(path, mode);
@@ -626,7 +632,9 @@ umth_sound_load(UmkaStackSlot *p, UmkaStackSlot *r)
 	char *path = (char *)p[1].ptrVal;
 	uint32_t flags = p[0].intVal;
 
-	r->ptrVal = th_audio_load(path, flags);
+	char *cpath = conv_path(path);
+	r->ptrVal = th_audio_load(cpath, flags);
+	free(cpath);
 }
 
 void
@@ -1172,6 +1180,7 @@ _th_umka_bind(void *umka)
 {
 	// etc
 	umkaAddFunc(umka, "umth_fopen", &umth_fopen);
+	umkaAddFunc(umka, "rtlfopen", &umth_fopen);
 	umkaAddFunc(umka, "umth_th_getglobal", &umth_th_getglobal);
 	umkaAddFunc(umka, "umth_th_getfuncs", &umth_th_getfuncs);
 
