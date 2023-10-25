@@ -5,11 +5,17 @@ packages:
 - libxi-dev
 - libxcursor-dev
 - mingw-w64
-repositories: {}
+sources:
+- https://git.sr.ht/~mrms/pak
 secrets:
 - 09e2cbc4-14d3-473d-9855-d14a906bda1e
+- 96f40120-5dba-49af-a092-e02b98957ef1
 shell: false
 tasks:
+- pak_setup: |
+    cd pak
+    python3 -m pip install -r requirements.txt
+    ./setup.py install --user
 - build: |
     cd ~/tophat
     make
@@ -18,6 +24,12 @@ tasks:
     cd ~/tophat
     rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@tophat2d.dev:www/tophat-web/dl/tophat-linux
     rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat.exe marek@tophat2d.dev:www/tophat-web/dl/tophat-windows.exe
+- pak_deploy: |
+    cd $project
+    set +x
+    python3 -m pak upload -t `cat ../.secret` pak.tar
+    python3 -m pak upload -t `cat ../.secret` pak.json
+    set -x
 - event: |
     cd ~/tophat
     ssh -o 'StrictHostKeyChecking no' marek@tophat2d.dev /home/marek/on-tophat-push
