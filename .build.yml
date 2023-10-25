@@ -5,6 +5,8 @@ packages:
 - libxi-dev
 - libxcursor-dev
 - mingw-w64
+- python3
+- python3-pip
 sources:
 - https://git.sr.ht/~mrms/pak
 secrets:
