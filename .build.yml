@@ -9,6 +9,8 @@ packages:
 - python3-pip
 sources:
 - https://git.sr.ht/~mrms/pak
+environment:
+  project: tophat
 secrets:
 - 09e2cbc4-14d3-473d-9855-d14a906bda1e
 - 96f40120-5dba-49af-a092-e02b98957ef1
