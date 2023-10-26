@@ -175,5 +175,4 @@ void
 th_nav_init(void)
 {
 	umka_vf2s = umkaGetType(thg->umka, "nav.um", "Vf2s");
-	printf("%p\n", umka_vf2s);
 }

@@ -24,6 +24,7 @@ tasks:
     cd ~/tophat
     make
     make cross
+    python3 -m pak build
 - deploy: |
     cd ~/tophat
     rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@tophat2d.dev:www/tophat-web/dl/tophat-linux
