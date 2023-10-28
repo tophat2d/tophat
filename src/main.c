@@ -96,6 +96,7 @@ int th_init(const char *scriptpath, const char *script_src) {
 	if (thg->umth_frame_callback == -1) {
 		th_error("Internal error: umth_frame_callback == -1");
 	}
+
 	if (thg->umth_destroy_callback == -1) {
 		th_error("Internal error: umth_destroy_callback == -1");
 	}
