@@ -211,6 +211,10 @@ fn umth_window_set_icon(img: image.Image)
 // Sets the window icon.
 fn setIcon*(img: image.Image) {
 //~~
+	if !img.validate() {
+		th.__error("invalid image")
+	}	
+
 	umth_window_set_icon(img)
 }
 
@@ -236,6 +240,7 @@ fn umth_window_set_cursor(cursor: int)
 //~~fn setCursor
 // Allows you to set the displaying cursor. Refer to the cursors section for available cursors.
 fn setCursor*(cursor: int) {
+//~~
 	umth_window_set_cursor(cursor);
 }
 

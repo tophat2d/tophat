@@ -8,17 +8,57 @@ DEPS = $(OBJS:.o=.d)
 
 HELPER_SCRIPT = cmd/buildhelper.um
 EM_TARGET = src/staembed.c
-UMKA_MODULES = umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um umka/input.um umka/misc.um umka/canvas.um umka/ray.um umka/rect.um umka/tilemap.um umka/window.um umka/std/std.um umka/particles.um umka/lerp.um umka/font.um umka/th.um umka/signal.um umka/atlas.um umka/shader.um umka/color.um umka/coll.um umka/placeholders.um umka/nav.um umka/ui.um
+UMKA_MODULES = \
+	umka/anim.um \
+	umka/audio.um \
+	umka/csv.um \
+	umka/ent.um \
+	umka/image.um \
+	umka/input.um \
+	umka/misc.um \
+	umka/canvas.um \
+	umka/ray.um \
+	umka/rect.um \
+	umka/tilemap.um \
+	umka/window.um \
+	umka/std/std.um \
+	umka/particles.um \
+	umka/lerp.um \
+	umka/font.um \
+	umka/th.um \
+	umka/signal.um \
+	umka/atlas.um \
+	umka/shader.um \
+	umka/color.um \
+	umka/coll.um \
+	umka/placeholders.um \
+	umka/nav.um \
+	umka/ui.um \
+	umka/coulau/filepath.um \
+	umka/coulau/fmt.um \
+	umka/coulau/io.um \
+	umka/coulau/json.um \
+	umka/coulau/jsonenc.um \
+	umka/coulau/logs.um \
+	umka/coulau/sort.um \
+	umka/coulau/strings.um
+UMKA_DOCS=$(UMKA_MODULES:.um=.md)
+MMDOC=$(UMKA_BIN) cmd/mmdoc/mmdoc.um
 IMAGES_MOD = umka/placeholders.um
 IMAGES = etc/test.ff etc/icon.ff etc/button.ff
 
-$(EM_TARGET): $(UMKA_MODULES) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(UMKA_BIN) $(IMAGES)
+%.md: %.um
+	@echo BU $@
+	@$(MMDOC) $< > $@
+
+$(EM_TARGET): $(UMKA_MODULES) $(UMKA_DOCS) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(UMKA_BIN) $(IMAGES)
 	@echo EM $@
 	@echo '#include "tophat.h"' > $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_modulesrc $(UMKA_MODULES) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) argarr th_em_modulenames $(UMKA_MODULES:umka/%=%) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_misc LICENSE version >> $(EM_TARGET)
-	$(UMKA_BIN) $(HELPER_SCRIPT) placeholders $(IMAGES) >> $(EM_TARGET)
+	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_moduledocs $(UMKA_DOCS) >> $(EM_TARGET)
+	@$(UMKA_BIN) $(HELPER_SCRIPT) placeholders $(IMAGES) >> $(EM_TARGET)
 
 %.o: %.c
 	@echo CC $@

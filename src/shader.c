@@ -1,13 +1,14 @@
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "tophat.h"
 
 extern th_global *thg;
 
-int th_shader_compile(
-	char *vertf, char *fragf, char *vertb, char *fragb,
-	const char **verta, int vertac) {
+int
+th_shader_compile(
+    char *vertf, char *fragf, char *vertb, char *fragb, const char **verta, int vertac)
+{
 	/*
 
 	char *vert = calloc(1, strlen(vertf) + strlen(vertb) + 1);
@@ -33,7 +34,9 @@ int th_shader_compile(
 	return 0;
 }
 
-void th_shader_deinit() {
+void
+th_shader_deinit()
+{
 	/*for (int i=0; i < thg->shader_count; i++)
 		th_gl_free_prog(thg->shaders[i]);
 

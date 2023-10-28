@@ -15,8 +15,8 @@
 #include <sokol_app.h>
 #include <sokol_gfx.h>
 #include <sokol_glue.h>
-#include <sokol_time.h>
 #include <sokol_log.h>
+#include <sokol_time.h>
 
 #ifdef __linux__
 #include <X11/Xlib.h>
@@ -25,6 +25,8 @@ Display **th_sapp_dpy = &_sapp.x11.display;
 #endif
 int *th_sapp_swap_interval = &_sapp.swap_interval;
 
-GLuint th_sg_get_gl_image(sg_image img) {
-    return *_sg_image_at(&_sg.pools, img.id)->gl.tex;
+GLuint
+th_sg_get_gl_image(sg_image img)
+{
+	return *_sg_image_at(&_sg.pools, img.id)->gl.tex;
 }

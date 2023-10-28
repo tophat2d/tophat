@@ -64,11 +64,22 @@ fn load*(path: str): Image {
 	return img
 }
 
+//~~fn Image.validate
+// Returns true, if i's handle points to an image.
+fn (i: ^Image) validate*(): bool {
+//~~
+	return i._ != null
+}
+
 fn umth_image_flipv(i: Image, f: bool)
 //~~fn Image.flipv
 // Flips image on it's vertical axis.
 fn (i: ^Image) flipv*(flip: bool) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	umth_image_flipv(i^, flip)
 }
 
@@ -77,6 +88,10 @@ fn umth_image_fliph(i: Image, f: bool)
 // Flips image on it's horizontal axis.
 fn (i: ^Image) fliph*(flip: bool) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	umth_image_fliph(i^, flip)
 }
 
@@ -86,6 +101,10 @@ fn umth_image_draw(img: Image, t: ^th.Transform, color: uint32)
 // applies color as a color filter.
 fn (i: ^Image) draw*(t: th.Transform, color: uint32 = th.white) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	umth_image_draw(i^, &t, color)
 }
 
@@ -99,6 +118,10 @@ fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: ^rect.Rect,
 // ![](img/ninepatch.png)
 fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect.Rect, color: uint32 = th.white, scale: real = 1.0) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	umth_image_draw_nine_patch(i^, &outer, &inner, &dest, color, scale)
 }
 
@@ -108,14 +131,11 @@ fn umth_image_draw_on_quad(img: Image, color: uint32, q: th.Quad)
 // on the verticies of the quad.
 fn (i: ^Image) drawOnQuad*(q: th.Quad, color: uint32 = th.white) {
 //~~
-	umth_image_draw_on_quad(i^, color, q)
-}
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
 
-//~~fn Image.validate
-// Returns true, if i's handle points to an image.
-fn (i: ^Image) validate*(): bool {
-//~~
-	return i._ != null
+	umth_image_draw_on_quad(i^, color, q)
 }
 
 fn umth_image_get_dims(dm: ^th.Vf2, i: Image)
@@ -123,6 +143,10 @@ fn umth_image_get_dims(dm: ^th.Vf2, i: Image)
 // Returns width and heigth.
 fn (i: ^Image) getDims*(): th.Vf2 {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	out := th.Vf2{}
 	umth_image_get_dims(&out, i^)
 
@@ -135,6 +159,10 @@ fn umth_image_crop(img: Image, tl, br: th.Vf2)
 // 1, 1 (bottom right)
 fn (i: ^Image) crop*(tl, br: th.Vf2) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	umth_image_crop(i^, tl, br)
 }
 
@@ -142,6 +170,10 @@ fn (i: ^Image) crop*(tl, br: th.Vf2) {
 // Same as `Image.crop`, but the positions are in pixels.
 fn (i: ^Image) cropPx*(tr, br: th.Vf2) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	dm := i.getDims()
 	umth_image_crop(i^, tr.div(dm), br.div(dm))
 }
@@ -150,6 +182,10 @@ fn (i: ^Image) cropPx*(tr, br: th.Vf2) {
 // Same as `Image.crop`, but uses a rect instead of two positions.
 fn (i: ^Image) cropRect*(r: rect.Rect) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	umth_image_crop(i^, r.getPos(), r.getEnd())
 }
 
@@ -158,6 +194,10 @@ fn umth_image_crop_quad(img: Image, q: ^th.Quad)
 // Crop an image using a quad.
 fn (i: ^Image) cropQuad*(q: th.Quad) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	umth_image_crop_quad(i^, &q)
 }
 
@@ -166,6 +206,10 @@ fn umth_image_get_crop_quad(img: Image, q: ^th.Quad)
 // Crop an image using a quad.
 fn (i: ^Image) getCropQuad*(): th.Quad {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	var (q: th.Quad)
 	umth_image_get_crop_quad(i^, &q)
 	return q
@@ -187,6 +231,10 @@ fn umth_image_copy(ret: ^Image, data: Image)
 // Copies image into a new one.
 fn (i: ^Image) copy*(): Image {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	img := Image{}
 	umth_image_copy(&img, i^)
 
@@ -202,6 +250,10 @@ fn umth_image_set_filter(data: Image, filter: int)
 // left is nearest, right is linear.
 fn (i: ^Image) setfilter*(filter: int) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	umth_image_set_filter(i^, filter)
 }
 
@@ -211,6 +263,10 @@ fn umth_image_update_data(img: Image, data: ^uint32, dm: th.Vf2)
 // The new image doesn't have to be the same size as the old one.
 fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
 //~~
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
+
 	if dm.x * dm.y != len(data) {
 		error(sprintf("setData: incorrect dimensions: %v" + "!= %v", dm.x * dm.y, len(data)))
 	}
@@ -228,9 +284,9 @@ fn umth_image_get_data(img: Image, data: ^uint32)
 // Don't use in performance critical sections.
 fn (i: ^Image) getData*(): []uint32 {
 //~~
-	if i._ == null {
-		return []uint32{}
-	}
+	if !i.validate() {
+		th.__error("image is invalid")
+	}	
 
 	buf := make([]uint32, trunc(i.getDims().x * i.getDims().y))
 	if len(buf) == 0 {

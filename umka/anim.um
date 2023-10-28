@@ -23,6 +23,10 @@ type Anim* = struct {
 // `Anim` constructor
 fn mk*(atl: atlas.Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 */, offset: int = -1 /* th.time */): Anim {
 //~~
+	if !atl.i.validate() {
+		th.__error("invalid atlas image")
+	}
+
 	a := Anim{}
 
 	a.atl = atl
@@ -47,6 +51,10 @@ fn mk*(atl: atlas.Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 *
 // Crops the base atlas to the cell that should be visible at `time`.
 fn (anm: ^Anim) animate*(time: int) {
 //~~
+	if anm.fps == 0 || anm.max == 0 {
+			return
+	}
+
 	n := (round(real(time-anm.offset)/round((1000.0/anm.fps))) % anm.max) + anm.min
 
 	anm.atl.cropSource(anm.atl.coords(n))

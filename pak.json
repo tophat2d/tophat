@@ -1,0 +1,12 @@
+{
+    "name": "tophat",
+    "version": "v1.2.0",
+    "author": "Marek Maškarinec <marek@mrms.cz>",
+    "license": "BSD-3",
+    "description": "A 2d game framework",
+    "readme": "README.md",
+    "link": "https://tophat2d.dev",
+    "dependencies": [],
+    "include": ["tophat", "tophat.exe"],
+    "run": "./tophat"
+}

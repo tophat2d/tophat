@@ -4,21 +4,28 @@
 
 extern th_global *thg;
 
-th_shader *th_get_shader(uu index) {
-	if (!index) return NULL;
+th_shader *
+th_get_shader(uu index)
+{
+	if (!index)
+		return NULL;
 	if (index > thg->shader_count)
 		return NULL;
-	return &thg->shaders[index-1];
+	return &thg->shaders[index - 1];
 }
 
-th_shader *th_get_shader_err(uu index) {
+th_shader *
+th_get_shader_err(uu index)
+{
 	th_shader *p = th_get_shader(index);
 	if (!p)
 		th_error("Could not find shader with index %d.", index);
 	return p;
 }
 
-th_shader *th_alloc_shader() { 
+th_shader *
+th_alloc_shader()
+{
 	void *p = realloc(thg->shaders, (++thg->shader_count + 1) * sizeof(th_shader));
 	if (!p)
 		return NULL;

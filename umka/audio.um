@@ -2,6 +2,10 @@
 // Module for audio loading and playback.
 //~~
 
+import (
+	"th.um"
+)
+
 //~~opaque Sound
 // Represents an instance of a playable sound. It is an opaque structure.
 type Sound* = struct { _: ^struct{} }
@@ -27,15 +31,6 @@ fn load*(path: str, flags: LoadFlag = 0): Sound {
 	return Sound{umth_sound_load(path, flags)}
 }
 
-fn umth_sound_copy(s: Sound): ^struct{}
-//~~fn Sound.copy
-// Copies the sound. This will create another sound which can be configured
-// and played independently from the original sound.
-fn (s: ^Sound) copy*(): Sound {
-//~~
-	return Sound{umth_sound_copy(s^)}
-}
-
 //~~fn Sound.validate
 // Returns `true` if `s` loaded correctly.
 fn (s: ^Sound) validate*(): bool {
@@ -43,11 +38,28 @@ fn (s: ^Sound) validate*(): bool {
 	return s._ != null
 }
 
+fn umth_sound_copy(s: Sound): ^struct{}
+//~~fn Sound.copy
+// Copies the sound. This will create another sound which can be configured
+// and played independently from the original sound.
+fn (s: ^Sound) copy*(): Sound {
+//~~
+	if !s.validate() {
+		th.__error("Cannot copy invalid sound.")
+	}
+
+	return Sound{umth_sound_copy(s^)}
+}
+
 fn umth_sound_is_playing(s: Sound): bool
 //~~fn Sound.isPlaying
 // Returns true if the sound is still playing.
 fn (s: ^Sound) isPlaying*(): bool {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	return umth_sound_is_playing(s^)
 }
 
@@ -56,6 +68,10 @@ fn umth_sound_play(s: Sound)
 // Plays the sound.
 fn (s: ^Sound) play*() {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_play(s^)
 }
 
@@ -65,6 +81,10 @@ fn (s: ^Sound) play*() {
 // while it is playing. The returned pointer can be discarded.
 fn (s: ^Sound) start*(): ^Sound {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	cpy := new(Sound)
 	cpy ^= s.copy()
 	cpy.play()
@@ -80,6 +100,10 @@ fn umth_sound_stop(s: Sound)
 // begginning, use `audio.Sound.seekToFrame(0)`.
 fn (s: ^Sound) stop*() {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_stop(s^)
 }
 
@@ -88,6 +112,10 @@ fn umth_sound_set_volume(s: Sound, vol: real32)
 // Sets the volume as a multiplier of the base volume.
 fn (s: ^Sound) setVol*(vol: real32) {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_set_volume(s^, vol)
 }
 
@@ -96,6 +124,10 @@ fn umth_sound_set_pan(s: Sound, pan: real32)
 // Sets the pan of the sound.
 fn (s: ^Sound) setPan*(pan: real32) {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_set_pan(s^, pan)
 }
 
@@ -104,6 +136,10 @@ fn umth_sound_set_pitch(s: Sound, pitch: real32)
 // Sets the pitch of the sound.
 fn (s: ^Sound) setPitch*(pitch: real32) {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_set_pitch(s^, pitch)
 }
 
@@ -112,6 +148,10 @@ fn umth_sound_set_looping(s: Sound, looping: bool)
 // Sets whether the sound will loop upon finishing.
 fn (s: ^Sound) setLooping*(looping: bool) {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_set_looping(s^, looping)
 }
 
@@ -120,6 +160,10 @@ fn umth_sound_seek_to_frame(s: Sound, frame: uint)
 // Seeks to a specified PCM frame.
 fn (s: ^Sound) seekToFrame*(frame: uint) {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_seek_to_frame(s^, frame)
 }
 
@@ -128,6 +172,10 @@ fn umth_sound_frame_count(s: Sound): uint
 // Returns length of the sound in PCM frames.
 fn (s: ^Sound) frameCount*(): uint {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	return umth_sound_frame_count(s^)
 }
 
@@ -136,6 +184,10 @@ fn umth_sound_length_ms(s: Sound): uint
 // Returns length of the sound in ms.
 fn (s: ^Sound) lengthMs*(): uint {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	return umth_sound_length_ms(s^)
 }
 
@@ -143,6 +195,10 @@ fn umth_sound_set_start_time_ms(s: Sound, t: uint)
 //~~fn Sound.setStartTimeMs
 fn (s: ^Sound) setStartTimeMs*(t: uint) {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_set_start_time_ms(s^, t)
 }
 
@@ -150,6 +206,10 @@ fn umth_sound_set_stop_time_ms(s: Sound, t: uint)
 //~~fn Sound.setStopTimeMs
 fn (s: ^Sound) setStopTimeMs*(t: uint) {
 //~~
+	if !s.validate() {
+		th.__error("invalid sound")
+	}
+
 	umth_sound_set_stop_time_ms(s^, t)
 }
 
