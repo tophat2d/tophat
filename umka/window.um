@@ -27,7 +27,7 @@ const (
 	cursorSizeNWSE*			// Resize width and height from the right side cursor; Northwest-Southeast resize cursor
 	cursorSizeSWNE*			// Resize width and height from the left side cursor; Southwest-Northeast resize cursor
 	cursorSizeAll*			// Resize all cursor; Move cursor
-	cursorNo*				// '(/)' cursor; Disabled cursor; Disallowed cursor
+	cursorNo*			// '(/)' cursor; Disabled cursor; Disallowed cursor
 	cursorCount_*
 )
 //~~

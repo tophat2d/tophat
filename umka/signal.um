@@ -7,7 +7,7 @@
 
 //~~type Callback
 // `args` is a list of arguments passed to the `emit` method.
-type Callback* = fn(args: []any) 
+type Callback* = fn(args: []any)
 //~~
 
 //~~type Id

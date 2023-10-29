@@ -72,13 +72,13 @@
 #define SLOT_smp (0)
 /*
     #version 300 es
-    
+
     layout(location = 0) in vec2 pos;
     out vec2 uv;
     layout(location = 1) in vec2 uv0;
     out vec4 color;
     layout(location = 2) in vec4 color0;
-    
+
     void main()
     {
         vec2 _15 = pos * 2.0;
@@ -87,7 +87,7 @@
         uv = uv0;
         color = color0;
     }
-    
+
 */
 static const char th_vs_source_glsl300es[342] = {
     0x23,0x76,0x65,0x72,0x73,0x69,0x6f,0x6e,0x20,0x33,0x30,0x30,0x20,0x65,0x73,0x0a,
@@ -117,18 +117,18 @@ static const char th_vs_source_glsl300es[342] = {
     #version 300 es
     precision mediump float;
     precision highp int;
-    
+
     uniform highp sampler2D tex_smp;
-    
+
     layout(location = 0) out highp vec4 frag_color;
     in highp vec4 color;
     in highp vec2 uv;
-    
+
     void main()
     {
         frag_color = color * texture(tex_smp, uv);
     }
-    
+
 */
 static const char th_fs_source_glsl300es[250] = {
     0x23,0x76,0x65,0x72,0x73,0x69,0x6f,0x6e,0x20,0x33,0x30,0x30,0x20,0x65,0x73,0x0a,
