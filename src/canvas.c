@@ -6,7 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef EMSCRIPTEN
+#include "shader-web.glsl.h"
+#else
 #include "shader.glsl.h"
+#endif
 
 extern th_global *thg;
 
