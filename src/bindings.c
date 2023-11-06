@@ -767,6 +767,10 @@ umth_window_set_clipboard(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	char *str = p[0].ptrVal;
 
+	if (str == NULL) {
+		return;
+	}
+
 	sapp_set_clipboard_string(str);
 }
 
