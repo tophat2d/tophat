@@ -28,8 +28,8 @@ extern th_global *thg;
 void
 th_image_free(th_image *img)
 {
-	sg_uninit_image(img->tex);
-	sg_dealloc_image(img->tex);
+	sg_destroy_image(img->tex);
+	sg_destroy_sampler(img->smp);
 }
 
 static void
@@ -216,8 +216,7 @@ th_image_set_filter(th_image *img, sg_filter filter)
 	uint32_t *data = th_image_get_data(img);
 	img->filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST;
 
-	sg_uninit_image(img->tex);
-	sg_dealloc_image(img->tex);
+	th_image_free(img);
 	gen_tex(img, data);
 
 	free(data);
@@ -226,8 +225,7 @@ th_image_set_filter(th_image *img, sg_filter filter)
 void
 th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm)
 {
-	sg_uninit_image(img->tex);
-	sg_dealloc_image(img->tex);
+	th_image_free(img);
 
 	img->dm = dm;
 	gen_tex(img, data);
