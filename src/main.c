@@ -145,8 +145,13 @@ int
 run_playground(const char *src)
 {
 	UmkaStackSlot s;
-	umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
-	umkaFree(thg->umka);
+	
+	if (thg->umka) {
+		umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
+		umkaRun(thg->umka);
+		umkaFree(thg->umka);
+		thg->umka = NULL;
+	}
 
 	if (th_init("playground_main.um", src)) {
 		return 1;
@@ -158,6 +163,7 @@ run_playground(const char *src)
 	}
 
 	fprintf(stderr, "inited\n");
+	return 0;
 }
 
 #endif
