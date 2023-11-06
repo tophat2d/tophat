@@ -391,5 +391,5 @@ th_image_init()
 void
 th_image_deinit()
 {
-	return;
+	sg_destroy_pipeline(thg->image_pip);
 }
