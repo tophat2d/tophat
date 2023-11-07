@@ -18,7 +18,7 @@ else
 endif
 endif
 
-CFLAGS ?= -s -O3 -fsanitize=leak -pipe
+CFLAGS ?= -s -O3 -pipe
 CFLAGS += -Ilib/stb/ \
 	-Isrc \
 	-Ilib/miniaudio/ \
