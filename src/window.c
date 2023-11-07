@@ -53,6 +53,7 @@ init()
 
 	th_nav_init();
 	th_canvas_init();
+	th_image_init();
 
 	UmkaStackSlot s;
 	if (!umkaCall(

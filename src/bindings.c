@@ -815,9 +815,6 @@ umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r)
 	int h = p[0].intVal;
 
 	th_window_setup(title, w, h);
-
-	th_image_init();
-	th_canvas_init();
 }
 
 void
