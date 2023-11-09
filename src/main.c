@@ -38,7 +38,7 @@ warning(UmkaError *error)
 int
 th_init(const char *scriptpath, const char *script_src)
 {
-	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\"; \"nav.um\")\n"
+	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
 			    "fn main() {}\n"
 			    "fn __th_init*() {\n"
 			    "  mainmod.init()\n"

@@ -59,17 +59,15 @@ fn (m: ^Mesh) addQuad*(q: th.Quad) {
 	umth_nav_mesh_add_quad(m, &q)
 }
 
-type Vf2s* = []th.Vf2
-
-fn umth_nav_mesh_nav(cameFrom: ^Vf2s, m: ^Mesh, p1, p2: th.Vf2)
+fn umth_nav_mesh_nav(cameFrom: ^[]th.Vf2, cameFromType: ^void, m: ^Mesh, p1, p2: th.Vf2)
 //~~fn Mesh.nav
 // Navigates between `p1` and `p2`. Returns the path as an array of `th.Vf2`s.
 // If it doesn't find any path, or one of the points is outside of the mask,
 // returns an empty array.
 fn (m: ^Mesh) nav*(p1, p2: th.Vf2): []th.Vf2 {
 //~~
-	var cameFrom: Vf2s
-	umth_nav_mesh_nav(&cameFrom, m, p1, p2)
+	var cameFrom: []th.Vf2
+	umth_nav_mesh_nav(&cameFrom, typeptr([]th.Vf2), m, p1, p2)
 	
 	path := []th.Vf2{p2}
 	p := p2

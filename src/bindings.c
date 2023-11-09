@@ -1110,12 +1110,13 @@ umth_nav_mesh_add_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 void
 umth_nav_mesh_nav(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2s *cameFrom = p[3].ptrVal;
+	th_vf2s *cameFrom = p[4].ptrVal;
+	void *cameFromType = p[3].ptrVal;
 	th_navmesh *m = p[2].ptrVal;
 	th_vf2 p1 = *(th_vf2 *)&p[1];
 	th_vf2 p2 = *(th_vf2 *)&p[0];
 
-	th_navmesh_nav(cameFrom, m, p1, p2);
+	th_navmesh_nav(cameFrom, cameFromType, m, p1, p2);
 }
 
 void
