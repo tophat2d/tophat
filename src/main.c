@@ -171,6 +171,15 @@ run_playground(const char *src)
 static int
 th_main(int argc, char *argv[])
 {
+#ifdef _WIN32
+	// Enable colored text in Windows console
+	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD dwMode = 0;
+	GetConsoleMode(hOutput, &dwMode);
+	dwMode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode(hOutput, dwMode);
+#endif
+
 	thg = malloc(sizeof(th_global));
 	*thg = (th_global){0};
 
