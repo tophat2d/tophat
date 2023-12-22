@@ -27,5 +27,5 @@ fn init*() {
 		drawTextRect("Awesome\nSkip", th.Vf2{0, 0})
 		drawTextRect("Reset\nTest", th.Vf2{50, 50}, 2.0)
 		drawTextRect("|||||||", th.Vf2{100, 0})
-	}, null)
+	})
 }

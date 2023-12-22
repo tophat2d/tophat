@@ -21,7 +21,7 @@ fn pixelsplit(inp: uint32): (uint8, uint8, uint8, uint8) {
 fn pixelmerge(r, g, b, a: uint8): uint32 { return r << 24 | g << 16 | b << 8 | a }
 
 var (
-	img, img2: image.Image
+	img, img2, img3: image.Image
 	target: image.RenderTarget
 )
 
@@ -30,10 +30,10 @@ fn init*() {
 	window.setViewport(th.Vf2{600, 600})
 
 	img = image.load("etc/test.png")
-	printf("etc/test.png: %s\n", repr(img.validate()))
+	printf("etc/test.png: %v\n", img.validate())
 
 	img2 = img.copy()
-	printf("copy: %s\n", repr(img2.validate()))
+	printf("copy: %v\n", img2.validate())
 	data := img.getData()
 	dm := img.getDims()
 	for i in data {
@@ -44,6 +44,10 @@ fn init*() {
 
 	//img2 := image.mk(data, dm)
 	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
+
+	img3 = img.copy()
+	img3.crop({ 0.5, 0.5 }, { 1, 1 })
+	img3.flipv(true)
 
 	target = image.createRenderTarget(th.Vf2{10, 10}, 0)
 
@@ -90,7 +94,7 @@ fn init*() {
 		img2.draw(th.Transform{
 			s: th.Vf2{10, 10},
 			p: p})
-		
+
 		p.y += img2.getDims().y * 10 + 1
 
 		canvas.drawText("render target:", p, th.black, 2)
@@ -111,8 +115,13 @@ fn init*() {
 		placeholders.button.drawNinepatch(rect.mk(0, 0, 5, 5), rect.mk(1, 1, 2, 2), rect.mk(0, p.y, 64, 64), 0xFFAAFFFF)
 		placeholders.button.drawNinepatch(rect.mk(0, 0, 5, 5), rect.mk(1, 1, 2, 2), rect.mk(64+2, p.y, 128, 128), 0xFFFFFFFF, 4)
 		placeholders.button.drawNinepatch(rect.mk(5, 0, 5, 5), rect.mk(2, 2, 1, 1), rect.mk(128+2+64+2, p.y, 64, 64), 0xCCCCCCFF, 2)
-		p.y += 32
+		p.y += 128
 
-		if input.isJustPressedc('Q') { exit() }
-	}, null)
+		canvas.drawText("flip crop:", p, th.black, 2)
+		p.y += 12
+
+		img3.draw({ s: th.Vf2{ 4, 4 }, p: p})
+
+		if input.isJustPressedc('Q') { window.quit() }
+	})
 }

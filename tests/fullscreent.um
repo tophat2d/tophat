@@ -1,4 +1,11 @@
-import ("window.um"; "rect.um"; "canvas.um"; "input.um"; "th.um"; "signal.um")
+import (
+	"window.um"
+	"rect.um"
+	"canvas.um"
+	"input.um"
+	"th.um"
+	"signal.um"
+)
 
 fn init*() {
 	window.setup("fullscreen test", 640, 480)
@@ -21,5 +28,5 @@ fn init*() {
 		if input.isJustPressed(input.key_escape) {
 			window.setFullscreen(false)
 		}
-	}, null)
+	})
 }

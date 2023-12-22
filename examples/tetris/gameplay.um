@@ -17,6 +17,8 @@ var (
 	lock_stash: bool = false
 	stash*: int = -1
 	bag*: m_bag.Bag
+	speed*: real
+	places: int
 )
 
 fn kind(): int {
@@ -32,9 +34,16 @@ fn init*() {
 	bag = m_bag.init()
 	falling_piece.init()
 	falling_piece.reset(kind())
+	speed = 1
+	places = 0
 }
 
 fn place() {
+	places += 1
+	if places % 25 == 0 {
+		speed += 0.5
+	}
+
 	tspin := falling_piece.isTspin
 	falling_piece.place()
 	streak := field.clearRows()
@@ -43,17 +52,17 @@ fn place() {
 		global.playSound(&global.audioClearMega)
 		switch streak {
 			case 0:
-				crazytext.putText("T-SPIN EMPTY! x"+repr(combo), 4)
+				crazytext.putText(sprintf("T-SPIN EMPTY! x%d", combo), 4)
 			case 1:
-				crazytext.putText("T-SPIN SINGLE! x"+repr(combo), 4)
+				crazytext.putText(sprintf("T-SPIN SINGLE! x%d", combo), 4)
 			case 2:
-				crazytext.putText("T-SPIN DOUBLE! x"+repr(combo), 5)
+				crazytext.putText(sprintf("T-SPIN DOUBLE! x%d", combo), 5)
 			case 3:
-				crazytext.putText("T-SPIN TRIPLE! x"+repr(combo), 6)
+				crazytext.putText(sprintf("T-SPIN TRIPLE! x%d", combo), 6)
 		}
 	} else {
 		if streak == 4 {
-			crazytext.putText("TETRIS! x"+repr(combo), 6)
+			crazytext.putText(sprintf("TETRIS! x%d", combo), 6)
 			global.playSound(&global.audioClearMega)
 		} else if streak > 0 {
 			global.playSound(&global.audioClear)
@@ -61,7 +70,7 @@ fn place() {
 	}
 
 	global.score += presets.getScore(streak, tspin) * combo
-	
+
 	if streak == 4 || tspin {
 		combo += 1
 	} else if streak > 0 {
@@ -76,7 +85,7 @@ fn place() {
 
 fn stashPiece() {
 	if lock_stash {
-		return 
+		return
 	}
 	lock_stash = true
 	if stash == -1 {

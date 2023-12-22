@@ -8,17 +8,17 @@ import (
 	"window.um"
 )
 
-fn main() {
+fn init*() {
 	window.setup("title", 1280, 720)
 	window.setViewport(th.Vf2{192, 108})
 
-	signal.register("spacePress", signal.Callback{
-		printf("%s\n", repr(ctx))
+	signal.register("spacePress", {
+		printf("%v\n", args)
 	})
 
-	for window.cycle() {
-		if input.isPressed(' ') {
+	window.onFrame.register({
+		if input.isPressed(input.key_space) {
 			signal.emit("spacePress", th.time)
 		}
-	}
+	})
 }

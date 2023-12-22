@@ -24,11 +24,11 @@ fn init*() {
 		mpos := input.getMousePos()
 
 		canvas.beginScissorRect({ 0, 0, 100, 200 })
-
-		canvas.beginScissorRect(rect.Rect{mpos.x-32, mpos.y-32, 64, 64})
-			img.draw(th.Transform{p: th.Vf2{0, 0}, s: th.Vf2{17, 17}})
-			canvas.drawText("Hey :)", th.Vf2{10, 10}, th.white, 3);
-			canvas.drawRect(th.red, rect.Rect{40, 40, 40, 40});
+			canvas.beginScissorRect(rect.Rect{mpos.x-32, mpos.y-32, 64, 64})
+				img.draw(th.Transform{p: th.Vf2{0, 0}, s: th.Vf2{17, 17}})
+				canvas.drawText("Hey :)", th.Vf2{10, 10}, th.white, 3);
+				canvas.drawRect(th.red, rect.Rect{40, 40, 40, 40});
+			canvas.endScissor()
 		canvas.endScissor()
-	}, null)
+	})
 }

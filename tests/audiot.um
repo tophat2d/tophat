@@ -34,5 +34,5 @@ fn init*() {
 		if input.isJustPressedc(' ') {
 			s.play()
 		}
-	}, null)
+	})
 }

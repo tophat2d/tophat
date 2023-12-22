@@ -44,9 +44,9 @@ THEXT(void, th_calculate_scaling, float, float);
 
 THEXT(void, th_particles_draw, th_particles *, int);
 
-THEXT(th_vf2, th_quad_min, th_quad );
-THEXT(th_vf2, th_quad_max, th_quad );
-THEXT(th_rect, th_quad_bounding_box, th_quad );
+THEXT(th_vf2, th_quad_min, th_quad);
+THEXT(th_vf2, th_quad_max, th_quad);
+THEXT(th_rect, th_quad_bounding_box, th_quad);
 THEXT(void, th_transform_rect, th_quad *, th_transform, th_rect);
 THEXT(void, th_transform_quad, th_quad *, th_transform);
 THEXT(void, th_transform_vf2, th_vf2 *, th_transform);

@@ -169,7 +169,7 @@ fn getGlobalMousePos*(): th.Vf2 {
 	return getMousePos().add(window.getViewportOffset())
 }
 
-fn umth_input_is_pressed(keycode: int): int32
+fn umth_input_is_pressed(keycode: int32): int32
 //~~fn isPressed
 // Returns true if key is pressed. Either use codes defined in the file above,
 // or pass lower case char/number.
@@ -186,7 +186,7 @@ fn isPressedc*(code: char): bool {
 	return isPressed(toupper(code))
 }
 
-fn umth_input_is_just_pressed(key: int): int32
+fn umth_input_is_just_pressed(key: int32): int32
 //~~fn isJustPressed
 // Returns, whether code was just pressed this loop.
 fn isJustPressed*(code: int): bool {
@@ -201,7 +201,7 @@ fn isJustPressedc*(code: char): bool {
 	return isJustPressed(toupper(code))
 }
 
-fn umth_input_is_pressed_repeat(key: int): int32
+fn umth_input_is_pressed_repeat(key: int32): int32
 //~~fn isPressedRepeat
 // Returns, whether code was just pressed this loop, with key repeat.
 fn isPressedRepeat*(code: int): bool {
@@ -217,7 +217,7 @@ fn isPressedRepeatc*(code: char): bool {
 }
 
 
-fn umth_input_is_just_released(key: int): int32
+fn umth_input_is_just_released(key: int32): int32
 //~~fn isJustReleased
 // Returns true if a key was just released.
 fn isJustReleased*(code: int): bool {

@@ -26,58 +26,23 @@ reference [here](https://docs.tophat2d.dev)
 	>
 </p>
 
-## examples
+## build instructions
 
-Creating a moving rectangle is as easy as this:
+1. Clone the repository with the `--recursive` flag.
 
-```go
-import ("th.um"; "rect.um"; "input.um"; "canvas.um"; "window.um"; "signal.um")
-
-pos := th.Vf2{100, 100}
-
-fn init*() {
-	const speed = 100
-
-	window.setup("my game", 400, 400)
-	window.setViewport(th.Vf2{200, 200})
-
-	window.onFrame.register(signal.Callback{
-		var change: th.Vf2
-
-		// Handle input
-		if input.isPressed(input.key_left)  { change.x -= 1 }
-		if input.isPressed(input.key_right) { change.x += 1 }
-		if input.isPressed(input.key_up)    { change.y -= 1 }
-		if input.isPressed(input.key_down)  { change.y += 1 }
-
-		// Apply movement
-		pos = pos.add(change.norm().mulf(speed * th.delta / 1000.0))
-
-		// Draw!
-		canvas.drawRect(th.green, rect.mk(pos.x, pos.y, 10, 10))
-	}, null)
-}
+```
+git clone https://git.sr.ht/~mrms/tophat --recursive
 ```
 
-Draw an image to the screen using this:
+2. On Linux run `make`, on Windows `msbuild.bat`.
 
-```go
-import ("window.um"; "image.um"; "th.um"; "signal.um")
+You can also download precompiled binaries [here](https://tophat2d.dev/dl).
 
-var img: image.Image
+## contributing
 
-fn init*() {
-	window.setup("image drawing", 400, 400)
-	img = image.load("my-image.png")
-	
-	window.onFrame.register(signal.Callback{
-		img.draw(th.mkTransform(th.Vf2{ 0, 0 }))
-	}, null)
-}
-```
-
-You can look at more complex examples in the
-[`examples/`](https://git.sr.ht/~mrms/tophat/tree/main/item/examples) folder.
+I'm happy to take contributions through the mailing list. Please format your c
+files using the `.clang-format` file. If you contribute umka code, please
+format it similarly to other code.
 
 ## license
 

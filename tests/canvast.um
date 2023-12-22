@@ -13,6 +13,7 @@ var (
 )
 
 fn init*() {
+	exit()
 	img = image.load("etc/test.png")
 	window.setViewport(th.Vf2{192, 168})
 
@@ -48,5 +49,5 @@ fn init*() {
 			window.setViewportOffset(
 				window.getViewportOffset().sub({ 0, th.delta * 0.2 }))
 		}
-	}, null)
+	})
 }

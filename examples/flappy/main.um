@@ -264,7 +264,7 @@ fn game() {
 	window.setViewportOffset({ })
 
 	// HUD
-	ft.draw(repr(getScore()), { 4, 4 }, th.black, 0.4)
+	ft.draw(sprintf("%v", getScore()), { 4, 4 }, th.black, 0.4)
 }
 
 fn init*() {
@@ -335,5 +335,5 @@ fn init*() {
 		// the bottom part of the background is in the foreground
 		backgroundImg.cropPx({ 0, 600 }, { 480, 640 })
 		drawBackground(backgroundImg, 600, 1)
-	}, null)
+	})
 }

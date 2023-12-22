@@ -13,7 +13,9 @@ src/*.o
 src/*.d
 **/gmon.out
 **/wasm-out
+**/th_wasm_data
 th_emscripten.a
+umka/**/*.md
 
 # Windows:
 .obj
@@ -21,3 +23,6 @@ th_emscripten.a
 
 # For now windows:
 bin
+
+umbox/
+box.tar

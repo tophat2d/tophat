@@ -1,24 +1,34 @@
-#include <string.h>
 #include "tophat.h"
+#include <string.h>
 
 extern th_global *thg;
 
 #define ANY_CONTROL 16
-#define ANY_SHIFT   17
-#define ANY_ALT     18
+#define ANY_SHIFT 17
+#define ANY_ALT 18
 
-void th_input_sync_fake_keys() {
+void
+th_input_sync_fake_keys()
+{
 	// emit fake scancodes for any ctrl/shift/alt
-	thg->pressed[ANY_CONTROL] = thg->pressed[SAPP_KEYCODE_LEFT_CONTROL] || thg->pressed[SAPP_KEYCODE_RIGHT_CONTROL];
-	thg->pressed[ANY_SHIFT] = thg->pressed[SAPP_KEYCODE_LEFT_SHIFT] || thg->pressed[SAPP_KEYCODE_RIGHT_SHIFT];
-	thg->pressed[ANY_ALT] = thg->pressed[SAPP_KEYCODE_LEFT_ALT] || thg->pressed[SAPP_KEYCODE_RIGHT_ALT];
+	thg->pressed[ANY_CONTROL] =
+	    thg->pressed[SAPP_KEYCODE_LEFT_CONTROL] || thg->pressed[SAPP_KEYCODE_RIGHT_CONTROL];
+	thg->pressed[ANY_SHIFT] =
+	    thg->pressed[SAPP_KEYCODE_LEFT_SHIFT] || thg->pressed[SAPP_KEYCODE_RIGHT_SHIFT];
+	thg->pressed[ANY_ALT] =
+	    thg->pressed[SAPP_KEYCODE_LEFT_ALT] || thg->pressed[SAPP_KEYCODE_RIGHT_ALT];
 
-	thg->just_pressed[ANY_CONTROL] = thg->just_pressed[SAPP_KEYCODE_LEFT_CONTROL] || thg->just_pressed[SAPP_KEYCODE_RIGHT_CONTROL];
-	thg->just_pressed[ANY_SHIFT] = thg->just_pressed[SAPP_KEYCODE_LEFT_SHIFT] || thg->just_pressed[SAPP_KEYCODE_RIGHT_SHIFT];
-	thg->just_pressed[ANY_ALT] = thg->just_pressed[SAPP_KEYCODE_LEFT_ALT] || thg->just_pressed[SAPP_KEYCODE_RIGHT_ALT];
+	thg->just_pressed[ANY_CONTROL] = thg->just_pressed[SAPP_KEYCODE_LEFT_CONTROL] ||
+	    thg->just_pressed[SAPP_KEYCODE_RIGHT_CONTROL];
+	thg->just_pressed[ANY_SHIFT] = thg->just_pressed[SAPP_KEYCODE_LEFT_SHIFT] ||
+	    thg->just_pressed[SAPP_KEYCODE_RIGHT_SHIFT];
+	thg->just_pressed[ANY_ALT] =
+	    thg->just_pressed[SAPP_KEYCODE_LEFT_ALT] || thg->just_pressed[SAPP_KEYCODE_RIGHT_ALT];
 }
 
-void th_input_key(int keycode, int bDown) {
+void
+th_input_key(int keycode, int bDown)
+{
 	if (!bDown) {
 		thg->just_released[keycode] = 1;
 		thg->pressed[keycode] = 0;
@@ -35,13 +45,17 @@ void th_input_key(int keycode, int bDown) {
 	thg->just_pressed[keycode] = 0;
 }
 
-void th_input_repeated(int keycode, int bDown) {
+void
+th_input_repeated(int keycode, int bDown)
+{
 	if (bDown) {
 		thg->press_repeat[keycode] = true;
 	}
 }
 
-void th_input_cycle() {
+void
+th_input_cycle()
+{
 	thg->mouse_wheel = (th_vf2){{0, 0}};
 	*thg->input_string = 0;
 	thg->input_string_len = 0;

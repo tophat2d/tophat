@@ -7,7 +7,6 @@
 import (
 	"canvas.um"
 	"coll.um"
-	"font.um"
 	"image.um"
 	"input.um"
 	"placeholders.um"
@@ -149,6 +148,27 @@ fn (this: ^Gui) getStyle*(): ^Style {
 	return &this.style[len(this.style) - 1]
 }
 
+//~~fn Gui.getContainer
+// Returns the container atop the container stack.
+fn (this: ^Gui) getContainer*(): Container {
+//~~
+	return this.container[len(this.container) - 1]
+}
+
+//~~fn Gui.pushRect
+// Shortcut to `this.getContainer().pushRect(r)`
+fn (this: ^Gui) pushRect*(r: rect.Rect): rect.Rect {
+//~~
+	return this.getContainer().pushRect(r)
+}
+
+//~~fn Gui.getDims
+// Shortcut to `this.getContainer().getDims(r)`
+fn (this: ^Gui) getDims*(): rect.Rect {
+//~~
+	return this.getContainer().getDims()
+}
+
 //~~fn Gui.dupStyle
 // Duplicates the current style.
 fn (this: ^Gui) dupStyle*() {
@@ -171,27 +191,6 @@ fn (this: ^Gui) popContainer*() {
 		this.container =
 			slice(this.container, 0, len(this.container) - 1)
 	}
-}
-
-//~~fn Gui.getContainer
-// Returns the container atop the container stack.
-fn (this: ^Gui) getContainer*(): Container {
-//~~
-	return this.container[len(this.container) - 1]
-}
-
-//~~fn Gui.pushRect
-// Shortcut to `this.getContainer().pushRect(r)`
-fn (this: ^Gui) pushRect*(r: rect.Rect): rect.Rect {
-//~~
-	return this.getContainer().pushRect(r)
-}
-
-//~~fn Gui.getDims
-// Shortcut to `this.getContainer().getDims(r)`
-fn (this: ^Gui) getDims*(): rect.Rect {
-//~~
-	return this.getContainer().getDims()
 }
 
 fn (this: ^Gui) hover(r: rect.Rect): bool {
@@ -425,6 +424,76 @@ fn (gui: ^Gui) stack*(cfg: StackConfig = {}) {
 	}
 }
 
+//~~struct ScrollAreaConfig
+// Configuration for the scroll area.
+type ScrollAreaConfig* = struct {
+	rect: rect.Rect
+	// scroll speed. Default is 1
+	speed: real32
+	// if true, scrolling will be horizontal
+	horizontal: bool
+}
+//~~
+
+//~~struct ScrollArea
+// Scroll area is a container which allows the user to scroll. It acts as a
+// stack container, but all the elements are shifted by the scroll.
+type ScrollArea* = struct {
+	dm: rect.Rect
+	cfg: ScrollAreaConfig
+	scroll: ^real32
+	maxScroll: real32
+}
+//~~
+
+fn (this: ^ScrollArea) pushRect(r: rect.Rect): rect.Rect {
+	if r.x == 0 { r.x = this.dm.x }
+	if r.y == 0 { r.y = this.dm.y }
+	if this.cfg.horizontal {
+		if r.w == 0 { r.w = this.maxScroll }
+		if r.h == 0 { r.h = this.dm.h }
+		return { r.x - this.scroll^, r.y, r.w, r.h }
+	}
+
+	if r.w == 0 { r.w = this.dm.w }
+	if r.h == 0 { r.h = this.maxScroll }
+	return { r.x, r.y - this.scroll^, r.w, r.h }
+}
+
+fn (this: ^ScrollArea) getDims(): rect.Rect {
+	return this.dm
+}
+
+//~~fn Gui.scrollArea
+// Pushes a scroll area. `scroll` is both input and output value. Both `scroll`
+// and `maxScroll` are in pixels.
+fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaConfig = {}) {
+//~~
+	if cfg.speed == 0 {
+		cfg.speed = 1
+	}
+
+	this := ScrollArea{
+		dm: gui.pushRect(cfg.rect),
+		cfg: cfg,
+		scroll: scroll }
+	gui.pushContainer(this)
+
+	if gui.isEval && gui.hover(this.dm) {
+		v := input.getMouseScroll().y
+		dm := this.dm.h
+		if this.cfg.horizontal {
+			v = input.getMouseScroll().x
+			dm = this.dm.w
+		}
+
+		scroll ^= scroll^ - v*th.delta*this.cfg.speed
+		if scroll^ < 0 { scroll^ = 0 }
+		if maxScroll > dm && scroll^ >= maxScroll - dm { scroll^ = maxScroll - dm }
+		if maxScroll < dm && scroll^ >= maxScroll { scroll^ = maxScroll }
+	}
+}
+
 //~~struct ButtonConfig
 // Configuration for the button.
 type ButtonConfig* = struct {
@@ -535,6 +604,13 @@ type TextBox* = struct {
 }
 //~~
 
+//~~fn TextBox.clear
+// Clears the textbox
+fn (this: ^TextBox) clear*() {
+	this.buffer = ""
+	this.cursor = 0
+}
+
 //~~fn Gui.textBox
 // Adds a single line textbox to the gui.
 // TODO:
@@ -559,6 +635,10 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 		if input.isJustPressed(input.mouse1) && !hover &&
 			gui.selection == gui.idx {
 				gui.selection = 0
+		}
+		
+		if input.isJustPressed(input.key_escape) && gui.selection == gui.idx {
+			gui.selection = 0
 		}
 
 		if gui.selection != gui.idx {
@@ -585,8 +665,14 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			}
 		}
 
-		s := input.getStr()
 		v := true
+
+		if input.isPressed(input.key_ctrl) && input.isJustPressedc('u') {
+			tb.clear()
+			v = false
+		}
+
+		s := input.getStr()
 		for i in s {
 			if int(s[i]) < int(' ') || int(s[i]) == int('z') + 1 {
 				v = false
@@ -611,8 +697,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 
 	p := th.Vf2{}
 	p.y = r.y + r.h/2 - dm.y/2
-	c := th.Vf2{}
-	c.y = p.y
+	c := th.Vf2{r.x, p.y}
 
 	cdmx := style.ft.measure(slice(tb.buffer, 0, tb.cursor)).x * style.ftScale
 	if cdmx < r.w - 2 {
@@ -622,10 +707,12 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 		c.x = r.x + r.w - 1
 		p.x = c.x - cdmx
 	}
+	
+	aW := style.ft.measure("A").x * style.ftScale
 
 	style.ft.draw(tb.buffer, p, style.ftColor, style.ftScale)
-	if gui.selection == gui.idx && th.time/500 % 2 == 0 {
-		canvas.drawRect(style.ftColor, rect.mk(c.x, c.y, 1, dm.y))
+	if gui.selection == gui.idx {
+		canvas.drawRect(style.ftColor, rect.mk(c.x, c.y, aW / 4, dm.y))
 	}
 
 	canvas.endScissor()

@@ -1,12 +1,13 @@
 import (
-	"std.um"
-	"input.um"
-	"th.um"
-	"rect.um"
-	"image.um"
-	"window.um"	
 	"canvas.um"
 	"font.um"
+	"image.um"
+	"input.um"
+	"rect.um"
+	"signal.um"
+	"std.um"
+	"th.um"
+	"window.um"
 )
 
 var (
@@ -17,7 +18,7 @@ var (
 	loadedFont: font.Font
 )
 
-fn onFrame(cctx, uctx: any) {
+fn onFrame(args: []any) {
 	canvas.drawRect(bg, rect.mk(0, 0, window.wp.x, window.wp.y))
 
 	p := th.Vf2{ 0, 1 }
@@ -57,9 +58,9 @@ fn onFrame(cctx, uctx: any) {
 
 	if input.isJustPressed(input.key_enter) {
 		if th.platform == th.PlatformWindows {
-			std.system("explorer \"https://th.mrms.cz/\"")
+			std.system("explorer \"https://tophat2d.dev/\"")
 		} else if th.platform == th.PlatformLinux {
-			std.system("xdg-open https://th.mrms.cz/")
+			std.system("xdg-open https://tophat2d.dev/")
 		}
 	}
 
@@ -72,7 +73,7 @@ fn onFrame(cctx, uctx: any) {
 fn init*() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
-	
+
 	loadedFont = font.load("etc/roboto.ttf", 16, 2)
 	if !loadedFont.validate() {
 		error("could not load font")
@@ -95,6 +96,6 @@ fn init*() {
 		"OPEN THE",
 		"HOMEPAGE" }
 
-	window.onFrame.register(onFrame, null)
+	window.onFrame.register(onFrame)
 }
 

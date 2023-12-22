@@ -8,13 +8,13 @@
 #include <X11/Xlib.h>
 #endif
 
-#include <stdint.h>
-#include <stdbool.h>
 #include <miniaudio.h>
-#include <stb_truetype.h>
-#include <umka_api.h>
 #include <sokol_app.h>
 #include <sokol_gfx.h>
+#include <stb_truetype.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <umka_api.h>
 
 #define PI 3.1415926535897932
 
@@ -35,66 +35,89 @@ typedef int32_t iu;
 
 #define LEN(a) (sizeof(a) / sizeof((a)[0]))
 
-typedef union {
-	struct {fu w, h;};
-	struct {fu x, y;};
+typedef union
+{
+	struct
+	{
+		fu w, h;
+	};
+	struct
+	{
+		fu x, y;
+	};
 } th_vf2;
 
-typedef struct {
+typedef UmkaDynArray(th_vf2) th_vf2s;
+
+typedef struct
+{
 	fu x, y, w, h;
 } th_rect;
 
-typedef union {
-	struct {th_vf2 tl, tr, br, bl;};
+typedef union
+{
+	struct
+	{
+		th_vf2 tl, tr, br, bl;
+	};
 	th_vf2 v[4];
 } th_quad;
 
-typedef struct {
+typedef struct
+{
 	th_vf2 pos;
 	th_vf2 scale;
 	th_vf2 origin;
 	fu rot;
 } th_transform;
 
-typedef struct {
+typedef struct
+{
 	th_vf2 dm;
 	uu channels;
 	sg_image tex;
+	sg_sampler smp;
 	sg_filter filter;
 	th_quad crop;
 	char flipv;
 	char fliph;
 } th_image;
 
-typedef struct {
+typedef struct
+{
 	sg_pass pass;
 	sg_image depth;
 	th_image *image;
 } th_render_target;
 
-typedef struct {
+typedef struct
+{
 	ma_sound inst;
 	bool copied;
 } th_sound;
 
-typedef struct {
+typedef struct
+{
 	th_rect rect;
 	th_image *img;
 	th_transform t;
 	uint32_t color;
 } th_ent;
 
-typedef struct {
+typedef struct
+{
 	uu index;
 	th_vf2 pos;
 } th_coll;
 
-typedef struct {
+typedef struct
+{
 	uint64_t start_time;
 	int seed;
 } _th_particle;
 
-typedef struct {
+typedef struct
+{
 	th_vf2 pos;
 	th_vf2 dm;
 	th_vf2 gravity;
@@ -122,19 +145,22 @@ typedef struct {
 	UmkaDynArray(_th_particle) particles;
 } th_particles;
 
-typedef struct {
+typedef struct
+{
 	th_vf2 pos;
 	fu l;
 	fu r;
 } th_ray;
 
-typedef struct {
+typedef struct
+{
 	th_image *i;
 	th_vf2 cs;
 	th_vf2 dm;
 } th_atlas;
 
-typedef struct {
+typedef struct
+{
 	th_atlas a;
 	th_vf2 pos;
 	uu w;
@@ -143,13 +169,14 @@ typedef struct {
 	fu scale;
 } th_tmap;
 
-typedef struct {
+typedef struct
+{
 	uint32_t *data;
 	th_vf2 dm;
 } th_em_placeholder;
 
 #ifdef _WIN32
-typedef void* th_window_handle;
+typedef void *th_window_handle;
 #elif __linux__
 #include <X11/Xlib.h>
 typedef Window *th_window_handle;
@@ -164,16 +191,18 @@ typedef int th_window_handle;
 
 // this fits 256 characters into an img.
 // with an nxn image. size is power of 2. don't go over 1024x1024 please.
-typedef struct {
+typedef struct
+{
 	th_image img; // Can i really safely do that
 	stbtt_packedchar pc[TH_FONTPLATFORM_CHARSPERPAGE];
 } th_font_atlas_page;
 
-typedef struct {
+typedef struct
+{
 	uint32_t filter;
 	double size, ascent, descent, scale;
 
-	void* data;
+	void *data;
 	stbtt_fontinfo info;
 	// 1024 is a reasonable amount to represent about 262k glyphs (256*1024)
 	// page 0 (ascii set), is always allocated at startup for frequencey reasons.
@@ -183,7 +212,8 @@ typedef struct {
 typedef uint32_t th_shader;
 
 // struct holding all tophat's global variables.
-typedef struct {
+typedef struct
+{
 	char respath[4096];
 	fu scaling;
 	th_vf2 offset;
@@ -227,20 +257,25 @@ typedef struct {
 
 	bool prof;
 	bool profJson;
-	
+
 	int argc;
 	char **argv;
 	int argOffset;
 	bool silent;
 	bool check;
-	
+	bool print_asm;
+	bool dpi_aware;
+
+	float dpi_scale_factor;
+
 	int umth_destroy_callback;
 	int umth_frame_callback;
 
 	ma_engine audio_engine;
 } th_global;
 
-typedef struct {
+typedef struct
+{
 	UmkaDynArray(bool) d;
 	th_rect r;
 	uu w;
@@ -253,7 +288,9 @@ typedef struct {
 #include "thextdata.h"
 #undef THEXT
 
-static int th_ext_count() {
+static int
+th_ext_count()
+{
 	int count = 0;
 #define THEXT(ret, name, ...) ++count
 #include "thextdata.h"
@@ -261,7 +298,9 @@ static int th_ext_count() {
 	return count;
 }
 
-static void th_ext_set(void **arr) {
+static void
+th_ext_set(void **arr)
+{
 	int count = th_ext_count();
 
 	int idx = 0;
@@ -276,147 +315,246 @@ static void th_ext_set(void **arr) {
 #ifndef THEXT
 
 // atlas
-th_vf2 th_atlas_nth_coords(th_atlas *a, uu n);
-th_rect th_atlas_get_cell(th_atlas *a, th_vf2 cell);
+th_vf2
+th_atlas_nth_coords(th_atlas *a, uu n);
+th_rect
+th_atlas_get_cell(th_atlas *a, th_vf2 cell);
 
 // audio
-void th_audio_init();
-void th_audio_deinit();
-th_sound *th_audio_load(char *path);
-th_sound *th_sound_copy(th_sound *s);
+void
+th_audio_init();
+void
+th_audio_deinit();
+th_sound *
+th_audio_load(char *path, uint32_t flags);
+th_sound *
+th_sound_copy(th_sound *s);
 
 // bindings
-void _th_umka_bind(void *umka);
+void
+_th_umka_bind(void *umka);
 
 // canvas
-void th_canvas_rect(uint32_t color, th_rect r);
-void th_canvas_init();
-void th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
-void th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size);
-void th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);
-void th_canvas_quad(th_quad *q, uint32_t color);
-bool th_canvas_batch_push(float *array, size_t n);
-void th_canvas_flush();
-void th_canvas_use_image(th_image *img);
-void th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n);
-void th_canvas_begin_scissor_rect(th_rect rect);
-void th_canvas_end_scissor();
-void th_canvas_end_frame();
+void
+th_canvas_rect(uint32_t color, th_rect r);
+void
+th_canvas_init();
+void
+th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
+void
+th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size);
+void
+th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);
+void
+th_canvas_quad(th_quad *q, uint32_t color);
+bool
+th_canvas_batch_push(float *array, size_t n);
+void
+th_canvas_flush();
+void
+th_canvas_use_image(th_image *img);
+void
+th_canvas_batch_push_auto_flush(th_image *img, float *array, size_t n);
+void
+th_canvas_begin_scissor_rect(th_rect rect);
+void
+th_canvas_end_scissor();
+void
+th_canvas_end_frame();
 
 // collisions
-int th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
-uu th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
-uu th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic);
-uu th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
-uu th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
-uu _th_coll_on_tilemap(th_ent *e, th_tmap *t, uu *vert, th_vf2 *tc);
-bool th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
-uu th_coll_point_on_rect(th_vf2 p, th_rect *r);
-uu th_rect_to_rect(th_rect *r1, th_rect *r2);
+int
+th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
+uu
+th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
+uu
+th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic);
+uu
+th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
+uu
+th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
+uu
+th_coll_on_tilemap(th_ent *e, th_tmap *t, th_vf2 *ic, th_vf2 *tc);
+bool
+th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
+uu
+th_coll_point_on_rect(th_vf2 p, th_rect *r);
+uu
+th_rect_to_rect(th_rect *r1, th_rect *r2);
 
 // entity
-th_quad th_ent_transform(th_ent *e);
-void th_ent_draw(th_ent *o);
-void th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC,
-	uu maxColls, th_coll *colls);
+th_quad
+th_ent_transform(th_ent *e);
+void
+th_ent_draw(th_ent *o);
+void
+th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC, uu maxColls, th_coll *colls);
 
 // colour
-uint32_t th_color_rgb(float r, float g, float b, float a);
-uint32_t th_color_hsv2rgb(float h, float s, float v, float a);
+uint32_t
+th_color_rgb(float r, float g, float b, float a);
+uint32_t
+th_color_hsv2rgb(float h, float s, float v, float a);
 
 // font
-th_font *th_font_load(char *path, double size, uint32_t filter);
-void th_font_draw(th_font *font, const char *s, double x, double y, uint32_t color, double scale);
-th_vf2 th_font_measure(th_font *font, const char *s);
-void th_font_deinit();
+th_font *
+th_font_load(char *path, double size, uint32_t filter);
+void
+th_font_draw(th_font *font, const char *s, double x, double y, uint32_t color, double scale);
+th_vf2
+th_font_measure(th_font *font, const char *s);
+void
+th_font_deinit();
 
 // image
-th_image *th_load_image(char *path);
-void th_image_free(th_image *img);
-void th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
-uint32_t *th_image_get_data(th_image *img);
+th_image *
+th_load_image(char *path);
+void
+th_image_free(th_image *img);
+void
+th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
+uint32_t *
+th_image_get_data(th_image *img);
 
-unsigned int th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
-void th_blit_tex(th_image *img, th_quad q, uint32_t color);
-void th_image_render_transformed(th_image *img, th_transform trans, uint32_t color);
-void th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
+unsigned int
+th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
+void
+th_blit_tex(th_image *img, th_quad q, uint32_t color);
+void
+th_image_render_transformed(th_image *img, th_transform trans, uint32_t color);
+void
+th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
 
-void th_image_set_filter(th_image *img, sg_filter filter);
-void th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
-th_image *th_image_alloc();
-void th_image_init();
-void th_image_deinit();
+void
+th_image_set_filter(th_image *img, sg_filter filter);
+void
+th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
+th_image *
+th_image_alloc();
+void
+th_image_init();
+void
+th_image_deinit();
 
-th_render_target *th_image_create_render_target(int width, int height, int filter);
-void th_image_set_as_render_target(th_render_target *t);
-void th_image_remove_render_target(th_render_target *t, th_vf2 wp);
+th_render_target *
+th_image_create_render_target(int width, int height, int filter);
+void
+th_image_set_as_render_target(th_render_target *t);
+void
+th_image_remove_render_target(th_render_target *t, th_vf2 wp);
 
 // input
-void th_input_key(int keycode, int bDown);
-void th_input_repeated(int keycode, int bDown);
-void th_input_sync_fake_keys();
-void th_input_cycle();
+void
+th_input_key(int keycode, int bDown);
+void
+th_input_repeated(int keycode, int bDown);
+void
+th_input_sync_fake_keys();
+void
+th_input_cycle();
 
 // misc
-void th_error(char *text, ...);
-void th_info(char *text, ...);
-void th_calculate_scaling(float camw, float camh);
-int th_init(const char *scriptpath, const char *script_path);
-void th_deinit();
-void th_print_umka_error_and_quit();
+void
+th_error(char *text, ...);
+void
+th_info(char *text, ...);
+void
+th_calculate_scaling(float camw, float camh);
+int
+th_init(const char *scriptpath, const char *script_path);
+void
+th_deinit();
+void
+th_print_umka_error_and_quit();
 
 // navmesh
-void th_navmesh_add_quad(th_navmesh *m, th_quad *q);
-void th_navmesh_nav(th_vf2 *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2);
+void
+th_navmesh_add_quad(th_navmesh *m, th_quad *q);
+void
+th_navmesh_nav(th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2);
+void
+th_nav_init(void);
 
 // particles
-void th_particles_draw(th_particles *p, int t);
+void
+th_particles_draw(th_particles *p, int t);
 
 // quad/transform
-th_vf2 th_quad_min(th_quad q);
-th_vf2 th_quad_max(th_quad q);
-th_rect th_quad_bounding_box(th_quad q);
-void th_transform_rect(th_quad *q, th_transform t, th_rect r);
-void th_transform_quad(th_quad *q, th_transform t);
-void th_transform_vf2(th_vf2 *v, th_transform t);
-void th_transform_transform(th_transform *o, th_transform t);
+th_vf2
+th_quad_min(th_quad q);
+th_vf2
+th_quad_max(th_quad q);
+th_rect
+th_quad_bounding_box(th_quad q);
+void
+th_transform_rect(th_quad *q, th_transform t, th_rect r);
+void
+th_transform_quad(th_quad *q, th_transform t);
+void
+th_transform_vf2(th_vf2 *v, th_transform t);
+void
+th_transform_transform(th_transform *o, th_transform t);
 
 // vector
-void th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
-void th_vector_normalize(float *x, float *y);
+void
+th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
+void
+th_vector_normalize(float *x, float *y);
 
 // raycast
-void th_ray_getcoll(th_ray *ra, th_coll *colls, int maxColls,
-                    int *collCount, th_ent **scene, int sceneLen);
+void
+th_ray_getcoll(
+    th_ray *ra, th_coll *colls, int maxColls, int *collCount, th_ent **scene, int sceneLen);
 
 // sokol
-uint32_t th_sg_get_gl_image(sg_image img);
-
+uint32_t
+th_sg_get_gl_image(sg_image img);
 
 // tilemap
-void th_tmap_draw(th_tmap *t);
-void th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
+void
+th_tmap_draw(th_tmap *t);
+void
+th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 
 // tophat
-th_shader *th_get_shader(uu index);
-th_shader *th_get_shader_err(uu index);
-th_shader *th_alloc_shader();
+th_shader *
+th_get_shader(uu index);
+th_shader *
+th_get_shader_err(uu index);
+th_shader *
+th_alloc_shader();
 
 // utf8
-size_t th_utf8_decode(uint32_t *out, const char *s);
-size_t th_utf8_encode(char *out, uint32_t r);
+size_t
+th_utf8_decode(uint32_t *out, const char *s);
+size_t
+th_utf8_encode(char *out, uint32_t r);
 
 // window
-void th_window_setup(char *name, int w, int h);
-void th_window_get_dimensions(int *w, int *h);
-th_window_handle th_get_window_handle();
-void th_window_set_dims(th_vf2 dm);
-void th_window_set_icon(th_image *img);
-void th_window_show_cursor(bool show);
-void th_window_freeze_cursor(bool freeze);
-bool th_window_is_fullscreen();
-void th_window_set_fullscreen(bool fullscreen);
-sapp_desc th_window_sapp_desc();
+fu
+th_window_dpi_scale();
+void
+th_window_setup(char *name, int w, int h);
+void
+th_window_get_dimensions(int *w, int *h);
+th_window_handle
+th_get_window_handle();
+void
+th_window_set_dims(th_vf2 dm);
+void
+th_window_set_icon(th_image *img);
+void
+th_window_show_cursor(bool show);
+void
+th_window_freeze_cursor(bool freeze);
+void
+th_window_set_cursor(int cursor);
+bool
+th_window_is_fullscreen();
+void
+th_window_set_fullscreen(bool fullscreen);
+sapp_desc
+th_window_sapp_desc();
 
 #endif
 

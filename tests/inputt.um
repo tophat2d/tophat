@@ -23,10 +23,10 @@ fn init*() {
 			y += 5
 		}*/
 
-		printf("lshift: %s %s %s\n",
-			repr(input.isPressed(input.key_left_shift)),
-			repr(input.isJustPressed(input.key_left_shift)),
-			repr(input.isJustReleased(input.key_left_shift)))
+		printf("lshift: %v %v %v\n",
+			input.isPressed(input.key_left_shift),
+			input.isJustPressed(input.key_left_shift),
+			input.isJustReleased(input.key_left_shift))
 
 		if input.isJustPressed(input.key_backspace) {
 			text = ""
@@ -36,8 +36,8 @@ fn init*() {
 			printf("' was just pressed\n")
 		}
 
-		if input.isJustPressed(input.key_right) {
-			printf("key right was just pressed\n")
+		if input.isJustPressed(input.key_escape) {
+			printf("escape was just pressed\n")
 		}
 
 		if input.isPressedRepeatc('q') {
@@ -54,14 +54,14 @@ fn init*() {
 
 		s := input.getStr()
 		if len(s) > 0 {
-			printf("input string: %s %s\n", input.getStr(), repr([]char(input.getStr())))
+			printf("input string: %s %v\n", input.getStr(), []char(input.getStr()))
 		}
 
 		text = text + s
 
 		canvas.drawText(sprintf("%d", qcount), th.Vf2{5, 40}, th.black, 2);
 		canvas.drawText(text, th.Vf2{5, 20}, th.black, 2);
-		canvas.drawText(sprintf("%s", repr(input.getMouseScroll())), th.Vf2{5, 5}, th.black, 2);
+		canvas.drawText(sprintf("%v", input.getMouseScroll()), th.Vf2{5, 5}, th.black, 2);
 		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
-	}, text)
+	})
 }

@@ -32,7 +32,7 @@ fn init*() {
 		std.fclose(f)
 	}
 
-	window.onFrame.register(signal.Callback{
+	window.onFrame.register({
 		canvas.drawRect(0x000022ff, rect.fromVf2({}, window.wp))
 
 		star.handle()
@@ -46,5 +46,5 @@ fn init*() {
 		case global.NONE:
 			window.quit()
 		}
-	}, null)
+	})
 }

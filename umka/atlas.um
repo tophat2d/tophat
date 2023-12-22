@@ -18,6 +18,10 @@ type Atlas* = struct {
 // dm: amount of cells
 fn mk*(i: image.Image, dm: th.Vf2): Atlas {
 //~~
+	if !i.validate() {
+		th.__error("Image is not valid")
+	}
+
 	a := Atlas{}
 
 	a.i = i

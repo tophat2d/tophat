@@ -44,5 +44,5 @@ fn init*() {
 
 		r.draw(th.green, 2)
 		e.draw()
-	}, null)
+	})
 }
