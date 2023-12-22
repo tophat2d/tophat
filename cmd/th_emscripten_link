@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TH_DIR=$( dirname -- "$0"; )/../
+TH_DIR=$(dirname $(readlink -f $0))/../
 
 mkdir -p $TH_DIR
 if [ ! -f $TH_DIR/th_emscripten.a ]; then
@@ -24,7 +24,7 @@ done
 emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
 	$TH_DIR/th_emscripten.a \
 	-s ALLOW_MEMORY_GROWTH=1 \
-	-s ASYNCIFY_STACK_SIZE=2MB \
+	-s STACK_SIZE=2MB \
 	-lc \
 	-lm \
 	-s MINIFY_HTML=0 \
