@@ -51,7 +51,9 @@ init()
 
 	thg->dpi_scale_factor = sapp_dpi_scale();
 
+	th_nav_init();
 	th_canvas_init();
+	th_image_init();
 
 	UmkaStackSlot s;
 	if (!umkaCall(

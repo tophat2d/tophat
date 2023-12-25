@@ -25,9 +25,9 @@ CFLAGS += -Ilib/stb/ \
 	-Ilib/umprof/ \
 	-Ilib/sokol/
 
-# NOTE(skejeton): @vtereshkov here you might need to fix the flags
-# 								try adding -mwin32 and -municode, or removing them in permutations
-#									for more info: https://gcc.gnu.org/onlinedocs/gcc/x86-Windows-Options.html
+# NOTE(skejeton): @vtereshkov here you might need to fix the flags try adding
+# -mwin32 and -municode, or removing them in permutations for more info:
+#  https://gcc.gnu.org/onlinedocs/gcc/x86-Windows-Options.html
 ifeq ($(SHORT_PLATFORM), MINGW64_NT)
 	CFLAGS += -mwindows
 endif

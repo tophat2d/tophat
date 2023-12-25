@@ -23,3 +23,6 @@ umka/**/*.md
 
 # For now windows:
 bin
+
+umbox/
+box.tar

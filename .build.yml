@@ -5,19 +5,32 @@ packages:
 - libxi-dev
 - libxcursor-dev
 - mingw-w64
-repositories: {}
+- unzip
+- curl
+environment:
+  project: tophat
 secrets:
 - 09e2cbc4-14d3-473d-9855-d14a906bda1e
+- c1afcf5f-16b5-4584-9942-2cccfbfec899
 shell: false
 tasks:
+- umbox_setup: |
+    curl -L https://umbox.tophat2d.dev/dl/setup.sh | sh
 - build: |
     cd ~/tophat
     make
     make cross
+    ~/.local/opt/umbox/umbox build
 - deploy: |
     cd ~/tophat
-    rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@mrms.cz:www/tophat-web/dl/tophat-linux
-    rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat.exe marek@mrms.cz:www/tophat-web/dl/tophat-windows.exe
+    rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@tophat2d.dev:www/tophat-web/dl/tophat-linux
+    rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat.exe marek@tophat2d.dev:www/tophat-web/dl/tophat-windows.exe
+- umbox: |
+    cd ~/tophat
+    set +x
+    ~/.local/opt/umbox/umbox upload `cat ../.secret` box.tar
+    ~/.local/opt/umbox/umbox upload `cat ../.secret` box.json
+    set -x
 - event: |
     cd ~/tophat
-    ssh -o 'StrictHostKeyChecking no' marek@mrms.cz /home/marek/on-tophat-push
+    ssh -o 'StrictHostKeyChecking no' marek@tophat2d.dev /home/marek/on-tophat-push

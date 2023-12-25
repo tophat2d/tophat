@@ -23,6 +23,10 @@ type Anim* = struct {
 // `Anim` constructor
 fn mk*(atl: atlas.Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 */, offset: int = -1 /* th.time */): Anim {
 //~~
+	if !atl.i.validate() {
+		th.__error("invalid atlas image")
+	}
+
 	a := Anim{}
 
 	a.atl = atl

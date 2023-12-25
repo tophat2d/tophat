@@ -6,7 +6,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef EMSCRIPTEN
+#include "shader-web.glsl.h"
+#else
 #include "shader.glsl.h"
+#endif
 
 extern th_global *thg;
 
@@ -239,6 +243,8 @@ void
 th_canvas_deinit()
 {
 	th_image_free(&white_img);
+	sg_destroy_pipeline(thg->canvas_pip);
+	sg_destroy_shader(thg->main_shader);
 }
 
 void

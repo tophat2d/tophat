@@ -33,15 +33,7 @@ UMKA_MODULES = \
 	umka/coll.um \
 	umka/placeholders.um \
 	umka/nav.um \
-	umka/ui.um \
-	umka/coulau/filepath.um \
-	umka/coulau/fmt.um \
-	umka/coulau/io.um \
-	umka/coulau/json.um \
-	umka/coulau/jsonenc.um \
-	umka/coulau/logs.um \
-	umka/coulau/sort.um \
-	umka/coulau/strings.um
+	umka/ui.um
 UMKA_DOCS=$(UMKA_MODULES:.um=.md)
 MMDOC=$(UMKA_BIN) cmd/mmdoc/mmdoc.um
 IMAGES_MOD = umka/placeholders.um

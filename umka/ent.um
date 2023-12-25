@@ -91,6 +91,10 @@ fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
 // the first frame. If you want that, use anim.Anim.
 fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
 //~~
+	if len(frames^) == 0 {
+		return
+	}	
+
 	e.i = frames^[(round(real(t)/(1000/fps)) % len(frames^))]
 }
 

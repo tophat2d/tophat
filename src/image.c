@@ -28,8 +28,8 @@ extern th_global *thg;
 void
 th_image_free(th_image *img)
 {
-	sg_uninit_image(img->tex);
-	sg_dealloc_image(img->tex);
+	sg_destroy_image(img->tex);
+	sg_destroy_sampler(img->smp);
 }
 
 static void
@@ -72,7 +72,13 @@ th_image_get_data(th_image *img)
 
 #ifdef __EMSCRIPTEN__
 	glBindTexture(GL_TEXTURE_2D, tex);
+	GLuint fbo;
+	glGenFramebuffers(1, &fbo);
+	glBindFramebuffer(GL_FRAMEBUFFER, fbo);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, tex, 0);
 	glReadPixels(0, 0, img->dm.w, img->dm.h, GL_RGBA, GL_UNSIGNED_BYTE, data);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers(1, &fbo);
 	glBindTexture(GL_TEXTURE_2D, 0);
 #else
 	void glBindTexture(GLenum target, GLuint texture);
@@ -210,8 +216,7 @@ th_image_set_filter(th_image *img, sg_filter filter)
 	uint32_t *data = th_image_get_data(img);
 	img->filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST;
 
-	sg_uninit_image(img->tex);
-	sg_dealloc_image(img->tex);
+	th_image_free(img);
 	gen_tex(img, data);
 
 	free(data);
@@ -220,8 +225,7 @@ th_image_set_filter(th_image *img, sg_filter filter)
 void
 th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm)
 {
-	sg_uninit_image(img->tex);
-	sg_dealloc_image(img->tex);
+	th_image_free(img);
 
 	img->dm = dm;
 	gen_tex(img, data);
@@ -387,5 +391,5 @@ th_image_init()
 void
 th_image_deinit()
 {
-	return;
+	sg_destroy_pipeline(thg->image_pip);
 }
