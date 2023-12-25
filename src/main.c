@@ -15,6 +15,10 @@
 #include <umprof.h>
 #ifdef _WIN32
 #include <windows.h>
+#define mkdir(p, m) mkdir(p)
+#else
+#include <sys/stat.h>
+#include <sys/types.h>
 #endif
 #include <sokol_app.h>
 
@@ -49,7 +53,13 @@ th_init(const char *scriptpath, const char *script_src)
 	}
 
 	{
-		char *abs = realpath(thg->res_dir[0] == '\0' ? "./" : thg->res_dir, NULL);
+		char *res_dir = thg->res_dir[0] == '\0' ? "./" : thg->res_dir;
+#ifdef _WIN32
+		char abs[PATH_MAX];
+		GetFullPathNameA(res_dir, PATH_MAX - 1, abs, NULL);
+#else
+		char *abs = realpath(res_dir, NULL);
+#endif
 		char *dirname = strrchr(abs, '/');
 		ssize_t dirlen = dirname == NULL ? 0 : strlen(dirname);
 
@@ -81,7 +91,9 @@ th_init(const char *scriptpath, const char *script_src)
 
 		if (data_path_allocd)
 			free(data_path);
+#ifndef _WIN32
 		free(abs);
+#endif
 	}
 
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
@@ -193,7 +205,7 @@ int
 run_playground(const char *src)
 {
 	UmkaStackSlot s;
-	
+
 	if (thg->umka) {
 		umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
 		umkaRun(thg->umka);
