@@ -91,7 +91,7 @@ th_init(const char *scriptpath, const char *script_src)
 
 	// Just check umka file
 	if (thg->check) {
-		return 0;
+		exit(0);
 	}
 
 	thg->umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
@@ -145,7 +145,7 @@ int
 run_playground(const char *src)
 {
 	UmkaStackSlot s;
-	
+
 	if (thg->umka) {
 		umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
 		umkaRun(thg->umka);
