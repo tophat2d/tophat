@@ -1,7 +1,6 @@
 #!/bin/sh
 
-_=${TH_DIR:=../th_wasm_data}
-
+TH_DIR=$(dirname $(readlink -f $0))/../
 echo Data directory: $TH_DIR
 
 mkdir -p $TH_DIR
@@ -28,7 +27,7 @@ echo Linking...
 emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
 	$TH_DIR/th_emscripten.a \
 	-s ALLOW_MEMORY_GROWTH=1 \
-	-s ASYNCIFY_STACK_SIZE=2000000 \
+	-s STACK_SIZE=2MB \
 	-lc \
 	-lm \
 	-sMIN_WEBGL_VERSION=2 \
