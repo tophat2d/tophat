@@ -1,3 +1,4 @@
+THEXT(void, th_atlas_pack, th_atlas *, void *, th_atlas_pack_strategy);
 THEXT(th_vf2, th_atlas_nth_coords, th_atlas *, uu);
 THEXT(th_rect, th_atlas_get_cell, th_atlas *, th_vf2);
 

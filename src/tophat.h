@@ -34,6 +34,7 @@ typedef uint32_t uu;
 typedef int32_t iu;
 
 #define LEN(a) (sizeof(a) / sizeof((a)[0]))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 typedef union
 {
@@ -158,6 +159,13 @@ typedef struct
 	th_vf2 cs;
 	th_vf2 dm;
 } th_atlas;
+
+typedef enum
+{
+	TH_ATLAS_PACK_SQUARE,
+	TH_ATLAS_PACK_ROW,
+	TH_ATLAS_PACK_COLUMN
+} th_atlas_pack_strategy;
 
 typedef struct
 {
@@ -315,6 +323,8 @@ th_ext_set(void **arr)
 #ifndef THEXT
 
 // atlas
+void
+th_atlas_pack(th_atlas *a, void *arr, th_atlas_pack_strategy strategy);
 th_vf2
 th_atlas_nth_coords(th_atlas *a, uu n);
 th_rect

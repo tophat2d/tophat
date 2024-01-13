@@ -1147,6 +1147,16 @@ umth_quad_bounding_box(UmkaStackSlot *p, UmkaStackSlot *r)
 }
 
 void
+umth_atlas_pack(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_atlas *a = p[2].ptrVal;
+	UmkaDynArray(th_image *) *images = p[1].ptrVal;
+	th_atlas_pack_strategy strategy = p[0].intVal;
+
+	th_atlas_pack(a, images, strategy);
+}
+
+void
 _th_umka_bind(void *umka)
 {
 	// etc
@@ -1283,6 +1293,9 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_quad_min", &umth_quad_min);
 	umkaAddFunc(umka, "umth_quad_max", &umth_quad_max);
 	umkaAddFunc(umka, "umth_quad_bounding_box", &umth_quad_bounding_box);
+
+	// atlas
+	umkaAddFunc(umka, "umth_atlas_pack", &umth_atlas_pack);
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);
