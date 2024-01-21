@@ -20,7 +20,7 @@ tasks:
     cd ~/tophat
     make
     make cross
-    ~/.local/opt/umbox/umbox build
+    umbox build
 - deploy: |
     cd ~/tophat
     rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@tophat2d.dev:www/tophat-web/dl/tophat-linux
@@ -28,8 +28,7 @@ tasks:
 - umbox: |
     cd ~/tophat
     set +x
-    ~/.local/opt/umbox/umbox upload `cat ../.secret` box.tar
-    ~/.local/opt/umbox/umbox upload `cat ../.secret` box.json
+    umbox upload `cat ../.secret` box.json
     set -x
 - event: |
     cd ~/tophat
