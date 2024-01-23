@@ -479,12 +479,20 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 		scroll: scroll }
 	gui.pushContainer(this)
 
+	dm := this.dm.h
+	if this.cfg.horizontal {
+		dm = this.dm.w
+	}
+
+	if maxScroll < dm {
+		scroll ^= 0
+		return
+	}
+
 	if gui.isEval && gui.hover(this.dm) {
 		v := input.getMouseScroll().y
-		dm := this.dm.h
 		if this.cfg.horizontal {
 			v = input.getMouseScroll().x
-			dm = this.dm.w
 		}
 
 		scroll ^= scroll^ - v*th.delta*this.cfg.speed
@@ -636,7 +644,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			gui.selection == gui.idx {
 				gui.selection = 0
 		}
-		
+
 		if input.isJustPressed(input.key_escape) && gui.selection == gui.idx {
 			gui.selection = 0
 		}
@@ -707,7 +715,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 		c.x = r.x + r.w - 1
 		p.x = c.x - cdmx
 	}
-	
+
 	aW := style.ft.measure("A").x * style.ftScale
 
 	style.ft.draw(tb.buffer, p, style.ftColor, style.ftScale)
