@@ -31,6 +31,19 @@ fn init*() {
 				padding: 5 })
 			{
 				gui.box(ui.BoxConfig{
+					span: { 1.5, 1, 1.5 },
+					growType: ui.BoxGrowSpan,
+					dir: ui.BoxDirectionRight })
+				{
+					for i := 0; i < 3; i++ {
+						if gui.qbutton(sprintf("Button %d", i+1)) {
+							printf("click %d\n", i+1)
+						}
+					}
+				}
+				gui.popContainer()
+
+				gui.box(ui.BoxConfig{
 					subdivisions: 3,
 					growType: ui.BoxGrowSubdivision,
 					dir: ui.BoxDirectionRight })
