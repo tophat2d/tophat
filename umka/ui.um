@@ -437,8 +437,8 @@ type Stack* = struct {
 //~~
 
 fn (this: ^Stack) pushRect(r: rect.Rect): rect.Rect {
-	if r.x == 0 { r.x = this.dm.x + this.cfg.padding }
-	if r.y == 0 { r.y = this.dm.y + this.cfg.padding }
+	r.x += this.dm.x + this.cfg.padding
+	r.y += this.dm.y + this.cfg.padding
 	if r.w == 0 { r.w = this.dm.w - 2*this.cfg.padding }
 	if r.h == 0 { r.h = this.dm.h - 2*this.cfg.padding }
 
