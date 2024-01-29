@@ -21,7 +21,6 @@ UMKA_MODULES = \
 	umka/rect.um \
 	umka/tilemap.um \
 	umka/window.um \
-	umka/std/std.um \
 	umka/particles.um \
 	umka/lerp.um \
 	umka/font.um \
