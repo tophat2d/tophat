@@ -653,6 +653,7 @@ type TextBox* = struct {
 //~~fn TextBox.clear
 // Clears the textbox
 fn (this: ^TextBox) clear*() {
+//~~
 	this.buffer = ""
 	this.cursor = 0
 }
@@ -839,7 +840,10 @@ fn getDefaultStyle*(): Style {
 			color: 0x888888ff } }
 }
 
+//~~fn mk
+// Creates a GUI instance.
 fn mk*(r: rect.Rect, s: Style): Gui {
+//~~
 	gui := Gui{}
 	gui.pushStyle(s)
 	gui.container = []Container{ Stack{ dm: r } }
