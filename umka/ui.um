@@ -12,6 +12,7 @@ import (
 	"placeholders.um"
 	"rect.um"
 	"th.um"
+	"utf8.um"
 )
 
 //~~struct BoxStyle
@@ -643,19 +644,34 @@ type TextBoxConfig* = struct {
 
 //~~struct TextBox
 type TextBox* = struct {
-	// the content of the textbox
-	buffer: str
 	// index of the cursor
 	cursor: int
-}
+	// contains other unexported rules...
 //~~
+	buffer: []utf8.Rune
+}
 
 //~~fn TextBox.clear
 // Clears the textbox
 fn (this: ^TextBox) clear*() {
 //~~
-	this.buffer = ""
+	this.buffer = {}
 	this.cursor = 0
+}
+
+//~~fn TextBox.getBuf()
+// Get the content of the textbox.
+fn (this: ^TextBox) getBuf*(): str {
+//~~
+	return utf8.encode(this.buffer)
+}
+
+//~~fn TextBox.setBuf()
+// Get the content of the textbox.
+fn (this: ^TextBox) setBuf*(s: str) {
+//~~
+	this.buffer = utf8.decode(s)
+	this.cursor = len(this.buffer)
 }
 
 //~~fn Gui.textBox
@@ -706,8 +722,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			input.isPressedRepeat(input.key_backspace) {
 
 			if tb.cursor > 0 {
-				tb.buffer = slice(tb.buffer, 0, tb.cursor - 1) +
-					slice(tb.buffer, tb.cursor)
+				tb.buffer = append(slice(tb.buffer, 0, tb.cursor - 1), slice(tb.buffer, tb.cursor))
 				tb.cursor--
 			}
 		}
@@ -719,34 +734,28 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			v = false
 		}
 
-		s := input.getStr()
-		for i in s {
-			if int(s[i]) < int(' ') || int(s[i]) == int('z') + 1 {
-				v = false
-			}
-		}
-		if len(s) > 0 && v {
-			tb.buffer = slice(tb.buffer, 0, tb.cursor) + s +
-				slice(tb.buffer, tb.cursor)
-			tb.cursor += len(s)
+		runes := utf8.decode(input.getStr())
+		if len(runes) > 0 && v {
+			tb.buffer = append(slice(tb.buffer, 0, tb.cursor), append(slice(tb.buffer, tb.cursor), runes))
+			tb.cursor += len(runes)
 		}
 
 		return
 	}
-
 
 	style := gui.getStyle()
 
 	style.negBox.draw(r)
 	canvas.beginScissorRect(r)
 
-	dm := style.ft.measure(tb.buffer).mulf(style.ftScale)
+	buf := utf8.encode(tb.buffer)
+	dm := style.ft.measure(buf).mulf(style.ftScale)
 
 	p := th.Vf2{}
 	p.y = r.y + r.h/2 - dm.y/2
 	c := th.Vf2{r.x, p.y}
 
-	cdmx := style.ft.measure(slice(tb.buffer, 0, tb.cursor)).x * style.ftScale
+	cdmx := style.ft.measure(utf8.encode(slice(tb.buffer, 0, tb.cursor))).x * style.ftScale
 	if cdmx < r.w - 2 {
 		p.x = r.x + 1
 		c.x = p.x + cdmx
@@ -757,7 +766,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 
 	aW := style.ft.measure("A").x * style.ftScale
 
-	style.ft.draw(tb.buffer, p, style.ftColor, style.ftScale)
+	style.ft.draw(buf, p, style.ftColor, style.ftScale)
 	if gui.selection == gui.idx {
 		canvas.drawRect(style.ftColor, rect.mk(c.x, c.y, aW / 4, dm.y))
 	}
