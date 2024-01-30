@@ -90,7 +90,7 @@ frame()
 		}
 	}
 
-	thg->mouse_delta = (th_vf2){};
+	thg->mouse_delta = (th_vf2){{0}};
 
 	th_input_cycle();
 	th_canvas_flush();
