@@ -3606,7 +3606,7 @@ const char *th_em_modulesrc[] = {
 "//~~fn Gui.textBox\n"
 "// Adds a single line textbox to the gui.\n"
 "// TODO:\n"
-"// * unicode is not supported.\n"
+"// * right-to-left unicode is not supported.\n"
 "// * no selection\n"
 "// * multiline\n"
 "// * copy paste\n"
