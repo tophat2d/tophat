@@ -677,7 +677,6 @@ fn (this: ^TextBox) setBuf*(s: str) {
 //~~fn Gui.textBox
 // Adds a single line textbox to the gui.
 // TODO:
-// * unicode is not supported.
 // * no selection
 // * multiline
 // * copy paste
