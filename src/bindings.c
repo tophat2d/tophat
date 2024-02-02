@@ -815,9 +815,6 @@ umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r)
 	int h = p[0].intVal;
 
 	th_window_setup(title, w, h);
-
-	th_image_init();
-	th_canvas_init();
 }
 
 void
@@ -1113,12 +1110,13 @@ umth_nav_mesh_add_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 void
 umth_nav_mesh_nav(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2s *cameFrom = p[3].ptrVal;
+	th_vf2s *cameFrom = p[4].ptrVal;
+	void *cameFromType = p[3].ptrVal;
 	th_navmesh *m = p[2].ptrVal;
 	th_vf2 p1 = *(th_vf2 *)&p[1];
 	th_vf2 p2 = *(th_vf2 *)&p[0];
 
-	th_navmesh_nav(cameFrom, m, p1, p2);
+	th_navmesh_nav(cameFrom, cameFromType, m, p1, p2);
 }
 
 void
@@ -1146,6 +1144,16 @@ umth_quad_bounding_box(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_quad *q = (th_quad *)p[0].ptrVal;
 
 	*o = th_quad_bounding_box(*q);
+}
+
+void
+umth_atlas_pack(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_atlas *a = p[2].ptrVal;
+	UmkaDynArray(th_image *) *images = p[1].ptrVal;
+	th_atlas_pack_strategy strategy = p[0].intVal;
+
+	th_atlas_pack(a, images, strategy);
 }
 
 void
@@ -1285,6 +1293,9 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_quad_min", &umth_quad_min);
 	umkaAddFunc(umka, "umth_quad_max", &umth_quad_max);
 	umkaAddFunc(umka, "umth_quad_bounding_box", &umth_quad_bounding_box);
+
+	// atlas
+	umkaAddFunc(umka, "umth_atlas_pack", &umth_atlas_pack);
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		umkaAddModule(umka, th_em_modulenames[i], th_em_modulesrc[i]);

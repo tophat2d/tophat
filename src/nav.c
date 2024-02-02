@@ -97,17 +97,15 @@ check_bounds(th_navmesh *m, th_vf2 p, size_t h)
 	return p.x >= 0 && p.y >= 0 && p.x < m->w && p.y < h;
 }
 
-static void *umka_vf2s = NULL;
-
 void
-th_navmesh_nav(th_vf2s *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
+th_navmesh_nav(th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 {
 	const th_vf2 movemap[] = {{{-1, -1}}, {{+0, -1}}, {{+1, -1}}, {{-1, +0}}, {{+1, +0}},
 	    {{-1, +1}}, {{+0, +1}}, {{+1, +1}}};
 	const size_t msiz = umkaGetDynArrayLen((void *)&m->d);
 	const size_t mh = msiz / m->w;
 
-	umkaMakeDynArray(thg->umka, cameFrom, umka_vf2s, msiz);
+	umkaMakeDynArray(thg->umka, cameFrom, cameFromType, msiz);
 
 	for (int i = 0; i < msiz; ++i) {
 		cameFrom->data[i].x = -1;
@@ -174,5 +172,4 @@ th_navmesh_nav(th_vf2s *cameFrom, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 void
 th_nav_init(void)
 {
-	umka_vf2s = umkaGetType(thg->umka, "nav.um", "Vf2s");
 }

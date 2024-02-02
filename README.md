@@ -31,7 +31,7 @@ reference [here](https://docs.tophat2d.dev)
 1. Clone the repository with the `--recursive` flag.
 
 ```
-git clone https://git.sr.ht/~mrms/tophat --recursive
+git clone https://github.com/marekmaskarinec/tophat --recursive
 ```
 
 2. On Linux run `make`, on Windows `msbuild.bat`.

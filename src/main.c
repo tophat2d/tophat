@@ -38,7 +38,7 @@ warning(UmkaError *error)
 int
 th_init(const char *scriptpath, const char *script_src)
 {
-	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\"; \"nav.um\")\n"
+	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
 			    "fn main() {}\n"
 			    "fn __th_init*() {\n"
 			    "  mainmod.init()\n"
@@ -91,7 +91,7 @@ th_init(const char *scriptpath, const char *script_src)
 
 	// Just check umka file
 	if (thg->check) {
-		return 0;
+		exit(0);
 	}
 
 	thg->umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
@@ -145,8 +145,13 @@ int
 run_playground(const char *src)
 {
 	UmkaStackSlot s;
-	umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
-	umkaFree(thg->umka);
+
+	if (thg->umka) {
+		umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
+		umkaRun(thg->umka);
+		umkaFree(thg->umka);
+		thg->umka = NULL;
+	}
 
 	if (th_init("playground_main.um", src)) {
 		return 1;
@@ -158,6 +163,7 @@ run_playground(const char *src)
 	}
 
 	fprintf(stderr, "inited\n");
+	return 0;
 }
 
 #endif
@@ -165,6 +171,15 @@ run_playground(const char *src)
 static int
 th_main(int argc, char *argv[])
 {
+#ifdef _WIN32
+	// Enable colored text in Windows console
+	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+	DWORD dwMode = 0;
+	GetConsoleMode(hOutput, &dwMode);
+	dwMode |= ENABLE_PROCESSED_OUTPUT | ENABLE_VIRTUAL_TERMINAL_PROCESSING;
+	SetConsoleMode(hOutput, dwMode);
+#endif
+
 	thg = malloc(sizeof(th_global));
 	*thg = (th_global){0};
 

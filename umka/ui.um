@@ -12,6 +12,7 @@ import (
 	"placeholders.um"
 	"rect.um"
 	"th.um"
+	"utf8.um"
 )
 
 //~~struct BoxStyle
@@ -236,6 +237,9 @@ const (
 	BoxGrowDimension*   = BoxGrow(0)
 	// Divides the container into `n` equal parts.
 	BoxGrowSubdivision* = BoxGrow(1)
+	// Grows the box based on values in the span array.
+	BoxGrowSpan*        = BoxGrow(2)
+	BoxGrowPxSpan*      = BoxGrow(3)
 )
 //~~
 
@@ -261,6 +265,11 @@ type BoxConfig* = struct {
 	growType: BoxGrow
 	// the grow direction
 	dir: BoxDirection
+	// Specifies the values used with BoxGrowSpan nad BoxGrowPxSpan.
+	// If BoxGrowSpan is used, 1 equals the size of the box divided by the sum
+	// of all spans.
+	// If BoxGrowPxSpan is used, 1 equals one pixel.
+	span: []th.fu
 	// rect passed to the current container
 	rect: rect.Rect
 	// padding inserted after each element
@@ -276,10 +285,32 @@ type BoxConfig* = struct {
 // be kept. Position is always forced.
 type Box* = struct {
 	grow: th.fu
+	spanCursor: int
 	dm: rect.Rect
 	cfg: BoxConfig
 }
 //~~
+
+fn (this: ^Box) getGrow(): th.fu {
+	switch this.cfg.growType {
+	// These values are constant and can therefore be only calculated once.
+	case BoxGrowDimension:
+		return this.grow
+	case BoxGrowSubdivision:
+		return this.grow
+	case BoxGrowSpan:
+		// We store the amount of pixels per a span in the grow array.
+		sp := this.cfg.span[this.spanCursor]
+		this.spanCursor = (this.spanCursor + 1) % len(this.cfg.span)
+		return sp * this.grow
+	case BoxGrowPxSpan:
+		sp := this.cfg.span[this.spanCursor]
+		this.spanCursor = (this.spanCursor + 1) % len(this.cfg.span)
+		return sp
+	}
+
+	return 0
+}
 
 fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 	switch this.cfg.dir {
@@ -288,7 +319,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 		r.y = this.dm.y
 
 		if r.h == 0 {
-			r.h = this.grow
+			r.h = this.getGrow()
 		}
 
 		if r.w == 0 {
@@ -305,13 +336,13 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 		}
 
 		if r.w == 0 {
-			r.w = this.grow
+			r.w = this.getGrow()
 		}
 
 		this.dm.x += r.w + this.cfg.padding
 	case BoxDirectionUp:
 		if r.h == 0 {
-			r.h = this.grow
+			r.h = this.getGrow()
 		}
 
 		if r.w == 0 {
@@ -327,7 +358,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 		}
 
 		if r.w == 0 {
-			r.w = this.grow
+			r.w = this.getGrow()
 		}
 
 		this.dm.w -= r.w + this.cfg.padding
@@ -353,6 +384,13 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = {
 	b := Box{}
 	b.dm = gui.pushRect(cfg.rect)
 	b.cfg = cfg
+
+	dm := b.dm.h
+	if cfg.dir == BoxDirectionRight || cfg.dir == BoxDirectionLeft {
+		dm = b.dm.w
+	}
+	dm += b.cfg.padding
+
 	switch cfg.growType {
 	case BoxGrowDimension:
 		b.grow = cfg.dimension
@@ -361,13 +399,14 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = {
 			error("Invalid subdivision count")
 		}
 
-		dm := b.dm.h
-		if cfg.dir == BoxDirectionRight || cfg.dir == BoxDirectionLeft {
-			dm = b.dm.w
-		}
-		dm += b.cfg.padding
-
 		b.grow = dm / cfg.subdivisions
+	case BoxGrowSpan:
+		s := th.fu(0)
+		for _,v in b.cfg.span {
+			s += v
+		}
+
+		b.grow = dm / s
 	}
 
 	if !gui.isEval {
@@ -399,8 +438,8 @@ type Stack* = struct {
 //~~
 
 fn (this: ^Stack) pushRect(r: rect.Rect): rect.Rect {
-	if r.x == 0 { r.x = this.dm.x + this.cfg.padding }
-	if r.y == 0 { r.y = this.dm.y + this.cfg.padding }
+	r.x += this.dm.x + this.cfg.padding
+	r.y += this.dm.y + this.cfg.padding
 	if r.w == 0 { r.w = this.dm.w - 2*this.cfg.padding }
 	if r.h == 0 { r.h = this.dm.h - 2*this.cfg.padding }
 
@@ -479,12 +518,20 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 		scroll: scroll }
 	gui.pushContainer(this)
 
+	dm := this.dm.h
+	if this.cfg.horizontal {
+		dm = this.dm.w
+	}
+
+	if maxScroll < dm {
+		scroll ^= 0
+		return
+	}
+
 	if gui.isEval && gui.hover(this.dm) {
 		v := input.getMouseScroll().y
-		dm := this.dm.h
 		if this.cfg.horizontal {
 			v = input.getMouseScroll().x
-			dm = this.dm.w
 		}
 
 		scroll ^= scroll^ - v*th.delta*this.cfg.speed
@@ -597,24 +644,40 @@ type TextBoxConfig* = struct {
 
 //~~struct TextBox
 type TextBox* = struct {
-	// the content of the textbox
-	buffer: str
 	// index of the cursor
 	cursor: int
-}
+	// contains other unexported rules...
 //~~
+	buffer: []utf8.Rune
+}
 
 //~~fn TextBox.clear
 // Clears the textbox
 fn (this: ^TextBox) clear*() {
-	this.buffer = ""
+//~~
+	this.buffer = {}
 	this.cursor = 0
+}
+
+//~~fn TextBox.getBuf()
+// Get the content of the textbox.
+fn (this: ^TextBox) getBuf*(): str {
+//~~
+	return utf8.encode(this.buffer)
+}
+
+//~~fn TextBox.setBuf()
+// Get the content of the textbox.
+fn (this: ^TextBox) setBuf*(s: str) {
+//~~
+	this.buffer = utf8.decode(s)
+	this.cursor = len(this.buffer)
 }
 
 //~~fn Gui.textBox
 // Adds a single line textbox to the gui.
 // TODO:
-// * unicode is not supported.
+// * right-to-left unicode is not supported.
 // * no selection
 // * multiline
 // * copy paste
@@ -636,7 +699,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			gui.selection == gui.idx {
 				gui.selection = 0
 		}
-		
+
 		if input.isJustPressed(input.key_escape) && gui.selection == gui.idx {
 			gui.selection = 0
 		}
@@ -659,8 +722,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			input.isPressedRepeat(input.key_backspace) {
 
 			if tb.cursor > 0 {
-				tb.buffer = slice(tb.buffer, 0, tb.cursor - 1) +
-					slice(tb.buffer, tb.cursor)
+				tb.buffer = append(slice(tb.buffer, 0, tb.cursor - 1), slice(tb.buffer, tb.cursor))
 				tb.cursor--
 			}
 		}
@@ -672,34 +734,28 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			v = false
 		}
 
-		s := input.getStr()
-		for i in s {
-			if int(s[i]) < int(' ') || int(s[i]) == int('z') + 1 {
-				v = false
-			}
-		}
-		if len(s) > 0 && v {
-			tb.buffer = slice(tb.buffer, 0, tb.cursor) + s +
-				slice(tb.buffer, tb.cursor)
-			tb.cursor += len(s)
+		runes := utf8.decode(input.getStr())
+		if len(runes) > 0 && v {
+			tb.buffer = append(slice(tb.buffer, 0, tb.cursor), append(slice(tb.buffer, tb.cursor), runes))
+			tb.cursor += len(runes)
 		}
 
 		return
 	}
-
 
 	style := gui.getStyle()
 
 	style.negBox.draw(r)
 	canvas.beginScissorRect(r)
 
-	dm := style.ft.measure(tb.buffer).mulf(style.ftScale)
+	buf := utf8.encode(tb.buffer)
+	dm := style.ft.measure(buf).mulf(style.ftScale)
 
 	p := th.Vf2{}
 	p.y = r.y + r.h/2 - dm.y/2
 	c := th.Vf2{r.x, p.y}
 
-	cdmx := style.ft.measure(slice(tb.buffer, 0, tb.cursor)).x * style.ftScale
+	cdmx := style.ft.measure(utf8.encode(slice(tb.buffer, 0, tb.cursor))).x * style.ftScale
 	if cdmx < r.w - 2 {
 		p.x = r.x + 1
 		c.x = p.x + cdmx
@@ -707,10 +763,10 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 		c.x = r.x + r.w - 1
 		p.x = c.x - cdmx
 	}
-	
+
 	aW := style.ft.measure("A").x * style.ftScale
 
-	style.ft.draw(tb.buffer, p, style.ftColor, style.ftScale)
+	style.ft.draw(buf, p, style.ftColor, style.ftScale)
 	if gui.selection == gui.idx {
 		canvas.drawRect(style.ftColor, rect.mk(c.x, c.y, aW / 4, dm.y))
 	}
@@ -793,7 +849,10 @@ fn getDefaultStyle*(): Style {
 			color: 0x888888ff } }
 }
 
+//~~fn mk
+// Creates a GUI instance.
 fn mk*(r: rect.Rect, s: Style): Gui {
+//~~
 	gui := Gui{}
 	gui.pushStyle(s)
 	gui.container = []Container{ Stack{ dm: r } }

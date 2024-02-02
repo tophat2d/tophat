@@ -12,7 +12,7 @@
 	url = https://git.sr.ht/~mrms/umprof
 [submodule "lib/sokol"]
 	path = lib/sokol
-	url = https://git.sr.ht/~mrms/sokol
+	url = https://github.com/floooh/sokol
 [submodule "cmd/mmdoc"]
 	path = cmd/mmdoc
 	url = https://git.sr.ht/~mrms/mmdoc

@@ -5,10 +5,8 @@ packages:
 - libxi-dev
 - libxcursor-dev
 - mingw-w64
-- python3
-- python3-pip
-sources:
-- https://git.sr.ht/~mrms/pak
+- unzip
+- curl
 environment:
   project: tophat
 secrets:
@@ -16,24 +14,21 @@ secrets:
 - c1afcf5f-16b5-4584-9942-2cccfbfec899
 shell: false
 tasks:
-- pak_setup: |
-    cd pak
-    python3 -m pip install -r requirements.txt
-    ./setup.py install --user
+- umbox_setup: |
+    curl -L https://umbox.tophat2d.dev/dl/setup.sh | sh
 - build: |
     cd ~/tophat
     make
     make cross
-    python3 -m pak build
+    ~/.local/bin/umbox build
 - deploy: |
     cd ~/tophat
     rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat marek@tophat2d.dev:www/tophat-web/dl/tophat-linux
     rsync --rsh="ssh -o StrictHostKeyChecking=no" tophat.exe marek@tophat2d.dev:www/tophat-web/dl/tophat-windows.exe
-- pak_deploy: |
-    cd $project
+- umbox: |
+    cd ~/tophat
     set +x
-    python3 -m pak upload -t `cat ../.secret` pak.tar
-    python3 -m pak upload -t `cat ../.secret` pak.json
+    ~/.local/bin/umbox upload `cat ../.secret` box.json
     set -x
 - event: |
     cd ~/tophat

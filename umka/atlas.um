@@ -51,6 +51,25 @@ fn (a: ^Atlas) cropSource*(at: th.Vf2) {
 		th.Vf2{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})
 }
 
+//~~enum PackStrategy
+const (
+	PackSquare* = 0
+	PackRow*
+	PackColumn*
+)
+//~~
+
+fn umth_atlas_pack(a: ^Atlas, images: ^[]image.Image, strategy: int)
+
+//~~fn pack
+// Packs an array of images into an atlas
+fn pack*(images: []image.Image, strategy: int): Atlas {
+//~~
+	var a: Atlas
+	umth_atlas_pack(&a, &images, strategy)
+	return a
+}
+
 //~~fn Atlas.draw
 // Draws the tile at `at`
 fn (a: ^Atlas) draw*(at: th.Vf2, t: th.Transform) {

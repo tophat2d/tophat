@@ -53,6 +53,7 @@ init()
 
 	th_nav_init();
 	th_canvas_init();
+	th_image_init();
 
 	UmkaStackSlot s;
 	if (!umkaCall(
@@ -88,6 +89,8 @@ frame()
 			th_print_umka_error_and_quit();
 		}
 	}
+
+	thg->mouse_delta = (th_vf2){{0}};
 
 	th_input_cycle();
 	th_canvas_flush();

@@ -243,6 +243,8 @@ void
 th_canvas_deinit()
 {
 	th_image_free(&white_img);
+	sg_destroy_pipeline(thg->canvas_pip);
+	sg_destroy_shader(thg->main_shader);
 }
 
 void

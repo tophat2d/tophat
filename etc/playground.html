@@ -159,7 +159,7 @@ fn init*() {
 
   window.onFrame.register({
     canvas.drawText("Hello world", { 1, 1 }, th.green, 1)
-  }, null)
+  })
 }`);
             break;
           case "Hello world (using font.um)":
@@ -179,7 +179,7 @@ fn init*() {
 
   window.onFrame.register({
     ft.draw("Hello world", { 1, 1 }, th.green, 1)
-  }, null)
+  })
 }`);
             break;
           case "Moving rectangle":
@@ -208,7 +208,7 @@ fn init*() {
 
 		// Draw!
 		canvas.drawRect(th.green, rect.mk(pos.x, pos.y, 10, 10))
-	}, null)
+	})
 }`);
             break;
           case "Draw an image":
@@ -227,7 +227,7 @@ fn init*() {
     img.draw(th.mkTransform(
       window.wp.sub(img.getDims().mulf(scale)).divf(2),
       th.vf2f(scale) ))
-  }, null)
+  })
 }`);
             break;
           }
