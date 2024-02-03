@@ -13,6 +13,7 @@ import (
 	"rect.um"
 	"th.um"
 	"utf8.um"
+	"window.um"
 )
 
 //~~struct BoxStyle
@@ -680,8 +681,9 @@ fn (this: ^TextBox) setBuf*(s: str) {
 // * right-to-left unicode is not supported.
 // * no selection
 // * multiline
-// * copy paste
-// * stuff like home and end
+// * copy paste (now implemented but in a limited way due to the lack of selection)
+// * common input shortcuts
+//   - ctrl+delete / ctrl+backspace (delete word)
 fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 //~~
 	gui.idx++
@@ -708,18 +710,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			return
 		}
 
-		if input.isJustPressed(input.key_left) ||
-			input.isPressedRepeat(input.key_left) {
-			if tb.cursor > 0 { tb.cursor-- }
-		}
-
-		if input.isJustPressed(input.key_right) ||
-			input.isPressedRepeat(input.key_right) {
-			if tb.cursor < len(tb.buffer) { tb.cursor++ }
-		}
-
-		if input.isJustPressed(input.key_backspace) ||
-			input.isPressedRepeat(input.key_backspace) {
+		if input.isPressedRepeat(input.key_backspace) {
 
 			if tb.cursor > 0 {
 				tb.buffer = append(slice(tb.buffer, 0, tb.cursor - 1), slice(tb.buffer, tb.cursor))
@@ -727,11 +718,75 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			}
 		}
 
+		if input.isPressedRepeat(input.key_delete) {
+
+			if tb.cursor >= 0 && tb.cursor < len(tb.buffer) {
+				tb.buffer = append(slice(tb.buffer, 0, tb.cursor), slice(tb.buffer, tb.cursor+1))
+			}
+		}
+
+		if input.isPressedRepeat(input.key_home) {
+			tb.cursor = 0
+		}
+
+		if input.isPressedRepeat(input.key_end) {
+			tb.cursor = len(tb.buffer)
+		}
+
 		v := true
+
+		if input.isPressed(input.key_ctrl) && input.isJustPressedc('v') {
+			toInsert := utf8.decode(window.getClipboard())
+
+			tb.buffer = append(append(slice(tb.buffer, 0, tb.cursor), toInsert), slice(tb.buffer, tb.cursor))
+			tb.cursor += len(toInsert)
+			v = false
+		}
+
+		if input.isPressed(input.key_ctrl) && input.isJustPressedc('c') {
+			window.setClipboard(utf8.encode(tb.buffer))
+			v = false
+		}
 
 		if input.isPressed(input.key_ctrl) && input.isJustPressedc('u') {
 			tb.clear()
 			v = false
+		}
+
+		const isRuneSpace = fn (r: utf8.Rune): bool {
+			return r == utf8.Rune(' ') || r == utf8.Rune('\t') || r == utf8.Rune('\n')
+		}
+
+		if input.isPressed(input.key_ctrl) && input.isPressedRepeat(input.key_left) {
+			// skip spaces
+			for tb.cursor > 0 && isRuneSpace(tb.buffer[tb.cursor-1]) {
+				tb.cursor--
+			}
+
+			for tb.cursor > 0 && !isRuneSpace(tb.buffer[tb.cursor-1]) {
+				tb.cursor--
+			}
+			v = false
+		}
+
+		if input.isPressed(input.key_ctrl) && input.isPressedRepeat(input.key_right) {
+			// skip spaces
+			for tb.cursor < len(tb.buffer) && isRuneSpace(tb.buffer[tb.cursor]) {
+				tb.cursor++
+			}
+
+			for tb.cursor < len(tb.buffer) && !isRuneSpace(tb.buffer[tb.cursor]) {
+				tb.cursor++
+			}
+			v = false
+		}
+
+		if input.isPressedRepeat(input.key_left) && v {
+			if tb.cursor > 0 { tb.cursor-- }
+		}
+
+		if input.isPressedRepeat(input.key_right) && v {
+			if tb.cursor < len(tb.buffer) { tb.cursor++ }
 		}
 
 		runes := utf8.decode(input.getStr())
