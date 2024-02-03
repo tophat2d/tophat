@@ -476,6 +476,8 @@ void
 th_deinit();
 void
 th_print_umka_error_and_quit();
+void
+th_regularize_path(const char *path, const char *cur_folder, char *regularized_path, int size);
 
 // navmesh
 void

@@ -97,3 +97,15 @@ th_vector_normalize(float *x, float *y)
 		*y /= fabs(*y);
 	}
 }
+
+// implemented in umka_common.c
+bool moduleRegularizePath(const char *path, const char *curFolder, char *regularizedPath, int size);
+
+void
+th_regularize_path(const char *path, const char *cur_folder, char *regularized_path, int size)
+{
+	if (!moduleRegularizePath(path, cur_folder, regularized_path, size)) {
+		th_error("Could not regularize path %s", path);
+		exit(1);
+	}
+}

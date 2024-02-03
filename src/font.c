@@ -254,6 +254,10 @@ th_font_alloc()
 th_font *
 th_font_load(char *path, double size, uint32_t filter)
 {
+	char regularized_path[4096];
+	th_regularize_path(path, "./", regularized_path, sizeof regularized_path);
+	path = regularized_path;
+
 	void *data = read_font_data(path);
 	if (data == NULL) {
 		th_error("Failed to read font data.");

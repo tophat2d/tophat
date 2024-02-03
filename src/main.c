@@ -186,7 +186,9 @@ th_main(int argc, char *argv[])
 	thg->argc = argc;
 	thg->argv = argv;
 
-	strncpy(thg->respath, "", sizeof thg->respath - 1);
+	const char *respath = "";
+
+	thg->respath[0] = 0;
 	const char *scriptpath = "main.um";
 
 	thg->argOffset = 1;
@@ -255,7 +257,7 @@ th_main(int argc, char *argv[])
 				exit(1);
 			}
 
-			strncpy(thg->respath, argv[thg->argOffset + 1], sizeof(thg->respath) - 1);
+			respath = argv[thg->argOffset + 1];
 			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-help") == 0) {
 			th_info("tophat - a minimalist game engine for making games in umka.\n"
@@ -285,18 +287,35 @@ th_main(int argc, char *argv[])
 		}
 	}
 
+	char regularizedScriptPath[BUFSIZ];
+	th_regularize_path(scriptpath, "./", regularizedScriptPath, sizeof regularizedScriptPath);
+	th_regularize_path(respath, "./", thg->respath, sizeof thg->respath);
+
+	th_info("Running %s", regularizedScriptPath);
+
+	if (thg->respath[strlen(thg->respath)-1] != '/' && thg->respath[0] != 0) {
+		if (strlen(thg->respath) == sizeof(thg->respath) - 1) {
+			th_error("Respath is too long");
+			return 1;
+		}
+
+		strncat(thg->respath, "/", sizeof(thg->respath) - 1);
+	}
+
+	th_info("Respath %s", thg->respath);
+
 	FILE *f;
-	if ((f = fopen(scriptpath, "r"))) {
+	if ((f = fopen(regularizedScriptPath, "r"))) {
 		fclose(f);
 	} else {
 		th_error("Could not find %s. Make sure you are in a proper directory, or specify "
 			 "it using the dir flag.",
-		    scriptpath);
+		    regularizedScriptPath);
 
 		return 1;
 	}
 
-	return th_init(scriptpath, NULL);
+	return th_init(regularizedScriptPath, NULL);
 }
 
 sapp_desc

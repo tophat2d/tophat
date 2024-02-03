@@ -32,6 +32,10 @@ sound_free(UmkaStackSlot *p, UmkaStackSlot *r)
 th_sound *
 th_audio_load(char *path, uint32_t flags)
 {
+	char regularized_path[4096];
+	th_regularize_path(path, "./", regularized_path, sizeof regularized_path);
+	path = regularized_path;
+
 	th_sound *s = umkaAllocData(thg->umka, sizeof(th_sound), sound_free);
 	s->copied = 0;
 

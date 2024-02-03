@@ -171,6 +171,10 @@ gen_tex(th_image *img, uint32_t *data)
 th_image *
 th_load_image(char *path)
 {
+	char regularized_path[4096];
+	th_regularize_path(path, "./", regularized_path, sizeof regularized_path);
+	path = regularized_path;
+
 	int w, h, c;
 
 	unsigned char *data = stbi_load(path, &w, &h, &c, STBI_rgb_alpha);
