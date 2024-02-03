@@ -736,7 +736,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 
 		runes := utf8.decode(input.getStr())
 		if len(runes) > 0 && v {
-			tb.buffer = append(slice(tb.buffer, 0, tb.cursor), append(slice(tb.buffer, tb.cursor), runes))
+			tb.buffer = append(append(slice(tb.buffer, 0, tb.cursor), runes), slice(tb.buffer, tb.cursor))
 			tb.cursor += len(runes)
 		}
 

@@ -15,11 +15,11 @@ fn init*() {
 	window.setup("gui test", 600, 600)
 	window.setViewport(th.Vf2{ 200, 200 })
 
-	ft := font.load("etc/roboto.ttf", 96, font.filterLinear)
+	ft := font.load("etc/roboto.ttf", 32, font.filterLinear)
 
 	gui = ui.mk(rect.mk(0, 0, 200, 200), ui.getDefaultStyle())
 	gui.getStyle().ft = ft
-	gui.getStyle().ftScale = 0.1
+	gui.getStyle().ftScale = 0.3
 
 	win = ui.mk(rect.mk(100, 100, 80, 50), ui.getDefaultStyle())
 	win.getStyle().containerBox.color = 0x88aa88ff
