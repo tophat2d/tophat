@@ -26,4 +26,5 @@ import (
 	"window.um"
 )
 
-fn init*() {}
+fn init*() {
+}

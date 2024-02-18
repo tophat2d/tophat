@@ -67,14 +67,14 @@ fn guiPopRect(gui: ^Gui) {
   }
 
   if len(gui.rectStack) == 0 {
-    error("Gui rectangle stack is empty!\n")
+    exit(1, "Gui rectangle stack is empty!\n")
   }
   gui.rectStack = delete(gui.rectStack, len(gui.rectStack)-1)
 }
 
 fn guiGetLastRect(gui: ^Gui): ^BoundRect {
   if len(gui.rectStack) == 0 {
-    error("Gui rectangle stack is empty!\n")
+    exit(1, "Gui rectangle stack is empty!\n")
   }
   return &gui.rectStack[len(gui.rectStack)-1]
 }

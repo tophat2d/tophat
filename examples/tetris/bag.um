@@ -44,7 +44,7 @@ fn (b: ^Bag) nextPiece*() {
   if b.index == 6 {
     b.pieces = slice(b.pieces, 7)
     if len(b.pieces) != 7 {
-      error(sprintf("ASSERT FAIL. %d", len(b.pieces)))
+      exit(1, sprintf("ASSERT FAIL. %d", len(b.pieces)))
     }
     b.pieces = append(b.pieces, makeBag())
     b.index = 0
@@ -52,6 +52,6 @@ fn (b: ^Bag) nextPiece*() {
     b.index += 1
   }
   if np != b.getCurrentPiece() {
-    error("ASSERT FAIL.")
+    exit(1, "ASSERT FAIL.")
   }
 }

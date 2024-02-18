@@ -20,7 +20,7 @@ fn init*() {
 	window.setViewport(th.Vf2{400, 400})
 	f = font.load("etc/roboto.ttf", 16, 0)
 	if f.validate() == false {
-		error("Invalid font.");
+		exit(1, "Invalid font.");
 	}
 
 	window.onFrame.register(signal.Callback{

@@ -56,8 +56,9 @@ init()
 	th_image_init();
 
 	UmkaStackSlot s;
-	if (!umkaCall(
-		thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
+	int res =
+	    umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+	if (res != 0) {
 		th_print_umka_error_and_quit();
 	}
 }
@@ -85,7 +86,8 @@ frame()
 	if (thg->umth_frame_callback != -1) {
 		s.realVal = sapp_frame_duration();
 
-		if (!umkaCall(thg->umka, thg->umth_frame_callback, 1, &s, &s)) {
+		int res = umkaCall(thg->umka, thg->umth_frame_callback, 1, &s, &s);
+		if (res != 0) {
 			th_print_umka_error_and_quit();
 		}
 	}

@@ -99,7 +99,7 @@ fn umth_tilemap_autotile(tgt: ^th.uu, w, h: th.uu, src, cfg: ^th.uu, tile: th.uu
 fn (t: ^Tilemap) autotile*(src, tileCfg: []th.uu, tile: th.uu) {
 //~~
 	if len(tileCfg) < 16 {
-		error("autotile: tileCfg len isn't 16'")
+		th.__error("autotile: tileCfg len isn't 16'")
 	}
 
 	umth_tilemap_autotile(&t.cells[0], t.w, len(t.cells)/t.w, &src[0], &tileCfg[0], tile)

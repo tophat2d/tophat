@@ -13,7 +13,6 @@ var (
 )
 
 fn init*() {
-	exit()
 	img = image.load("etc/test.png")
 	window.setViewport(th.Vf2{192, 168})
 

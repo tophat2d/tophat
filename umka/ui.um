@@ -397,7 +397,7 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = {
 		b.grow = cfg.dimension
 	case BoxGrowSubdivision:
 		if cfg.subdivisions == 0 {
-			error("Invalid subdivision count")
+			th.__error("Invalid subdivision count")
 		}
 
 		b.grow = dm / cfg.subdivisions

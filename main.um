@@ -76,7 +76,7 @@ fn init*() {
 
 	loadedFont = font.load("etc/roboto.ttf", 16, 2)
 	if !loadedFont.validate() {
-		error("could not load font")
+		exit(1, "could not load font")
 	}
 
 	logo = image.load("etc/logo/logo-normal-white.png")

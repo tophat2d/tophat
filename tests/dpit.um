@@ -16,7 +16,7 @@ fn init*() {
 	window.setViewport(window.getDims())
 	f = font.load("etc/roboto.ttf", 64, 1)
 	if f.validate() == false {
-		error("Invalid font.");
+		exit(1, "Invalid font.");
 	}
 
     dpiEnabled = window.isDpiEnabled()

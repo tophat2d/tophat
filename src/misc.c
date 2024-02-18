@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "tophat.h"
 
@@ -99,7 +100,8 @@ th_vector_normalize(float *x, float *y)
 }
 
 // implemented in umka_common.c
-bool moduleRegularizePath(const char *path, const char *curFolder, char *regularizedPath, int size);
+bool
+moduleRegularizePath(const char *path, const char *curFolder, char *regularizedPath, int size);
 
 void
 th_regularize_path(const char *path, const char *cur_folder, char *regularized_path, int size)

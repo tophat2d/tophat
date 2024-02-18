@@ -265,14 +265,17 @@ fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
 //~~
 	if !i.validate() {
 		th.__error("image is invalid")
+		return
 	}	
 
 	if dm.x * dm.y != len(data) {
-		error(sprintf("setData: incorrect dimensions: %v" + "!= %v", dm.x * dm.y, len(data)))
+		th.__error(sprintf("setData: incorrect dimensions: %v" + "!= %v", dm.x * dm.y, len(data)))
+		return
 	}
 
 	if len(data) == 0 {
-		error("setData: can't set empty image")
+		th.__error("setData: can't set empty image")
+		return
 	}
 
 	umth_image_update_data(i^, &data[0], dm)

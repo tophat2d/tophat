@@ -300,12 +300,12 @@ fn getFuncs*(): ^struct{} {
 }
 
 //~~var enableErrrors
-// If true, errors will result in a call to error(), otherwise printf is used.
+// If true, errors will result in a call to exit(255), otherwise printf is used.
 var enableErrors*: bool = true
 //~~
 fn __error*(msg: str) {
 	if enableErrors {
-		error(msg)
+		exit(255, msg)
 	} else {
 		printf("error: %s\n", msg)
 	}
