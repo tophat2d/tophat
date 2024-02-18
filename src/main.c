@@ -157,9 +157,10 @@ run_playground(const char *src)
 		return 1;
 	}
 
-	if (!umkaCall(
-		thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s)) {
-		th_print_umka_error_and_quit();
+	int code = umkaCall(
+		thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+	if (!umkaAlive()) {
+		th_print_umka_error_and_quit(code);
 	}
 
 	fprintf(stderr, "inited\n");

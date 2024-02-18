@@ -14,33 +14,38 @@
 extern th_global *thg;
 
 void
-th_print_umka_error_and_quit()
+th_print_umka_error_and_quit(int code)
 {
 	UmkaError error;
 	umkaGetError(thg->umka, &error);
-	th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
-	fprintf(stderr, "\tStack trace:\n");
 
-	for (int depth = 0; depth < 10; depth++) {
-		char fnName[UMKA_MSG_LEN + 1];
-		char file[UMKA_MSG_LEN + 1];
-		int line, offset;
+	if (*error.msg) {
+		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
 
-		if (!umkaGetCallStack(
-			thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
-			break;
-			fprintf(stderr, "\t\t...\n");
+		fprintf(stderr, "\tStack trace:\n");
+
+		for (int depth = 0; depth < 10; depth++) {
+			char fnName[UMKA_MSG_LEN + 1];
+			char file[UMKA_MSG_LEN + 1];
+			int line, offset;
+
+			if (!umkaGetCallStack(
+				thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
+				break;
+				fprintf(stderr, "\t\t...\n");
+			}
+#ifndef _WIN32
+			fprintf(stderr, "\033[34m");
+#endif
+			fprintf(stderr, "\t\t%s:%06d: ", file, line);
+#ifndef _WIN32
+			fprintf(stderr, "\033[0m");
+#endif
+			fprintf(stderr, "%s\n", fnName);
 		}
-#ifndef _WIN32
-		fprintf(stderr, "\033[34m");
-#endif
-		fprintf(stderr, "\t\t%s:%06d: ", file, line);
-#ifndef _WIN32
-		fprintf(stderr, "\033[0m");
-#endif
-		fprintf(stderr, "%s\n", fnName);
 	}
-	exit(-1);
+
+	exit(code);
 }
 
 static void
@@ -56,10 +61,11 @@ init()
 	th_image_init();
 
 	UmkaStackSlot s;
-	int res =
+
+	int code =
 	    umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
-	if (res != 0) {
-		th_print_umka_error_and_quit();
+	if (!umkaAlive(thg->umka)) {
+		th_print_umka_error_and_quit(code);
 	}
 }
 
@@ -86,9 +92,9 @@ frame()
 	if (thg->umth_frame_callback != -1) {
 		s.realVal = sapp_frame_duration();
 
-		int res = umkaCall(thg->umka, thg->umth_frame_callback, 1, &s, &s);
-		if (res != 0) {
-			th_print_umka_error_and_quit();
+		int code = umkaCall(thg->umka, thg->umth_frame_callback, 1, &s, &s);
+		if (!umkaAlive(thg->umka)) {
+			th_print_umka_error_and_quit(code);
 		}
 	}
 

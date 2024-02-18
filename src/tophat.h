@@ -475,7 +475,7 @@ th_init(const char *scriptpath, const char *script_path);
 void
 th_deinit();
 void
-th_print_umka_error_and_quit();
+th_print_umka_error_and_quit(int code);
 void
 th_regularize_path(const char *path, const char *cur_folder, char *regularized_path, int size);
 
