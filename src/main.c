@@ -158,7 +158,7 @@ run_playground(const char *src)
 
 	int code =
 	    umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
-	if (!umkaAlive()) {
+	if (!umkaAlive(thg->umka)) {
 		th_print_umka_error_and_quit(code);
 	}
 
