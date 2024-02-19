@@ -10,5 +10,5 @@ fn init*() {
 	for i:=0; i < argc; i++ {
 		printf("%s\n", std.argv(i))
 	}
-	window.quit()
+	exit(0)
 }

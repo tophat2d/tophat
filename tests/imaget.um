@@ -122,6 +122,6 @@ fn init*() {
 
 		img3.draw({ s: th.Vf2{ 4, 4 }, p: p})
 
-		if input.isJustPressedc('Q') { window.quit() }
+		if input.isJustPressedc('Q') { exit(0) }
 	})
 }

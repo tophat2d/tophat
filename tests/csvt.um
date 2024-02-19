@@ -9,5 +9,5 @@ fn init*() {
 	t := csv.parse(s)
 	printf("%v\n", t)
 	printf("%s\n", csv.encode(t))
-	window.quit()
+	exit(0)
 }

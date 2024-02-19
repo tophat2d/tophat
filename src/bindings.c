@@ -817,12 +817,6 @@ umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_window_setup(title, w, h);
 }
 
-void
-umth_window_quit(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	thg->need_quit = 1;
-}
-
 // draws text
 void
 umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1261,7 +1255,6 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_window_set_cursor", &umth_window_set_cursor);
 	umkaAddFunc(umka, "umth_window_set_target_fps", &umth_window_set_target_fps);
 	umkaAddFunc(umka, "umth_window_get_platform_id", &umth_window_get_platform_id);
-	umkaAddFunc(umka, "umth_window_quit", &umth_window_quit);
 
 	// canvas
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);

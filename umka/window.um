@@ -213,7 +213,7 @@ fn setIcon*(img: image.Image) {
 //~~
 	if !img.validate() {
 		th.__error("invalid image")
-	}	
+	}
 
 	umth_window_set_icon(img)
 }
@@ -242,15 +242,6 @@ fn umth_window_set_cursor(cursor: int)
 fn setCursor*(cursor: int) {
 //~~
 	umth_window_set_cursor(cursor);
-}
-
-
-fn umth_window_quit()
-//~~fn quit
-// Exits the application. Use this instead of umka's default `exit`.
-fn quit*() {
-//~~
-	umth_window_quit()
 }
 
 fn umth_window_set_clipboard(s: str)
