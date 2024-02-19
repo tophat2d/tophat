@@ -80,13 +80,12 @@ th_init(const char *scriptpath, const char *script_src)
 
 		char *buf = umkaAsm(thg->umka);
 
-		FILE *f = fopen(path, "w");
+		FILE *f = fopen(path, "wb");
 		fprintf(f, "%s\n", buf);
 		fclose(f);
 
 		free(path);
 		free(buf);
-		return 0;
 	}
 
 	// Just check umka file
@@ -157,8 +156,8 @@ run_playground(const char *src)
 		return 1;
 	}
 
-	int code = umkaCall(
-		thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+	int code =
+	    umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
 	if (!umkaAlive()) {
 		th_print_umka_error_and_quit(code);
 	}
@@ -292,7 +291,7 @@ th_main(int argc, char *argv[])
 	th_regularize_path(scriptpath, "./", regularizedScriptPath, sizeof regularizedScriptPath);
 	th_regularize_path(respath, "./", thg->respath, sizeof thg->respath);
 
-	if (thg->respath[strlen(thg->respath)-1] != '/' && thg->respath[0] != 0) {
+	if (thg->respath[strlen(thg->respath) - 1] != '/' && thg->respath[0] != 0) {
 		if (strlen(thg->respath) == sizeof(thg->respath) - 1) {
 			th_error("Respath is too long");
 			return 1;
