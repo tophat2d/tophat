@@ -45,6 +45,7 @@ th_print_umka_error_and_quit(int code)
 		}
 	}
 
+	th_deinit();
 	exit(code);
 }
 
@@ -73,11 +74,6 @@ static void
 frame()
 {
 	thg->dpi_scale_factor = sapp_dpi_scale();
-
-	if (thg->need_quit) {
-		sapp_quit();
-		return;
-	}
 
 	thg->pass_action = (sg_pass_action){
 	    .colors[0] = {.load_action = SG_LOADACTION_LOAD, .store_action = SG_STOREACTION_STORE}};

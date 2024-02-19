@@ -228,7 +228,6 @@ typedef struct
 	th_vf2 viewport;
 	th_vf2 wp_offset;
 	th_vf2 target_size;
-	bool need_quit;
 	void *umka;
 
 	uu pressed[512];
