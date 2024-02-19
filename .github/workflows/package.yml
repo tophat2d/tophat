@@ -31,6 +31,8 @@ jobs:
       run: make
     - name: Build windows
       run: make cross
+    - name: Test
+      run: sh cmd/checkall.sh
     - name: Deploy
       run: |
         rsync tophat marek@tophat2d.dev:www/tophat-web/dl/tophat-linux
