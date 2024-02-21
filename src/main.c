@@ -263,17 +263,19 @@ th_main(int argc, char *argv[])
 			th_info("tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um\n"
 				"Available modes:\n"
+				"  -asm - print assembly\n"
 				"  -check - only check the program for errors\n"
 				"  -dir - specify the resource directory (. by default)\n"
+				"  -doc - print API docs for an umka module\n"
+				"  -dpiaware - enable DPI awareness\n"
 				"  -help - show this help\n"
 				"  -license - print the license\n"
 				"  -main - specify the main file (dir/main.um by default)\n"
 				"  -modsrc <module name> - print source of a builtin module\n"
 				"  -prof - use the profiler\n"
-				"  -profjson - output profiler stuff as json\n"
+				"  -profjson - output profiler stuff as Google JSON profile\n"
 				"  -silent - omit warnings\n"
 				"  -version - print the version\n"
-				"  -doc - print API docs for an umka module\n"
 				"Visit tophat2d.dev for more info.\n");
 			exit(0);
 		} else if (strcmp(argv[thg->argOffset], "-prof") == 0) {
