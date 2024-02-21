@@ -314,10 +314,71 @@ th_main(int argc, char *argv[])
 	return th_init(regularizedScriptPath, NULL);
 }
 
-sapp_desc
-sokol_main(int argc, char *argv[])
+static sapp_desc desc;
+
+#ifdef _WIN32
+static void
+get_argv_argc(int *argc, char ***argv)
 {
-	if (th_main(argc, argv))
-		exit(1);
-	return th_window_sapp_desc();
+	LPWSTR *szArglist;
+	int nArgs;
+
+	szArglist = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+	if (NULL == szArglist) {
+		*argc = 0;
+		*argv = NULL;
+		return;
+	}
+
+	*argc = nArgs;
+	*argv = malloc(sizeof(char *) * nArgs);
+
+	for (int i = 0; i < nArgs; i++) {
+		int sz = WideCharToMultiByte(CP_UTF8, 0, szArglist[i], -1, NULL, 0, NULL, NULL);
+		(*argv)[i] = malloc(sz);
+		WideCharToMultiByte(CP_UTF8, 0, szArglist[i], -1, (*argv)[i], sz, NULL, NULL);
+	}
+
+	LocalFree(szArglist);
 }
+
+static void
+free_argv(int argc, char **argv)
+{
+	for (int i = 0; i < argc; i++) {
+		free(argv[i]);
+	}
+
+	free(argv);
+}
+
+int APIENTRY
+WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
+{
+	int argc;
+	char **argv;
+	get_argv_argc(&argc, &argv);
+
+	int code = th_main(argc, argv);
+	if (code != 0)
+		return code;
+
+	desc = th_window_sapp_desc();
+
+	sapp_run(&desc);
+
+	free_argv(argc, argv);
+}
+#else
+int
+main(int argc, char *argv[])
+{
+	int code = th_main(argc, argv);
+	if (code != 0)
+		return code;
+
+	desc = th_window_sapp_desc();
+
+	sapp_run(&desc);
+}
+#endif

@@ -1,4 +1,4 @@
-
+#define SOKOL_NO_ENTRY
 #define SOKOL_IMPL
 #if defined(_MSC_VER)
 #define SOKOL_GLCORE33
