@@ -282,6 +282,7 @@ fn umth_window_get_viewport_shift(s: ^th.Vf2)
 //~~fn getViewportOffset
 // Gets the offset of the viewport (as set by `setViewportShift`)
 fn getViewportOffset*(): th.Vf2 {
+//~~
 	o := th.Vf2{}
 
 	umth_window_get_viewport_shift(&o)
