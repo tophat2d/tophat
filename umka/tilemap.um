@@ -5,7 +5,6 @@
 
 import (
 	"th.um"
-	"rect.um"
 	"ent.um"
 	"atlas.um"
 )
@@ -36,7 +35,7 @@ fn mk*(cells: []th.uu, w: th.uu, at: atlas.Atlas, scale: th.fu = 1): Tilemap {
 //~~
 	if !at.i.validate() {
 		th.__error("invalid atlas")
-	}	
+	}
 
 	t := Tilemap{}
 	t.cells = cells

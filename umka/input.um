@@ -5,7 +5,6 @@
 //~~
 
 import (
-	"rect.um"
 	"th.um"
 	"window.um"
 )
