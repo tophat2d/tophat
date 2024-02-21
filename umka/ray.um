@@ -2,7 +2,6 @@
 import (
 	"th.um"
 	"ent.um"
-	"rect.um"
 	"canvas.um"
 	"tilemap.um"
 )

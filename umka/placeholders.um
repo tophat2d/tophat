@@ -1,4 +1,4 @@
-import("image.um"; "th.um")
+import("image.um")
 
 //~~Placeholder images
 // These images are included with tophat and don't have to be loaded.
@@ -7,7 +7,7 @@ var (
 	test*: image.Image
 	// the image used for the app icon
 	icon*: image.Image
-	// Windows 95 style button, to be used with ninepatch (image.um) 
+	// Windows 95 style button, to be used with ninepatch (image.um)
 	button*: image.Image
 )
 //~~
