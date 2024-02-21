@@ -229,6 +229,12 @@ th_window_set_cursor(int cursor)
 	sapp_set_mouse_cursor(cursor);
 }
 
+void
+th_window_request_exit()
+{
+	sapp_request_quit();
+}
+
 // ---- PLATFORM DEPENDENT CODE
 
 #ifdef _WIN32

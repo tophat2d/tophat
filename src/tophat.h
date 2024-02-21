@@ -560,6 +560,8 @@ void
 th_window_freeze_cursor(bool freeze);
 void
 th_window_set_cursor(int cursor);
+void
+th_window_request_exit();
 bool
 th_window_is_fullscreen();
 void

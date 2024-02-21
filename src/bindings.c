@@ -912,6 +912,12 @@ umth_window_set_cursor(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_window_set_cursor(cursor);
 }
 
+void
+umth_window_request_exit(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_window_request_exit();
+}
+
 extern int *th_sapp_swap_interval;
 void
 umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1253,6 +1259,7 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_window_show_cursor", &umth_window_show_cursor);
 	umkaAddFunc(umka, "umth_window_freeze_cursor", &umth_window_freeze_cursor);
 	umkaAddFunc(umka, "umth_window_set_cursor", &umth_window_set_cursor);
+	umkaAddFunc(umka, "umth_window_request_exit", &umth_window_request_exit);
 	umkaAddFunc(umka, "umth_window_set_target_fps", &umth_window_set_target_fps);
 	umkaAddFunc(umka, "umth_window_get_platform_id", &umth_window_get_platform_id);
 

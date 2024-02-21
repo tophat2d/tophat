@@ -13,7 +13,7 @@ cursorShow := true
 cursorFreeze := false
 
 fn init*() {
-	window.setup("input test", 400, 400)
+	window.setup("window test", 400, 400)
 	window.setViewport(th.Vf2{100, 100})
 
 	window.setDims(th.Vf2{500, 400})
@@ -23,6 +23,10 @@ fn init*() {
 		canvas.drawLine(th.black, th.Vf2{0, 0}, th.Vf2{100, 100}, 1)
 		canvas.drawLine(th.red, input.getMousePos(),
 			input.getMousePos().sub(input.getMouseDelta()), 1)
+
+		if input.isJustPressedc('X') {
+			window.requestExit();
+		}
 
 		if input.isJustPressedc('C') {
 			cursorShow = !cursorShow

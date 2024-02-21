@@ -244,6 +244,14 @@ fn setCursor*(cursor: int) {
 	umth_window_set_cursor(cursor);
 }
 
+fn umth_window_request_exit()
+//~~fn requestExit
+// Requests the window to close.
+fn requestExit*() {
+//~~
+	umth_window_request_exit()
+}
+
 fn umth_window_set_clipboard(s: str)
 //~~fn setClipboard
 // Puts a string to the system clipboard.
