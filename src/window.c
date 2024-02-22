@@ -143,7 +143,8 @@ cleanup()
 sapp_desc
 th_window_sapp_desc()
 {
-	return (sapp_desc){.init_cb = init,
+	return (sapp_desc){
+	    .init_cb = init,
 	    .frame_cb = frame,
 	    .cleanup_cb = cleanup,
 	    .event_cb = event,
@@ -154,7 +155,15 @@ th_window_sapp_desc()
 	    .clipboard_size = 8192,
 	    .icon.sokol_default = true,
 	    .logger.func = slog_func,
-	    .high_dpi = thg->dpi_aware};
+	    .high_dpi = thg->dpi_aware,
+#ifdef __EMSCRIPTEN__
+	    .html5_bubble_mouse_events = true,
+	    .html5_bubble_touch_events = true,
+	    .html5_bubble_wheel_events = true,
+	    .html5_bubble_key_events = true,
+	    .html5_bubble_char_events = true,
+#endif
+	};
 }
 
 fu
