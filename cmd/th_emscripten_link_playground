@@ -1,26 +1,15 @@
 #!/bin/sh
 
-_=${TH_DIR:=../th_wasm_data}
+TH_DIR=.
 
 echo Data directory: $TH_DIR
-
-mkdir -p $TH_DIR
-if [ ! -f $TH_DIR/th_emscripten.a ]; then
-	echo "Tophat emscripten build was not found. Downloading it from https://th.mrms.cz/dl/th_emscripten.a"
-	curl https://tophat2d.dev/dl/th_emscripten.a -o $TH_DIR/th_emscripten.a
-fi
-
-if [ ! -f $TH_DIR/etc/shell.html ]; then
-	mkdir -p $TH_DIR/etc/
-	echo "shell.html was not found. Downloading it from https://th.mrms.cz/dl/shell.html"
-	curl https://tophat2d.dev/dl/shell.html -o $TH_DIR/etc/shell.html
-fi
 
 mkdir -p ../th_wasm_data/wasm-out
 
 FILES=""
+FILES_SRC="main.um etc/roboto.ttf etc/test.png etc/logo/*.png"
 
-for f in $@; do
+for f in $FILES_SRC; do
 	FILES="$FILES --preload-file $f"
 done
 
@@ -28,7 +17,7 @@ echo Linking...
 emcc -O3 --sASYNCIFY -Wall -fno-strict-aliasing -Wno-format-security\
 	$TH_DIR/th_emscripten.a \
 	-s ALLOW_MEMORY_GROWTH=1 \
-	-s ASYNCIFY_STACK_SIZE=2000000 \
+	-s STACK_SIZE=2MB \
 	-lc \
 	-lm \
 	-sMIN_WEBGL_VERSION=2 \

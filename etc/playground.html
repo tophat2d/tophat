@@ -113,7 +113,7 @@
           return canvas;
         })(),
         setStatus: function(text) {
-            console.log("status: " + text);
+            Module.print("status: " + text);
         },
         totalDependencies: 0,
         monitorRunDependencies: function(left) {
@@ -233,11 +233,6 @@ fn init*() {
       examplesCombo.onchange = (ev) => {
         chooseExample();
       }
-
-      window.onload = (ev) => {
-        chooseExample();
-        clearButton.click();
-      };
     </script>
     {{{ SCRIPT }}}
   </body>
