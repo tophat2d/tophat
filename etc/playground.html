@@ -25,7 +25,7 @@
           image-rendering: pixelated;
           -ms-interpolation-mode: nearest-neighbor;
         }
-        
+
         .grid {
           display: grid;
           height: 90vh;
@@ -33,28 +33,28 @@
           grid-template-areas: "i g" "i g" "o g";
           grid-gap: 10px;
         }
-        
+
         textarea {
           width: 100%;
           height: 100%;
           resize: none;
           z-index: 1;
         }
-        
+
         .editor {
           font-family: monospace;
           padding: 5px;
           z-index: 1;
         }
-        
+
         #inputArea {
           grid-area: i;
         }
-        
+
         #outputArea {
           grid-area: o;
         }
-        
+
         .game {
           grid-area: g;
         }
@@ -86,7 +86,7 @@
       <a href="https://docs.tophat2d.dev/api/placeholders.um.html">placeholders.um</a>, or use
       one of these files:
     </p>
-    
+
     <ul>
       <li><code>etc/roboto.ttf</code> - the roboto font</li>
       <li><code>etc/logo/*.png</code> - all the versions of the tophat logos</li>
@@ -97,15 +97,10 @@
       var examplesCombo = document.getElementById('examples');
       var outputArea = document.getElementById('outputArea');
       var canvas = document.getElementById('canvas');
-      
+
       var Module = {
         postRun: [],
         print: (function() {
-          return function(text) {
-            outputArea.value += text + '\n';
-          };
-        })(),
-        printErr: (function() {
           return function(text) {
             outputArea.value += text + '\n';
           };
@@ -117,29 +112,29 @@
 
           return canvas;
         })(),
+        setStatus: function(text) {
+            console.log("status: " + text);
+        },
+        totalDependencies: 0,
+        monitorRunDependencies: function(left) {
+            this.totalDependencies = Math.max(this.totalDependencies, left);
+          Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+        }
       };
 
-      /*window.addEventListener("resize", (e) => {
-        var canvas = document.getElementById('canvas')
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      })
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;*/
-      
       window.onerror = function() {
         Module.setStatus('Exception thrown, see JavaScript console');
         Module.setStatus = function(text) {
           if (text) console.error('[post-exception status] ' + text);
         };
       };
-      
+
       runButton.onclick = (ev) => {
         clearButton.click();
-        run_playground = Module.cwrap('run_playground', 'undefined', ['string']);
+        run_playground = Module.cwrap('run_playground', 'int', ['string']);
         run_playground(window.jar.toString());
       };
-      
+
       clearButton.onclick = (ev) => {
         outputArea.value = "";
       }
@@ -169,12 +164,12 @@ fn init*() {
   "th.um"
   "window.um"
 )
-      
+
 var ft: font.Font
 
 fn init*() {
   window.setup("Hello world", 200, 200)
-  
+
   ft = font.load("etc/roboto.ttf", 32)
 
   window.onFrame.register({
@@ -217,12 +212,12 @@ fn init*() {
 
 var img: image.Image
 
-const scale = 4              
+const scale = 4
 
 fn init*() {
   window.setup("image drawing", 400, 400)
   img = image.load("etc/logo/logo-hatonly.png")
-	
+
   window.onFrame.register(signal.Callback{
     img.draw(th.mkTransform(
       window.wp.sub(img.getDims().mulf(scale)).divf(2),
@@ -231,14 +226,14 @@ fn init*() {
 }`);
             break;
           }
-      
+
           runButton.click();
       };
-      
+
       examplesCombo.onchange = (ev) => {
         chooseExample();
       }
-      
+
       window.onload = (ev) => {
         chooseExample();
         clearButton.click();

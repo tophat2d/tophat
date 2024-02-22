@@ -39,3 +39,25 @@ jobs:
         rsync tophat.exe marek@tophat2d.dev:www/tophat-web/dl/tophat-windows.exe
     - name: On push script
       run: ssh marek@tophat2d.dev /home/marek/on-tophat-push
+
+  emscripten_build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    - uses: mymindstorm/setup-emsdk@v14
+    - name: Install packages
+      run: sudo apt install -y openssh-client mesa-common-dev xorg-dev libxi-dev libxcursor-dev mingw-w64
+    - name: Update submodules
+      run: |
+        git submodule init
+        git submodule update --remote
+    - name: Install SSH key
+      uses: shimataro/ssh-key-action@v2
+      with:
+        key: ${{ secrets.SSH_KEY }}
+        known_hosts: ${{ secrets.KNOWN_HOSTS }}
+    - name: Build
+      run: sh cmd/emscripten_build.sh
+    - name: Deploy
+      run: |
+        rsync th_emscripten.a marek@tophat2d.dev:www/tophat-web/dl/th_emscripten.a
