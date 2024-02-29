@@ -38,7 +38,11 @@ th_get_scaling(int w, int h, int camw, int camh)
 void
 th_error(char *text, ...)
 {
+#ifdef __EMSCRIPTEN__
+	fprintf(stderr, "error: ");
+#else
 	fprintf(stderr, "\x1b[1m\x1b[31merror: \x1b[0m");
+#endif
 
 	va_list args;
 	va_start(args, text);

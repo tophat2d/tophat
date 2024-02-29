@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no"/>
-    <title>Emscripten-Generated Code</title>
+    <title>Tophat playground</title>
     <link rel="stylesheet" href="https://mrms.cz/dl/up/atom-one-light.css">
     <script src="https://mrms.cz/dl/up/highlight.js"></script>
     <style>
@@ -105,6 +105,11 @@
             outputArea.value += text + '\n';
           };
         })(),
+				printErr: (function() {
+					return function(text) {
+						outputArea.value += text + '\n';
+					}
+				})(),
         canvas: (function() {
           var canvas = document.getElementById('canvas');
 
