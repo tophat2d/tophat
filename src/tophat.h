@@ -86,7 +86,7 @@ typedef struct
 
 typedef struct
 {
-	sg_pass pass;
+	sg_attachments attachments;
 	sg_image depth;
 	th_image *image;
 } th_render_target;
