@@ -85,7 +85,7 @@ fn init*() {
 		placeholders.test.draw(th.Transform{
 			s: th.Vf2{4, 4},
 			p: p,
-			r: 0})
+			r: 0}, 0xFFFFFF99)
 
 		p.y += img.getDims().mulf(4).y
 
@@ -101,10 +101,10 @@ fn init*() {
 		p.y += 12
 
 		target.begin()
-			canvas.drawLine(0xff, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
+			canvas.drawLine(0xFF, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
 			img.draw(th.Transform{
 				s: th.Vf2{0.5, 0.5},
-				p: th.Vf2{0, 0}})
+				p: th.Vf2{0, 0}}, 0xFFFFFF99)
 		target.end(window.wp)
 
 		target.toImage().draw(th.Transform{s: th.Vf2{10, 10}, p: p})

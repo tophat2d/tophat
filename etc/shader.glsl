@@ -16,6 +16,9 @@ void main() {
 @end
 
 @fs th_fs
+uniform th_fs_params {
+	float premultiply;
+};
 uniform texture2D tex;
 uniform sampler smp;
 layout (location = 0) out vec4 frag_color;
@@ -24,6 +27,9 @@ in vec4 color;
 
 void main() {
   frag_color = color * texture(sampler2D(tex, smp), uv);
+  if (premultiply > 0.5) {
+		frag_color.rgb *= frag_color.a;
+	}
 }
 @end
 

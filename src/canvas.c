@@ -223,9 +223,9 @@ th_canvas_init()
 		{
 		    .enabled = true,
 		    .src_factor_alpha = SG_BLENDFACTOR_ONE,
-		    .dst_factor_alpha = SG_BLENDFACTOR_ZERO,
+		    .dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
 		    .op_alpha = SG_BLENDOP_ADD,
-		    .src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+		    .src_factor_rgb = SG_BLENDFACTOR_ONE,
 		    .dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
 		    .op_rgb = SG_BLENDOP_ADD,
 		},
@@ -260,13 +260,18 @@ th_canvas_flush()
 	sg_update_buffer(buf, &SG_RANGE(thg->canvas_batch));
 	thg->canvas_bind.vertex_buffers[0] = buf;
 	finalize_last_phase();
+	th_fs_params_t fs_params = {0};
 	for (size_t i = 0; i < phases_len; i++) {
 		phase *phs = &phases[i];
 		switch (phs->scissor_stage) {
 		case SCISSOR_NONE:
 			thg->canvas_bind.fs.images[SLOT_tex] = phs->img->tex;
 			thg->canvas_bind.fs.samplers[SLOT_smp] = phs->img->smp;
+			// Targets are premultiplied
+			fs_params.premultiply = phs->img->target ? 0 : 1;
 			sg_apply_bindings(&thg->canvas_bind);
+			sg_apply_uniforms(
+			    SG_SHADERSTAGE_FS, SLOT_th_fs_params, &SG_RANGE(fs_params));
 			sg_draw(
 			    phs->start / BATCH_VERTEX, (phs->end - phs->start) / BATCH_VERTEX, 1);
 			break;

@@ -1,4 +1,4 @@
-#include "tophat.h"
+#include "tophat.h" 
 const char *th_em_modulesrc[] = {
 "\n"
 "import (\n"
@@ -3879,7 +3879,7 @@ const char *th_em_misc[] = {
 "OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE\n"
 "OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n"
 "",
-"v1.3\n"
+"v1.3.1\n"
 "",
 };
 const char *th_em_moduledocs[] = {

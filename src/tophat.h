@@ -82,6 +82,7 @@ typedef struct
 	th_quad crop;
 	char flipv;
 	char fliph;
+	bool target;
 } th_image;
 
 typedef struct

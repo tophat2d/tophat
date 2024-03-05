@@ -144,6 +144,8 @@ th_image_create_render_target(int width, int height, int filter)
 	    .depth_stencil_attachment.image = t->depth,
 	    .label = "offscreen-pass"});
 
+	t->image->target = true;
+
 	return t;
 }
 
@@ -360,10 +362,14 @@ th_image_remove_render_target(th_render_target *t, th_vf2 wp)
 void
 th_image_init()
 {
-	thg->offscreen_pass_action =
-	    (sg_pass_action){.colors[0] = {.store_action = SG_STOREACTION_STORE,
-				 .load_action = SG_LOADACTION_CLEAR,
-				 .clear_value = {0, 0, 0, 0}}};
+	thg->offscreen_pass_action = (sg_pass_action){
+	    .colors[0] =
+		{
+		    .store_action = SG_STOREACTION_STORE,
+		    .load_action = SG_LOADACTION_CLEAR,
+		    .clear_value = {0, 0, 0, 0},
+		},
+	};
 	thg->image_pip = sg_make_pipeline(&(sg_pipeline_desc){.shader = thg->main_shader,
 	    .layout = {.attrs =
 			   {
@@ -381,9 +387,9 @@ th_image_init()
 		{
 		    .enabled = true,
 		    .src_factor_alpha = SG_BLENDFACTOR_ONE,
-		    .dst_factor_alpha = SG_BLENDFACTOR_ZERO,
+		    .dst_factor_alpha = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
 		    .op_alpha = SG_BLENDOP_ADD,
-		    .src_factor_rgb = SG_BLENDFACTOR_SRC_ALPHA,
+		    .src_factor_rgb = SG_BLENDFACTOR_ONE,
 		    .dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
 		    .op_rgb = SG_BLENDOP_ADD,
 		},
