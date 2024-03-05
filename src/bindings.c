@@ -533,6 +533,7 @@ umth_input_clear(UmkaStackSlot *p, UmkaStackSlot *r)
 	thg->just_pressed[keycode] = 0;
 	thg->just_released[keycode] = 0;
 	thg->pressed[keycode] = 0;
+	thg->press_repeat[keycode] = 0;
 }
 
 void
