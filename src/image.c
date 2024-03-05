@@ -6,6 +6,7 @@
 #include <stb_image.h>
 
 #include <sokol_gfx.h>
+#include <sokol_glue.h>
 
 #include "tophat.h"
 #include "umka_api.h"
@@ -48,7 +49,6 @@ static void
 th_image_free_render_target(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_render_target *t = p[0].ptrVal;
-	sg_destroy_pass(t->pass);
 	sg_destroy_image(t->depth);
 	th_image_free(t->image);
 }
@@ -140,9 +140,10 @@ th_image_create_render_target(int width, int height, int filter)
 	img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
 	t->depth = sg_make_image(&img_desc);
 
-	t->pass = sg_make_pass(&(sg_pass_desc){.color_attachments[0].image = t->image->tex,
-	    .depth_stencil_attachment.image = t->depth,
-	    .label = "offscreen-pass"});
+	t->attachments = sg_make_attachments(&(sg_attachments_desc){
+	    .colors[0].image = t->image->tex,
+	    .depth_stencil.image = t->depth,
+	});
 
 	t->image->target = true;
 
@@ -324,7 +325,10 @@ th_image_set_as_render_target(th_render_target *t)
 	th_canvas_flush();
 	sg_end_pass();
 
-	sg_begin_pass(t->pass, &thg->offscreen_pass_action);
+	sg_begin_pass(&(sg_pass){
+	    .action = thg->pass_action,
+	    .attachments = t->attachments,
+	});
 	sg_apply_pipeline(thg->image_pip);
 
 	thg->has_render_target = true;
@@ -347,7 +351,10 @@ th_image_remove_render_target(th_render_target *t, th_vf2 wp)
 	th_canvas_flush();
 	sg_end_pass();
 
-	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
+	sg_begin_pass(&(sg_pass){
+	    .action = thg->pass_action,
+	    .swapchain = sglue_swapchain(),
+	});
 	sg_apply_pipeline(thg->canvas_pip);
 
 	th_calculate_scaling(wp.x, wp.y);
@@ -370,7 +377,9 @@ th_image_init()
 		    .clear_value = {0, 0, 0, 0},
 		},
 	};
-	thg->image_pip = sg_make_pipeline(&(sg_pipeline_desc){.shader = thg->main_shader,
+
+	thg->image_pip = sg_make_pipeline(&(sg_pipeline_desc){
+	    .shader = thg->main_shader,
 	    .layout = {.attrs =
 			   {
 			       [0].format = SG_VERTEXFORMAT_FLOAT2, // X, Y
@@ -393,7 +402,8 @@ th_image_init()
 		    .dst_factor_rgb = SG_BLENDFACTOR_ONE_MINUS_SRC_ALPHA,
 		    .op_rgb = SG_BLENDOP_ADD,
 		},
-	    .label = "image-pip"});
+	    .label = "image-pip",
+	});
 
 	return;
 }

@@ -53,7 +53,10 @@ static void
 init()
 {
 	th_audio_init();
-	sg_setup(&(sg_desc){.context = sapp_sgcontext(), .logger.func = slog_func});
+	sg_setup(&(sg_desc){
+	    .environment = sglue_environment(),
+	    .logger.func = slog_func,
+	});
 
 	thg->dpi_scale_factor = sapp_dpi_scale();
 
@@ -76,8 +79,16 @@ frame()
 	thg->dpi_scale_factor = sapp_dpi_scale();
 
 	thg->pass_action = (sg_pass_action){
-	    .colors[0] = {.load_action = SG_LOADACTION_LOAD, .store_action = SG_STOREACTION_STORE}};
-	sg_begin_default_pass(&thg->pass_action, sapp_width(), sapp_height());
+	    .colors[0] =
+		{
+		    .load_action = SG_LOADACTION_LOAD,
+		    .store_action = SG_STOREACTION_STORE,
+		},
+	};
+	sg_begin_pass(&(sg_pass){
+	    .action = thg->pass_action,
+	    .swapchain = sglue_swapchain(),
+	});
 	sg_apply_pipeline(thg->canvas_pip);
 	th_input_sync_fake_keys();
 	int window_width, window_height;
