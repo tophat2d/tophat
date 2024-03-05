@@ -96,6 +96,7 @@ fn init*() {
 		"OPEN THE",
 		"HOMEPAGE" }
 
+
 	window.onFrame.register(onFrame)
 }
 

@@ -326,7 +326,7 @@ th_image_set_as_render_target(th_render_target *t)
 	sg_end_pass();
 
 	sg_begin_pass(&(sg_pass){
-	    .action = thg->pass_action,
+	    .action = thg->offscreen_pass_action,
 	    .attachments = t->attachments,
 	});
 	sg_apply_pipeline(thg->image_pip);
