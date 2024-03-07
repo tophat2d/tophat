@@ -47,11 +47,9 @@ f_pack_atlas_page(th_font *font, uint32_t char_offset, th_font_atlas_page *out_p
 		uint8_t *buffer = malloc(size * size);
 
 		if (f_pack_attempt(font, char_offset, out_page, buffer, size)) {
-			// Sigh.. We're just doing that to later simply throw it away. What a waste
-			// of CPU time >:(
 			uint32_t *rgba = malloc(size * size * sizeof(*rgba));
 			for (int i = 0; i < size * size; ++i) {
-				rgba[i] = 0x00FFFFFF | ((uint32_t)buffer[i] << (uint32_t)24);
+				rgba[i] = 0x00FFFFFFU | ((uint32_t)buffer[i] << (uint32_t)24);
 			}
 
 			th_image_from_data(&out_page->img, rgba, (th_vf2){{size, size}});
@@ -81,7 +79,7 @@ f_get_page(th_font *font, uint32_t page_index)
 	th_font_atlas_page **pages = font->pages;
 
 	if (pages[page_index] == NULL) {
-		pages[page_index] = malloc(sizeof *pages[0]);
+		pages[page_index] = calloc(sizeof *pages[0], 1);
 		if (f_pack_atlas_page(font, page_index * PACK_CHARSPERPAGE, pages[page_index]) ==
 		    false) {
 			th_error("I failed allocating page %d for the font atlas, make sure you "
