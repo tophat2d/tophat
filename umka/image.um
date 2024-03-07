@@ -45,7 +45,9 @@ fn (rt: ^RenderTarget) end*(wp: th.Vf2) {
 
 fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
 //~~fn RenderTarget.toImage
-// Returns the image of the render target.
+// Returns the image of the render target. The resulting image has the same
+// lifetime as the base RenderTarget. If you need to use it past the lifetime
+// of the RenderTarget, use the copy method.
 // Do not call `setfilter` on the resulting image.
 fn (rt: ^RenderTarget) toImage*(): Image {
 //~~

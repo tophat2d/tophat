@@ -61,3 +61,7 @@ jobs:
     - name: Deploy
       run: |
         rsync th_emscripten.a marek@tophat2d.dev:www/tophat-web/dl/th_emscripten.a
+    - name: Build and deploy playground
+      run: |
+        ./cmd/th_emscripten_link_playground
+        rsync -r ../th_wasm_data/wasm-out/* marek@tophat2d.dev:www/tophat-web/playground
