@@ -15,7 +15,7 @@ fn init*() {
 	window.setup("gui test", 600, 600)
 	window.setViewport(th.Vf2{ 200, 200 })
 
-	ft := font.load("etc/roboto.ttf", 32, font.filterLinear)
+	ft := font.load("etc/roboto.ttf", 32, font.Filter.linear)
 
 	gui = ui.mk(rect.mk(0, 0, 200, 200), ui.getDefaultStyle())
 	gui.getStyle().ft = ft
@@ -28,14 +28,14 @@ fn init*() {
 		layout := ui.LayoutFn{
 			gui.box(ui.BoxConfig{
 				dimension: 30,
-				growType: ui.BoxGrowDimension,
-				dir: ui.BoxDirectionUp,
+				growType: ui.BoxGrow.dimension,
+				dir: ui.BoxDir.up,
 				padding: 5 })
 			{
 				gui.box(ui.BoxConfig{
 					span: { 1.5, 1, 1.5 },
-					growType: ui.BoxGrowSpan,
-					dir: ui.BoxDirectionRight })
+					growType: ui.BoxGrow.span,
+					dir: ui.BoxDir.right })
 				{
 					for i := 0; i < 3; i++ {
 						if gui.qbutton(sprintf("Button %d", i+1)) {
@@ -47,8 +47,8 @@ fn init*() {
 
 				gui.box(ui.BoxConfig{
 					subdivisions: 3,
-					growType: ui.BoxGrowSubdivision,
-					dir: ui.BoxDirectionRight })
+					growType: ui.BoxGrow.subdiv,
+					dir: ui.BoxDir.right })
 				{
 					for i := 0; i < 3; i++ {
 						if gui.qbutton(sprintf("Button %d", i+1)) {
@@ -74,8 +74,8 @@ fn init*() {
 			gui.stack({ padding: 3 })
 			gui.box(ui.BoxConfig{
 				subdivisions: 2,
-				growType: ui.BoxGrowSubdivision,
-				dir: ui.BoxDirectionDown })
+				growType: ui.BoxGrow.subdiv,
+				dir: ui.BoxDir.down})
 			{
 				gui.label("I'm a window\n", ui.LabelConfig{
 					centerX: true, centerY: true })

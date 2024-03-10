@@ -325,14 +325,13 @@ const (
 //~~
 
 //~~enum Platform
-type Platform* = int
-const (
-	PlatformUnknown* = 0
-	PlatformLinux*
-	PlatformWindows*
-	PlatformMacOs*
-	PlatformWeb*
-)
+type Platform* = enum {
+	unknown
+	linux
+	windows
+	macOs
+	web
+}
 //~~
 
 //~~Misc variables

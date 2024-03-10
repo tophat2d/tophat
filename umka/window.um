@@ -16,20 +16,20 @@ var (
 )
 
 //~~Cursor types
-const (
-	cursorDefault* = 0		// Default system cursor
-	cursorArrow*			// Normal cursor; Arrow cursor
-	cursorIBeam*			// 'I' text cursor; I-Beam
-	cursorCrosshair*		// '+' cursor; Select region cursor
-	cursorFinger*			// Index finger pointing cursor; Click cursor
-	cursorSizeEW*			// '<->' cursor; Resize width cursor; Resize horizontally cursor; East-West resize cursor
-	cursorSizeNS*			// Resize height cursor; Resize vertically cursor; North-South resize cursor
-	cursorSizeNWSE*			// Resize width and height from the right side cursor; Northwest-Southeast resize cursor
-	cursorSizeSWNE*			// Resize width and height from the left side cursor; Southwest-Northeast resize cursor
-	cursorSizeAll*			// Resize all cursor; Move cursor
-	cursorNo*			// '(/)' cursor; Disabled cursor; Disallowed cursor
-	cursorCount_*
-)
+type Cursor* = enum {
+	system = 0		// Default system cursor
+	arrow			// Normal cursor; Arrow cursor
+	iBeam			// 'I' text cursor; I-Beam
+	crosshair		// '+' cursor; Select region cursor
+	finger			// Index finger pointing cursor; Click cursor
+	sizeEW			// '<->' cursor; Resize width cursor; Resize horizontally cursor; East-West resize cursor
+	sizeNS			// Resize height cursor; Resize vertically cursor; North-South resize cursor
+	sizeNWSE			// Resize width and height from the right side cursor; Northwest-Southeast resize cursor
+	sizeSWNE			// Resize width and height from the left side cursor; Southwest-Northeast resize cursor
+	sizeAll			// Resize all cursor; Move cursor
+	no			// '(/)' cursor; Disabled cursor; Disallowed cursor
+	count_
+}
 //~~
 
 //~~Window dimensions
@@ -100,7 +100,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	w, h = width, height
 	umth_window_setup(title, width, height)
 
-	th.platform = umth_window_get_platform_id()
+	th.platform = th.Platform(umth_window_get_platform_id())
 
 	audio.__setup()
 	placeholders.__setup()
@@ -236,10 +236,10 @@ fn freezeCursor*(freeze: bool) {
 	umth_window_freeze_cursor(freeze)
 }
 
-fn umth_window_set_cursor(cursor: int)
+fn umth_window_set_cursor(cursor: Cursor)
 //~~fn setCursor
 // Allows you to set the displaying cursor. Refer to the cursors section for available cursors.
-fn setCursor*(cursor: int) {
+fn setCursor*(cursor: Cursor) {
 //~~
 	umth_window_set_cursor(cursor);
 }

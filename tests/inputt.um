@@ -24,11 +24,11 @@ fn init*() {
 		}*/
 
 		printf("lshift: %v %v %v\n",
-			input.isPressed(input.key_left_shift),
-			input.isJustPressed(input.key_left_shift),
-			input.isJustReleased(input.key_left_shift))
+			input.isPressed(input.Key.leftShift),
+			input.isJustPressed(input.Key.leftShift),
+			input.isJustReleased(input.Key.leftShift))
 
-		if input.isJustPressed(input.key_backspace) {
+		if input.isJustPressed(input.Key.backspace) {
 			text = ""
 		}
 
@@ -36,7 +36,7 @@ fn init*() {
 			printf("' was just pressed\n")
 		}
 
-		if input.isJustPressed(input.key_escape) {
+		if input.isJustPressed(input.Key.escape) {
 			printf("escape was just pressed\n")
 		}
 

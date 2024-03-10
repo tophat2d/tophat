@@ -21,11 +21,11 @@ fn init*() {
 			canvas.drawText("FULLSCREEN OFF", th.Vf2{0, 33}, th.red, 4)
 		}
 
-		if input.isPressed(input.key_alt) && input.isJustPressed(input.key_enter) {
+		if input.isPressed(input.Key.alt) && input.isJustPressed(input.Key.enter) {
 			window.setFullscreen(true)
 		}
 
-		if input.isJustPressed(input.key_escape) {
+		if input.isJustPressed(input.Key.escape) {
 			window.setFullscreen(false)
 		}
 	})

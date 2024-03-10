@@ -203,21 +203,21 @@ fn (this: ^Gui) hover(r: rect.Rect): bool {
 // Runs the evaluation phase on `layout`.
 fn (this: ^Gui) eval*(layout: LayoutFn) {
 //~~
-	if input.isJustPressed(input.mouse1) { this.m1Pressed = true }
-	if input.isJustReleased(input.mouse1) { this.m1Pressed = false }
-	if input.isJustPressed(input.mouse2) { this.m2Pressed = true }
-	if input.isJustReleased(input.mouse2) { this.m2Pressed = false }
-	if input.isJustPressed(input.mouse3) { this.m3Pressed = true }
-	if input.isJustReleased(input.mouse3) { this.m3Pressed = false }
+	if input.isJustPressed(input.Key.mouse1) { this.m1Pressed = true }
+	if input.isJustReleased(input.Key.mouse1) { this.m1Pressed = false }
+	if input.isJustPressed(input.Key.mouse2) { this.m2Pressed = true }
+	if input.isJustReleased(input.Key.mouse2) { this.m2Pressed = false }
+	if input.isJustPressed(input.Key.mouse3) { this.m3Pressed = true }
+	if input.isJustReleased(input.Key.mouse3) { this.m3Pressed = false }
 
 	this.idx = 0
 	this.isEval = true
 	layout(this)
 
 	if this.hover(this.container[0].getDims()) {
-			input.clear(input.mouse1)
-			input.clear(input.mouse2)
-			input.clear(input.mouse3)
+			input.clear(input.Key.mouse1)
+			input.clear(input.Key.mouse2)
+			input.clear(input.Key.mouse3)
 	}
 }
 
@@ -232,27 +232,22 @@ fn (this: ^Gui) draw*(layout: LayoutFn) {
 
 //~~enum BoxGrow
 // The different types of "growing" the box can do.
-type BoxGrow* = uint
-const (
-	// Increments by an amount set by the user.
-	BoxGrowDimension*   = BoxGrow(0)
-	// Divides the container into `n` equal parts.
-	BoxGrowSubdivision* = BoxGrow(1)
-	// Grows the box based on values in the span array.
-	BoxGrowSpan*        = BoxGrow(2)
-	BoxGrowPxSpan*      = BoxGrow(3)
-)
+type BoxGrow* = enum {
+	dimension
+	subdiv
+	span
+	pxSpan
+}
 //~~
 
 //~~enum BoxDirection
 // Direction in which the box will grow.
-type BoxDirection* = uint
-const (
-	BoxDirectionDown*  = BoxDirection(0)
-	BoxDirectionRight* = BoxDirection(1)
-	BoxDirectionUp*    = BoxDirection(2)
-	BoxDirectionLeft*  = BoxDirection(3)
-)
+type BoxDir* = enum {
+	down
+	right
+	up
+	left
+}
 //~~
 
 //~~struct BoxConfig
@@ -265,7 +260,7 @@ type BoxConfig* = struct {
 	// the grow type
 	growType: BoxGrow
 	// the grow direction
-	dir: BoxDirection
+	dir: BoxDir
 	// Specifies the values used with BoxGrowSpan nad BoxGrowPxSpan.
 	// If BoxGrowSpan is used, 1 equals the size of the box divided by the sum
 	// of all spans.
@@ -295,16 +290,16 @@ type Box* = struct {
 fn (this: ^Box) getGrow(): th.fu {
 	switch this.cfg.growType {
 	// These values are constant and can therefore be only calculated once.
-	case BoxGrowDimension:
+	case BoxGrow.dimension:
 		return this.grow
-	case BoxGrowSubdivision:
+	case BoxGrow.subdiv:
 		return this.grow
-	case BoxGrowSpan:
+	case BoxGrow.span:
 		// We store the amount of pixels per a span in the grow array.
 		sp := this.cfg.span[this.spanCursor]
 		this.spanCursor = (this.spanCursor + 1) % len(this.cfg.span)
 		return sp * this.grow
-	case BoxGrowPxSpan:
+	case BoxGrow.pxSpan:
 		sp := this.cfg.span[this.spanCursor]
 		this.spanCursor = (this.spanCursor + 1) % len(this.cfg.span)
 		return sp
@@ -315,7 +310,7 @@ fn (this: ^Box) getGrow(): th.fu {
 
 fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 	switch this.cfg.dir {
-	case BoxDirectionDown:
+	case BoxDir.down:
 		r.x = this.dm.x
 		r.y = this.dm.y
 
@@ -328,7 +323,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 		}
 
 		this.dm.y += r.h + this.cfg.padding
-	case BoxDirectionRight:
+	case BoxDir.right:
 		r.x = this.dm.x
 		r.y = this.dm.y
 
@@ -341,7 +336,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 		}
 
 		this.dm.x += r.w + this.cfg.padding
-	case BoxDirectionUp:
+	case BoxDir.up:
 		if r.h == 0 {
 			r.h = this.getGrow()
 		}
@@ -353,7 +348,7 @@ fn (this: ^Box) pushRect(r: rect.Rect): rect.Rect {
 		this.dm.h -= r.h + this.cfg.padding
 		r.x = this.dm.x
 		r.y = this.dm.y + this.dm.h
-	case BoxDirectionLeft:
+	case BoxDir.left:
 		if r.h == 0 {
 			r.h = this.dm.h
 		}
@@ -378,8 +373,8 @@ fn (this: ^Box) getDims(): rect.Rect {
 // Adds the `Box` container to the gui.
 fn (gui: ^Gui) box*(cfg: BoxConfig = {
 	dimension: 30,
-	growType: BoxGrowDimension,
-	dir: BoxDirectionDown }) {
+	growType: BoxGrow.dimension,
+	dir: BoxDir.down }) {
 //~~
 
 	b := Box{}
@@ -387,21 +382,21 @@ fn (gui: ^Gui) box*(cfg: BoxConfig = {
 	b.cfg = cfg
 
 	dm := b.dm.h
-	if cfg.dir == BoxDirectionRight || cfg.dir == BoxDirectionLeft {
+	if cfg.dir == BoxDir.right || cfg.dir == BoxDir.left {
 		dm = b.dm.w
 	}
 	dm += b.cfg.padding
 
 	switch cfg.growType {
-	case BoxGrowDimension:
+	case BoxGrow.dimension:
 		b.grow = cfg.dimension
-	case BoxGrowSubdivision:
+	case BoxGrow.subdiv:
 		if cfg.subdivisions == 0 {
 			th.__error("Invalid subdivision count")
 		}
 
 		b.grow = dm / cfg.subdivisions
-	case BoxGrowSpan:
+	case BoxGrow.span:
 		s := th.fu(0)
 		for _,v in b.cfg.span {
 			s += v
@@ -559,7 +554,7 @@ fn (gui: ^Gui) button*(cfg: ButtonConfig = {}): bool {
 	r := gui.getContainer().getDims()
 
 	if gui.isEval {
-		if gui.hover(r) && input.isJustReleased(input.mouse1) {
+		if gui.hover(r) && input.isJustReleased(input.Key.mouse1) {
 			return true
 		}
 		return false
@@ -693,16 +688,16 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 	hover := gui.hover(r)
 
 	if gui.isEval {
-		if input.isJustPressed(input.mouse1) && hover {
+		if input.isJustPressed(input.Key.mouse1) && hover {
 			gui.selection = gui.idx
 		}
 
-		if input.isJustPressed(input.mouse1) && !hover &&
+		if input.isJustPressed(input.Key.mouse1) && !hover &&
 			gui.selection == gui.idx {
 				gui.selection = 0
 		}
 
-		if input.isJustPressed(input.key_escape) && gui.selection == gui.idx {
+		if input.isJustPressed(input.Key.escape) && gui.selection == gui.idx {
 			gui.selection = 0
 		}
 
@@ -710,7 +705,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			return
 		}
 
-		if input.isPressedRepeat(input.key_backspace) {
+		if input.isPressedRepeat(input.Key.backspace) {
 
 			if tb.cursor > 0 {
 				tb.buffer = append(slice(tb.buffer, 0, tb.cursor - 1), slice(tb.buffer, tb.cursor))
@@ -718,24 +713,24 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			}
 		}
 
-		if input.isPressedRepeat(input.key_delete) {
+		if input.isPressedRepeat(input.Key.delete) {
 
 			if tb.cursor >= 0 && tb.cursor < len(tb.buffer) {
 				tb.buffer = append(slice(tb.buffer, 0, tb.cursor), slice(tb.buffer, tb.cursor+1))
 			}
 		}
 
-		if input.isPressedRepeat(input.key_home) {
+		if input.isPressedRepeat(input.Key.home) {
 			tb.cursor = 0
 		}
 
-		if input.isPressedRepeat(input.key_end) {
+		if input.isPressedRepeat(input.Key.end) {
 			tb.cursor = len(tb.buffer)
 		}
 
 		v := true
 
-		if input.isPressed(input.key_ctrl) && input.isJustPressedc('v') {
+		if input.isPressed(input.Key.ctrl) && input.isJustPressedc('v') {
 			toInsert := utf8.decode(window.getClipboard())
 
 			tb.buffer = append(append(slice(tb.buffer, 0, tb.cursor), toInsert), slice(tb.buffer, tb.cursor))
@@ -743,12 +738,12 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			v = false
 		}
 
-		if input.isPressed(input.key_ctrl) && input.isJustPressedc('c') {
+		if input.isPressed(input.Key.ctrl) && input.isJustPressedc('c') {
 			window.setClipboard(utf8.encode(tb.buffer))
 			v = false
 		}
 
-		if input.isPressed(input.key_ctrl) && input.isJustPressedc('u') {
+		if input.isPressed(input.Key.ctrl) && input.isJustPressedc('u') {
 			tb.clear()
 			v = false
 		}
@@ -757,7 +752,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			return r == utf8.Rune(' ') || r == utf8.Rune('\t') || r == utf8.Rune('\n')
 		}
 
-		if input.isPressed(input.key_ctrl) && input.isPressedRepeat(input.key_left) {
+		if input.isPressed(input.Key.ctrl) && input.isPressedRepeat(input.Key.left) {
 			// skip spaces
 			for tb.cursor > 0 && isRuneSpace(tb.buffer[tb.cursor-1]) {
 				tb.cursor--
@@ -769,7 +764,7 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			v = false
 		}
 
-		if input.isPressed(input.key_ctrl) && input.isPressedRepeat(input.key_right) {
+		if input.isPressed(input.Key.ctrl) && input.isPressedRepeat(input.Key.right) {
 			// skip spaces
 			for tb.cursor < len(tb.buffer) && isRuneSpace(tb.buffer[tb.cursor]) {
 				tb.cursor++
@@ -781,11 +776,11 @@ fn (gui: ^Gui) textBox*(tb: ^TextBox, cfg: TextBoxConfig = {}) {
 			v = false
 		}
 
-		if input.isPressedRepeat(input.key_left) && v {
+		if input.isPressedRepeat(input.Key.left) && v {
 			if tb.cursor > 0 { tb.cursor-- }
 		}
 
-		if input.isPressedRepeat(input.key_right) && v {
+		if input.isPressedRepeat(input.Key.right) && v {
 			if tb.cursor < len(tb.buffer) { tb.cursor++ }
 		}
 

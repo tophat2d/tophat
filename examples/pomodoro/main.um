@@ -95,7 +95,7 @@ fn guiGetButtonState(gui: ^Gui): ButtonState {
   lastRect := guiGetLastRect(gui).rect
   state := ButtonState{}
   state.hovered = rectVsPoint(lastRect, th_input.getMousePos())
-  state.pressed = state.hovered && th_input.isJustPressed(th_input.mouse1)
+  state.pressed = state.hovered && th_input.isJustPressed(th_input.Key.mouse1)
   return state
 }
 
@@ -401,7 +401,7 @@ const onFrame = fn(args: []any) {
     v_colorscheme = c_colorschemeLight
   }
 
-  if th_input.isJustPressed(th_input.key_escape) {
+  if th_input.isJustPressed(th_input.Key.escape) {
     debug = !debug
   }
 
@@ -490,8 +490,8 @@ fn init*() {
   v_lastTime = th.time
   th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
 	th_window.setViewport(th.Vf2{screen.w, screen.h})
-  v_mainFont = th_font.load("Font.ttf", 32, 1)
-  v_mainFontSmall = th_font.load("Font.ttf", 20, 1)
+  v_mainFont = th_font.load("Font.ttf", 32)
+  v_mainFontSmall = th_font.load("Font.ttf", 20)
   v_countdown = getCountdown(0)
   v_alarm = th_audio.load("Alarm.wav")
   v_rectBase = th_image.load("rectbase.png")

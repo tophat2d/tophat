@@ -54,7 +54,7 @@ fn handle*() {
 		bees.handle()
 		player.handle()
 	case stateFinished:
-		if input.isJustPressed(input.key_enter) {
+		if input.isJustPressed(input.Key.enter) {
 			state = stateGame
 			reset()
 		}

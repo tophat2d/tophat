@@ -13,20 +13,21 @@ type Sound* = struct { _: ^struct{} }
 
 var pool: []^Sound
 
-type LoadFlag = uint32
-const (
+//~~enum LoadFlag
+type LoadFlag* = enum {
 	// Streams the audio, only saving 2 seconds into memory.
-	LoadFlagStream* = LoadFlag(1)
+	stream = 1
 	// Loads the sound in async. Use `audio.waitForLoad` to wait for the
 	// sounds to load.
-	LoadFlagAsync* = LoadFlag(4)
-)
+	async = 4
+}
+//~~
 
-fn umth_sound_load(path: str, flags: uint32): ^struct{}
+fn umth_sound_load(path: str, flags: LoadFlag): ^struct{}
 //~~fn load
 // Loads a sounds at path, if there is an error, the underlying pointer
 // will be `NULL` and `validate` will return false.
-fn load*(path: str, flags: LoadFlag = 0): Sound {
+fn load*(path: str, flags: LoadFlag = LoadFlag.stream): Sound {
 //~~
 	return Sound{umth_sound_load(path, flags)}
 }

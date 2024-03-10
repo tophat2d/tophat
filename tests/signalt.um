@@ -17,7 +17,7 @@ fn init*() {
 	})
 
 	window.onFrame.register({
-		if input.isPressed(input.key_space) {
+		if input.isPressed(input.Key.space) {
 			signal.emit("spacePress", th.time)
 		}
 	})

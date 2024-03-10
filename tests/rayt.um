@@ -21,16 +21,16 @@ fn init*() {
 	window.setup("raycast test", 400, 400)
 
 	r = ray.mk(th.Vf2{}, 60, 0)
-	e = ent.mk(image.load("etc/test.png"), th.Transform{s: th.Vf2{4, 4}})
+	e = ent.mk(image.load("etc/test.png"), {p: { 100, 100 }, s: { 4, 4 }})
 
 	window.onFrame.register(signal.Callback{
 		r.pos = input.getGlobalMousePos()
 
-		if input.isPressed(input.mouse1) {
+		if input.isPressed(input.Key.mouse1) {
 			r.r -= 0.1 * th.delta
 		}
 
-		if input.isPressed(input.mouse3) {
+		if input.isPressed(input.Key.mouse3) {
 			r.r += 0.1 * th.delta
 		}
 

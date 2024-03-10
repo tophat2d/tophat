@@ -18,7 +18,7 @@ fn drawTextRect(text: str, pos: th.Vf2, scale: real = 1.0) {
 fn init*() {
 	window.setup("my title", 400, 400)
 	window.setViewport(th.Vf2{400, 400})
-	f = font.load("etc/roboto.ttf", 16, 0)
+	f = font.load("etc/roboto.ttf", 16, font.Filter.nearest)
 	if f.validate() == false {
 		exit(1, "Invalid font.");
 	}

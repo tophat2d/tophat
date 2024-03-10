@@ -111,7 +111,7 @@ fn update*() {
 		field.init()
 		field.lost = false
 	}
-	if input.isJustPressed(input.key_shift) {
+	if input.isJustPressed(input.Key.shift) {
 		stashPiece()
 	}
 	if falling_piece.placeTimer > 0.5 || falling_piece.groundTouchTimer > 5 {
