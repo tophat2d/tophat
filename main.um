@@ -23,7 +23,7 @@ fn onFrame(args: []any) {
 
 	p := th.Vf2{ 0, 1 }
 
-	if !input.isPressed(input.key_left_alt) {
+	if !input.isPressed(input.Key.leftAlt) {
 		for i in lines {
 			s := 1
 			if i == 1 {
@@ -56,10 +56,10 @@ fn onFrame(args: []any) {
 	}
 
 
-	if input.isJustPressed(input.key_enter) {
-		if th.platform == th.PlatformWindows {
+	if input.isJustPressed(input.Key.enter) {
+		if th.platform == th.Platform.windows {
 			std.system("explorer \"https://tophat2d.dev/\"")
-		} else if th.platform == th.PlatformLinux {
+		} else if th.platform == th.Platform.linux {
 			std.system("xdg-open https://tophat2d.dev/")
 		}
 	}
@@ -74,7 +74,7 @@ fn init*() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
 
-	loadedFont = font.load("etc/roboto.ttf", 16, 2)
+	loadedFont = font.load("etc/roboto.ttf", 16)
 	if !loadedFont.validate() {
 		exit(1, "could not load font")
 	}

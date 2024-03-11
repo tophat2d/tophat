@@ -52,12 +52,12 @@ fn init*() {
 	p = m.nav(s, e)
 
 	window.onFrame.register(signal.Callback{
-		if input.isJustPressed(input.mouse1) {
+		if input.isJustPressed(input.Key.mouse1) {
 			s = input.getMousePos()
 			p = update(&m, s, e)
 		}
 
-		if input.isJustPressed(input.mouse3) {
+		if input.isJustPressed(input.Key.mouse3) {
 			e = input.getMousePos()
 			p = update(&m, s, e)
 		}

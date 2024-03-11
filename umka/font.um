@@ -7,19 +7,19 @@ import (
 )
 
 //~~Filtering constants
-const (
-	filterNearest* = 0
-	filterLinear* = 1
-)
+type Filter* = enum {
+	nearest = 0
+	linear = 1
+}
 //~~
 
 //~~opaque Font
 type Font* = struct { _: ^struct{} }
 //~~
 
-fn umth_font_load(path: str, size: th.fu, filter: uint32): ^struct{}
+fn umth_font_load(path: str, size: th.fu, filter: Filter): ^struct{}
 //~~fn load
-fn load*(path: str, size: th.fu, filter: uint32 = filterLinear): Font {
+fn load*(path: str, size: th.fu, filter: Filter = Filter.linear): Font {
 //~~
 	return Font{umth_font_load(path, size, filter)}
 }

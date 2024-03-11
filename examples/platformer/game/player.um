@@ -57,11 +57,11 @@ fn move() {
 		canJump = false
 	}
 
-	if input.isPressed(input.key_left) {
+	if input.isPressed(input.Key.left) {
 		mot.x = -1
 	}
 
-	if input.isPressed(input.key_right) {
+	if input.isPressed(input.Key.right) {
 		mot.x = 1
 	}
 
@@ -150,7 +150,7 @@ fn handle*() {
 		die()
 	}
 
-	if input.isJustPressed(input.key_escape) {
+	if input.isJustPressed(input.Key.escape) {
 		body.t.p = env.spawn
 	}
 

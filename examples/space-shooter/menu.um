@@ -48,7 +48,7 @@ fn handle*() {
 		gui.box({
 			dimension: 10,
 			padding: 2,
-			dir: ui.BoxDirectionUp })
+			dir: ui.BoxDir.up })
 
 			if gui.qbutton("EXIT") {
 				global.scene = global.NONE

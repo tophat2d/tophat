@@ -51,13 +51,13 @@ fn getKicks(from, to: int): [4]presets.Kick {
 		if clockwise {
 			return presets.ClockwiseI[from]
 		} else {
-			return presets.CounterclockwiseI[from] 
+			return presets.CounterclockwiseI[from]
 		}
 	}
 	if clockwise {
 		return presets.ClockwiseNI[from]
 	}
-	return presets.CounterclockwiseNI[from] 
+	return presets.CounterclockwiseNI[from]
 }
 
 fn checkTSpinCorners() {
@@ -88,14 +88,14 @@ fn runKickTable(table: [4]presets.Kick): bool {
 		if !invalid() {
 			if kind == presets.pieceTypeT {
 				isTspin = true
-			} 
+			}
 			return true
 		}
 		x = original_x
 		y = original_y
 	}
 	return false
-} 
+}
 
 fn rotate180() {
 	from := rotation
@@ -180,18 +180,18 @@ fn update*(speed: real) {
 		placeTimer = 0
 	}
 
-	
-	if (leftBtnLatch.pass(input.isPressed(input.key_left))) {
+
+	if (leftBtnLatch.pass(input.isPressed(input.Key.left))) {
 		placeTimer = 0
 		movePiece(-1, 0)
 	}
 
-	if (rightBtnLatch.pass(input.isPressed(input.key_right))) {
+	if (rightBtnLatch.pass(input.isPressed(input.Key.right))) {
 		placeTimer = 0
 		movePiece(1, 0)
 	}
 
-	if (input.isPressed(input.key_down)) {
+	if (input.isPressed(input.Key.down)) {
 		placeTimer += th.delta/1000.0
 		prev := y
 		y += 0.01*th.delta*speed;
@@ -200,7 +200,7 @@ fn update*(speed: real) {
 		}
 	}
 
-	if (input.isJustPressedc('X') || input.isJustPressed(input.key_up)) {
+	if (input.isJustPressedc('X') || input.isJustPressed(input.Key.up)) {
 		global.playSound(&global.audioRotate)
 		placeTimer = 0
 		rotateClockwise()
@@ -215,7 +215,7 @@ fn update*(speed: real) {
 	}
 	if (input.isJustPressedc(' ')) {
 		global.playSound(&global.audioPush)
-		push()	
+		push()
 	}
 }
 

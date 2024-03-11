@@ -14,7 +14,7 @@ dpiEnabled := false
 fn init*() {
 	window.setup("DPI Awareness Test", trunc(400*window.getDpiScaleFactor()), trunc(400*window.getDpiScaleFactor()))
 	window.setViewport(window.getDims())
-	f = font.load("etc/roboto.ttf", 64, 1)
+	f = font.load("etc/roboto.ttf", 64)
 	if f.validate() == false {
 		exit(1, "Invalid font.");
 	}
@@ -23,8 +23,8 @@ fn init*() {
 
 	window.onFrame.register(signal.Callback{
         dpiStr := "DPI Awareness Test\n"
-        dpiStr += sprintf("Scale: %g\n", window.getDpiScaleFactor())  
-        dpiStr += sprintf("DPI Enabled: %v\n", dpiEnabled)  
+        dpiStr += sprintf("Scale: %g\n", window.getDpiScaleFactor())
+        dpiStr += sprintf("DPI Enabled: %v\n", dpiEnabled)
 		f.draw(dpiStr, th.Vf2{0, 0}, 0x000000FF, window.getDpiScaleFactor()*0.5)
 	})
 }

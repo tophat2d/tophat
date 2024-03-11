@@ -147,8 +147,8 @@ fn drawCenteredText(t: str, y: th.fu, c: uint32, s: th.fu): th.fu {
 
 fn menu() {
 	// check all the known keys for a press
-	for i:=0; i <= input.key_menu; i++ {
-		if input.isJustPressed(i) {
+	for i:=0; i <= int(input.Key.menu); i++ {
+		if input.isJustPressed(input.Key(i)) {
 			play()
 		}
 	}
@@ -196,7 +196,7 @@ fn game() {
 	}
 
 	// jumping means setting the y motion to the jumpForce
-	if input.isJustPressedc(' ') || input.isJustPressed(input.mouse1) {
+	if input.isJustPressedc(' ') || input.isJustPressed(input.Key.mouse1) {
 		motion.y = jumpForce
 		jumpSound.play()
 	}

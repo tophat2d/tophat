@@ -1,5 +1,8 @@
 name: Tophat workflow
-on: [push]
+on:
+  push:
+    branches:
+      - main
 jobs:
   windows_build:
     runs-on: windows-latest

@@ -10,137 +10,137 @@ import (
 )
 
 //~~Keycode constants
-const (
-	mouse1*              = 1   // NOTE: mouse 2 and 3 key codes are swapped
-	mouse2*              = 3   //       because sokol uses 3 for middle mouse
-	mouse3*              = 2   //       button.
+type Key* = enum {
+	mouse1         = 1   // NOTE: mouse 2 and 3 key codes are swapped
+	mouse2         = 3   //       because sokol uses 3 for middle mouse
+	mouse3         = 2   //       button.
 
-	key_ctrl*            = 16
-	key_shift*           = 17
-	key_alt*             = 18
+	ctrl           = 16
+	shift          = 17
+	alt            = 18
 
-	key_space*           = 32
-	key_apostrophe*      = 39  /* ' */
-	key_comma*           = 44  /* , */
-	key_minus*           = 45  /* - */
-	key_dot*             = 46  /* . */
-	key_slash*           = 47  /* / */
-	key_0*               = 48
-	key_1*               = 49
-	key_2*               = 50
-	key_3*               = 51
-	key_4*               = 52
-	key_5*               = 53
-	key_6*               = 54
-	key_7*               = 55
-	key_8*               = 56
-	key_9*               = 57
-	key_semicolon*       = 59  /* ; */
-	key_equal*           = 61  /* = */
-	key_a*               = 65
-	key_b*               = 66
-	key_c*               = 67
-	key_d*               = 68
-	key_e*               = 69
-	key_f*               = 70
-	key_g*               = 71
-	key_h*               = 72
-	key_i*               = 73
-	key_j*               = 74
-	key_k*               = 75
-	key_l*               = 76
-	key_m*               = 77
-	key_n*               = 78
-	key_o*               = 79
-	key_p*               = 80
-	key_q*               = 81
-	key_r*               = 82
-	key_s*               = 83
-	key_t*               = 84
-	key_u*               = 85
-	key_v*               = 86
-	key_w*               = 87
-	key_x*               = 88
-	key_y*               = 89
-	key_z*               = 90
-	key_left_bracket*    = 91  /* [ */
-	key_backslash*       = 92  /* \ */
-	key_right_bracket*   = 93  /* ] */
-	key_grave_accent*    = 96  /* ` */
-	key_world_1*         = 161 /* non-US #1 */
-	key_world_2*         = 162 /* non-US #2 */
-	key_escape*          = 256
-	key_enter*           = 257
-	key_tab*             = 258
-	key_backspace*       = 259
-	key_insert*          = 260
-	key_delete*          = 261
-	key_right*           = 262
-	key_left*            = 263
-	key_down*            = 264
-	key_up*              = 265
-	key_page_up*         = 266
-	key_page_down*       = 267
-	key_home*            = 268
-	key_end*             = 269
-	key_caps_lock*       = 280
-	key_scroll_lock*     = 281
-	key_num_lock*        = 282
-	key_print_screen*    = 283
-	key_pause*           = 284
-	key_fn*              = 289
-	key_fn1*             = 290
-	key_fn2*             = 291
-	key_fn3*             = 292
-	key_fn4*             = 293
-	key_fn5*             = 294
-	key_fn6*             = 295
-	key_fn7*             = 296
-	key_fn8*             = 297
-	key_fn9*             = 298
-	key_fn10*            = 299
-	key_fn11*            = 300
-	key_fn12*            = 301
-	key_fn13*            = 302
-	key_fn14*            = 303
-	key_fn15*            = 304
-	key_fn16*            = 305
-	key_fn17*            = 306
-	key_fn18*            = 307
-	key_fn19*            = 308
-	key_fn20*            = 309
-	key_fn21*            = 310
-	key_fn22*            = 311
-	key_fn23*            = 312
-	key_fn24*            = 313
-	key_fn25*            = 314
-	key_kp_0*            = 320
-	key_kp_1*            = 321
-	key_kp_2*            = 322
-	key_kp_3*            = 323
-	key_kp_4*            = 324
-	key_kp_5*            = 325
-	key_kp_6*            = 326
-	key_kp_7*            = 327
-	key_kp_8*            = 328
-	key_kp_9*            = 329
-	key_kp_decimal*      = 330
-	key_kp_divide*       = 331
-	key_kp_multiply*     = 332
-	key_kp_subtract*     = 333
-	key_kp_add*          = 334
-	key_kp_enter*        = 335
-	key_kp_equal*        = 336
-	key_left_shift*      = 340
-	key_left_control*    = 341
-	key_left_alt*        = 342
-	key_left_super*      = 343
-	key_right_shift*     = 344
-	key_right_control*   = 345
-	key_right_alt*       = 346
-	key_right_super*     = 347
-	key_menu*            = 348
-)
+	space          = 32
+	apostrophe     = 39  /* ' */
+	comma          = 44  /* , */
+	minus          = 45  /* - */
+	dot            = 46  /* . */
+	slash          = 47  /* / */
+	num0           = 48
+	num1           = 49
+	num2           = 50
+	num3           = 51
+	num4           = 52
+	num5           = 53
+	num6           = 54
+	num7           = 55
+	num8           = 56
+	num9           = 57
+	semicolon      = 59  /* ; */
+	equal          = 61  /* = */
+	a              = 65
+	b              = 66
+	c              = 67
+	d              = 68
+	e              = 69
+	f              = 70
+	g              = 71
+	h              = 72
+	i              = 73
+	j              = 74
+	k              = 75
+	l              = 76
+	m              = 77
+	n              = 78
+	o              = 79
+	p              = 80
+	q              = 81
+	r              = 82
+	s              = 83
+	t              = 84
+	u              = 85
+	v              = 86
+	w              = 87
+	x              = 88
+	y              = 89
+	z              = 90
+	leftBracket    = 91  /* [ */
+	backslash      = 92  /* \ */
+	rightBracket   = 93  /* ] */
+	graveAccent    = 96  /* ` */
+	world1         = 161 /* non-US #1 */
+	world2         = 162 /* non-US #2 */
+	escape         = 256
+	enter          = 257
+	tab            = 258
+	backspace      = 259
+	insert         = 260
+	delete         = 261
+	right          = 262
+	left           = 263
+	down           = 264
+	up             = 265
+	pageUp         = 266
+	pageDown       = 267
+	home           = 268
+	end            = 269
+	capsLock       = 280
+	scrollLock     = 281
+	numLock        = 282
+	printScreen    = 283
+	pause          = 284
+	fn0            = 289
+	fn1            = 290
+	fn2            = 291
+	fn3            = 292
+	fn4            = 293
+	fn5            = 294
+	fn6            = 295
+	fn7            = 296
+	fn8            = 297
+	fn9            = 298
+	fn10           = 299
+	fn11           = 300
+	fn12           = 301
+	fn13           = 302
+	fn14           = 303
+	fn15           = 304
+	fn16           = 305
+	fn17           = 306
+	fn18           = 307
+	fn19           = 308
+	fn20           = 309
+	fn21           = 310
+	fn22           = 311
+	fn23           = 312
+	fn24           = 313
+	fn25           = 314
+	kp0            = 320
+	kp1            = 321
+	kp2            = 322
+	kp3            = 323
+	kp4            = 324
+	kp5            = 325
+	kp6            = 326
+	kp7            = 327
+	kp8            = 328
+	kp9            = 329
+	kpDecimal      = 330
+	kpDivide       = 331
+	kpMultiply     = 332
+	kpSubtract     = 333
+	kpAdd          = 334
+	kpEnter        = 335
+	kpEqual        = 336
+	leftShift      = 340
+	leftControl    = 341
+	leftAlt        = 342
+	leftSuper      = 343
+	rightShift     = 344
+	rightControl   = 345
+	rightAlt       = 346
+	rightSuper     = 347
+	menu           = 348
+}
 //~~
 
 
@@ -168,11 +168,11 @@ fn getGlobalMousePos*(): th.Vf2 {
 	return getMousePos().add(window.getViewportOffset())
 }
 
-fn umth_input_is_pressed(keycode: int32): int32
+fn umth_input_is_pressed(keycode: Key): int32
 //~~fn isPressed
 // Returns true if key is pressed. Either use codes defined in the file above,
 // or pass lower case char/number.
-fn isPressed*(code: int): bool {
+fn isPressed*(code: Key): bool {
 	//~~
 	val := bool(umth_input_is_pressed(code))
 	return val
@@ -182,13 +182,13 @@ fn isPressed*(code: int): bool {
 // Like `isPressed`, but you can pass char as the code.
 fn isPressedc*(code: char): bool {
 	//~~
-	return isPressed(toupper(code))
+	return isPressed(Key(toupper(code)))
 }
 
-fn umth_input_is_just_pressed(key: int32): int32
+fn umth_input_is_just_pressed(key: Key): int32
 //~~fn isJustPressed
 // Returns, whether code was just pressed this loop.
-fn isJustPressed*(code: int): bool {
+fn isJustPressed*(code: Key): bool {
 	//~~
 	return bool(umth_input_is_just_pressed(code))
 }
@@ -197,13 +197,13 @@ fn isJustPressed*(code: int): bool {
 // Like `isJustPressed`, but you can pass char as the code.
 fn isJustPressedc*(code: char): bool {
 	//~~
-	return isJustPressed(toupper(code))
+	return isJustPressed(Key(toupper(code)))
 }
 
-fn umth_input_is_pressed_repeat(key: int32): int32
+fn umth_input_is_pressed_repeat(key: Key): int32
 //~~fn isPressedRepeat
 // Returns, whether code was just pressed this loop, with key repeat.
-fn isPressedRepeat*(code: int): bool {
+fn isPressedRepeat*(code: Key): bool {
 	//~~
 	return bool(umth_input_is_pressed_repeat(code))
 }
@@ -212,14 +212,14 @@ fn isPressedRepeat*(code: int): bool {
 // Like `isPressedRepeat`, but you can pass char as the code.
 fn isPressedRepeatc*(code: char): bool {
 	//~~
-	return isPressedRepeat(toupper(code))
+	return isPressedRepeat(Key(toupper(code)))
 }
 
 
-fn umth_input_is_just_released(key: int32): int32
+fn umth_input_is_just_released(key: Key): int32
 //~~fn isJustReleased
 // Returns true if a key was just released.
-fn isJustReleased*(code: int): bool {
+fn isJustReleased*(code: Key): bool {
 	//~~
 	return bool(umth_input_is_just_released(code))
 }
@@ -227,13 +227,13 @@ fn isJustReleased*(code: int): bool {
 // Like `isJustReleased`, but you can pass char as the code.
 fn isJustReleasedc*(code: char): bool {
 	//~~
-	return isJustReleased(toupper(code))
+	return isJustReleased(Key(toupper(code)))
 }
 
-fn umth_input_clear*(code: int)
+fn umth_input_clear*(code: Key)
 //~~fn clear
 // Clears both the pressed and justPressed state of a code.
-fn clear*(code: int) {
+fn clear*(code: Key) {
 	//~~
 	umth_input_clear(code)
 }
@@ -242,7 +242,7 @@ fn clear*(code: int) {
 // Like `clear`, but you can pass char as the code.
 fn clearc*(code: char) {
 	//~~
-	umth_input_clear(toupper(code))
+	umth_input_clear(Key(toupper(code)))
 }
 
 fn umth_input_get_str(): str
