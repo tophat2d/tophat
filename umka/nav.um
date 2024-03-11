@@ -10,10 +10,10 @@ import (
 // Mesh is a 2d array of bool cells.  If a cell is true, the cell can be used
 // in a path.  The mesh is located in a world using the `r` field.  A cell can
 // have an arbitrary size as specified by `s`.
-// 
+//
 // The mesh can be edited using the `addQuad` method, but it should be trivial
 // to add your own, similar methods.
-// 
+//
 // Please use the `mk` constructor to construct a `Mesh`, unless you really
 // know what you're doing.
 type Mesh* = struct {
@@ -36,7 +36,6 @@ type Mesh* = struct {
 // : the scale of the mask
 fn mk*(r: rect.Rect, s: th.fu): Mesh {
 //~~
-
 	m := Mesh{}
 
 	m.d = make([]bool, ceil(r.w/s) * ceil(r.h/s))
@@ -68,7 +67,7 @@ fn (m: ^Mesh) nav*(p1, p2: th.Vf2): []th.Vf2 {
 //~~
 	var cameFrom: []th.Vf2
 	umth_nav_mesh_nav(&cameFrom, typeptr([]th.Vf2), m, p1, p2)
-	
+
 	path := []th.Vf2{p2}
 	p := p2
 	p.x = trunc((p.x - m.r.x) / m.s)

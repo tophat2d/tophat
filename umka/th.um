@@ -17,6 +17,44 @@ type iu* = int32
 type uu* = uint32
 //~~
 
+//~~enum ErrCode
+type ErrCode* = enum (int32) {
+	ok = 0
+	failure = 1
+	io
+	bad_enum
+	bad_action
+	inval
+	alloc
+	already
+	out_of_bounds
+}
+
+fn (e: ^ErrCode) toStr*(): str {
+	switch e^ {
+	case ErrCode.ok:
+		return "ok"
+	case ErrCode.io:
+		return "input/output error"
+	}
+
+	return "unknown error"
+}
+
+fn __errFromCode*(ec: ErrCode, msg: str = ""): std.Err {
+	if msg != "" {
+		return std.error(int(ec), ec.toStr() + ": " + msg, "tophat")
+	}
+
+	return std.error(int(ec), ec.toStr(), "tophat")
+}
+
+fn (e: ^ErrCode) err*(): std.Err {
+	if e^ == ErrCode(0) { return {} }
+
+	return __errFromCode(e^)
+}
+
 //~~struct Vf2
 // vector 2
 type Vf2* = struct {

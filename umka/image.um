@@ -1,5 +1,6 @@
 import (
 	"rect.um"
+	"std.um"
 	"th.um"
 )
 
@@ -15,32 +16,32 @@ type Image* = struct{ _: ^struct{} }
 type RenderTarget* = struct { _: ^struct{} }
 //~~
 
-fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: int)
+fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: int): th.ErrCode
 //~~fn createRenderTarget
 // Creates a render target you can draw to, like to a window.
 // Filter specifies specfifies filtering for resulting image.
 // Image can be retrieved via `toImage`.
-fn createRenderTarget*(size: th.Vf2, filter: int): RenderTarget {
+fn createRenderTarget*(size: th.Vf2, filter: int): (RenderTarget, std.Err) {
 //~~
 	rt := RenderTarget{}
-	umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y), filter)
-	return rt
+	ec := umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y), filter)
+	return rt, ec.err()
 }
 
-fn umth_image_render_target_begin(rt: RenderTarget)
+fn umth_image_render_target_begin(rt: RenderTarget): th.ErrCode
 //~~fn RenderTarget.end
 // Begins the render target rendering pass.
-fn (rt: ^RenderTarget) begin*() {
+fn (rt: ^RenderTarget) begin*(): std.Err {
 //~~
-	umth_image_render_target_begin(rt^)
+	return umth_image_render_target_begin(rt^).err()
 }
 
-fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2)
+fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2): th.ErrCode
 //~~fn RenderTarget.end
 // Ends the render target rendering pass.
-fn (rt: ^RenderTarget) end*(wp: th.Vf2) {
+fn (rt: ^RenderTarget) end*(wp: th.Vf2): std.Err {
 //~~
-	umth_image_render_target_end(rt^, wp)
+	return umth_image_render_target_end(rt^, wp).err()
 }
 
 fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
@@ -56,14 +57,14 @@ fn (rt: ^RenderTarget) toImage*(): Image {
 	return img
 }
 
-fn umth_image_load(ret: ^Image, path: str)
+fn umth_image_load(ret: ^Image, path: str): th.ErrCode
 //~~fn load
 // Loads an image at path.
-fn load*(path: str): Image {
+fn load*(path: str): (Image, std.Err) {
 //~~
 	img := Image{}
-	umth_image_load(&img, path)
-	return img
+	ec := umth_image_load(&img, path)
+	return img, ec.err()
 }
 
 //~~fn Image.validate
@@ -218,30 +219,30 @@ fn (i: ^Image) getCropQuad*(): th.Quad {
 	return q
 }
 
-fn umth_image_from_data(ret: ^Image, data: ^uint32, dm: th.Vf2)
+fn umth_image_from_data(ret: ^Image, data: ^uint32, dm: th.Vf2): th.ErrCode
 //~~fn mk
 // Creates an image from raw data.
-fn mk*(data: []uint32, dm: th.Vf2): Image {
+fn mk*(data: []uint32, dm: th.Vf2): (Image, std.Err) {
 //~~
 	img := Image{}
-	umth_image_from_data(&img, &data[0], dm)
+	ec := umth_image_from_data(&img, &data[0], dm)
 
-	return img
+	return img, ec.err()
 }
 
 fn umth_image_copy(ret: ^Image, data: Image)
 //~~fn Image.copy
 // Copies image into a new one.
-fn (i: ^Image) copy*(): Image {
+fn (i: ^Image) copy*(): (Image, std.Err) {
 //~~
 	if !i.validate() {
 		th.__error("image is invalid")
 	}
 
 	img := Image{}
-	umth_image_copy(&img, i^)
+	ec := umth_image_copy(&img, i^)
 
-	return img
+	return img, ec.err()
 }
 
 fn umth_image_set_filter(data: Image, filter: int)
@@ -251,20 +252,20 @@ fn umth_image_set_filter(data: Image, filter: int)
 // used in a loop.
 // https://learnopengl.com/img/getting-started/texture_filtering.png
 // left is nearest, right is linear.
-fn (i: ^Image) setfilter*(filter: int) {
+fn (i: ^Image) setfilter*(filter: int): std.Err {
 //~~
 	if !i.validate() {
 		th.__error("image is invalid")
 	}
 
-	umth_image_set_filter(i^, filter)
+	return umth_image_set_filter(i^, filter).err()
 }
 
 fn umth_image_update_data(img: Image, data: ^uint32, dm: th.Vf2)
 //~~fn Image.setData
 // Updates the image data. dm are the dimensions of the new image.
 // The new image doesn't have to be the same size as the old one.
-fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
+fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2): std.Err {
 //~~
 	if !i.validate() {
 		th.__error("image is invalid")
@@ -272,16 +273,10 @@ fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2) {
 	}
 
 	if dm.x * dm.y != len(data) {
-		th.__error(sprintf("setData: incorrect dimensions: %v" + "!= %v", dm.x * dm.y, len(data)))
-		return
+		return th.__errFromCode(.inval, "incorrect dimensions")
 	}
 
-	if len(data) == 0 {
-		th.__error("setData: can't set empty image")
-		return
-	}
-
-	umth_image_update_data(i^, &data[0], dm)
+	return umth_image_update_data(i^, &data[0], dm).err()
 }
 
 fn umth_image_get_data(img: Image, data: ^uint32)

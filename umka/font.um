@@ -4,6 +4,7 @@
 
 import (
 	"th.um"
+	"std.um"
 )
 
 //~~Filtering constants
@@ -17,11 +18,13 @@ type Filter* = enum {
 type Font* = struct { _: ^struct{} }
 //~~
 
-fn umth_font_load(path: str, size: th.fu, filter: Filter): ^struct{}
+fn umth_font_load(f: ^Font, path: str, size: th.fu, filter: Filter): th.ErrCode
 //~~fn load
-fn load*(path: str, size: th.fu, filter: Filter = Filter.linear): Font {
+fn load*(path: str, size: th.fu, filter: Filter = Filter.linear): (Font, std.Err) {
 //~~
-	return Font{umth_font_load(path, size, filter)}
+	var f: Font
+	ec := umth_font_load(&f, path, size, filter)
+	return f, ec.err()
 }
 
 //~~fn Font.validate

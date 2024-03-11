@@ -35,6 +35,25 @@ typedef int32_t iu;
 
 #define LEN(a) (sizeof(a) / sizeof((a)[0]))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define TH_ASSERT(err, e) \
+	do { \
+		if (!(e)) \
+			return err; \
+	} while (0)
+
+typedef enum
+{
+	th_err_ok = 0,
+	th_err_failure = 1,
+	th_err_io,
+	th_err_bad_enum,
+	th_err_bad_action,
+	th_err_inval,
+	th_err_alloc,
+	th_err_already,
+	th_err_out_of_bounds,
+	th_err__pad = 2147483647
+} th_err;
 
 typedef union
 {
@@ -323,7 +342,7 @@ th_ext_set(void **arr)
 #ifndef THEXT
 
 // atlas
-void
+th_err
 th_atlas_pack(th_atlas *a, void *arr, th_atlas_pack_strategy strategy);
 th_vf2
 th_atlas_nth_coords(th_atlas *a, uu n);
@@ -335,10 +354,10 @@ void
 th_audio_init();
 void
 th_audio_deinit();
-th_sound *
-th_audio_load(char *path, uint32_t flags);
-th_sound *
-th_sound_copy(th_sound *s);
+th_err
+th_audio_load(th_sound **out, char *path, uint32_t flags);
+th_err
+th_sound_copy(th_sound **out, th_sound *s);
 
 // bindings
 void
@@ -407,8 +426,8 @@ uint32_t
 th_color_hsv2rgb(float h, float s, float v, float a);
 
 // font
-th_font *
-th_font_load(char *path, double size, uint32_t filter);
+th_err
+th_font_load(th_font **out, char *path, double size, uint32_t filter);
 void
 th_font_draw(th_font *font, const char *s, double x, double y, uint32_t color, double scale);
 th_vf2
@@ -417,11 +436,11 @@ void
 th_font_deinit();
 
 // image
-th_image *
-th_load_image(char *path);
+th_err
+th_load_image(th_image **out, char *path);
 void
 th_image_free(th_image *img);
-void
+th_err
 th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 uint32_t *
 th_image_get_data(th_image *img);
@@ -435,9 +454,9 @@ th_image_render_transformed(th_image *img, th_transform trans, uint32_t color);
 void
 th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
 
-void
+th_err
 th_image_set_filter(th_image *img, sg_filter filter);
-void
+th_err
 th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
 th_image *
 th_image_alloc();
@@ -446,11 +465,11 @@ th_image_init();
 void
 th_image_deinit();
 
-th_render_target *
-th_image_create_render_target(int width, int height, int filter);
-void
+th_err
+th_image_create_render_target(th_render_target **out, int width, int height, int filter);
+th_err
 th_image_set_as_render_target(th_render_target *t);
-void
+th_err
 th_image_remove_render_target(th_render_target *t, th_vf2 wp);
 
 // input
@@ -476,13 +495,13 @@ void
 th_deinit();
 void
 th_print_umka_error_and_quit(int code);
-void
+th_err
 th_regularize_path(const char *path, const char *cur_folder, char *regularized_path, int size);
 
 // navmesh
 void
 th_navmesh_add_quad(th_navmesh *m, th_quad *q);
-void
+th_err
 th_navmesh_nav(th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2);
 void
 th_nav_init(void);
