@@ -1,5 +1,6 @@
 
 import (
+	"std.um"
 	"th.um"
 	"rect.um"
 	"image.um"
@@ -26,13 +27,17 @@ var (
 )
 
 fn init*() {
+	var err: std.Err
+
 	window.setup("image test", 600, 600)
 	window.setViewport(th.Vf2{600, 600})
 
-	img = image.load("etc/test.png")
+	img, err = image.load("etc/test.png")
+	std.exitif(err)
 	printf("etc/test.png: %v\n", img.validate())
 
-	img2 = img.copy()
+	img2, err = img.copy()
+	std.exitif(err)
 	printf("copy: %v\n", img2.validate())
 	data := img.getData()
 	dm := img.getDims()
@@ -45,12 +50,17 @@ fn init*() {
 	//img2 := image.mk(data, dm)
 	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
 
-	img3 = img.copy()
+	img3, err = img.copy()
+	std.exitif(err)
 	img3.crop({ 0.5, 0.5 }, { 1, 1 })
 	img3.flipv(true)
 
-	target = image.createRenderTarget(th.Vf2{10, 10}, 0)
+	target, err = image.createRenderTarget(th.Vf2{10, 10}, 0)
+	std.exitif(err)
+
 	window.onFrame.register({
+		var err: std.Err
+
 		p := th.Vf2{1, 1}
 
 		canvas.drawText("drawOnQuad:", p, th.black, 2)
@@ -99,12 +109,14 @@ fn init*() {
 		canvas.drawText("render target:", p, th.black, 2)
 		p.y += 12
 
-		target.begin()
+		err = target.begin()
+		std.exitif(err)
 			canvas.drawLine(0xFF, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
 			img.draw(th.Transform{
 				s: th.Vf2{0.5, 0.5},
 				p: th.Vf2{0, 0}}, 0xFFFFFF99)
-		target.end(window.wp)
+		err = target.end(window.wp)
+		std.exitif(err)
 
 		target.toImage().draw(th.Transform{s: th.Vf2{10, 10}, p: p})
 		p.y += target.toImage().getDims().y*10

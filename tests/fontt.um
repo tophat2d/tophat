@@ -1,6 +1,7 @@
 import (
 	"font.um"
 	"th.um"
+	"std.um"
 	"canvas.um"
 	"window.um"
 	"rect.um"
@@ -16,12 +17,12 @@ fn drawTextRect(text: str, pos: th.Vf2, scale: real = 1.0) {
 }
 
 fn init*() {
+	var err: std.Err
+
 	window.setup("my title", 400, 400)
 	window.setViewport(th.Vf2{400, 400})
-	f = font.load("etc/roboto.ttf", 16, font.Filter.nearest)
-	if f.validate() == false {
-		exit(1, "Invalid font.");
-	}
+	f, err = font.load("etc/roboto.ttf", 16, font.Filter.nearest)
+	std.exitif(err)
 
 	window.onFrame.register(signal.Callback{
 		drawTextRect("Awesome\nSkip", th.Vf2{0, 0})
