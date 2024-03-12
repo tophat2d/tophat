@@ -1,5 +1,6 @@
 import (
 	"audio.um"
+	"std.um"
 )
 
 var (
@@ -14,18 +15,25 @@ var (
 )
 
 fn initAudio*() {
-	audioBackground = audio.load("IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
+	var err: std.Err
+	audioBackground, err = audio.load("IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
+	std.exitif(err)
 	audioBackground.setLooping(true)
 	audioBackground.setVol(0.05)
 
-	audioRotate = audio.load("Rotation.wav")
-	audioPush = audio.load("Placement.wav")
-	audioClear = audio.load("Clear.wav")
-	audioClearMega = audio.load("ClearMega.wav")
+	audioRotate, err = audio.load("Rotation.wav")
+	std.exitif(err)
+	audioPush, err = audio.load("Placement.wav")
+	std.exitif(err)
+	audioClear, err = audio.load("Clear.wav")
+	std.exitif(err)
+	audioClearMega, err = audio.load("ClearMega.wav")
+	std.exitif(err)
 }
 
 fn playSound*(sound: ^audio.Sound) {
-	sound.start()
+	_, err := sound.start()
+	std.exitif(err)
 }
 
 // stolen :)
