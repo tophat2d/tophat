@@ -29,7 +29,7 @@ fn umth_sound_load(Sound: ^Sound, path: str, flags: LoadFlag): th.ErrCode
 //~~fn load
 // Loads a sounds at path, if there is an error, the underlying pointer
 // will be `NULL` and `validate` will return false.
-fn load*(path: str, flags: LoadFlag = LoadFlag.none): Sound {
+fn load*(path: str, flags: LoadFlag = LoadFlag.none): (Sound, std.Err) {
 //~~
 	var snd: Sound
 	ec := umth_sound_load(&snd, path, flags)
