@@ -1,4 +1,5 @@
 // line to line is stolen from: http://jeffreythompson.org/collision-detection/table_of_contents.php
+#include <float.h>
 #include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
@@ -42,14 +43,37 @@ th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic)
 	return coll;
 }
 
+static fu
+point_distance(th_vf2 a, th_vf2 b)
+{
+	a.x -= b.x;
+	a.y -= b.y;
+	return a.x * a.x + a.y * a.y;
+}
+
 uu
 th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic)
 {
-	for (uu i = 0; i < 4; i++)
-		if (th_line_to_line(b, e, q->v[i], q->v[(i + 1) % 4], ic))
-			return 1;
+	th_vf2 ic_c;	      // closest incident point
+	float ic_d = FLT_MAX; // incident distance
+	bool collision = false;
 
-	return 0;
+	for (uu i = 0; i < 4; i++) {
+		th_vf2 ic_n; // current incident point
+
+		if (th_line_to_line(b, e, q->v[i], q->v[(i + 1) % 4], &ic_n)) {
+			float ic_nd = point_distance(b, ic_n);
+			if (ic_nd < ic_d) {
+				ic_d = ic_nd;
+				ic_c = ic_n;
+			}
+			collision = true;
+		}
+	}
+
+	*ic = ic_c;
+
+	return collision;
 }
 
 uu

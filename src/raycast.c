@@ -11,9 +11,8 @@ th_ray_getcoll(
 	for (int i = 0; i < sceneLen && *collCount < maxColls; i++) {
 		th_quad q = th_ent_transform(scene[i]);
 
-		if (th_line_to_quad(ra->pos, p2, &q, &colls[*collCount].pos) ||
-		    // in case the ray is completely inside the quad
-		    th_point_to_quad(ra->pos, &q, &colls[*collCount].pos)) {
+		if (th_point_to_quad(ra->pos, &q, &colls[*collCount].pos) ||
+		    th_line_to_quad(ra->pos, p2, &q, &colls[*collCount].pos)) {
 			++(*collCount);
 		}
 	}
