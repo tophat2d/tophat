@@ -117,7 +117,7 @@ umth_placeholder_fetch(UmkaStackSlot *p, UmkaStackSlot *r)
 static void
 umth_font_load(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	uint64_t filter = p[0].uintVal;
+	uint32_t filter = p[0].uintVal;
 	double size = p[1].real32Val;
 	char *path = conv_path(p[2].ptrVal);
 	th_font **ft = p[3].ptrVal;
