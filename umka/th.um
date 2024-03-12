@@ -49,12 +49,6 @@ fn __errFromCode*(ec: ErrCode, msg: str = ""): std.Err {
 	return std.error(int(ec), ec.toStr(), "tophat")
 }
 
-fn (e: ^ErrCode) err*(): std.Err {
-	if e^ == ErrCode(0) { return {} }
-
-	return __errFromCode(e^)
-}
-
 //~~struct Vf2
 // vector 2
 type Vf2* = struct {

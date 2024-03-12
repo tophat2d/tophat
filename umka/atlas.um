@@ -74,7 +74,7 @@ fn pack*(images: []image.Image, strategy: int): (Atlas, std.Err) {
 //~~
 	var a: Atlas
 	ec := umth_atlas_pack(&a, &images, strategy)
-	return a, ec.err()
+	return a, th.__errFromCode(ec)
 }
 
 //~~fn Atlas.draw

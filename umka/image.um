@@ -25,7 +25,7 @@ fn createRenderTarget*(size: th.Vf2, filter: int): (RenderTarget, std.Err) {
 //~~
 	rt := RenderTarget{}
 	ec := umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y), filter)
-	return rt, ec.err()
+	return rt, th.__errFromCode(ec)
 }
 
 fn umth_image_render_target_begin(rt: RenderTarget): th.ErrCode
@@ -34,7 +34,7 @@ fn umth_image_render_target_begin(rt: RenderTarget): th.ErrCode
 fn (rt: ^RenderTarget) begin*(): std.Err {
 //~~
 	ec := umth_image_render_target_begin(rt^)
-	return ec.err()
+	return th.__errFromCode(ec)
 }
 
 fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2): th.ErrCode
@@ -43,7 +43,7 @@ fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2): th.ErrCode
 fn (rt: ^RenderTarget) end*(wp: th.Vf2): std.Err {
 //~~
 	ec := umth_image_render_target_end(rt^, wp)
-	return ec.err()
+	return th.__errFromCode(ec)
 }
 
 fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
@@ -66,7 +66,7 @@ fn load*(path: str): (Image, std.Err) {
 //~~
 	img := Image{}
 	ec := umth_image_load(&img, path)
-	return img, ec.err()
+	return img, th.__errFromCode(ec)
 }
 
 //~~fn Image.validate
@@ -229,7 +229,7 @@ fn mk*(data: []uint32, dm: th.Vf2): (Image, std.Err) {
 	img := Image{}
 	ec := umth_image_from_data(&img, &data[0], dm)
 
-	return img, ec.err()
+	return img, th.__errFromCode(ec)
 }
 
 fn umth_image_copy(ret: ^Image, data: Image): th.ErrCode
@@ -244,7 +244,7 @@ fn (i: ^Image) copy*(): (Image, std.Err) {
 	img := Image{}
 	ec := umth_image_copy(&img, i^)
 
-	return img, ec.err()
+	return img, th.__errFromCode(ec)
 }
 
 fn umth_image_set_filter(data: Image, filter: int): th.ErrCode

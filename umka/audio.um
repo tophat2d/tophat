@@ -32,7 +32,7 @@ fn load*(path: str, flags: LoadFlag = LoadFlag.stream): (Sound, std.Err) {
 //~~
 	var snd: Sound
 	ec := umth_sound_load(&snd, path, flags)
-	return snd, ec.err()
+	return snd, th.__errFromCode(ec)
 }
 
 //~~fn Sound.validate
@@ -54,7 +54,7 @@ fn (s: ^Sound) copy*(): (Sound, std.Err) {
 
 	var out: Sound
 	ec := umth_sound_copy(&out, s^)
-	return out, ec.err()
+	return out, th.__errFromCode(ec)
 }
 
 fn umth_sound_is_playing(s: Sound): bool
