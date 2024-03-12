@@ -275,7 +275,7 @@ fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2): std.Err {
 	}
 
 	if dm.x * dm.y != len(data) {
-		return th.__errFromCode(.inval, "incorrect dimensions")
+		return th.__errFromCode(.bad_input, "incorrect dimensions")
 	}
 
 	return th.__errFromCode(umth_image_update_data(i^, &data[0], dm))

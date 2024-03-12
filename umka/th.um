@@ -24,7 +24,7 @@ type ErrCode* = enum (int32) {
 	io
 	bad_enum
 	bad_action
-	inval
+	bad_input
 	alloc
 	already
 	out_of_bounds
@@ -32,10 +32,22 @@ type ErrCode* = enum (int32) {
 
 fn (e: ^ErrCode) toStr*(): str {
 	switch e^ {
-	case ErrCode.ok:
+	case .ok:
 		return "ok"
-	case ErrCode.io:
+	case .io:
 		return "input/output error"
+	case .bad_enum:
+		return "invalid enum value"
+	case .bad_action:
+		return "invalid action"
+	case .bad_input:
+		return "invalid input value"
+	case .alloc:
+		return "failed allocation"
+	case .already:
+		return "action already performet"
+	case .out_of_bounds:
+		return "index out of bounds"
 	}
 
 	return "unknown error"

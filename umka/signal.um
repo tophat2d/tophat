@@ -105,7 +105,7 @@ fn emit*(name: str, args: ..any): std.Err {
 	}
 
 	if !validkey(signals, name) {
-		return th.__errFromCode(.inval, "unknown signal")
+		return th.__errFromCode(.bad_input, "unknown signal")
 	}
 
 	signals[name].emit(args)
