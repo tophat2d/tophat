@@ -1,6 +1,7 @@
 
 import (
 	"th.um"
+	"std.um"
 	"image.um"
 )
 
@@ -53,6 +54,8 @@ fn (a: ^Atlas) cropSource*(at: th.Vf2): std.Err {
 	a.i.crop(
 		th.Vf2{at.x / a.dm.x, at.y / a.dm.y},
 		th.Vf2{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})
+
+	return {}
 }
 
 //~~enum PackStrategy
@@ -67,7 +70,7 @@ fn umth_atlas_pack(a: ^Atlas, images: ^[]image.Image, strategy: int): th.ErrCode
 
 //~~fn pack
 // Packs an array of images into an atlas
-fn pack*(images: []image.Image, strategy: int): Atlas {
+fn pack*(images: []image.Image, strategy: int): (Atlas, std.Err) {
 //~~
 	var a: Atlas
 	ec := umth_atlas_pack(&a, &images, strategy)
@@ -85,4 +88,6 @@ fn (a: ^Atlas) draw*(at: th.Vf2, t: th.Transform): std.Err {
 	a.cropSource(at)
 	a.i.draw(t, th.white)
 	a.i.crop(th.Vf2{}, th.Vf2{1, 1})
+
+	return {}
 }

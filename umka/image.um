@@ -33,7 +33,8 @@ fn umth_image_render_target_begin(rt: RenderTarget): th.ErrCode
 // Begins the render target rendering pass.
 fn (rt: ^RenderTarget) begin*(): std.Err {
 //~~
-	return umth_image_render_target_begin(rt^).err()
+	ec := umth_image_render_target_begin(rt^)
+	return ec.err()
 }
 
 fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2): th.ErrCode
@@ -41,7 +42,8 @@ fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2): th.ErrCode
 // Ends the render target rendering pass.
 fn (rt: ^RenderTarget) end*(wp: th.Vf2): std.Err {
 //~~
-	return umth_image_render_target_end(rt^, wp).err()
+	ec := umth_image_render_target_end(rt^, wp)
+	return ec.err()
 }
 
 fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
@@ -230,7 +232,7 @@ fn mk*(data: []uint32, dm: th.Vf2): (Image, std.Err) {
 	return img, ec.err()
 }
 
-fn umth_image_copy(ret: ^Image, data: Image)
+fn umth_image_copy(ret: ^Image, data: Image): th.ErrCode
 //~~fn Image.copy
 // Copies image into a new one.
 fn (i: ^Image) copy*(): (Image, std.Err) {
@@ -245,7 +247,7 @@ fn (i: ^Image) copy*(): (Image, std.Err) {
 	return img, ec.err()
 }
 
-fn umth_image_set_filter(data: Image, filter: int)
+fn umth_image_set_filter(data: Image, filter: int): th.ErrCode
 //~~fn Image.setfilter
 // Sets a mag/min filter. 0 is nearest, others are linear.
 // This function will regenerate the texture. This means it shouldn't be
@@ -258,10 +260,10 @@ fn (i: ^Image) setfilter*(filter: int): std.Err {
 		th.__error("image is invalid")
 	}
 
-	return umth_image_set_filter(i^, filter).err()
+	return th.__errFromCode(umth_image_set_filter(i^, filter))
 }
 
-fn umth_image_update_data(img: Image, data: ^uint32, dm: th.Vf2)
+fn umth_image_update_data(img: Image, data: ^uint32, dm: th.Vf2): th.ErrCode
 //~~fn Image.setData
 // Updates the image data. dm are the dimensions of the new image.
 // The new image doesn't have to be the same size as the old one.
@@ -269,14 +271,14 @@ fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2): std.Err {
 //~~
 	if !i.validate() {
 		th.__error("image is invalid")
-		return
+		return {}
 	}
 
 	if dm.x * dm.y != len(data) {
 		return th.__errFromCode(.inval, "incorrect dimensions")
 	}
 
-	return umth_image_update_data(i^, &data[0], dm).err()
+	return th.__errFromCode(umth_image_update_data(i^, &data[0], dm))
 }
 
 fn umth_image_get_data(img: Image, data: ^uint32)

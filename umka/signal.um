@@ -5,6 +5,11 @@
 // adressed by a string name.
 //~~
 
+import (
+	"std.um"
+	"th.um"
+)
+
 //~~type Callback
 // `args` is a list of arguments passed to the `emit` method.
 type Callback* = fn(args: []any)
@@ -104,4 +109,6 @@ fn emit*(name: str, args: ..any): std.Err {
 	}
 
 	signals[name].emit(args)
+
+	return {}
 }
