@@ -1,5 +1,6 @@
 
 import (
+	"std.um"
 	"th.um"
 	"rect.um"
 	"signal.um"
@@ -15,7 +16,8 @@ fn init*() {
 	window.setup("gui test", 600, 600)
 	window.setViewport(th.Vf2{ 200, 200 })
 
-	ft := font.load("etc/roboto.ttf", 32, font.Filter.linear)
+	ft, err := font.load("etc/roboto.ttf", 32, font.Filter.linear)
+	std.exitif(err)
 
 	gui = ui.mk(rect.mk(0, 0, 200, 200), ui.getDefaultStyle())
 	gui.getStyle().ft = ft

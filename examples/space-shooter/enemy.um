@@ -28,9 +28,9 @@ var (
 fn init*() {
 	enemies = []Enemy{}
 
-	prefab = ent.mk(
-		image.load("gfx/enemy.png"),
-		th.Transform{p: th.Vf2{y: -window.wp.y - 20}, s: th.Vf2{1, 1}})
+	im, err := image.load("gfx/enemy.png")
+	std.exitif(err)
+	prefab = ent.mk(im, { p: {y: -window.wp.y - 20}, s: {1, 1} })
 }
 
 fn spawn*() {

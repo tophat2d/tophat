@@ -15,10 +15,13 @@ var (
 )
 
 fn init*() {
+	var err: std.Err
+
 	window.setup("my title", 400, 400)
 	window.setViewport(th.Vf2{200, 200})
 
-	img = image.load("etc/test.png")
+	img, err = image.load("etc/test.png")
+	std.exitif(err)
 
 	window.onFrame.register(signal.Callback{
 		mpos := input.getMousePos()
