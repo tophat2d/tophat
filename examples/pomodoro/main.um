@@ -7,6 +7,7 @@ import (
   th_image = "image.um"
   th_font = "font.um"
   th_audio = "audio.um"
+	"std.um"
 )
 
 type (
@@ -487,14 +488,20 @@ const onFrame = fn(args: []any) {
 }
 
 fn init*() {
+	var err: std.Err
+
   v_lastTime = th.time
   th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
 	th_window.setViewport(th.Vf2{screen.w, screen.h})
-  v_mainFont = th_font.load("Font.ttf", 32)
-  v_mainFontSmall = th_font.load("Font.ttf", 20)
+  v_mainFont, err = th_font.load("Font.ttf", 32)
+	std.exitif(err)
+  v_mainFontSmall, err = th_font.load("Font.ttf", 20)
+	std.exitif(err)
   v_countdown = getCountdown(0)
-  v_alarm = th_audio.load("Alarm.wav")
-  v_rectBase = th_image.load("rectbase.png")
+  v_alarm, err = th_audio.load("Alarm.wav")
+	std.exitif(err)
+  v_rectBase, err = th_image.load("rectbase.png")
+	std.exitif(err)
 
   gui = guiInit()
 
