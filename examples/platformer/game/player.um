@@ -120,7 +120,9 @@ fn move() {
 }
 
 fn setup*() {
-	body = ent.mk(image.load("res/hat.png"), th.Transform{ p: env.spawn, s: th.Vf2{0.6, 0.6} })
+	im, err := image.load("res/hat.png")
+	std.exitif(err)
+	body = ent.mk(im, th.Transform{ p: env.spawn, s: th.Vf2{0.6, 0.6} })
 	body.r = rect.mk(0, 0, body.i.getDims().x, body.i.getDims().y - 0.4)
 	feet = ent.mk(image.Image{}, th.Transform{ s: th.Vf2{0.6, 0.6} })
 	feet.r = rect.mk(0, body.i.getDims().y - 2, body.i.getDims().x, 2)

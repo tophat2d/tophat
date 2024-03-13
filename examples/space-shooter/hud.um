@@ -1,6 +1,7 @@
 
 import (
 	"th.um"
+	"std.um"
 	"font.um"
 	"image.um"
 	"global.um"
@@ -13,9 +14,13 @@ var (
 )
 
 fn init*() {
-	hearth = image.load("gfx/hearth.png")
+	var err: std.Err
 
-	mainFont = font.load("gfx/marediv-regular.ttf", 64, font.Filter.nearest)
+	hearth, err = image.load("gfx/hearth.png")
+	std.exitif(err)
+
+	mainFont, err = font.load("gfx/marediv-regular.ttf", 64, font.Filter.nearest)
+	std.exitif(err)
 }
 
 fn handle*() { }
