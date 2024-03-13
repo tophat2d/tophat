@@ -1,6 +1,7 @@
 
 import (
 	"th.um"
+	"std.um"
 	"canvas.um"
 	"window.um"
 	"atlas.um"
@@ -31,20 +32,24 @@ fn drawAtlas(a: atlas.Atlas, p: th.Vf2): th.Vf2 {
 }
 
 fn init*() {
+	var err: std.Err
 	window.setup("Pack test", 400, 400)
 
 	logos := []image.Image{
-		image.load("etc/logo/logo-hatonly-white.png"),
-		image.load("etc/logo/logo-hatonly.png"),
-		image.load("etc/logo/logo-normal-white.png"),
-		image.load("etc/logo/logo-normal.png"),
-		image.load("etc/logo/logo-notext-white.png"),
-		image.load("etc/logo/logo-notext.png")
+		image.load("etc/logo/logo-hatonly-white.png").item0,
+		image.load("etc/logo/logo-hatonly.png").item0,
+		image.load("etc/logo/logo-normal-white.png").item0,
+		image.load("etc/logo/logo-normal.png").item0,
+		image.load("etc/logo/logo-notext-white.png").item0,
+		image.load("etc/logo/logo-notext.png").item0
 	}
 
-	square := atlas.pack(logos, atlas.PackSquare)
-	row := atlas.pack(logos, atlas.PackRow)
-	column := atlas.pack(logos, atlas.PackColumn)
+	square, err := atlas.pack(logos, atlas.PackSquare)
+	std.exitif(err)
+	row, err := atlas.pack(logos, atlas.PackRow)
+	std.exitif(err)
+	column, err := atlas.pack(logos, atlas.PackColumn)
+	std.exitif(err)
 
 	window.onFrame.register(|square, row, column| {
 		p := th.Vf2{ 1, 1 }

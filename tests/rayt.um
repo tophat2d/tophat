@@ -21,7 +21,7 @@ fn init*() {
 	window.setup("raycast test", 400, 400)
 
 	r = ray.mk(th.Vf2{}, 60, 0)
-	e = ent.mk(image.load("etc/test.png"), {p: { 100, 100 }, s: { 4, 4 }})
+	e = ent.mk(image.load("etc/test.png").item0, {p: { 100, 100 }, s: { 4, 4 }})
 
 	window.onFrame.register(signal.Callback{
 		r.pos = input.getGlobalMousePos()
