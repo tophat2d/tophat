@@ -249,24 +249,24 @@ th_font_alloc()
 	return umkaAllocData(thg->umka, sizeof(th_font), free_font);
 }
 
-th_font *
-th_font_load(char *path, double size, uint32_t filter)
+th_err
+th_font_load(th_font **out, char *path, double size, uint32_t filter)
 {
+	*out = NULL;
+
 	char regularized_path[4096];
 	th_regularize_path(path, "./", regularized_path, sizeof regularized_path);
 	path = regularized_path;
 
 	void *data = read_font_data(path);
 	if (data == NULL) {
-		th_error("Failed to read font data.");
-		return NULL;
+		return th_err_io;
 	}
 
 	th_font *font = th_font_alloc();
 	if (font == NULL) {
 		free(data);
-		th_error("Failed to allocate a font.");
-		return NULL;
+		return th_err_alloc;
 	}
 
 	{
@@ -285,7 +285,8 @@ th_font_load(char *path, double size, uint32_t filter)
 		font->descent = descent; // descent
 	}
 
-	return font;
+	*out = font;
+	return 0;
 }
 
 th_vf2
@@ -323,7 +324,6 @@ th_font_draw(th_font *font, const char *s, double x, double y, uint32_t color, d
 	}
 
 	if (font == NULL) {
-		th_error("Font is null!");
 		return;
 	}
 
@@ -334,6 +334,8 @@ th_font_draw(th_font *font, const char *s, double x, double y, uint32_t color, d
 
 		th_blit_tex(glyph.img, glyph.quad, color);
 	}
+
+	return;
 }
 
 void

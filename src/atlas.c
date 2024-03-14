@@ -8,16 +8,21 @@ extern th_global *thg;
 th_vf2
 th_atlas_nth_coords(th_atlas *a, uu n)
 {
-	return (th_vf2){.x = n % (int)a->dm.w, .y = (n - n % (int)a->dm.w) / (int)a->dm.w};
+	return (th_vf2){
+	    .x = n % (int)a->dm.w,
+	    .y = (n - n % (int)a->dm.w) / (int)a->dm.w,
+	};
 }
 
 th_rect
 th_atlas_get_cell(th_atlas *a, th_vf2 cell)
 {
-	return (th_rect){.x = cell.x * a->cs.x / a->i->dm.x,
+	return (th_rect){
+	    .x = cell.x * a->cs.x / a->i->dm.x,
 	    .y = cell.y * a->cs.y / a->i->dm.y,
 	    .w = a->cs.x / a->i->dm.x,
-	    .h = a->cs.y / a->i->dm.y};
+	    .h = a->cs.y / a->i->dm.y,
+	};
 }
 
 static void
@@ -29,7 +34,7 @@ blit(uint32_t *tgt, uint32_t tw, uint32_t th, uint32_t *src, uint32_t x0, uint32
 	}
 }
 
-void
+th_err
 th_atlas_pack(th_atlas *a, void *arr, th_atlas_pack_strategy strategy)
 {
 	const size_t count = umkaGetDynArrayLen(arr);
@@ -97,9 +102,11 @@ th_atlas_pack(th_atlas *a, void *arr, th_atlas_pack_strategy strategy)
 
 		break;
 	}
-	default: th_error("Unknown packing strategy %d", strategy); return;
+	default: return th_err_bad_enum;
 	}
 
 	a->i = th_image_alloc();
 	th_image_from_data(a->i, data, (th_vf2){{iw, ih}});
+
+	return 0;
 }

@@ -27,7 +27,9 @@ var (
 )
 
 fn setup*() {
-	beePreset = ent.mk(image.load("res/bee.png"), th.Transform{ p: env.tm.pos, s: th.Vf2{ 1, 1 }, o: th.Vf2{13/2, 11/2}})
+	im, err := image.load("res/bee.png")
+	std.exitif(err)
+	beePreset = ent.mk(im, th.Transform{ p: env.tm.pos, s: th.Vf2{ 1, 1 }, o: th.Vf2{13/2, 11/2}})
 }
 
 fn reset*() {

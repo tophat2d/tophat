@@ -113,18 +113,16 @@ umth_placeholder_fetch(UmkaStackSlot *p, UmkaStackSlot *r)
 ///////////////////////////
 // FONT
 
-// fn umth_font_load((2) path: str, (1) size: real, (0) filter: uint32)
+// fn umth_font_load((3) out: ^Font, (2) path: str, (1) size: real, (0) filter: uint32): th.ErrCode
 static void
 umth_font_load(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	uint32_t filter = p[0].uintVal;
 	double size = p[1].real32Val;
 	char *path = conv_path(p[2].ptrVal);
+	th_font **ft = p[3].ptrVal;
 
-	// NOTE(skejeton): The font load function may return null pointer on fail,
-	//	   				     it would be the responsibility of the user to
-	// verify the validity.
-	r->ptrVal = th_font_load(path, size, filter);
+	r->intVal = th_font_load(ft, path, size, filter);
 	free(path);
 }
 
@@ -211,7 +209,7 @@ umth_image_load(UmkaStackSlot *p, UmkaStackSlot *r)
 	char *path = (char *)p[0].ptrVal;
 
 	char *pathcpy = conv_path(path);
-	*img = th_load_image(pathcpy);
+	r->intVal = th_load_image(img, pathcpy);
 	free(pathcpy);
 }
 
@@ -296,7 +294,7 @@ umth_image_from_data(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_image *img = th_image_alloc();
 	if (!img)
 		return;
-	th_image_from_data(img, data, dm);
+	r->intVal = th_image_from_data(img, data, dm);
 
 	*ret = img;
 }
@@ -315,7 +313,7 @@ umth_image_copy(UmkaStackSlot *p, UmkaStackSlot *r)
 
 	uint32_t *data = th_image_get_data(img1);
 
-	th_image_from_data(img2, data, img1->dm);
+	r->intVal = th_image_from_data(img2, data, img1->dm);
 	img2->flipv = img1->flipv;
 	img2->fliph = img1->fliph;
 	img2->crop = img1->crop;
@@ -333,7 +331,7 @@ umth_image_set_filter(UmkaStackSlot *p, UmkaStackSlot *r)
 		return;
 	int filter = p[0].intVal;
 
-	th_image_set_filter(img, filter);
+	r->intVal = th_image_set_filter(img, filter);
 }
 
 void
@@ -345,7 +343,7 @@ umth_image_update_data(UmkaStackSlot *p, UmkaStackSlot *r)
 	uint32_t *data = p[1].ptrVal;
 	th_vf2 dm = *(th_vf2 *)&p[0];
 
-	th_image_update_data(img, data, dm);
+	r->intVal = th_image_update_data(img, data, dm);
 }
 
 void
@@ -369,7 +367,7 @@ umth_image_render_target_begin(UmkaStackSlot *p, UmkaStackSlot *r)
 	if (!t)
 		return;
 
-	th_image_set_as_render_target(t);
+	r->intVal = th_image_set_as_render_target(t);
 }
 
 void
@@ -378,7 +376,7 @@ umth_image_render_target_end(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_render_target *t = p[1].ptrVal;
 	th_vf2 wp = *(th_vf2 *)&p[0];
 
-	th_image_remove_render_target(t, wp);
+	r->intVal = th_image_remove_render_target(t, wp);
 }
 
 void
@@ -471,7 +469,7 @@ umth_image_create_render_target(UmkaStackSlot *p, UmkaStackSlot *r)
 	int height = p[1].intVal;
 	int width = p[2].intVal;
 
-	*result = th_image_create_render_target(width, height, filter);
+	r->intVal = th_image_create_render_target(result, width, height, filter);
 }
 
 void
@@ -601,18 +599,20 @@ umth_ent_ysort(UmkaStackSlot *p, UmkaStackSlot *r)
 void
 umth_sound_load(UmkaStackSlot *p, UmkaStackSlot *r)
 {
+	th_sound **out = p[2].ptrVal;
 	char *path = (char *)p[1].ptrVal;
 	uint32_t flags = p[0].intVal;
 
-	r->ptrVal = th_audio_load(path, flags);
+	r->intVal = th_audio_load(out, path, flags);
 }
 
 void
 umth_sound_copy(UmkaStackSlot *p, UmkaStackSlot *r)
 {
+	th_sound **out = p[1].ptrVal;
 	th_sound *s = p[0].ptrVal;
 
-	r->ptrVal = th_sound_copy(s);
+	r->intVal = th_sound_copy(out, s);
 }
 
 void
@@ -1154,7 +1154,7 @@ umth_atlas_pack(UmkaStackSlot *p, UmkaStackSlot *r)
 	UmkaDynArray(th_image *) *images = p[1].ptrVal;
 	th_atlas_pack_strategy strategy = p[0].intVal;
 
-	th_atlas_pack(a, images, strategy);
+	r->intVal = th_atlas_pack(a, images, strategy);
 }
 
 void

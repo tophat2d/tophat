@@ -5,6 +5,7 @@ import (
 	"rect.um"
 	"signal.um"
 	"th.um"
+	"std.um"
 	"window.um"
 )
 
@@ -13,7 +14,10 @@ var (
 )
 
 fn init*() {
-	img = image.load("etc/test.png")
+	var err: std.Err
+
+	img, err = image.load("etc/test.png")
+	std.exitif(err)
 	window.setViewport(th.Vf2{192, 168})
 
 	window.onFrame.register(signal.Callback{

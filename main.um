@@ -73,13 +73,13 @@ fn onFrame(args: []any) {
 fn init*() {
 	window.setup("Hello world", 600, 600)
 	window.setViewport(th.Vf2{ 100, 100 })
+	var err: std.Err
 
-	loadedFont = font.load("etc/roboto.ttf", 16)
-	if !loadedFont.validate() {
-		exit(1, "could not load font")
-	}
+	loadedFont, err = font.load("etc/roboto.ttf", 16)
+	std.exitif(err)
 
-	logo = image.load("etc/logo/logo-normal-white.png")
+	logo, err = image.load("etc/logo/logo-normal-white.png")
+	std.exitif(err)
 
 	fg = 0xadadd5ff
 	bg = 0x262626ff

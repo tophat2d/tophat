@@ -93,21 +93,21 @@ th_image_get_data(th_image *img)
 	return data;
 }
 
-static void
+static th_err
 assert_image(th_image *img)
 {
 	sg_resource_state creation_status = sg_query_image_state(img->tex);
-	if (creation_status != SG_RESOURCESTATE_VALID) {
-		assert(creation_status != SG_RESOURCESTATE_INVALID && "gen_tex: INVALID");
-		assert(creation_status != SG_RESOURCESTATE_FAILED && "gen_tex: FAILED");
-		assert(false && "gen_tex: Unknown error");
-	}
+	TH_ASSERT(-1, creation_status == SG_RESOURCESTATE_VALID);
+	return 0;
 }
 
-th_render_target *
-th_image_create_render_target(int width, int height, int filter)
+th_err
+th_image_create_render_target(th_render_target **out, int width, int height, int filter)
 {
+	*out = NULL;
 	th_render_target *t = th_render_target_alloc();
+	if (t == NULL)
+		return th_err_alloc;
 
 	sg_image_desc img_desc = {
 	    .render_target = true,
@@ -135,7 +135,10 @@ th_image_create_render_target(int width, int height, int filter)
 	t->image->fliph = 1;
 	t->image->tex = sg_make_image(&img_desc);
 	t->image->smp = sg_make_sampler(&smp_desc);
-	assert_image(t->image);
+	th_err err = assert_image(t->image);
+	if (err) {
+		return err;
+	}
 
 	img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
 	t->depth = sg_make_image(&img_desc);
@@ -147,10 +150,11 @@ th_image_create_render_target(int width, int height, int filter)
 
 	t->image->target = true;
 
-	return t;
+	*out = t;
+	return 0;
 }
 
-static void
+static th_err
 gen_tex(th_image *img, uint32_t *data)
 {
 	img->tex = sg_make_image(&(sg_image_desc){.width = img->dm.w,
@@ -168,12 +172,14 @@ gen_tex(th_image *img, uint32_t *data)
 	    .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
 	});
 
-	assert_image(img);
+	return assert_image(img);
 }
 
-th_image *
-th_load_image(char *path)
+th_err
+th_load_image(th_image **out, char *path)
 {
+	*out = NULL;
+
 	char regularized_path[4096];
 	th_regularize_path(path, "./", regularized_path, sizeof regularized_path);
 	path = regularized_path;
@@ -182,8 +188,7 @@ th_load_image(char *path)
 
 	unsigned char *data = stbi_load(path, &w, &h, &c, STBI_rgb_alpha);
 	if (!data) {
-		th_error("Could not load an image at path %s.", path);
-		return NULL;
+		return th_err_io;
 	}
 
 	th_image *img = th_image_alloc();
@@ -196,14 +201,17 @@ th_load_image(char *path)
 	img->flipv = 0;
 	img->fliph = 0;
 
-	gen_tex(img, (uint32_t *)data);
-
+	th_err err = gen_tex(img, (uint32_t *)data);
 	stbi_image_free(data);
+	if (err) {
+		return err;
+	}
 
-	return img;
+	*out = img;
+	return 0;
 }
 
-void
+th_err
 th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm)
 {
 	img->dm = dm;
@@ -214,28 +222,29 @@ th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm)
 	img->channels = 4;
 	img->filter = SG_FILTER_NEAREST;
 
-	gen_tex(img, data);
+	return gen_tex(img, data);
 }
 
-void
+th_err
 th_image_set_filter(th_image *img, sg_filter filter)
 {
 	uint32_t *data = th_image_get_data(img);
 	img->filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST;
 
 	th_image_free(img);
-	gen_tex(img, data);
-
+	th_err err = gen_tex(img, data);
 	free(data);
+
+	return err;
 }
 
-void
+th_err
 th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm)
 {
 	th_image_free(img);
 
 	img->dm = dm;
-	gen_tex(img, data);
+	return gen_tex(img, data);
 }
 
 void
@@ -314,12 +323,11 @@ th_blit_tex(th_image *img, th_quad q, uint32_t color)
 	th_canvas_batch_push_auto_flush(img, verts, sizeof(verts) / sizeof(verts[0]));
 }
 
-void
+th_err
 th_image_set_as_render_target(th_render_target *t)
 {
 	if (thg->has_render_target) {
-		th_error("There already is a render target set!");
-		return;
+		return th_err_already;
 	}
 
 	th_canvas_flush();
@@ -338,14 +346,15 @@ th_image_set_as_render_target(th_render_target *t)
 	thg->offset.y = 0;
 	thg->viewport = t->image->dm;
 	thg->target_size = t->image->dm;
+
+	return 0;
 }
 
-void
+th_err
 th_image_remove_render_target(th_render_target *t, th_vf2 wp)
 {
 	if (!thg->has_render_target) {
-		th_error("No render target is set.");
-		return;
+		return th_err_bad_action;
 	}
 
 	th_canvas_flush();
@@ -364,6 +373,8 @@ th_image_remove_render_target(th_render_target *t, th_vf2 wp)
 	thg->target_size = (th_vf2){.w = window_width, .h = window_height};
 
 	thg->has_render_target = false;
+
+	return 0;
 }
 
 void

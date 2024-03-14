@@ -15,16 +15,19 @@ const (
 	modeHalf
 	modeOddEven
 )
-	
+
 rectCount := 20
 const rectSize = 12
 img := image.Image{}
 mode := modeRects
 
 fn init*() {
+	var err: std.Err
+
 	window.setup("th canvas stress test", 640, 480)
 
-	img = image.load("etc/test.png")
+	img, err = image.load("etc/test.png")
+	std.exitif(err)
 
 	window.onFrame.register(signal.Callback{
 		p := th.Vf2{}

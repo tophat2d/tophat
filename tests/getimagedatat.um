@@ -3,6 +3,7 @@ import (
     "image.um"
     "signal.um"
     "window.um"
+		"std.um"
 )
 
 var (
@@ -10,16 +11,19 @@ var (
 )
 
 fn init*() {
-    window.setup("get image data test", 640, 480)
+	var err: std.Err
 
-    img = image.load("etc/test.png")
-    
-    d := img.getData()
+	window.setup("get image data test", 640, 480)
 
-    for i in d {
-        printf("%x\n", d[i])
-    }
+	img, err = image.load("etc/test.png")
+	std.exitif(err)
 
-    window.onFrame.register(signal.Callback{
-    })
+	d := img.getData()
+
+	for i in d {
+		printf("%x\n", d[i])
+	}
+
+	window.onFrame.register(signal.Callback{
+	})
 }

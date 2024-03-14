@@ -1,6 +1,7 @@
 
 import (
 	"audio.um"
+	"std.um"
 )
 
 var (
@@ -8,10 +9,17 @@ var (
 )
 
 fn init*() {
-	dmg = audio.load("sfx/dmgsound.wav")
+	var err: std.Err
+
+	dmg, err = audio.load("sfx/dmgsound.wav")
+	std.exitif(err)
 	dmg.setVol(0.7)
-	explosion = audio.load("sfx/explosion.wav")
+
+	explosion, err = audio.load("sfx/explosion.wav")
+	std.exitif(err)
 	explosion.setVol(0.7)
-	shoot = audio.load("sfx/shoot.wav")
+
+	shoot, err = audio.load("sfx/shoot.wav")
+	std.exitif(err)
 	shoot.setVol(0.7)
 }

@@ -57,7 +57,7 @@ fn (anm: ^Anim) animate*(time: int) {
 
 	n := (round(real(time-anm.offset)/round((1000.0/anm.fps))) % anm.max) + anm.min
 
-	anm.atl.cropSource(anm.atl.coords(n))
+	anm.atl.cropSource(anm.atl.coords(n).item0)
 }
 
 //~~fn Anim.framesPlayed

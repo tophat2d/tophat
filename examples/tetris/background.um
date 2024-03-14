@@ -1,6 +1,7 @@
 import (
 	"global.um"
 	"image.um"; "window.um"; "th.um"
+	"std.um"
 )
 
 var (
@@ -9,7 +10,9 @@ var (
 )
 
 fn init*() {
-	bgTile = image.load("bg_tile.png")
+	var err: std.Err
+	bgTile, err = image.load("bg_tile.png")
+	std.exitif(err)
 }
 
 fn update*() {

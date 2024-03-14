@@ -20,7 +20,7 @@ fn init*() {
 	window.setViewport(th.Vf2{192, 108})
 	cam = rect.mk(0, 0, 192, 108)
 
-	atl := atlas.mk(image.load("etc/atlas.png"), th.Vf2{4, 4})
+	atl := atlas.mk(image.load("etc/atlas.png").item0, th.Vf2{4, 4})
 	src := []th.uu{
 		1, 1, 1, 0, 0, 1, 1, 1,
 		0, 0, 1, 0, 0, 1, 0, 1,
@@ -30,7 +30,7 @@ fn init*() {
 	h := len(src) / w
 
 	t = tilemap.mk(make([]th.uu, w * h), w,
-		atlas.mk(image.load("etc/atlas.png"), th.Vf2{4, 4}), 2)
+		atlas.mk(image.load("etc/atlas.png").item0, th.Vf2{4, 4}), 2)
 
 	cfg := make([]th.uu, 16)
 	cfg[tilemap.top | tilemap.bot] = 1

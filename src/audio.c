@@ -29,8 +29,8 @@ sound_free(UmkaStackSlot *p, UmkaStackSlot *r)
 	);*/
 }
 
-th_sound *
-th_audio_load(char *path, uint32_t flags)
+th_err
+th_audio_load(th_sound **out, char *path, uint32_t flags)
 {
 	char regularized_path[4096];
 	th_regularize_path(path, "./", regularized_path, sizeof regularized_path);
@@ -42,15 +42,15 @@ th_audio_load(char *path, uint32_t flags)
 	if (ma_sound_init_from_file(&thg->audio_engine, path,
 		MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION | flags, NULL, NULL,
 		&s->inst) != MA_SUCCESS) {
-		th_error("Could not load sound at path %s.", path);
-		return NULL;
+		return th_err_io;
 	}
 
-	return s;
+	*out = s;
+	return 0;
 }
 
-th_sound *
-th_sound_copy(th_sound *s)
+th_err
+th_sound_copy(th_sound **out, th_sound *s)
 {
 	th_sound *r = umkaAllocData(thg->umka, sizeof(th_sound), sound_free);
 	r->copied = true;
@@ -58,11 +58,11 @@ th_sound_copy(th_sound *s)
 	if (ma_sound_init_copy(&thg->audio_engine, &s->inst,
 		MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL,
 		&r->inst) != MA_SUCCESS) {
-		th_error("Could not copy a sound.");
-		return NULL;
+		return 1;
 	}
 
-	return r;
+	*out = r;
+	return 0;
 }
 
 void

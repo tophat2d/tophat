@@ -1,5 +1,6 @@
 
 import (
+	"std.um"
 	"audio.um"
 	"input.um"
 	"rect.um"
@@ -13,16 +14,20 @@ var (
 )
 
 fn init*() {
+	var err: std.Err
+
 	window.setup("audio test")
 	window.setViewport(th.Vf2{400, 400})
 
-	s = audio.load("examples/tetris/IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
+	s, err = audio.load("examples/tetris/IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
+	std.exitif(err)
 	s.play()
 
 	s.setVol(0.5)
 	s.setPitch(0.5)
 
-	s2 = audio.load("examples/tetris/ClearMega.wav")
+	s2, err = audio.load("examples/tetris/ClearMega.wav")
+	std.exitif(err)
 	s2.play()
 
 	window.onFrame.register(signal.Callback{

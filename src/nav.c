@@ -97,7 +97,7 @@ check_bounds(th_navmesh *m, th_vf2 p, size_t h)
 	return p.x >= 0 && p.y >= 0 && p.x < m->w && p.y < h;
 }
 
-void
+th_err
 th_navmesh_nav(th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 {
 	const th_vf2 movemap[] = {{{-1, -1}}, {{+0, -1}}, {{+1, -1}}, {{-1, +0}}, {{+1, +0}},
@@ -116,7 +116,7 @@ th_navmesh_nav(th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, 
 	p2 = vf2_to_loc(m, p2);
 
 	if (!check_bounds(m, p1, mh) || !check_bounds(m, p2, mh))
-		return;
+		return th_err_out_of_bounds;
 
 	struct qnode *q = push(NULL, p1, NULL, 0);
 
@@ -167,6 +167,8 @@ th_navmesh_nav(th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, 
 
 	free(hcost);
 	free(cost);
+
+	return 0;
 }
 
 void
