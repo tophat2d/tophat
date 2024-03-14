@@ -46,7 +46,7 @@ th_error(char *text, ...)
 
 	va_list args;
 	va_start(args, text);
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_CONSOLE)
 #include <winuser.h>
 	char buf[4096];
 	vsnprintf(buf, 4096, text, args);
@@ -62,7 +62,7 @@ th_info(char *text, ...)
 {
 	va_list args;
 	va_start(args, text);
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_CONSOLE)
 #include <winuser.h>
 	char buf[4096];
 	vsnprintf(buf, 4096, text, args);
