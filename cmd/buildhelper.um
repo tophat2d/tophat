@@ -27,7 +27,8 @@ fn peekn(f: std.File, next: int): int {
 }
 
 fn loadFF*(path: str): ([]uint32, int, int, int) {
-        f := std.fopen(path, "r")
+        f, err := std.fopen(path, "r")
+	std.exitif(err)
         if f == null { return []uint32{}, -1, -1, 1 }
         var w, h: int
         var tr: []uint32
@@ -57,7 +58,7 @@ fn readall(f: std.File): str {
 
     for ok := true; ok {
 	    var buff: [blockSize + 1]char
-	    ok = std.fread(f, ^[blockSize]char(&buff)) == 1
+	    ok = std.fread(f, ^[blockSize]char(&buff)).item1.code == 0
 	    res += str([]char(buff))
     }
 
@@ -106,7 +107,8 @@ fn main() {
 		printf("const char *%s[] = {\n", std.argv(2))
   
 		for i:=3; i < std.argc(); i++ {
-			f := std.fopen(std.argv(i), "r")
+			f, err := std.fopen(std.argv(i), "r")
+			std.exitif(err)
 			data := readall(f)
 			printf("%s\n", strtoc(data)+",")
 			std.fclose(f)
