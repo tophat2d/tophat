@@ -7,22 +7,11 @@ import (
 	"std.um"
 )
 
-//~~fn readall
-// Reads file content into a string.
+//~~fn readall **DEPRECATED**
+// Use std.freadall instaed.
 fn readall*(path: str): str {
 //~~
-	f := std.fopen(path, "r")
-	const blockSize = 16
-	res := ""
-
-	for ok := true; ok {
-	  var buff: [blockSize + 1]char
-	  ok = std.fread(f, ^[blockSize]char(&buff)) == 1
-	  res += str([]char(buff))
-	}
-
-	std.fclose(f)
-	return res
+	return std.freadall(std.fopen(path, "r").item0).item0
 }
 
 //~~fn stepify
