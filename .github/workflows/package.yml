@@ -42,6 +42,10 @@ jobs:
         rsync tophat.exe marek@tophat2d.dev:www/tophat-web/dl/tophat-windows.exe
     - name: On push script
       run: ssh marek@tophat2d.dev /home/marek/on-tophat-push
+    - name: UmBox
+      uses: marekmaskarinec/umbox@master
+      with:
+        secret: ${{ secrets.UMBOX }}
 
   emscripten_build:
     runs-on: ubuntu-20.04
