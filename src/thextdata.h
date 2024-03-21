@@ -15,7 +15,7 @@ THEXT(void, th_canvas_flush);
 
 THEXT(int, th_line_to_line, th_vf2, th_vf2, th_vf2, th_vf2, th_vf2 *);
 THEXT(uu, th_point_to_quad, th_vf2, th_quad *, th_vf2 *);
-THEXT(uu, th_quad_to_quad, th_quad *, th_quad *, th_vf2 *);
+THEXT(uu, th_quad_to_quad, th_quad *, th_quad *, th_vf2 *, th_vf2 *);
 THEXT(uu, th_ent_to_ent, th_ent *, th_ent *, th_vf2 *);
 THEXT(uu, th_line_to_quad, th_vf2, th_vf2, th_quad *q, th_vf2 *);
 
@@ -54,8 +54,6 @@ THEXT(void, th_transform_vf2, th_vf2 *, th_transform);
 
 THEXT(void, th_rotate_point, th_vf2 *, th_vf2 *, fu);
 THEXT(void, th_vector_normalize, float *, float *);
-
-THEXT(void, th_ray_getcoll, th_ray *, th_coll *, int, int *, th_ent **, int);
 
 THEXT(void, th_tmap_draw, th_tmap *);
 THEXT(void, th_tmap_autotile, uu *, uu *, uu, uu, uu *, uu);

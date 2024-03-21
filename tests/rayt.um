@@ -1,48 +1,47 @@
 
 import (
-	"th.um"
+	"canvas.um"
+	"coll.um"
 	"ent.um"
-	"ray.um"
-	"rect.um"
 	"image.um"
 	"input.um"
-	"canvas.um"
-	"window.um"
+	"rect.um"
 	"signal.um"
+	"th.um"
+	"window.um"
 )
 
 var (
-	r: ray.Ray
-	e : ent.Ent
+	en: ent.Ent
 	cam: rect.Rect
+)
+
+var (
+	b: th.Vf2 = { 60, 60 }
+	e: th.Vf2 = { 340, 340 }
 )
 
 fn init*() {
 	window.setup("raycast test", 400, 400)
 
-	r = ray.mk(th.Vf2{}, 60, 0)
-	e = ent.mk(image.load("etc/test.png").item0, {p: { 100, 100 }, s: { 4, 4 }})
+	en = ent.mk(image.load("etc/test.png").item0, {p: { 100, 100 }, s: { 4, 4 }})
 
-	window.onFrame.register(signal.Callback{
-		r.pos = input.getGlobalMousePos()
-
+	window.onFrame.register({
 		if input.isPressed(input.Key.mouse1) {
-			r.r -= 0.1 * th.delta
+			b = input.getGlobalMousePos()
 		}
 
 		if input.isPressed(input.Key.mouse3) {
-			r.r += 0.1 * th.delta
+			e = input.getGlobalMousePos()
 		}
 
-		if colls := r.getColl([]^ent.Ent{&e}, 1); len(colls) != 0 {
-			p := colls[0].pos
-			canvas.drawRect(th.red, rect.mk(p.x, p.y, 3, 3))
-			e.c = 0xffffff88
-		} else {
-			e.c = th.white
-		}
+		canvas.drawLine(th.green, b, e, 1)
+		en.draw()
 
-		r.draw(th.green, 2)
-		e.draw()
+		var ic1, ic2: th.Vf2
+		if coll.lineToQuad(b, e, en.r.transformed(en.t), &ic1, &ic2) {
+			canvas.drawRect(th.red, rect.mk(ic1.x - 1, ic1.y - 1, 2, 2))
+			canvas.drawRect(th.red, rect.mk(ic2.x - 1, ic2.y - 1, 2, 2))
+		}
 	})
 }

@@ -23,12 +23,12 @@ fn vf2ToQuad*(p: th.Vf2, q: th.Quad, ic: ^th.Vf2): bool {
 	return umth_coll_point_to_quad(&p, &q, ic)
 }
 
-fn umth_coll_line_to_quad(b, e: ^th.Vf2, q: ^th.Quad, ic: ^th.Vf2): bool
+fn umth_coll_line_to_quad(b, e: ^th.Vf2, q: ^th.Quad, ic1, ic2: ^th.Vf2): bool
 //~~fn lineToQuad
 // Check for a collision between a line and quad edges.
-fn lineToQuad*(b, e: th.Vf2, q: th.Quad, ic: ^th.Vf2): bool {
+fn lineToQuad*(b, e: th.Vf2, q: th.Quad, ic1, ic2: ^th.Vf2): bool {
 //~~
-	return umth_coll_line_to_quad(&b, &e, &q, ic)
+	return umth_coll_line_to_quad(&b, &e, &q, ic1, ic2)
 }
 
 fn umth_coll_quad_to_quad(q1, q2: ^th.Quad, ic: ^th.Vf2): bool

@@ -17,7 +17,6 @@ UMKA_MODULES = \
 	umka/input.um \
 	umka/misc.um \
 	umka/canvas.um \
-	umka/ray.um \
 	umka/rect.um \
 	umka/tilemap.um \
 	umka/window.um \

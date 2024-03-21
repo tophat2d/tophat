@@ -87,6 +87,15 @@ fn (t: ^Tilemap) getColl*(e: ent.Ent, ic: ^th.Vf2, pos: ^th.Vf2): bool {
 	return bool(c)
 }
 
+fn umth_tilemap_getcoll_line(b, e: th.Vf2, t: ^Tilemap, ic: ^th.Vf2): bool
+//~~fn Tilemap.getCollLine
+// Check for a collision between a tilemap and a line. `ic` will be a point of
+// an intersection, if there is one.
+fn (t: ^Tilemap) getCollLine*(b, e: th.Vf2, ic: ^th.Vf2): bool {
+//~~
+	return umth_tilemap_getcoll_line(b, e, t, ic)
+}
+
 fn umth_tilemap_autotile(tgt: ^th.uu, w, h: th.uu, src, cfg: ^th.uu, tile: th.uu)
 //~~fn Tilemap.autotile
 // Autotile turns all `tile` tiles in `src` into tiles in `tileCfg`, so they

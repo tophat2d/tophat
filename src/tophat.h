@@ -168,13 +168,6 @@ typedef struct
 
 typedef struct
 {
-	th_vf2 pos;
-	fu l;
-	fu r;
-} th_ray;
-
-typedef struct
-{
 	th_image *i;
 	th_vf2 cs;
 	th_vf2 dm;
@@ -401,15 +394,15 @@ th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic);
 uu
 th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic);
 uu
-th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic);
+th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic1, th_vf2 *ic2);
 uu
 th_coll_on_tilemap(th_ent *e, th_tmap *t, th_vf2 *ic, th_vf2 *tc);
-bool
-th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic);
 uu
 th_coll_point_on_rect(th_vf2 p, th_rect *r);
 uu
 th_rect_to_rect(th_rect *r1, th_rect *r2);
+uu
+th_line_to_tilemap(th_vf2 b, th_vf2 e, th_tmap *t, th_vf2 *ic);
 
 // entity
 th_quad
@@ -531,11 +524,6 @@ void
 th_rotate_point(th_vf2 *p, th_vf2 o, fu rot);
 void
 th_vector_normalize(float *x, float *y);
-
-// raycast
-void
-th_ray_getcoll(
-    th_ray *ra, th_coll *colls, int maxColls, int *collCount, th_ent **scene, int sceneLen);
 
 // sokol
 uint32_t

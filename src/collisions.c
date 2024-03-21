@@ -1,4 +1,3 @@
-// line to line is stolen from: http://jeffreythompson.org/collision-detection/table_of_contents.php
 #include <float.h>
 #include <math.h>
 #include <stdbool.h>
@@ -8,8 +7,9 @@
 
 #define MIN(a, b) (a < b ? a : b)
 
+// line to line is stolen from: http://jeffreythompson.org/collision-detection/table_of_contents.php
 int
-th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic)
+th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic1)
 {
 	const float x1 = b1.x, y1 = b1.y, x2 = e1.x, y2 = e1.y, x3 = b2.x, y3 = b2.y, x4 = e2.x,
 		    y4 = e2.y;
@@ -18,11 +18,11 @@ th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic)
 	float uB = (float)((x2 - x1) * (y1 - y3) - (y2 - y1) * (x1 - x3)) /
 	    ((y4 - y3) * (x2 - x1) - (x4 - x3) * (y2 - y1));
 
-	ic->x = b1.x + (uA * (e1.x - b1.x));
-	ic->y = b1.y + (uA * (e1.y - b1.y));
-
-	if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1)
+	if (uA >= 0 && uA <= 1 && uB >= 0 && uB <= 1) {
+		ic1->x = b1.x + (uA * (e1.x - b1.x));
+		ic1->y = b1.y + (uA * (e1.y - b1.y));
 		return 1;
+	}
 
 	return 0;
 }
@@ -52,28 +52,26 @@ point_distance(th_vf2 a, th_vf2 b)
 }
 
 uu
-th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic)
+th_line_to_quad(th_vf2 b, th_vf2 e, th_quad *q, th_vf2 *ic1, th_vf2 *ic2)
 {
-	th_vf2 ic_c;	      // closest incident point
-	float ic_d = FLT_MAX; // incident distance
-	bool collision = false;
-
 	for (uu i = 0; i < 4; i++) {
-		th_vf2 ic_n; // current incident point
+		if (th_line_to_line(b, e, q->v[i], q->v[(i + 1) % 4], ic1)) {
+			*ic2 = *ic1;
 
-		if (th_line_to_line(b, e, q->v[i], q->v[(i + 1) % 4], &ic_n)) {
-			float ic_nd = point_distance(b, ic_n);
-			if (ic_nd < ic_d) {
-				ic_d = ic_nd;
-				ic_c = ic_n;
-			}
-			collision = true;
+			for (i++; i < 4; i++)
+				if (th_line_to_line(b, e, q->v[i], q->v[(i + 1) % 4], ic2))
+					break;
+			return true;
 		}
 	}
 
-	*ic = ic_c;
+	if (th_point_to_quad(b, q, ic1) || th_point_to_quad(e, q, ic2)) {
+		*ic1 = b;
+		*ic2 = e;
+		return true;
+	}
 
-	return collision;
+	return false;
 }
 
 uu
@@ -92,7 +90,7 @@ th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic)
 		return 0;
 
 	for (uu i = 0; i < 4; i++)
-		if (th_line_to_quad(q1->v[i], q1->v[(i + 1) % 4], q2, ic))
+		if (th_line_to_quad(q1->v[i], q1->v[(i + 1) % 4], q2, ic, ic))
 			return 1;
 
 	for (uu i = 0; i < 4; i++)
@@ -128,23 +126,19 @@ th_ent_to_ent(th_ent *e1, th_ent *e2, th_vf2 *ic)
 	return th_quad_to_quad(&q1, &q2, ic);
 }
 
-bool
-th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic)
+uu
+th_line_to_tilemap(th_vf2 b, th_vf2 e, th_tmap *t, th_vf2 *ic)
 {
-	th_vf2 b = ra->pos, e = ra->pos;
-	e.y += ra->l;
-
-	th_rotate_point(&e, ra->pos, ra->r);
-
 	int tw = t->w, th = umkaGetDynArrayLen(&t->cells) / t->w;
 
 	float mx = e.x - b.x, my = e.y - b.y;
+	float lineLen = sqrt(mx * mx + my * my);
 	th_vector_normalize(&mx, &my);
 
 	float x = b.x, y = b.y, minlen = -1;
 	bool coll = false;
 	float len = 0;
-	while (len < ra->l) {
+	while (len < lineLen) {
 		int tx = (x - t->pos.x) / (t->scale * t->a.cs.x);
 		int ty = (y - t->pos.y) / (t->scale * t->a.cs.y);
 
@@ -161,9 +155,8 @@ th_ray_to_tilemap(th_ray *ra, th_tmap *t, th_vf2 *ic)
 		len += sqrt(mx * mx + my * my);
 	}
 
-	*ic = ra->pos;
-	ic->y += minlen;
-	th_rotate_point(ic, ra->pos, ra->r);
+	ic->x = b.x + (e.x - b.x) / lineLen * minlen;
+	ic->y = b.y + (e.y - b.y) / lineLen * minlen;
 
 	return coll;
 }

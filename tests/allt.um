@@ -17,7 +17,6 @@ import (
 	"nav.um"
 	"particles.um"
 	"placeholders.um"
-	"ray.um"
 	"rect.um"
 	"signal.um"
 	"th.um"

@@ -187,6 +187,17 @@ umth_tilemap_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 }
 
 void
+umth_tilemap_getcoll_line(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_vf2 b = *(th_vf2 *)&p[3];
+	th_vf2 e = *(th_vf2 *)&p[2];
+	th_tmap *t = p[1].ptrVal;
+	th_vf2 *ic = p[0].ptrVal;
+
+	r->intVal = th_line_to_tilemap(b, e, t, ic);
+}
+
+void
 umth_tilemap_autotile(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	uu tile = p[0].intVal;
@@ -722,31 +733,6 @@ umth_sound_set_stop_time_ms(UmkaStackSlot *p, UmkaStackSlot *r)
 }
 
 ///////////////////////
-// raycast
-void
-umth_ray_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_coll *colls = p[5].ptrVal;
-	int *count = p[4].ptrVal;
-	int maxColls = p[3].intVal;
-	int sceneLen = p[2].intVal;
-	th_ray *ra = (th_ray *)p[1].ptrVal;
-	th_ent **scene = (th_ent **)p[0].ptrVal;
-
-	th_ray_getcoll(ra, colls, maxColls, count, scene, sceneLen);
-}
-
-void
-umth_ray_get_tilemap_coll(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_ray *ra = (th_ray *)p[2].ptrVal;
-	th_tmap *t = (th_tmap *)p[1].ptrVal;
-	th_vf2 *ic = (th_vf2 *)p[0].ptrVal;
-
-	r->intVal = th_ray_to_tilemap(ra, t, ic);
-}
-
-///////////////////////
 // misc
 
 void
@@ -1063,12 +1049,13 @@ umth_coll_point_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 void
 umth_coll_line_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 *b = p[3].ptrVal;
-	th_vf2 *e = p[2].ptrVal;
-	th_quad *q = p[1].ptrVal;
-	th_vf2 *ic = p[0].ptrVal;
+	th_vf2 *b = p[4].ptrVal;
+	th_vf2 *e = p[3].ptrVal;
+	th_quad *q = p[2].ptrVal;
+	th_vf2 *ic1 = p[1].ptrVal;
+	th_vf2 *ic2 = p[0].ptrVal;
 
-	r->intVal = th_line_to_quad(*b, *e, q, ic);
+	r->intVal = th_line_to_quad(*b, *e, q, ic1, ic2);
 }
 
 void
@@ -1183,6 +1170,7 @@ _th_umka_bind(void *umka)
 	// tilemaps
 	umkaAddFunc(umka, "umth_tilemap_draw", &umth_tilemap_draw);
 	umkaAddFunc(umka, "umth_tilemap_getcoll", &umth_tilemap_getcoll);
+	umkaAddFunc(umka, "umth_tilemap_getcoll_line", &umth_tilemap_getcoll_line);
 	umkaAddFunc(umka, "umth_tilemap_autotile", &umth_tilemap_autotile);
 
 	// images
@@ -1221,10 +1209,6 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_ent_draw", &umth_ent_draw);
 	umkaAddFunc(umka, "umth_ent_getcoll", &umth_ent_getcoll);
 	umkaAddFunc(umka, "umth_ent_ysort", &umth_ent_ysort);
-
-	// rays
-	umkaAddFunc(umka, "umth_ray_getcoll", &umth_ray_getcoll);
-	umkaAddFunc(umka, "umth_ray_get_tilemap_coll", &umth_ray_get_tilemap_coll);
 
 	// audio
 	umkaAddFunc(umka, "umth_sound_load", &umth_sound_load);
