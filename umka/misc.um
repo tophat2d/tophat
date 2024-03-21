@@ -11,7 +11,7 @@ import (
 // Use std.freadall instaed.
 fn readall*(path: str): str {
 //~~
-	return std.freadall(std.fopen(path, "r").item0).item0
+	return std.freadall(std.fopen(path, "rb").item0).item0
 }
 
 //~~fn stepify
