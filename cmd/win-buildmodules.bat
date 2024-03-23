@@ -1,7 +1,7 @@
 @echo off
 setlocal enableDelayedExpansion
 
-set modules=umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um umka/input.um umka/misc.um umka/canvas.um umka/ray.um umka/rect.um umka/tilemap.um umka/window.um umka/particles.um umka/lerp.um umka/font.um umka/th.um umka/signal.um umka/atlas.um umka/shader.um umka/color.um umka/coll.um umka/placeholders.um umka/nav.um umka/ui.um
+set modules=umka/anim.um umka/audio.um umka/csv.um umka/ent.um umka/image.um umka/input.um umka/misc.um umka/canvas.um umka/rect.um umka/tilemap.um umka/window.um umka/particles.um umka/lerp.um umka/font.um umka/th.um umka/signal.um umka/atlas.um umka/shader.um umka/color.um umka/coll.um umka/placeholders.um umka/nav.um umka/ui.um
 set module_names=%modules:umka/=%
 set umka=lib\umka\umka_windows_msvc\umka.exe
 set em_target=src\staembed.c
