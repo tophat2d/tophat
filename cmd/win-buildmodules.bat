@@ -7,7 +7,7 @@ set umka=lib\umka\umka_windows_msvc\umka.exe
 set em_target=src\staembed.c
 set run=%umka% cmd\buildhelper.um
 set images=etc/test.ff etc/icon.ff etc/button.ff
-set docs=umka/anim.md umka/audio.md umka/csv.md umka/ent.md umka/image.md umka/input.md umka/misc.md umka/canvas.md umka/ray.md umka/rect.md umka/tilemap.md umka/window.md umka/particles.md umka/lerp.md umka/font.md umka/th.md umka/signal.md umka/atlas.md umka/shader.md umka/color.md umka/coll.md umka/placeholders.md umka/nav.md umka/ui.md
+set docs=umka/anim.md umka/audio.md umka/csv.md umka/ent.md umka/image.md umka/input.md umka/misc.md umka/canvas.md umka/rect.md umka/tilemap.md umka/window.md umka/particles.md umka/lerp.md umka/font.md umka/th.md umka/signal.md umka/atlas.md umka/shader.md umka/color.md umka/coll.md umka/placeholders.md umka/nav.md umka/ui.md
 
 echo. > %em_target%
 echo #include "tophat.h" > %em_target%
