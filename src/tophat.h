@@ -232,6 +232,44 @@ typedef struct
 
 typedef uint32_t th_shader;
 
+typedef struct
+{
+	uu pressed;
+	uu just_pressed;
+	uu just_released;
+	fu pressure;
+} th_gamepad_button;
+
+typedef struct
+{
+	bool connected;
+
+	// Modelled after XBox controller
+	union
+	{
+		struct
+		{
+			th_gamepad_button A, B, X, Y;
+			th_gamepad_button LT, RT, LB, RB;
+
+			th_gamepad_button select; // AKA view, back
+			th_gamepad_button start;  // AKA menu
+
+			th_gamepad_button dpad_up;
+			th_gamepad_button dpad_down;
+			th_gamepad_button dpad_left;
+			th_gamepad_button dpad_right;
+
+			th_gamepad_button left_stick_press;
+			th_gamepad_button right_stick_press;
+		};
+		th_gamepad_button buttons[16];
+	};
+
+	th_vf2 left_stick;  // -1 to 1
+	th_vf2 right_stick; // -1 to 1
+} th_generic_gamepad;
+
 // struct holding all tophat's global variables.
 typedef struct
 {
@@ -250,6 +288,8 @@ typedef struct
 	th_vf2 mouse;
 	th_vf2 mouse_delta;
 	th_vf2 mouse_wheel;
+
+	th_generic_gamepad gamepad[4];
 
 	th_shader *shaders;
 	uu shader_count;
@@ -474,6 +514,8 @@ void
 th_input_sync_fake_keys();
 void
 th_input_cycle();
+void
+th_input_update_gamepads();
 
 // misc
 void
