@@ -650,6 +650,30 @@ umth_input_gamepad_stick(UmkaStackSlot *p, UmkaStackSlot *r)
 	}
 }
 
+void
+umth_input_gamepad_rumble(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	int gamepad = p[2].intVal;
+	float left = p[1].realVal;
+	float right = p[0].realVal;
+
+	if (gamepad < 0 || gamepad >= 4) {
+		return;
+	}
+
+	if (left < 0)
+		left = 0;
+	if (right < 0)
+		right = 0;
+	if (left > 0.99)
+		left = 0.99;
+	if (right > 0.99)
+		right = 0.99;
+
+	thg->gamepad[gamepad].rumble_left = left;
+	thg->gamepad[gamepad].rumble_right = right;
+}
+
 ///////////////////////
 // entities
 // draws an entity
@@ -1295,6 +1319,7 @@ _th_umka_bind(void *umka)
 	    umka, "umth_input_gamepad_is_just_released", &umth_input_gamepad_is_just_released);
 	umkaAddFunc(umka, "umth_input_gamepad_pressure", &umth_input_gamepad_pressure);
 	umkaAddFunc(umka, "umth_input_gamepad_stick", &umth_input_gamepad_stick);
+	umkaAddFunc(umka, "umth_input_gamepad_rumble", &umth_input_gamepad_rumble);
 
 	// entities
 	umkaAddFunc(umka, "umth_ent_draw", &umth_ent_draw);

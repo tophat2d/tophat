@@ -96,6 +96,11 @@ th_input_update_gamepads()
 		th_generic_gamepad *gp = &thg->gamepad[i];
 
 		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
+			XINPUT_VIBRATION vib = {0};
+			vib.wLeftMotorSpeed = (gp->rumble_left * 65535);
+			vib.wRightMotorSpeed = (gp->rumble_right * 65535);
+			XInputSetState(i, &vib);
+
 			gp->connected = true;
 
 			XINPUT_GAMEPAD xgp = state.Gamepad;

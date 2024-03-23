@@ -385,3 +385,12 @@ fn (p: ^Player) stick*(stick: GamepadStick): th.Vf2 {
 	umth_input_gamepad_stick(p.id, stick, &out)
 	return out
 }
+
+fn umth_input_gamepad_rumble(player: int, left, right: th.fu)
+
+//~~fn rumble
+// Rumbles/vibrates the gamepad.
+fn (p: ^Player) rumble*(left, right: th.fu) {
+//~~
+	umth_input_gamepad_rumble(p.id, left, right)
+}

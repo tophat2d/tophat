@@ -70,6 +70,8 @@ fn showGamepadInfo(pos: th.Vf2, player: input.Player) {
 		return
 	}
 
+	player.rumble(player.pressure(.lt), player.pressure(.rt))
+
 	info := ""
 
 	for i := 0; i <  int(input.GenericGamepadButton._count); i++ {

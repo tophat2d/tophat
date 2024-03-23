@@ -268,6 +268,9 @@ typedef struct
 
 	th_vf2 left_stick;  // -1 to 1
 	th_vf2 right_stick; // -1 to 1
+
+	float rumble_left;
+	float rumble_right;
 } th_generic_gamepad;
 
 // struct holding all tophat's global variables.
