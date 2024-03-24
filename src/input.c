@@ -101,6 +101,9 @@ th_input_update_gamepads()
 			vib.wRightMotorSpeed = (gp->rumble_right * 65535);
 			XInputSetState(i, &vib);
 
+			gp->rumble_left = 0;
+			gp->rumble_right = 0;
+
 			gp->connected = true;
 
 			XINPUT_GAMEPAD xgp = state.Gamepad;
