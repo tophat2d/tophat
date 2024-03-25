@@ -64,6 +64,7 @@
     <button id="runButton">Run</button>
     <button id="clearButton">Clear Output</button>
     <select id="examples">
+      <option id=""></option>
       <option id="hello-world">Hello world</option>
       <option id="hello-world-font">Hello world (using font.um)</option>
       <option id="rectangle">Moving rectangle</option>
@@ -95,6 +96,7 @@
       var clearButton = document.getElementById('clearButton');
       var runButton = document.getElementById('runButton');
       var examplesCombo = document.getElementById('examples');
+			examplesCombo.value = '';
       var outputArea = document.getElementById('outputArea');
       var canvas = document.getElementById('canvas');
 
@@ -146,6 +148,9 @@
 
       var chooseExample = () => {
           switch (examplesCombo.value) {
+					case "":
+						window.jar.updateCode("");
+						break;
           case "Hello world":
             window.jar.updateCode(
 `import (
@@ -168,6 +173,7 @@ fn init*() {
   "font.um"
   "th.um"
   "window.um"
+  "std.um"
 )
 
 var ft: font.Font
@@ -175,7 +181,9 @@ var ft: font.Font
 fn init*() {
   window.setup("Hello world", 200, 200)
 
-  ft = font.load("etc/roboto.ttf", 32)
+  var err: std.Err
+  ft, err = font.load("etc/roboto.ttf", 32)
+  std.exitif(err)
 
   window.onFrame.register({
     ft.draw("Hello world", { 1, 1 }, th.green, 1)
@@ -221,7 +229,9 @@ const scale = 4
 
 fn init*() {
   window.setup("image drawing", 400, 400)
-  img = image.load("etc/logo/logo-hatonly.png")
+  var err: std.Err
+  img, err = image.load("etc/logo/logo-hatonly.png")
+  std.exitif(err)
 
   window.onFrame.register(signal.Callback{
     img.draw(th.mkTransform(
