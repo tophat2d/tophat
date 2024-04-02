@@ -144,7 +144,7 @@ type Key* = enum {
 //~~
 
 //~~Gamepad button number
-type GenericGamepadButton* = enum {
+type GamepadButton* = enum {
 	a
 	b
 	x
@@ -172,7 +172,7 @@ type GamepadStick* = enum {
 }
 //~~
 
-type Player* = struct {
+type Gamepad* = struct {
 	id: int
 }
 
@@ -306,91 +306,87 @@ fn getMouseScroll*(): th.Vf2 {
 	return th.Vf2{x, y}
 }
 
-fn umth_input_gamepad_get_players*(out: ^[4]int)
+fn umth_input_gamepad_get_gamepads*(out: ^[4]int)
 
-//~~fn players
+//~~fn gamepads
 // Returns a list of gamepads that are currently connected.
-fn players*(): []Player {
+fn gamepads*(): []Gamepad {
 //~~
-	var players: [4]int
-	umth_input_gamepad_get_players(&players)
+	var gamepads: [4]int
+	umth_input_gamepad_get_gamepads(&gamepads)
 
-	result := []Player{}
+	result := []Gamepad{}
 
-	for i, p in players {
+	for i, p in gamepads {
 		if p >= 0 {
-			result = append(result, Player{p})
+			result = append(result, Gamepad{p})
 		}
 	}
 
 	return result
 }
 
-//~~fn player
+fn umth_input_gamepad_get_gamepad*(): int
+
+//~~fn gamepad
 // Returns the connected gamepad.
-fn player*(): Player {
+fn gamepad*(): Gamepad {
 //~~
-	players := players()
-
-	if len(players) == 0 {
-		return Player{-1}
-	}
-
-	return players[0]
+	return Gamepad{umth_input_gamepad_get_gamepad()}
 }
 
-fn umth_input_gamepad_is_pressed(player: int, button: GenericGamepadButton): bool
+fn umth_input_gamepad_is_pressed(gamepad: int, button: GamepadButton): bool
 
 //~~fn isPressed
 // Returns true if the gamepad button is pressed.
-fn (p: ^Player) isPressed*(button: GenericGamepadButton): bool {
+fn (g: ^Gamepad) isPressed*(button: GamepadButton): bool {
 //~~
-	return umth_input_gamepad_is_pressed(p.id, button)
+	return umth_input_gamepad_is_pressed(g.id, button)
 }
 
-fn umth_input_gamepad_is_just_pressed(player: int, button: GenericGamepadButton): bool
+fn umth_input_gamepad_is_just_pressed(gamepad: int, button: GamepadButton): bool
 
 //~~fn isJustPressed
 // Returns true if the gamepad button was just pressed.
-fn (p: ^Player) isJustPressed*(button: GenericGamepadButton): bool {
+fn (g: ^Gamepad) isJustPressed*(button: GamepadButton): bool {
 //~~
-	return umth_input_gamepad_is_just_pressed(p.id, button)
+	return umth_input_gamepad_is_just_pressed(g.id, button)
 }
 
-fn umth_input_gamepad_is_just_released(player: int, button: GenericGamepadButton): bool
+fn umth_input_gamepad_is_just_released(gamepad: int, button: GamepadButton): bool
 
 //~~fn isJustReleased
 // Returns true if the gamepad button was just released.
-fn (p: ^Player) isJustReleased*(button: GenericGamepadButton): bool {
+fn (g: ^Gamepad) isJustReleased*(button: GamepadButton): bool {
 //~~
-	return umth_input_gamepad_is_just_released(p.id, button)
+	return umth_input_gamepad_is_just_released(g.id, button)
 }
 
-fn umth_input_gamepad_pressure(player: int, button: GenericGamepadButton): th.fu
+fn umth_input_gamepad_pressure(gamepad: int, button: GamepadButton): th.fu
 
 //~~fn pressure
 // Returns the pressure of the gamepad button in the range [0, 1].
-fn (p: ^Player) pressure*(button: GenericGamepadButton): th.fu {
+fn (g: ^Gamepad) pressure*(button: GamepadButton): th.fu {
 //~~
-	return umth_input_gamepad_pressure(p.id, button)
+	return umth_input_gamepad_pressure(g.id, button)
 }
 
-fn umth_input_gamepad_stick(player: int, stick: GamepadStick, out: ^th.Vf2)
+fn umth_input_gamepad_stick(gamepad: int, stick: GamepadStick, out: ^th.Vf2)
 
 //~~fn stick
 // Returns the movement of the gamepad stick in the range [-1, 1] for each axis.
-fn (p: ^Player) stick*(stick: GamepadStick): th.Vf2 {
+fn (g: ^Gamepad) stick*(stick: GamepadStick): th.Vf2 {
 //~~
 	var out: th.Vf2
-	umth_input_gamepad_stick(p.id, stick, &out)
+	umth_input_gamepad_stick(g.id, stick, &out)
 	return out
 }
 
-fn umth_input_gamepad_rumble(player: int, left, right: th.fu)
+fn umth_input_gamepad_rumble(gamepad: int, left, right: th.fu)
 
 //~~fn rumble
 // Rumbles/vibrates the gamepad.
-fn (p: ^Player) rumble*(left, right: th.fu) {
+fn (g: ^Gamepad) rumble*(left, right: th.fu) {
 //~~
-	umth_input_gamepad_rumble(p.id, left, right)
+	umth_input_gamepad_rumble(g.id, left, right)
 }

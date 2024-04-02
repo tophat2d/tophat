@@ -568,12 +568,25 @@ umth_input_get_mouse_scroll(UmkaStackSlot *p, UmkaStackSlot *r)
 }
 
 void
-umth_input_gamepad_get_players(UmkaStackSlot *p, UmkaStackSlot *r)
+umth_input_gamepad_get_gamepads(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	((int64_t *)p[0].ptrVal)[0] = thg->gamepad[0].connected ? 0 : -1;
 	((int64_t *)p[0].ptrVal)[1] = thg->gamepad[1].connected ? 1 : -1;
 	((int64_t *)p[0].ptrVal)[2] = thg->gamepad[2].connected ? 2 : -1;
 	((int64_t *)p[0].ptrVal)[3] = thg->gamepad[3].connected ? 3 : -1;
+}
+
+void
+umth_input_gamepad_get_gamepad(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	for (int i = 0; i < 4; i++) {
+		if (thg->gamepad[i].connected) {
+			r->intVal = i;
+			return;
+		}
+	}
+
+	r->intVal = -1;
 }
 
 void
@@ -1311,7 +1324,8 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_input_get_str", &umth_input_get_str);
 	umkaAddFunc(umka, "umth_input_get_mouse_delta", &umth_input_get_mouse_delta);
 	umkaAddFunc(umka, "umth_input_get_mouse_scroll", &umth_input_get_mouse_scroll);
-	umkaAddFunc(umka, "umth_input_gamepad_get_players", &umth_input_gamepad_get_players);
+	umkaAddFunc(umka, "umth_input_gamepad_get_gamepads", &umth_input_gamepad_get_gamepads);
+	umkaAddFunc(umka, "umth_input_gamepad_get_gamepad", &umth_input_gamepad_get_gamepad);
 	umkaAddFunc(umka, "umth_input_gamepad_is_pressed", &umth_input_gamepad_is_pressed);
 	umkaAddFunc(
 	    umka, "umth_input_gamepad_is_just_pressed", &umth_input_gamepad_is_just_pressed);
