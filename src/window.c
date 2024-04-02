@@ -77,6 +77,8 @@ static void
 frame()
 {
 	thg->dpi_scale_factor = sapp_dpi_scale();
+	th_input_update_gamepads();
+	th_input_sync_fake_keys();
 
 	thg->pass_action = (sg_pass_action){
 	    .colors[0] =
@@ -90,7 +92,6 @@ frame()
 	    .swapchain = sglue_swapchain(),
 	});
 	sg_apply_pipeline(thg->canvas_pip);
-	th_input_sync_fake_keys();
 	int window_width, window_height;
 	th_window_get_dimensions(&window_width, &window_height);
 	thg->target_size = (th_vf2){.w = window_width, .h = window_height};
