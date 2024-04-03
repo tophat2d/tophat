@@ -137,6 +137,7 @@ th_image_create_render_target(th_render_target **out, int width, int height, int
 	t->image->smp = sg_make_sampler(&smp_desc);
 	th_err err = assert_image(t->image);
 	if (err) {
+		umkaDecRef(thg->umka, t);
 		return err;
 	}
 
@@ -204,6 +205,7 @@ th_load_image(th_image **out, char *path)
 	th_err err = gen_tex(img, (uint32_t *)data);
 	stbi_image_free(data);
 	if (err) {
+		umkaDecRef(thg->umka, img);
 		return err;
 	}
 
