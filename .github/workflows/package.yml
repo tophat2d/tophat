@@ -20,7 +20,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Install packages
-      run: sudo apt install -y openssh-client mesa-common-dev xorg-dev libxi-dev libxcursor-dev mingw-w64
+      run: sudo apt install -y openssh-client mesa-common-dev xorg-dev libxi-dev libxcursor-dev mingw-w64 mingw-w64-common
     - name: Install SSH key
       uses: shimataro/ssh-key-action@v2
       with:
