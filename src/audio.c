@@ -42,6 +42,7 @@ th_audio_load(th_sound **out, char *path, uint32_t flags)
 	if (ma_sound_init_from_file(&thg->audio_engine, path,
 		MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION | flags, NULL, NULL,
 		&s->inst) != MA_SUCCESS) {
+		umkaDecRef(thg->umka, s);
 		return th_err_io;
 	}
 
@@ -58,6 +59,7 @@ th_sound_copy(th_sound **out, th_sound *s)
 	if (ma_sound_init_copy(&thg->audio_engine, &s->inst,
 		MA_SOUND_FLAG_DECODE | MA_SOUND_FLAG_NO_SPATIALIZATION, NULL,
 		&r->inst) != MA_SUCCESS) {
+		umkaDecRef(thg->umka, r);
 		return 1;
 	}
 

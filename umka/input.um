@@ -143,6 +143,38 @@ type Key* = enum {
 }
 //~~
 
+//~~Gamepad button number
+type GamepadButton* = enum {
+	a
+	b
+	x
+	y
+	lt
+	rt
+	lb
+	rb
+	select
+	start
+	up
+	down
+	left
+	right
+	lstick
+	rstick
+	_count
+}
+//~~
+
+//~~Gamepad stick number
+type GamepadStick* = enum {
+	left
+	right
+}
+//~~
+
+type Gamepad* = struct {
+	id: int
+}
 
 fn toupper(c: char): int {
 	if c >= 'a' && c <= 'z' {
@@ -272,4 +304,89 @@ fn getMouseScroll*(): th.Vf2 {
 	var x, y: th.fu
 	umth_input_get_mouse_scroll(&x, &y)
 	return th.Vf2{x, y}
+}
+
+fn umth_input_gamepad_get_gamepads*(out: ^[4]int)
+
+//~~fn gamepads
+// Returns a list of gamepads that are currently connected.
+fn gamepads*(): []Gamepad {
+//~~
+	var gamepads: [4]int
+	umth_input_gamepad_get_gamepads(&gamepads)
+
+	result := []Gamepad{}
+
+	for i, p in gamepads {
+		if p >= 0 {
+			result = append(result, Gamepad{p})
+		}
+	}
+
+	return result
+}
+
+fn umth_input_gamepad_get_gamepad*(): int
+
+//~~fn gamepad
+// Returns the connected gamepad.
+fn gamepad*(): Gamepad {
+//~~
+	return Gamepad{umth_input_gamepad_get_gamepad()}
+}
+
+fn umth_input_gamepad_is_pressed(gamepad: int, button: GamepadButton): bool
+
+//~~fn isPressed
+// Returns true if the gamepad button is pressed.
+fn (g: ^Gamepad) isPressed*(button: GamepadButton): bool {
+//~~
+	return umth_input_gamepad_is_pressed(g.id, button)
+}
+
+fn umth_input_gamepad_is_just_pressed(gamepad: int, button: GamepadButton): bool
+
+//~~fn isJustPressed
+// Returns true if the gamepad button was just pressed.
+fn (g: ^Gamepad) isJustPressed*(button: GamepadButton): bool {
+//~~
+	return umth_input_gamepad_is_just_pressed(g.id, button)
+}
+
+fn umth_input_gamepad_is_just_released(gamepad: int, button: GamepadButton): bool
+
+//~~fn isJustReleased
+// Returns true if the gamepad button was just released.
+fn (g: ^Gamepad) isJustReleased*(button: GamepadButton): bool {
+//~~
+	return umth_input_gamepad_is_just_released(g.id, button)
+}
+
+fn umth_input_gamepad_pressure(gamepad: int, button: GamepadButton): th.fu
+
+//~~fn pressure
+// Returns the pressure of the gamepad button in the range [0, 1].
+fn (g: ^Gamepad) pressure*(button: GamepadButton): th.fu {
+//~~
+	return umth_input_gamepad_pressure(g.id, button)
+}
+
+fn umth_input_gamepad_stick(gamepad: int, stick: GamepadStick, out: ^th.Vf2)
+
+//~~fn stick
+// Returns the movement of the gamepad stick in the range [-1, 1] for each axis.
+fn (g: ^Gamepad) stick*(stick: GamepadStick): th.Vf2 {
+//~~
+	var out: th.Vf2
+	umth_input_gamepad_stick(g.id, stick, &out)
+	return out
+}
+
+fn umth_input_gamepad_rumble(gamepad: int, left, right: th.fu)
+
+//~~fn rumble
+// Rumbles/vibrates the gamepad.
+fn (g: ^Gamepad) rumble*(left, right: th.fu) {
+//~~
+	umth_input_gamepad_rumble(g.id, left, right)
 }

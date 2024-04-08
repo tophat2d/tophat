@@ -37,7 +37,7 @@ if(MSVC)
     string(STRIP "${gitver}" gitver)
     target_compile_definitions(tophat PUBLIC -DTH_VERSION=\"${ver}\" -DTH_GITVER=\"${gitver}\")
 
-    target_link_libraries(tophat gdi32 opengl32 user32 ${umka_lib_path})
+    target_link_libraries(tophat xinput gdi32 opengl32 user32 ${umka_lib_path})
 else()
     message("TODO(skejeton): This script only works with MSVC. If you are on Linux or WSL/MSYS2 run `make` instead.")
 endif()

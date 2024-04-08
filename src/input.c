@@ -1,5 +1,9 @@
 #include "tophat.h"
 #include <string.h>
+#ifdef _WIN32
+#include <math.h>
+#include <xinput.h>
+#endif
 
 extern th_global *thg;
 
@@ -62,4 +66,85 @@ th_input_cycle()
 	memset(thg->just_pressed, 0, 512 * sizeof(uu));
 	memset(thg->just_released, 0, 512 * sizeof(uu));
 	memset(thg->press_repeat, 0, 512 * sizeof(uu));
+}
+
+// Deadzone and drift fix
+static float
+i_fix(float value)
+{
+	if (fabs(value) < 0.08)
+		return 0;
+	return value;
+}
+
+static void
+i_update_button(th_gamepad_button *btn, float value)
+{
+	btn->just_pressed = !btn->pressed && value > 0.5f;
+	btn->just_released = btn->pressed && value <= 0.5f;
+	btn->pressed = value > 0.5f;
+	btn->pressure = value;
+}
+
+void
+th_input_update_gamepads()
+{
+#ifdef _WIN32
+	XINPUT_STATE state;
+	for (int i = 0; i < 4; i++) {
+		state = (XINPUT_STATE){0};
+
+		th_generic_gamepad *gp = &thg->gamepad[i];
+
+		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
+			XINPUT_VIBRATION vib = {0};
+			vib.wLeftMotorSpeed = (gp->rumble_left * 65535);
+			vib.wRightMotorSpeed = (gp->rumble_right * 65535);
+			XInputSetState(i, &vib);
+
+			gp->rumble_left = 0;
+			gp->rumble_right = 0;
+
+			gp->connected = true;
+
+			XINPUT_GAMEPAD xgp = state.Gamepad;
+
+			i_update_button(&gp->dpad_up, (xgp.wButtons & XINPUT_GAMEPAD_DPAD_UP) > 0);
+			i_update_button(
+			    &gp->dpad_down, (xgp.wButtons & XINPUT_GAMEPAD_DPAD_DOWN) > 0);
+			i_update_button(
+			    &gp->dpad_left, (xgp.wButtons & XINPUT_GAMEPAD_DPAD_LEFT) > 0);
+			i_update_button(
+			    &gp->dpad_right, (xgp.wButtons & XINPUT_GAMEPAD_DPAD_RIGHT) > 0);
+
+			i_update_button(&gp->start, (xgp.wButtons & XINPUT_GAMEPAD_START) > 0);
+			i_update_button(&gp->select, (xgp.wButtons & XINPUT_GAMEPAD_BACK) > 0);
+
+			i_update_button(
+			    &gp->left_stick_press, (xgp.wButtons & XINPUT_GAMEPAD_LEFT_THUMB) > 0);
+			i_update_button(&gp->right_stick_press,
+			    (xgp.wButtons & XINPUT_GAMEPAD_RIGHT_THUMB) > 0);
+
+			i_update_button(&gp->LB, (xgp.wButtons & XINPUT_GAMEPAD_LEFT_SHOULDER) > 0);
+			i_update_button(
+			    &gp->RB, (xgp.wButtons & XINPUT_GAMEPAD_RIGHT_SHOULDER) > 0);
+
+			i_update_button(&gp->A, (xgp.wButtons & XINPUT_GAMEPAD_A) > 0);
+			i_update_button(&gp->B, (xgp.wButtons & XINPUT_GAMEPAD_B) > 0);
+			i_update_button(&gp->X, (xgp.wButtons & XINPUT_GAMEPAD_X) > 0);
+			i_update_button(&gp->Y, (xgp.wButtons & XINPUT_GAMEPAD_Y) > 0);
+
+			i_update_button(&gp->LT, (float)xgp.bLeftTrigger / 255.0f);
+			i_update_button(&gp->RT, (float)xgp.bRightTrigger / 255.0f);
+
+			gp->left_stick.x = i_fix((float)xgp.sThumbLX / 32768.0f);
+			gp->left_stick.y = i_fix((float)xgp.sThumbLY / 32768.0f);
+
+			gp->right_stick.x = i_fix((float)xgp.sThumbRX / 32768.0f);
+			gp->right_stick.y = i_fix((float)xgp.sThumbRY / 32768.0f);
+		} else {
+			gp->connected = false;
+		}
+	}
+#endif
 }
