@@ -1,9 +1,9 @@
 #include "tophat.h"
 #include <string.h>
 #ifdef _WIN32
-#include <math.h>
 #include <xinput.h>
 #endif
+#include <math.h>
 
 extern th_global *thg;
 
