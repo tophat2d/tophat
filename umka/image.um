@@ -16,34 +16,34 @@ type Image* = struct{ _: ^struct{} }
 type RenderTarget* = struct { _: ^struct{} }
 //~~
 
-fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: int): th.ErrCode
+fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: int): th::ErrCode
 //~~fn createRenderTarget
 // Creates a render target you can draw to, like to a window.
 // Filter specifies specfifies filtering for resulting image.
 // Image can be retrieved via `toImage`.
-fn createRenderTarget*(size: th.Vf2, filter: int): (RenderTarget, std.Err) {
+fn createRenderTarget*(size: th::Vf2, filter: int): (RenderTarget, std::Err) {
 //~~
 	rt := RenderTarget{}
 	ec := umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y), filter)
-	return rt, th.__errFromCode(ec)
+	return rt, th::__errFromCode(ec)
 }
 
-fn umth_image_render_target_begin(rt: RenderTarget): th.ErrCode
+fn umth_image_render_target_begin(rt: RenderTarget): th::ErrCode
 //~~fn RenderTarget.end
 // Begins the render target rendering pass.
-fn (rt: ^RenderTarget) begin*(): std.Err {
+fn (rt: ^RenderTarget) begin*(): std::Err {
 //~~
 	ec := umth_image_render_target_begin(rt^)
-	return th.__errFromCode(ec)
+	return th::__errFromCode(ec)
 }
 
-fn umth_image_render_target_end(rt: RenderTarget, wp: th.Vf2): th.ErrCode
+fn umth_image_render_target_end(rt: RenderTarget, wp: th::Vf2): th::ErrCode
 //~~fn RenderTarget.end
 // Ends the render target rendering pass.
-fn (rt: ^RenderTarget) end*(wp: th.Vf2): std.Err {
+fn (rt: ^RenderTarget) end*(wp: th::Vf2): std::Err {
 //~~
 	ec := umth_image_render_target_end(rt^, wp)
-	return th.__errFromCode(ec)
+	return th::__errFromCode(ec)
 }
 
 fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
@@ -59,14 +59,14 @@ fn (rt: ^RenderTarget) toImage*(): Image {
 	return img
 }
 
-fn umth_image_load(ret: ^Image, path: str): th.ErrCode
+fn umth_image_load(ret: ^Image, path: str): th::ErrCode
 //~~fn load
 // Loads an image at path.
-fn load*(path: str): (Image, std.Err) {
+fn load*(path: str): (Image, std::Err) {
 //~~
 	img := Image{}
 	ec := umth_image_load(&img, path)
-	return img, th.__errFromCode(ec)
+	return img, th::__errFromCode(ec)
 }
 
 //~~fn Image.validate
@@ -82,7 +82,7 @@ fn umth_image_flipv(i: Image, f: bool)
 fn (i: ^Image) flipv*(flip: bool) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	umth_image_flipv(i^, flip)
@@ -94,26 +94,26 @@ fn umth_image_fliph(i: Image, f: bool)
 fn (i: ^Image) fliph*(flip: bool) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	umth_image_fliph(i^, flip)
 }
 
-fn umth_image_draw(img: Image, t: ^th.Transform, color: uint32)
+fn umth_image_draw(img: Image, t: ^th::Transform, color: uint32)
 //~~fn Image.draw
 // Draws the image in screen coordinates. It transforms it with t and
 // applies color as a color filter.
-fn (i: ^Image) draw*(t: th.Transform, color: uint32 = th.white) {
+fn (i: ^Image) draw*(t: th::Transform, color: uint32 = th::white) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	umth_image_draw(i^, &t, color)
 }
 
-fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: ^rect.Rect,
+fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: ^rect::Rect,
 	color: uint32, scale: real)
 //~~fn Image.drawNinepatch
 // Draws "nine-patch" image.
@@ -122,51 +122,51 @@ fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: ^rect.Rect,
 // You can tint with `color`.
 //
 // ![](img/ninepatch.png)
-fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect.Rect, color: uint32 = th.white, scale: real = 1.0) {
+fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect::Rect, color: uint32 = th::white, scale: real = 1.0) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	umth_image_draw_nine_patch(i^, &outer, &inner, &dest, color, scale)
 }
 
-fn umth_image_draw_on_quad(img: Image, color: uint32, q: th.Quad)
+fn umth_image_draw_on_quad(img: Image, color: uint32, q: th::Quad)
 //~~fn Image.drawOnQuad
 // Draws the image on top of a quad with corners of the image positioned
 // on the verticies of the quad.
-fn (i: ^Image) drawOnQuad*(q: th.Quad, color: uint32 = th.white) {
+fn (i: ^Image) drawOnQuad*(q: th::Quad, color: uint32 = th::white) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	umth_image_draw_on_quad(i^, color, q)
 }
 
-fn umth_image_get_dims(dm: ^th.Vf2, i: Image)
+fn umth_image_get_dims(dm: ^th::Vf2, i: Image)
 //~~fn Image.getDims
 // Returns width and heigth.
-fn (i: ^Image) getDims*(): th.Vf2 {
+fn (i: ^Image) getDims*(): th::Vf2 {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
-	out := th.Vf2{}
+	out := th::Vf2{}
 	umth_image_get_dims(&out, i^)
 
 	return out
 }
 
-fn umth_image_crop(img: Image, tl, br: th.Vf2)
+fn umth_image_crop(img: Image, tl, br: th::Vf2)
 //~~fn Image.crop
 // Crops an image. Coordinates are between 0, 0 (top left) and
 // 1, 1 (bottom right)
-fn (i: ^Image) crop*(tl, br: th.Vf2) {
+fn (i: ^Image) crop*(tl, br: th::Vf2) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	umth_image_crop(i^, tl, br)
@@ -174,10 +174,10 @@ fn (i: ^Image) crop*(tl, br: th.Vf2) {
 
 //~~fn Image.cropPx
 // Same as `Image.crop`, but the positions are in pixels.
-fn (i: ^Image) cropPx*(tr, br: th.Vf2) {
+fn (i: ^Image) cropPx*(tr, br: th::Vf2) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	dm := i.getDims()
@@ -186,99 +186,99 @@ fn (i: ^Image) cropPx*(tr, br: th.Vf2) {
 
 //~~fn Image.cropRect
 // Same as `Image.crop`, but uses a rect instead of two positions.
-fn (i: ^Image) cropRect*(r: rect.Rect) {
+fn (i: ^Image) cropRect*(r: rect::Rect) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	umth_image_crop(i^, r.getPos(), r.getEnd())
 }
 
-fn umth_image_crop_quad(img: Image, q: ^th.Quad)
+fn umth_image_crop_quad(img: Image, q: ^th::Quad)
 //~~fn Image.cropQuad
 // Crop an image using a quad.
-fn (i: ^Image) cropQuad*(q: th.Quad) {
+fn (i: ^Image) cropQuad*(q: th::Quad) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	umth_image_crop_quad(i^, &q)
 }
 
-fn umth_image_get_crop_quad(img: Image, q: ^th.Quad)
+fn umth_image_get_crop_quad(img: Image, q: ^th::Quad)
 //~~fn Image.getCropQuad
 // Crop an image using a quad.
-fn (i: ^Image) getCropQuad*(): th.Quad {
+fn (i: ^Image) getCropQuad*(): th::Quad {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
-	var (q: th.Quad)
+	var (q: th::Quad)
 	umth_image_get_crop_quad(i^, &q)
 	return q
 }
 
-fn umth_image_from_data(ret: ^Image, data: ^uint32, dm: th.Vf2): th.ErrCode
+fn umth_image_from_data(ret: ^Image, data: ^uint32, dm: th::Vf2): th::ErrCode
 //~~fn mk
 // Creates an image from raw data.
-fn mk*(data: []uint32, dm: th.Vf2): (Image, std.Err) {
+fn mk*(data: []uint32, dm: th::Vf2): (Image, std::Err) {
 //~~
 	img := Image{}
 	ec := umth_image_from_data(&img, &data[0], dm)
 
-	return img, th.__errFromCode(ec)
+	return img, th::__errFromCode(ec)
 }
 
-fn umth_image_copy(ret: ^Image, data: Image): th.ErrCode
+fn umth_image_copy(ret: ^Image, data: Image): th::ErrCode
 //~~fn Image.copy
 // Copies image into a new one.
-fn (i: ^Image) copy*(): (Image, std.Err) {
+fn (i: ^Image) copy*(): (Image, std::Err) {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	img := Image{}
 	ec := umth_image_copy(&img, i^)
 
-	return img, th.__errFromCode(ec)
+	return img, th::__errFromCode(ec)
 }
 
-fn umth_image_set_filter(data: Image, filter: int): th.ErrCode
+fn umth_image_set_filter(data: Image, filter: int): th::ErrCode
 //~~fn Image.setfilter
 // Sets a mag/min filter. 0 is nearest, others are linear.
 // This function will regenerate the texture. This means it shouldn't be
 // used in a loop.
 // https://learnopengl.com/img/getting-started/texture_filtering.png
 // left is nearest, right is linear.
-fn (i: ^Image) setfilter*(filter: int): std.Err {
+fn (i: ^Image) setfilter*(filter: int): std::Err {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
-	return th.__errFromCode(umth_image_set_filter(i^, filter))
+	return th::__errFromCode(umth_image_set_filter(i^, filter))
 }
 
-fn umth_image_update_data(img: Image, data: ^uint32, dm: th.Vf2): th.ErrCode
+fn umth_image_update_data(img: Image, data: ^uint32, dm: th::Vf2): th::ErrCode
 //~~fn Image.setData
 // Updates the image data. dm are the dimensions of the new image.
 // The new image doesn't have to be the same size as the old one.
-fn (i: ^Image) setData*(data: []uint32, dm: th.Vf2): std.Err {
+fn (i: ^Image) setData*(data: []uint32, dm: th::Vf2): std::Err {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 		return {}
 	}
 
 	if dm.x * dm.y != len(data) {
-		return th.__errFromCode(.bad_input, "incorrect dimensions")
+		return th::__errFromCode(.bad_input, "incorrect dimensions")
 	}
 
-	return th.__errFromCode(umth_image_update_data(i^, &data[0], dm))
+	return th::__errFromCode(umth_image_update_data(i^, &data[0], dm))
 }
 
 fn umth_image_get_data(img: Image, data: ^uint32)
@@ -288,7 +288,7 @@ fn umth_image_get_data(img: Image, data: ^uint32)
 fn (i: ^Image) getData*(): []uint32 {
 //~~
 	if !i.validate() {
-		th.__error("image is invalid")
+		th::__error("image is invalid")
 	}
 
 	buf := make([]uint32, trunc(i.getDims().x * i.getDims().y))

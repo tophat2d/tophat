@@ -17,8 +17,8 @@ var (
 	rotation*: int = 0
 	kind*: int = 0
 
-	leftBtnLatch: latch.Latch
-	rightBtnLatch: latch.Latch
+	leftBtnLatch: latch::Latch
+	rightBtnLatch: latch::Latch
 )
 
 fn reset*(_kind: int) {
@@ -31,52 +31,52 @@ fn reset*(_kind: int) {
 	isTspin = false
 }
 
-fn pieceValue*(rotation: int): piece.Piece {
-	return presets.pieceValue(kind, rotation)
+fn pieceValue*(rotation: int): piece::Piece {
+	return presets::pieceValue(kind, rotation)
 }
 
 fn place*() {
 	val := pieceValue(rotation)
-	piece.project(val, trunc(x), trunc(y))
+	piece::project(val, trunc(x), trunc(y))
 }
 
 fn invalid(): bool {
 	val := pieceValue(rotation)
-	return !piece.canPut(val, trunc(x), trunc(y));
+	return !piece::canPut(val, trunc(x), trunc(y));
 }
 
-fn getKicks(from, to: int): [4]presets.Kick {
+fn getKicks(from, to: int): [4]presets::Kick {
 	clockwise := ((from+1)%4) == to
 	if kind == 0 {
 		if clockwise {
-			return presets.ClockwiseI[from]
+			return presets::ClockwiseI[from]
 		} else {
-			return presets.CounterclockwiseI[from]
+			return presets::CounterclockwiseI[from]
 		}
 	}
 	if clockwise {
-		return presets.ClockwiseNI[from]
+		return presets::ClockwiseNI[from]
 	}
-	return presets.CounterclockwiseNI[from]
+	return presets::CounterclockwiseNI[from]
 }
 
 fn checkTSpinCorners() {
 	isTspin = false
-	if kind == presets.pieceTypeT {
+	if kind == presets::pieceTypeT {
 		corners := 0
 		ix, iy := trunc(x), trunc(y)
 
-		if !field.isFree(ix, iy) { corners += 1 }
-		if !field.isFree(ix+2, iy) { corners += 1 }
-		if !field.isFree(ix, iy+2) { corners += 1 }
-		if !field.isFree(ix+2, iy+2) { corners += 1 }
+		if !field::isFree(ix, iy) { corners += 1 }
+		if !field::isFree(ix+2, iy) { corners += 1 }
+		if !field::isFree(ix, iy+2) { corners += 1 }
+		if !field::isFree(ix+2, iy+2) { corners += 1 }
 		if corners >= 3 {
 			isTspin = true
 		}
 	}
 }
 
-fn runKickTable(table: [4]presets.Kick): bool {
+fn runKickTable(table: [4]presets::Kick): bool {
 	if !invalid() {
 		return true
 	}
@@ -86,7 +86,7 @@ fn runKickTable(table: [4]presets.Kick): bool {
 		x += real(kick.x)
 		y += real(-kick.y)
 		if !invalid() {
-			if kind == presets.pieceTypeT {
+			if kind == presets::pieceTypeT {
 				isTspin = true
 			}
 			return true
@@ -164,57 +164,57 @@ fn init*() {
 	rotation = 0
 	kind = 0
 
-  leftBtnLatch = latch.initLatch()
-  rightBtnLatch = latch.initLatch()
+  leftBtnLatch = latch::initLatch()
+  rightBtnLatch = latch::initLatch()
 }
 
 fn update*(speed: real) {
 	prev := y
-	y += 0.001*th.delta*speed;
+	y += 0.001*th::delta*speed;
 	if invalid() {
 		y = prev
-		placeTimer += th.delta/1000.0
-		groundTouchTimer += th.delta/1000.0
+		placeTimer += th::delta/1000.0
+		groundTouchTimer += th::delta/1000.0
 	} else {
 		groundTouchTimer = 0
 		placeTimer = 0
 	}
 
 
-	if (leftBtnLatch.pass(input.isPressed(input.Key.left))) {
+	if (leftBtnLatch.pass(input::isPressed(input::Key.left))) {
 		placeTimer = 0
 		movePiece(-1, 0)
 	}
 
-	if (rightBtnLatch.pass(input.isPressed(input.Key.right))) {
+	if (rightBtnLatch.pass(input::isPressed(input::Key.right))) {
 		placeTimer = 0
 		movePiece(1, 0)
 	}
 
-	if (input.isPressed(input.Key.down)) {
-		placeTimer += th.delta/1000.0
+	if (input::isPressed(input::Key.down)) {
+		placeTimer += th::delta/1000.0
 		prev := y
-		y += 0.01*th.delta*speed;
+		y += 0.01*th::delta*speed;
 		if invalid() {
 			y = prev
 		}
 	}
 
-	if (input.isJustPressedc('X') || input.isJustPressed(input.Key.up)) {
-		global.playSound(&global.audioRotate)
+	if (input::isJustPressedc('X') || input::isJustPressed(input::Key.up)) {
+		global::playSound(&global::audioRotate)
 		placeTimer = 0
 		rotateClockwise()
-	} else if (input.isJustPressedc('Z')) {
-		global.playSound(&global.audioRotate)
+	} else if (input::isJustPressedc('Z')) {
+		global::playSound(&global::audioRotate)
 		placeTimer = 0
 		rotateCounterclockwise()
-	} else if (input.isJustPressedc('C')) {
-		global.playSound(&global.audioRotate)
+	} else if (input::isJustPressedc('C')) {
+		global::playSound(&global::audioRotate)
 		placeTimer = 0
 		rotate180()
 	}
-	if (input.isJustPressedc(' ')) {
-		global.playSound(&global.audioPush)
+	if (input::isJustPressedc(' ')) {
+		global::playSound(&global::audioPush)
 		push()
 	}
 }

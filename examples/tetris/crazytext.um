@@ -40,7 +40,7 @@ fn draw*(x, y: real) {
     slidingSpan = 100
   )
   
-  dt := th.delta/1000.0
+  dt := th::delta/1000.0
 
   py := 0.0
 
@@ -58,17 +58,17 @@ fn draw*(x, y: real) {
     xOffset := slidingSpan * (fading * fading * fading)
     alphaMask := trunc((1.0-fading)*(1.0-reverseFading)*255)&0xFF
 
-    color := th.white
-    rotation := th.Vf2{0, 0}
+    color := th::white
+    rotation := th::Vf2{0, 0}
     if entry.frantic {
-      color = global.hsvToRgb(th.time/1000.0, 0.5, 1.0)
-      rotation = th.Vf2{cos(th.time/1000.0*4.0)*5*(1.0-fading), sin(th.time/1000.0*4.0)*5*(1.0-fading)}
+      color = global::hsvToRgb(th::time/1000.0, 0.5, 1.0)
+      rotation = th::Vf2{cos(th::time/1000.0*4.0)*5*(1.0-fading), sin(th::time/1000.0*4.0)*5*(1.0-fading)}
     }
     color = color&0xFFFFFF00|alphaMask
 
     scale := 1.0+reverseFading*reverseFading
 
-    canvas.drawText(entry.text, th.Vf2{x+xOffset, y+entry.y}.add(rotation), color, fontSize*scale)
+    canvas::drawText(entry.text, th::Vf2{x+xOffset, y+entry.y}.add(rotation), color, fontSize*scale)
 
     // Slerp the entry.y to making approach the wanted y
     if dt > 0.01 {

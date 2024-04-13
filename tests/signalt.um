@@ -9,16 +9,16 @@ import (
 )
 
 fn init*() {
-	window.setup("title", 1280, 720)
-	window.setViewport(th.Vf2{192, 108})
+	window::setup("title", 1280, 720)
+	window::setViewport(th::Vf2{192, 108})
 
-	signal.register("spacePress", {
+	signal::register("spacePress", {
 		printf("%v\n", args)
 	})
 
-	window.onFrame.register({
-		if input.isPressed(input.Key.space) {
-			signal.emit("spacePress", th.time)
+	window::onFrame.register({
+		if input::isPressed(input::Key.space) {
+			signal::emit("spacePress", th::time)
 		}
 	})
 }

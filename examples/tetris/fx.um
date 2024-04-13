@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	reference_frame = rect.Rect{
+	reference_frame = rect::Rect{
 		0, 0,
-		field.FieldWidth*16+6*16,
-		field.FieldHeight*16 }
+		field::FieldWidth*16+6*16,
+		field::FieldHeight*16 }
 
 	EffectClearRow = 0
 )
@@ -29,25 +29,25 @@ type Effect = struct {
 }
 
 var (
-	fallingPiecePos: th.Vf2
+	fallingPiecePos: th::Vf2
 	offset_x : real = 0
 	offset_y : real = 0
 	effects: []Effect
 )
 
-fn getNextPiecePos(): th.Vf2 {
-	return th.Vf2{
+fn getNextPiecePos(): th::Vf2 {
+	return th::Vf2{
 		trunc(offset_x)-16*5,
-		trunc(offset_y)+32+trunc(sin(th.time/1000.0)*5)}
+		trunc(offset_y)+32+trunc(sin(th::time/1000.0)*5)}
 }
 
-fn getStashPos(): th.Vf2 {
-	return th.Vf2{16*11+trunc(offset_x), 1*16+trunc(offset_y)}
+fn getStashPos(): th::Vf2 {
+	return th::Vf2{16*11+trunc(offset_x), 1*16+trunc(offset_y)}
 }
 
 fn init*() {
-	offset_x = (window.wp.x-reference_frame.w)/2
-	offset_y = (window.wp.y-reference_frame.h)/2
+	offset_x = (window::wp.x-reference_frame.w)/2
+	offset_y = (window::wp.y-reference_frame.h)/2
 	fallingPiecePos = getNextPiecePos()
 	effects = make([]Effect, 0)
 }
@@ -60,10 +60,10 @@ fn drawEffect(effect: Effect) {
 	opacity := trunc(effect.life * effect.life * 255);
 	switch effect.kind {
 	case EffectClearRow:
-		canvas.drawRect(0xFFFFFF00|opacity,
-			rect.Rect{
+		canvas::drawRect(0xFFFFFF00|opacity,
+			rect::Rect{
 				offset_x, offset_y + effect.int_data*16,
-				field.FieldWidth*16, 16})
+				field::FieldWidth*16, 16})
 	}
 }
 
@@ -72,7 +72,7 @@ fn processFx() {
 
 	for i, effect in effects {
 		drawEffect(effect)
-		effect.life -= th.delta/1000.0
+		effect.life -= th::delta/1000.0
 		if effect.life > 0 {
 			newEffects = append(newEffects, effect)
 		}
@@ -81,8 +81,8 @@ fn processFx() {
 		effects = newEffects
 }
 
-fn drawCell(c: uint32, r: rect.Rect) {
-	canvas.drawRect(c, r)
+fn drawCell(c: uint32, r: rect::Rect) {
+	canvas::drawRect(c, r)
 	for i := 0; i < 5; i++ {
 		value := trunc((i / 5.0 * 255.0) / 8.0)
 		if (c & 0xFFFFFF00 == 0) {
@@ -90,20 +90,20 @@ fn drawCell(c: uint32, r: rect.Rect) {
 		}
 
 		color := value << 24 | value << 16 | value << 8 | (c & 0xFF)
-		canvas.drawRect(c | color, rect.Rect{r.x, r.y+(i / 5.0)*r.h, r.w, 3})
+		canvas::drawRect(c | color, rect::Rect{r.x, r.y+(i / 5.0)*r.h, r.w, 3})
 	}
-	canvas.drawRect(0xFFFFFF33, rect.Rect{r.x, r.y, r.w, 1})
+	canvas::drawRect(0xFFFFFF33, rect::Rect{r.x, r.y, r.w, 1})
 }
 
 fn cellRec(x, y: int) {
-	drawCell(field.Colors[field.playfield[x][y]], rect.Rect { offset_x + x * 16, offset_y + y * 16, 15, 15 })
+	drawCell(field::Colors[field::playfield[x][y]], rect::Rect { offset_x + x * 16, offset_y + y * 16, 15, 15 })
 }
 
-fn drawPiece(it: piece.Piece, x, y: int, mask: int) {
+fn drawPiece(it: piece::Piece, x, y: int, mask: int) {
 	x_origin := x
 	for _, chr in it.data {
 		if chr == '#' {
-			drawCell(field.Colors[it.color] & mask, rect.Rect { x, y, 15, 15 })
+			drawCell(field::Colors[it.color] & mask, rect::Rect { x, y, 15, 15 })
 		}
 		x += 16
 		if chr == '\n' {
@@ -114,65 +114,65 @@ fn drawPiece(it: piece.Piece, x, y: int, mask: int) {
 }
 
 fn drawStash() {
-	canvas.drawRect(0xFFFFFF11, rect.Rect {16*11-1+offset_x, 1*16-1+offset_y, 16*4+1, 16*4+1})
+	canvas::drawRect(0xFFFFFF11, rect::Rect {16*11-1+offset_x, 1*16-1+offset_y, 16*4+1, 16*4+1})
 	for i := 0; i < 4; i += 1 {
 		for j := 0; j < 4; j += 1 {
-			drawCell(field.Colors[field.None], rect.Rect{ (11+i)*16+offset_x, (1+j)*16+offset_y, 15, 15 })
+			drawCell(field::Colors[field::None], rect::Rect{ (11+i)*16+offset_x, (1+j)*16+offset_y, 15, 15 })
 		}
 	}
-	if gameplay.stash < 0 {
+	if gameplay::stash < 0 {
 		return 
 	}
 
 	pos := getStashPos()
-	drawPiece(presets.pieceValue(gameplay.stash, 0), round(pos.x), round(pos.y), 0xFFFFFFFF)
+	drawPiece(presets::pieceValue(gameplay::stash, 0), round(pos.x), round(pos.y), 0xFFFFFFFF)
 }
 
 fn drawFallingPiece() {
 
-	targetPos := th.Vf2{trunc(falling_piece.x)*16+trunc(offset_x), trunc(falling_piece.y)*16+trunc(offset_y)}
-	mul := th.delta/30.0
+	targetPos := th::Vf2{trunc(falling_piece::x)*16+trunc(offset_x), trunc(falling_piece::y)*16+trunc(offset_y)}
+	mul := th::delta/30.0
 	if mul > 1.0 {
 		mul = 1.0
 	}
 	fallingPiecePos = fallingPiecePos.add(targetPos.sub(fallingPiecePos).mulf(mul))
-	val := falling_piece.pieceValue(falling_piece.rotation)
+	val := falling_piece::pieceValue(falling_piece::rotation)
 
 	// draw ghost
-	prev := falling_piece.y
-	timerPrev := falling_piece.placeTimer
-	falling_piece.push()
-	drawPiece(val, trunc(falling_piece.x)*16+trunc(offset_x), trunc(falling_piece.y)*16+trunc(offset_y), 0x555555FF)
-	falling_piece.y = prev
-	falling_piece.placeTimer = timerPrev
+	prev := falling_piece::y
+	timerPrev := falling_piece::placeTimer
+	falling_piece::push()
+	drawPiece(val, trunc(falling_piece::x)*16+trunc(offset_x), trunc(falling_piece::y)*16+trunc(offset_y), 0x555555FF)
+	falling_piece::y = prev
+	falling_piece::placeTimer = timerPrev
 
 	drawPiece(val, round(fallingPiecePos.x), round(fallingPiecePos.y), 0xFFFFFFFF)
 }
 
 fn drawNextPiece() {
-	canvas.drawText("NEXT:", th.Vf2{trunc(offset_x)-16*5, trunc(offset_y)}, th.white, 2)
-	val := presets.pieceValue(gameplay.bag.getNextPiece(), 0)
+	canvas::drawText("NEXT:", th::Vf2{trunc(offset_x)-16*5, trunc(offset_y)}, th::white, 2)
+	val := presets::pieceValue(gameplay::bag.getNextPiece(), 0)
 	pos := getNextPiecePos()
 	drawPiece(val, trunc(pos.x), trunc(pos.y), 0xFFFFFFFF)
 }
 
 fn draw*() {
-	offset_x = (window.wp.x-reference_frame.w)/2
-	offset_y = (window.wp.y-reference_frame.h)/2
+	offset_x = (window::wp.x-reference_frame.w)/2
+	offset_y = (window::wp.y-reference_frame.h)/2
 
 	drawStash()
-	field_rect := rect.Rect { offset_x-1, offset_y-1, field.FieldWidth * 16+1, field.FieldHeight * 16+1 }
-	canvas.drawRect(0xFFFFFF11, field_rect)
+	field_rect := rect::Rect { offset_x-1, offset_y-1, field::FieldWidth * 16+1, field::FieldHeight * 16+1 }
+	canvas::drawRect(0xFFFFFF11, field_rect)
 	
-	if gameplay.hasPlaced {
+	if gameplay::hasPlaced {
 		fallingPiecePos = getNextPiecePos()
 	}
-	if gameplay.hasUsedStash {
+	if gameplay::hasUsedStash {
 		fallingPiecePos = getStashPos()
 	}
 
-	for i := 0; i < field.FieldWidth; i += 1 {
-		for j := 0; j < field.FieldHeight; j += 1 {
+	for i := 0; i < field::FieldWidth; i += 1 {
+		for j := 0; j < field::FieldHeight; j += 1 {
 			cellRec(i, j)
 		}
 	}
@@ -180,5 +180,5 @@ fn draw*() {
 	drawFallingPiece()
 	processFx()
 
-	crazytext.draw(16.0*11.0-1.0+offset_x, 6.0*16.0-1.0+offset_y)
+	crazytext::draw(16.0*11.0-1.0+offset_x, 6.0*16.0-1.0+offset_y)
 }

@@ -20,11 +20,11 @@ type Mesh* = struct {
 	// The mesh data.
 	d: []bool
 	// The dimensions and position of the mesh, r.w == w * s
-	r: rect.Rect
+	r: rect::Rect
 	// Width of the mesh.  Used to adress the mesh data.
-	w: th.uu
+	w: th::uu
 	// Scale of one cell (cell is a square)
-	s: th.fu
+	s: th::fu
 }
 //~~
 
@@ -34,7 +34,7 @@ type Mesh* = struct {
 // : the rectangle of the mask
 // 's'
 // : the scale of the mask
-fn mk*(r: rect.Rect, s: th.fu): Mesh {
+fn mk*(r: rect::Rect, s: th::fu): Mesh {
 //~~
 	m := Mesh{}
 
@@ -50,25 +50,25 @@ fn mk*(r: rect.Rect, s: th.fu): Mesh {
 	return m
 }
 
-fn umth_nav_mesh_add_quad(m: ^Mesh, q: ^th.Quad)
+fn umth_nav_mesh_add_quad(m: ^Mesh, q: ^th::Quad)
 //~~fn Mesh.addQuad
 // Sets mask's fields overlapping `q` to `false`.
-fn (m: ^Mesh) addQuad*(q: th.Quad) {
+fn (m: ^Mesh) addQuad*(q: th::Quad) {
 //~~
 	umth_nav_mesh_add_quad(m, &q)
 }
 
-fn umth_nav_mesh_nav(cameFrom: ^[]th.Vf2, cameFromType: ^void, m: ^Mesh, p1, p2: th.Vf2)
+fn umth_nav_mesh_nav(cameFrom: ^[]th::Vf2, cameFromType: ^void, m: ^Mesh, p1, p2: th::Vf2)
 //~~fn Mesh.nav
 // Navigates between `p1` and `p2`. Returns the path as an array of `th.Vf2`s.
 // If it doesn't find any path, or one of the points is outside of the mask,
 // returns an empty array.
-fn (m: ^Mesh) nav*(p1, p2: th.Vf2): []th.Vf2 {
+fn (m: ^Mesh) nav*(p1, p2: th::Vf2): []th::Vf2 {
 //~~
-	var cameFrom: []th.Vf2
-	umth_nav_mesh_nav(&cameFrom, typeptr([]th.Vf2), m, p1, p2)
+	var cameFrom: []th::Vf2
+	umth_nav_mesh_nav(&cameFrom, typeptr([]th::Vf2), m, p1, p2)
 
-	path := []th.Vf2{p2}
+	path := []th::Vf2{p2}
 	p := p2
 	p.x = trunc((p.x - m.r.x) / m.s)
 	p.y = trunc((p.y - m.r.y) / m.s)
@@ -78,7 +78,7 @@ fn (m: ^Mesh) nav*(p1, p2: th.Vf2): []th.Vf2 {
 	for (p.x != p1.x || p.y != p1.y) && p.x >= 0 && p.y >= 0 {
 		p = cameFrom[trunc(p.x + p.y*m.w)]
 
-		path = append(path, th.Vf2{
+		path = append(path, th::Vf2{
 			p.x * m.s + m.r.x + m.s/2,
 			p.y * m.s + m.r.y + m.s/2 })
 	}
@@ -91,7 +91,7 @@ fn (m: ^Mesh) nav*(p1, p2: th.Vf2): []th.Vf2 {
 
 	// path not found is the first element is [-1; -1]
 	if len(path) > 0 && path[0].x < m.r.x {
-		return []th.Vf2{}
+		return []th::Vf2{}
 	}
 
 	return path
@@ -103,12 +103,12 @@ fn (m: ^Mesh) draw*(alpha: real32 = 1.0) {
 //~~
 	for x:=0; x < m.w; x++ {
 		for y:=0; y < len(m.d)/m.w; y += 1 {
-			c := th.cyan
+			c := th::cyan
 			if m.d[x + y*m.w] {
-				c = th.black
+				c = th::black
 			}
-			c = color.alpha(c, alpha)
-			canvas.drawRect(c, rect.mk(m.r.x + x*m.s, m.r.y + y*m.s, m.s, m.s))
+			c = color::alpha(c, alpha)
+			canvas::drawRect(c, rect::mk(m.r.x + x*m.s, m.r.y + y*m.s, m.s, m.s))
 		}
 	}
 }

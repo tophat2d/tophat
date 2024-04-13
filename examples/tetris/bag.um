@@ -19,7 +19,7 @@ fn makeBag(): [7]int {
   // Shuffle
   for i := 0; i < 7; i += 1 {
     temp := b[i]
-    dest := (i+std.rand())%7
+    dest := (i+std::rand())%7
     b[i] = b[dest]
     b[dest] = temp
   }

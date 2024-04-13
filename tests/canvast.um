@@ -10,47 +10,47 @@ import (
 )
 
 var (
-	img: image.Image
+	img: image::Image
 )
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-	img, err = image.load("etc/test.png")
-	std.exitif(err)
-	window.setViewport(th.Vf2{192, 168})
+	img, err = image::load("etc/test.png")
+	std::exitif(err)
+	window::setViewport(th::Vf2{192, 168})
 
-	window.onFrame.register(signal.Callback{
-		canvas.drawRect(th.red, rect.mk(10, 10, 20, 5))
-		canvas.drawRect(0x0022ff88, rect.mk(10, 10, 10, 10))
-		canvas.drawLine(th.red, th.Vf2{10, 10}, th.Vf2{20, 20}, 1)
-		canvas.drawText("HELLO world\nhello WORLD", th.Vf2{20, 30}, th.cyan, 2)
-		canvas.drawText("lorem ipsum\ndolor sit amet", th.Vf2{20, 62}, th.black, 1)
+	window::onFrame.register(signal::Callback{
+		canvas::drawRect(th::red, rect::mk(10, 10, 20, 5))
+		canvas::drawRect(0x0022ff88, rect::mk(10, 10, 10, 10))
+		canvas::drawLine(th::red, th::Vf2{10, 10}, th::Vf2{20, 20}, 1)
+		canvas::drawText("HELLO world\nhello WORLD", th::Vf2{20, 30}, th::cyan, 2)
+		canvas::drawText("lorem ipsum\ndolor sit amet", th::Vf2{20, 62}, th::black, 1)
 
-		canvas.drawQuad(th.cyan, th.Quad{
-				th.Vf2{100, 100}, th.Vf2{104, 108},
-				th.Vf2{106, 120}, th.Vf2{95, 110}})
+		canvas::drawQuad(th::cyan, th::Quad{
+				th::Vf2{100, 100}, th::Vf2{104, 108},
+				th::Vf2{106, 120}, th::Vf2{95, 110}})
 
-		img.draw(th.Transform{p: th.Vf2{10, 40}, s: th.Vf2{1, 1}}, th.white)
+		img.draw(th::Transform{p: th::Vf2{10, 40}, s: th::Vf2{1, 1}}, th::white)
 
-		if input.isPressed(input.Key.right) {
-			window.setViewportOffset(
-				window.getViewportOffset().add({ th.delta * 0.2, 0 }))
+		if input::isPressed(input::Key.right) {
+			window::setViewportOffset(
+				window::getViewportOffset().add({ th::delta * 0.2, 0 }))
 		}
 
-		if input.isPressed(input.Key.left) {
-			window.setViewportOffset(
-				window.getViewportOffset().sub({ th.delta * 0.2, 0 }))
+		if input::isPressed(input::Key.left) {
+			window::setViewportOffset(
+				window::getViewportOffset().sub({ th::delta * 0.2, 0 }))
 		}
 
-		if input.isPressed(input.Key.down) {
-			window.setViewportOffset(
-				window.getViewportOffset().add({ 0, th.delta * 0.2 }))
+		if input::isPressed(input::Key.down) {
+			window::setViewportOffset(
+				window::getViewportOffset().add({ 0, th::delta * 0.2 }))
 		}
 
-		if input.isPressed(input.Key.up) {
-			window.setViewportOffset(
-				window.getViewportOffset().sub({ 0, th.delta * 0.2 }))
+		if input::isPressed(input::Key.up) {
+			window::setViewportOffset(
+				window::getViewportOffset().sub({ 0, th::delta * 0.2 }))
 		}
 	})
 }

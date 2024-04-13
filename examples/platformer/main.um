@@ -17,15 +17,15 @@ import (
 )
 
 fn init*() {
-	window.setup("tophat platformer", 512, 512)
-	window.setViewport(th.Vf2{16 * 16, 16 * 16})
+	window::setup("tophat platformer", 512, 512)
+	window::setViewport(th::Vf2{16 * 16, 16 * 16})
 
-	game.setup()
-	game.reset()
+	game::setup()
+	game::reset()
 
-	window.onFrame.register({
-		game.handle()
-		game.draw()
+	window::onFrame.register({
+		game::handle()
+		game::draw()
 	})
 }
 

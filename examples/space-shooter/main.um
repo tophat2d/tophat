@@ -15,35 +15,35 @@ import (
 )
 
 fn init*() {
-	window.setup("Space Shooter", 960, 1280)
+	window::setup("Space Shooter", 960, 1280)
 
-	window.setViewport(th.Vf2{96, 128})
-	global.scene = global.MENU
+	window::setViewport(th::Vf2{96, 128})
+	global::scene = global::MENU
 
-	game.init()
-	menu.init()
-	star.init()
-	sound.init()
-	global.hp = 10
+	game::init()
+	menu::init()
+	star::init()
+	sound::init()
+	global::hp = 10
 
-	f, err := std.fopen("score", "r")
+	f, err := std::fopen("score", "r")
 	if err.code != 0 {
-		fscanf(f, "%d", &global.hi)
-		std.fclose(f)
+		fscanf(f, "%d", &global::hi)
+		std::fclose(f)
 	}
 
-	window.onFrame.register({
-		canvas.drawRect(0x000022ff, rect.fromVf2({}, window.wp))
+	window::onFrame.register({
+		canvas::drawRect(0x000022ff, rect::fromVf2({}, window::wp))
 
-		star.handle()
-		star.draw()
+		star::handle()
+		star::draw()
 
-		switch global.scene {
-		case global.MENU:
-			menu.handle()
-		case global.GAME:
-			game.handle()
-		case global.NONE:
+		switch global::scene {
+		case global::MENU:
+			menu::handle()
+		case global::GAME:
+			game::handle()
+		case global::NONE:
 			exit(0)
 		}
 	})

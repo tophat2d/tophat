@@ -13,9 +13,9 @@ text := ""
 qcount := 0
 
 fn init*() {
-	window.setup("input test", 400, 400)
+	window::setup("input test", 400, 400)
 
-	window.onFrame.register(signal.Callback{
+	window::onFrame.register(signal::Callback{
 		/*if input.isJustPressed(input.mouse_up) {
 			y -= 5
 		}
@@ -24,44 +24,44 @@ fn init*() {
 		}*/
 
 		printf("lshift: %v %v %v\n",
-			input.isPressed(input.Key.leftShift),
-			input.isJustPressed(input.Key.leftShift),
-			input.isJustReleased(input.Key.leftShift))
+			input::isPressed(input::Key.leftShift),
+			input::isJustPressed(input::Key.leftShift),
+			input::isJustReleased(input::Key.leftShift))
 
-		if input.isJustPressed(input.Key.backspace) {
+		if input::isJustPressed(input::Key.backspace) {
 			text = ""
 		}
 
-		if input.isJustPressedc('\'') {
+		if input::isJustPressedc('\'') {
 			printf("' was just pressed\n")
 		}
 
-		if input.isJustPressed(input.Key.escape) {
+		if input::isJustPressed(input::Key.escape) {
 			printf("escape was just pressed\n")
 		}
 
-		if input.isPressedRepeatc('q') {
+		if input::isPressedRepeatc('q') {
 			qcount += 1
 		}
 
-		if input.isPressedc('S') {
+		if input::isPressedc('S') {
 			printf("s is pressed\n")
 		}
 
-		if input.isJustReleasedc('T') {
+		if input::isJustReleasedc('T') {
 			printf("t was just released\n")
 		}
 
-		s := input.getStr()
+		s := input::getStr()
 		if len(s) > 0 {
-			printf("input string: %s %v\n", input.getStr(), []char(input.getStr()))
+			printf("input string: %s %v\n", input::getStr(), []char(input::getStr()))
 		}
 
 		text = text + s
 
-		canvas.drawText(sprintf("%d", qcount), th.Vf2{5, 40}, th.black, 2);
-		canvas.drawText(text, th.Vf2{5, 20}, th.black, 2);
-		canvas.drawText(sprintf("%v", input.getMouseScroll()), th.Vf2{5, 5}, th.black, 2);
-		canvas.drawRect(th.black, rect.mk(200, y, 5, 5))
+		canvas::drawText(sprintf("%d", qcount), th::Vf2{5, 40}, th::black, 2);
+		canvas::drawText(text, th::Vf2{5, 20}, th::black, 2);
+		canvas::drawText(sprintf("%v", input::getMouseScroll()), th::Vf2{5, 5}, th::black, 2);
+		canvas::drawRect(th::black, rect::mk(200, y, 5, 5))
 	})
 }

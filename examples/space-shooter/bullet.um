@@ -2,20 +2,19 @@
 import (
 	"th.um"
 	"ent.um"
-	"image.um"	
 )
 
 const (
-	speed = 0.1								
+	speed = 0.1
 )
 
 var (
-	prefab: ent.Ent
-	bullets*: []ent.Ent
+	prefab: ent::Ent
+	bullets*: []ent::Ent
 )
 
 fn init*() {
-	prefab.t.s = th.Vf2{1, 1}
+	prefab.t.s = th::Vf2{1, 1}
 	prefab.r.w = 1
 	prefab.r.h = 2
 }

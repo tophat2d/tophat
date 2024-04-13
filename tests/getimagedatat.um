@@ -7,16 +7,16 @@ import (
 )
 
 var (
-    img: image.Image
+    img: image::Image
 )
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-	window.setup("get image data test", 640, 480)
+	window::setup("get image data test", 640, 480)
 
-	img, err = image.load("etc/test.png")
-	std.exitif(err)
+	img, err = image::load("etc/test.png")
+	std::exitif(err)
 
 	d := img.getData()
 
@@ -24,6 +24,6 @@ fn init*() {
 		printf("%x\n", d[i])
 	}
 
-	window.onFrame.register(signal.Callback{
+	window::onFrame.register(signal::Callback{
 	})
 }

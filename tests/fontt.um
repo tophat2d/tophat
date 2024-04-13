@@ -8,25 +8,25 @@ import (
 	"signal.um"
 )
 
-var f: font.Font
+var f: font::Font
 
-fn drawTextRect(text: str, pos: th.Vf2, scale: real = 1.0) {
+fn drawTextRect(text: str, pos: th::Vf2, scale: real = 1.0) {
 	size := f.measure(text)
-	canvas.drawRect(th.red, rect.mk(pos.x, pos.y, size.x*scale, size.y*scale))
-	f.draw(text, pos, th.white, scale)
+	canvas::drawRect(th::red, rect::mk(pos.x, pos.y, size.x*scale, size.y*scale))
+	f.draw(text, pos, th::white, scale)
 }
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-	window.setup("my title", 400, 400)
-	window.setViewport(th.Vf2{400, 400})
-	f, err = font.load("etc/roboto.ttf", 16, font.Filter.nearest)
-	std.exitif(err)
+	window::setup("my title", 400, 400)
+	window::setViewport(th::Vf2{400, 400})
+	f, err = font::load("etc/roboto.ttf", 16, font::Filter.nearest)
+	std::exitif(err)
 
-	window.onFrame.register(signal.Callback{
-		drawTextRect("Awesome\nSkip", th.Vf2{0, 0})
-		drawTextRect("Reset\nTest", th.Vf2{50, 50}, 2.0)
-		drawTextRect("|||||||", th.Vf2{100, 0})
+	window::onFrame.register(signal::Callback{
+		drawTextRect("Awesome\nSkip", th::Vf2{0, 0})
+		drawTextRect("Reset\nTest", th::Vf2{50, 50}, 2.0)
+		drawTextRect("|||||||", th::Vf2{100, 0})
 	})
 }

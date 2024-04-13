@@ -14,15 +14,15 @@ const (
 )
 
 var (
-	stars: []rect.Rect
+	stars: []rect::Rect
 )
 
 fn init*() {
-	stars = make([]rect.Rect, starNum)
+	stars = make([]rect::Rect, starNum)
 
 	for i:=0; i < len(stars); i++ {
-		stars[i].y = -std.rand()%round(window.wp.y)
-		stars[i].x = std.rand()%round(window.wp.x)
+		stars[i].y = -std::rand()%round(window::wp.y)
+		stars[i].x = std::rand()%round(window::wp.x)
 
 		stars[i].w = 0.1
 		stars[i].h = 0.2
@@ -35,17 +35,17 @@ fn handle*() {
 		if round(stars[i].x) % 3 == 0 {
 			s *= 1.5
 		}
-		stars[i].y += s * th.delta
+		stars[i].y += s * th::delta
 
-		if stars[i].y > window.wp.y {
-			stars[i].y = -std.rand()%round(window.wp.y/8)
-			stars[i].x = std.rand()%round(window.wp.x)
+		if stars[i].y > window::wp.y {
+			stars[i].y = -std::rand()%round(window::wp.y/8)
+			stars[i].x = std::rand()%round(window::wp.x)
 		}
 	}
 }
 
 fn draw*() {
 	for i:=0; i < len(stars); i++ {
-		canvas.drawRect(0xeeeeeeff, stars[i])
+		canvas::drawRect(0xeeeeeeff, stars[i])
 	}
 }

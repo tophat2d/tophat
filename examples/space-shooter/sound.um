@@ -5,21 +5,21 @@ import (
 )
 
 var (
-	dmg*, explosion*, shoot*: audio.Sound
+	dmg*, explosion*, shoot*: audio::Sound
 )
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-	dmg, err = audio.load("sfx/dmgsound.wav")
-	std.exitif(err)
+	dmg, err = audio::load("sfx/dmgsound.wav")
+	std::exitif(err)
 	dmg.setVol(0.7)
 
-	explosion, err = audio.load("sfx/explosion.wav")
-	std.exitif(err)
+	explosion, err = audio::load("sfx/explosion.wav")
+	std::exitif(err)
 	explosion.setVol(0.7)
 
-	shoot, err = audio.load("sfx/shoot.wav")
-	std.exitif(err)
+	shoot, err = audio::load("sfx/shoot.wav")
+	std::exitif(err)
 	shoot.setVol(0.7)
 }

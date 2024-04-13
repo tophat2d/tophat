@@ -53,12 +53,12 @@ fn (e: ^ErrCode) toStr*(): str {
 	return "unknown error"
 }
 
-fn __errFromCode*(ec: ErrCode, msg: str = ""): std.Err {
+fn __errFromCode*(ec: ErrCode, msg: str = ""): std::Err {
 	if msg != "" {
-		return std.error(int(ec), ec.toStr() + ": " + msg, "tophat")
+		return std::error(int(ec), ec.toStr() + ": " + msg, "tophat")
 	}
 
-	return std.error(int(ec), ec.toStr(), "tophat")
+	return std::error(int(ec), ec.toStr(), "tophat")
 }
 
 //~~struct Vf2
@@ -79,7 +79,7 @@ fn mkVf2*(x: fu = 0, y: fu = 0): Vf2 {
 // rotates `p` around `origin` with `rot` in degrees
 fn (p: ^Vf2) rotated*(origin: Vf2, rot: fu): Vf2 {
 //~~
-	angle := (rot * std.pi) / 180
+	angle := (rot * std::pi) / 180
 
 	pos := p^
 	pos.x -= origin.x
@@ -106,7 +106,7 @@ fn (p1: ^Vf2) distanceTo*(p2: Vf2): fu {
 fn (p1: ^Vf2) angleTo*(p2: Vf2): real {
 //~~
 	if p1.x == p2.x && p1.y == p2.y { return 0 }
-	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std.pi + 180
+	return atan2(p2.y - p1.y, p2.x - p1.x) * 180 / std::pi + 180
 }
 
 //~~fn Vf2.abs

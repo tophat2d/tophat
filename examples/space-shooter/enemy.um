@@ -11,42 +11,42 @@ import (
 )
 
 type Enemy* = struct {
-	motion: th.iu
-	ent: ent.Ent
+	motion: th::iu
+	ent: ent::Ent
 }
 
 const (
-	speed = th.Vf2{0.015, 0.04}
+	speed = th::Vf2{0.015, 0.04}
 	maxEnemies = 4
 )
 
 var (
 	enemies*: []Enemy
-	prefab: ent.Ent
+	prefab: ent::Ent
 )
 
 fn init*() {
 	enemies = []Enemy{}
 
-	im, err := image.load("gfx/enemy.png")
-	std.exitif(err)
-	prefab = ent.mk(im, { p: {y: -window.wp.y - 20}, s: {1, 1} })
+	im, err := image::load("gfx/enemy.png")
+	std::exitif(err)
+	prefab = ent::mk(im, { p: {y: -window::wp.y - 20}, s: {1, 1} })
 }
 
 fn spawn*() {
 	e := prefab
-	e.t.p.x = std.rand()%round(window.wp.x - e.r.w * 2) + e.r.w
-	e.t.p.y -= std.rand()%round(window.wp.y * 0.8)
+	e.t.p.x = std::rand()%round(window::wp.x - e.r.w * 2) + e.r.w
+	e.t.p.y -= std::rand()%round(window::wp.y * 0.8)
 
-	m := std.rand()%2
+	m := std::rand()%2
 	if m == 0 {
 		m = -1
 	}
 	enemies = append(enemies, Enemy{m, e})
 }
 
-fn getEnts*(): []^ent.Ent {
-	e := make([]^ent.Ent, len(enemies))
+fn getEnts*(): []^ent::Ent {
+	e := make([]^ent::Ent, len(enemies))
 	for i:=0; i < len(enemies); i++ {
 		e[i] = &enemies[i].ent
 	}
@@ -62,33 +62,33 @@ fn handle*() {
 	for i:=0; i >= 0 && i < len(enemies) && len(enemies) != 0; i++ {
 		e := &enemies[i]
 
-		e.ent.t.p.y += speed.y * th.delta
-		if e.ent.t.p.y > window.wp.y {
+		e.ent.t.p.y += speed.y * th::delta
+		if e.ent.t.p.y > window::wp.y {
 			enemies = delete(enemies, i)
 			i--
-			effects.damage()
-			global.hp--
-			sound.dmg.start()
+			effects::damage()
+			global::hp--
+			sound::dmg.start()
 
-			if global.hp == 0 {
-				if global.score > global.hi {
-					global.hi = global.score
-					f := std.fopen("score", "w").item0
-					fprintf(f, "%d", global.hi)
-					std.fclose(f)
+			if global::hp == 0 {
+				if global::score > global::hi {
+					global::hi = global::score
+					f := std::fopen("score", "w").item0
+					fprintf(f, "%d", global::hi)
+					std::fclose(f)
 				}
 
 				enemies = []Enemy{}
-				global.hp = 10
-				global.scene = global.MENU
+				global::hp = 10
+				global::scene = global::MENU
 			}
 
 			continue
 		}
 
-		e.ent.t.p.x += speed.x * th.delta * e.motion
+		e.ent.t.p.x += speed.x * th::delta * e.motion
 		if e.ent.t.p.x < 0 ||
-			e.ent.t.p.x > window.wp.x - e.ent.r.w {
+			e.ent.t.p.x > window::wp.x - e.ent.r.w {
 			e.motion *= -1
 			// prevent enemies from getting stuck in a loop
 			e.ent.t.p.x += e.motion

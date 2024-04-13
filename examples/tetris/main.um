@@ -16,41 +16,41 @@ import (
 
 bgPlaying := true
 var (
-	scoreText: ^crazytext.Entry
+	scoreText: ^crazytext::Entry
 )
 
 fn init*() {
-	window.setup("bricks lol", 640, 480)
+	window::setup("bricks lol", 640, 480)
 
-	global.initAudio()
-	global.audioBackground.play()
+	global::initAudio()
+	global::audioBackground.play()
 
-	background.init()
-	fx.init()
-	field.setClearCallback(fx.clearEffect)
-	gameplay.init()
-	crazytext.init()
-	scoreText = crazytext.putText("SCORE: 0", crazytext.lifetimeForever)
-	crazytext.putText("ARROW KEYS - MOVE", crazytext.lifetimeForever, false)
-	crazytext.putText("Z, X, C - ROTATE", crazytext.lifetimeForever, false)
-	crazytext.putText("M - MUTE", crazytext.lifetimeForever, false)
+	background::init()
+	fx::init()
+	field::setClearCallback(fx::clearEffect)
+	gameplay::init()
+	crazytext::init()
+	scoreText = crazytext::putText("SCORE: 0", crazytext::lifetimeForever)
+	crazytext::putText("ARROW KEYS - MOVE", crazytext::lifetimeForever, false)
+	crazytext::putText("Z, X, C - ROTATE", crazytext::lifetimeForever, false)
+	crazytext::putText("M - MUTE", crazytext::lifetimeForever, false)
 
-	window.onFrame.register({
-		if input.isJustPressedc('M') {
+	window::onFrame.register({
+		if input::isJustPressedc('M') {
 			if bgPlaying {
-				global.audioBackground.seekToFrame(std.rand() % global.audioBackground.frameCount())
-				global.audioBackground.play()
+				global::audioBackground.seekToFrame(std::rand() % global::audioBackground.frameCount())
+				global::audioBackground.play()
 			} else {
-				global.audioBackground.stop()
+				global::audioBackground.stop()
 			}
 			bgPlaying = !bgPlaying
 		}
-		scoreText.text = sprintf("SCORE: %d", global.score)
-		gameplay.update()
-		falling_piece.update(gameplay.speed)
-		canvas.drawRect(0x000000FF, rect.mk(0, 0, window.wp.x, window.wp.y))
-		background.update()
-		background.draw()
-		fx.draw()
+		scoreText.text = sprintf("SCORE: %d", global::score)
+		gameplay::update()
+		falling_piece::update(gameplay::speed)
+		canvas::drawRect(0x000000FF, rect::mk(0, 0, window::wp.x, window::wp.y))
+		background::update()
+		background::draw()
+		fx::draw()
 	})
 }

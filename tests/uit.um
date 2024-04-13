@@ -9,35 +9,35 @@ import (
 	"font.um"
 )
 
-var gui, win: ui.Gui
-var tb: ui.TextBox
+var gui, win: ui::Gui
+var tb: ui::TextBox
 
 fn init*() {
-	window.setup("gui test", 600, 600)
-	window.setViewport(th.Vf2{ 200, 200 })
+	window::setup("gui test", 600, 600)
+	window::setViewport(th::Vf2{ 200, 200 })
 
-	ft, err := font.load("etc/roboto.ttf", 32, font.Filter.linear)
-	std.exitif(err)
+	ft, err := font::load("etc/roboto.ttf", 32, font::Filter.linear)
+	std::exitif(err)
 
-	gui = ui.mk(rect.mk(0, 0, 200, 200), ui.getDefaultStyle())
+	gui = ui::mk(rect::mk(0, 0, 200, 200), ui::getDefaultStyle())
 	gui.getStyle().ft = ft
 	gui.getStyle().ftScale = 0.3
 
-	win = ui.mk(rect.mk(100, 100, 80, 50), ui.getDefaultStyle())
+	win = ui::mk(rect::mk(100, 100, 80, 50), ui::getDefaultStyle())
 	win.getStyle().containerBox.color = 0x88aa88ff
 
-	window.onFrame.register(signal.Callback{
-		layout := ui.LayoutFn{
-			gui.box(ui.BoxConfig{
+	window::onFrame.register(signal::Callback{
+		layout := ui::LayoutFn{
+			gui.box(ui::BoxConfig{
 				dimension: 30,
-				growType: ui.BoxGrow.dimension,
-				dir: ui.BoxDir.up,
+				growType: ui::BoxGrow.dimension,
+				dir: ui::BoxDir.up,
 				padding: 5 })
 			{
-				gui.box(ui.BoxConfig{
+				gui.box(ui::BoxConfig{
 					span: { 1.5, 1, 1.5 },
-					growType: ui.BoxGrow.span,
-					dir: ui.BoxDir.right })
+					growType: ui::BoxGrow.span,
+					dir: ui::BoxDir.right })
 				{
 					for i := 0; i < 3; i++ {
 						if gui.qbutton(sprintf("Button %d", i+1)) {
@@ -47,10 +47,10 @@ fn init*() {
 				}
 				gui.popContainer()
 
-				gui.box(ui.BoxConfig{
+				gui.box(ui::BoxConfig{
 					subdivisions: 3,
-					growType: ui.BoxGrow.subdiv,
-					dir: ui.BoxDir.right })
+					growType: ui::BoxGrow.subdiv,
+					dir: ui::BoxDir.right })
 				{
 					for i := 0; i < 3; i++ {
 						if gui.qbutton(sprintf("Button %d", i+1)) {
@@ -60,7 +60,7 @@ fn init*() {
 				}
 				gui.popContainer()
 
-				gui.label("I'm just a label", ui.LabelConfig{
+				gui.label("I'm just a label", ui::LabelConfig{
 					centerX: true })
 
 				if gui.qbutton("Next row button.") {
@@ -72,14 +72,14 @@ fn init*() {
 			gui.popContainer()
 		}
 
-		layout2 := ui.LayoutFn{
+		layout2 := ui::LayoutFn{
 			gui.stack({ padding: 3 })
-			gui.box(ui.BoxConfig{
+			gui.box(ui::BoxConfig{
 				subdivisions: 2,
-				growType: ui.BoxGrow.subdiv,
-				dir: ui.BoxDir.down})
+				growType: ui::BoxGrow.subdiv,
+				dir: ui::BoxDir.down})
 			{
-				gui.label("I'm a window\n", ui.LabelConfig{
+				gui.label("I'm a window\n", ui::LabelConfig{
 					centerX: true, centerY: true })
 				if gui.qbutton("Click me!") {
 					printf("Clicked button in window\n")

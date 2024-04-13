@@ -98,14 +98,14 @@ fn clear*(name: str) {
 
 //~~fn emit
 // Calls all callbacks associated with the passed global signal name.
-fn emit*(name: str, args: ..any): std.Err {
+fn emit*(name: str, args: ..any): std::Err {
 //~~
 	if !valid(signals) {
 		signals = make(map[str]Signal)
 	}
 
 	if !validkey(signals, name) {
-		return th.__errFromCode(.bad_input, "unknown signal")
+		return th::__errFromCode(.bad_input, "unknown signal")
 	}
 
 	signals[name].emit(args)

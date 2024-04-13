@@ -12,36 +12,36 @@ import (
 )
 
 var (
-	en: ent.Ent
-	cam: rect.Rect
+	en: ent::Ent
+	cam: rect::Rect
 )
 
 var (
-	b: th.Vf2 = { 60, 60 }
-	e: th.Vf2 = { 340, 340 }
+	b: th::Vf2 = { 60, 60 }
+	e: th::Vf2 = { 340, 340 }
 )
 
 fn init*() {
-	window.setup("raycast test", 400, 400)
+	window::setup("raycast test", 400, 400)
 
-	en = ent.mk(image.load("etc/test.png").item0, {p: { 100, 100 }, s: { 4, 4 }})
+	en = ent::mk(image::load("etc/test.png").item0, {p: { 100, 100 }, s: { 4, 4 }})
 
-	window.onFrame.register({
-		if input.isPressed(input.Key.mouse1) {
-			b = input.getGlobalMousePos()
+	window::onFrame.register({
+		if input::isPressed(input::Key.mouse1) {
+			b = input::getGlobalMousePos()
 		}
 
-		if input.isPressed(input.Key.mouse3) {
-			e = input.getGlobalMousePos()
+		if input::isPressed(input::Key.mouse3) {
+			e = input::getGlobalMousePos()
 		}
 
-		canvas.drawLine(th.green, b, e, 1)
+		canvas::drawLine(th::green, b, e, 1)
 		en.draw()
 
-		var ic1, ic2: th.Vf2
-		if coll.lineToQuad(b, e, en.r.transformed(en.t), &ic1, &ic2) {
-			canvas.drawRect(th.red, rect.mk(ic1.x - 1, ic1.y - 1, 2, 2))
-			canvas.drawRect(th.red, rect.mk(ic2.x - 1, ic2.y - 1, 2, 2))
+		var ic1, ic2: th::Vf2
+		if coll::lineToQuad(b, e, en.r.transformed(en.t), &ic1, &ic2) {
+			canvas::drawRect(th::red, rect::mk(ic1.x - 1, ic1.y - 1, 2, 2))
+			canvas::drawRect(th::red, rect::mk(ic2.x - 1, ic2.y - 1, 2, 2))
 		}
 	})
 }

@@ -1,14 +1,13 @@
 
 import (
 	"std.um"
-	"window.um"
 )
 
 fn init*() {
-	argc := std.argc()
+	argc := std::argc()
 	printf("%d arguments\n", argc)
 	for i:=0; i < argc; i++ {
-		printf("%s\n", std.argv(i))
+		printf("%s\n", std::argv(i))
 	}
 	exit(0)
 }

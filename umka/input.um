@@ -183,21 +183,21 @@ fn toupper(c: char): int {
 	return int(c);
 }
 
-fn umth_input_get_mouse(out: ^th.Vf2)
+fn umth_input_get_mouse(out: ^th::Vf2)
 //~~fn getMousePos
 // Returns the position of mouse cursor in relation to the screen.
-fn getMousePos*(): th.Vf2 {
+fn getMousePos*(): th::Vf2 {
 	//~~
-	out := th.Vf2{}
+	out := th::Vf2{}
 	umth_input_get_mouse(&out)
 	return out
 }
 
 //~~fn getGlobalMousePos
 // Returns the position of mouse cursor in relation to cam.
-fn getGlobalMousePos*(): th.Vf2 {
+fn getGlobalMousePos*(): th::Vf2 {
 	//~~
-	return getMousePos().add(window.getViewportOffset())
+	return getMousePos().add(window::getViewportOffset())
 }
 
 fn umth_input_is_pressed(keycode: Key): int32
@@ -285,25 +285,25 @@ fn getStr*(): str {
 	return umth_input_get_str()
 }
 
-fn umth_input_get_mouse_delta(o: ^th.Vf2)
+fn umth_input_get_mouse_delta(o: ^th::Vf2)
 //~~fn getMouseDelta
 // Returns the difference between mouse positions in the last cycle. Will work
 // even if `window.freezeCursor` is enabled.
-fn getMouseDelta*(): th.Vf2 {
+fn getMouseDelta*(): th::Vf2 {
 	//~~
-	o := th.Vf2{}
+	o := th::Vf2{}
 	umth_input_get_mouse_delta(&o)
 	return o
 }
 
-fn umth_input_get_mouse_scroll(x, y: ^th.fu)
+fn umth_input_get_mouse_scroll(x, y: ^th::fu)
 //~~fn getMouseScroll
 // Returns the scroll wheel value
-fn getMouseScroll*(): th.Vf2 {
+fn getMouseScroll*(): th::Vf2 {
 	//~~
-	var x, y: th.fu
+	var x, y: th::fu
 	umth_input_get_mouse_scroll(&x, &y)
-	return th.Vf2{x, y}
+	return th::Vf2{x, y}
 }
 
 fn umth_input_gamepad_get_gamepads*(out: ^[4]int)
@@ -362,31 +362,31 @@ fn (g: ^Gamepad) isJustReleased*(button: GamepadButton): bool {
 	return umth_input_gamepad_is_just_released(g.id, button)
 }
 
-fn umth_input_gamepad_pressure(gamepad: int, button: GamepadButton): th.fu
+fn umth_input_gamepad_pressure(gamepad: int, button: GamepadButton): th::fu
 
 //~~fn pressure
 // Returns the pressure of the gamepad button in the range [0, 1].
-fn (g: ^Gamepad) pressure*(button: GamepadButton): th.fu {
+fn (g: ^Gamepad) pressure*(button: GamepadButton): th::fu {
 //~~
 	return umth_input_gamepad_pressure(g.id, button)
 }
 
-fn umth_input_gamepad_stick(gamepad: int, stick: GamepadStick, out: ^th.Vf2)
+fn umth_input_gamepad_stick(gamepad: int, stick: GamepadStick, out: ^th::Vf2)
 
 //~~fn stick
 // Returns the movement of the gamepad stick in the range [-1, 1] for each axis.
-fn (g: ^Gamepad) stick*(stick: GamepadStick): th.Vf2 {
+fn (g: ^Gamepad) stick*(stick: GamepadStick): th::Vf2 {
 //~~
-	var out: th.Vf2
+	var out: th::Vf2
 	umth_input_gamepad_stick(g.id, stick, &out)
 	return out
 }
 
-fn umth_input_gamepad_rumble(gamepad: int, left, right: th.fu)
+fn umth_input_gamepad_rumble(gamepad: int, left, right: th::fu)
 
 //~~fn rumble
 // Rumbles/vibrates the gamepad.
-fn (g: ^Gamepad) rumble*(left, right: th.fu) {
+fn (g: ^Gamepad) rumble*(left, right: th::fu) {
 //~~
 	umth_input_gamepad_rumble(g.id, left, right)
 }

@@ -41,8 +41,8 @@ th_init(const char *scriptpath, const char *script_src)
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
 			    "fn main() {}\n"
 			    "fn __th_init*() {\n"
-			    "  _ := window.w\n"
-			    "  mainmod.init()\n"
+			    "  _ := window::w\n"
+			    "  mainmod::init()\n"
 			    "}\n";
 	char mainmod[sizeof(mainmod_fmt) + BUFSIZ];
 	snprintf(mainmod, sizeof(mainmod), mainmod_fmt, scriptpath);
@@ -69,9 +69,8 @@ th_init(const char *scriptpath, const char *script_src)
 	umkaOK = umkaCompile(thg->umka);
 
 	if (!umkaOK) {
-		UmkaError error;
-		umkaGetError(thg->umka, &error);
-		th_error("%s (%d, %d): %s", error.fileName, error.line, error.pos, error.msg);
+		UmkaError *error = umkaGetError(thg->umka);
+		th_error("%s (%d, %d): %s", error->fileName, error->line, error->pos, error->msg);
 		return 1;
 	}
 

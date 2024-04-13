@@ -9,30 +9,30 @@ import (
 )
 
 var (
-	hearth: image.Image
-	mainFont*: font.Font
+	hearth: image::Image
+	mainFont*: font::Font
 )
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-	hearth, err = image.load("gfx/hearth.png")
-	std.exitif(err)
+	hearth, err = image::load("gfx/hearth.png")
+	std::exitif(err)
 
-	mainFont, err = font.load("gfx/marediv-regular.ttf", 64, font.Filter.nearest)
-	std.exitif(err)
+	mainFont, err = font::load("gfx/marediv-regular.ttf", 64, font::Filter.nearest)
+	std::exitif(err)
 }
 
 fn handle*() { }
 
 fn draw*() {
 	dm := hearth.getDims()
-	for i:=0; i < global.hp; i++ {
+	for i:=0; i < global::hp; i++ {
 		hearth.draw(
-			th.Transform{
-				p: th.Vf2{window.wp.x - ((dm.x + 1) * (i + 1) + 1), 1},
-				s: th.Vf2{1, 1}}, th.white)
+			th::Transform{
+				p: th::Vf2{window::wp.x - ((dm.x + 1) * (i + 1) + 1), 1},
+				s: th::Vf2{1, 1}}, th::white)
 	}
 
-	mainFont.draw(sprintf("%d", global.score), th.Vf2{1, 1}, th.white, 0.2)
+	mainFont.draw(sprintf("%d", global::score), th::Vf2{1, 1}, th::white, 0.2)
 }

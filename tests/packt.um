@@ -8,12 +8,12 @@ import (
 	"image.um"
 )
 
-fn drawAtlas(a: atlas.Atlas, p: th.Vf2): th.Vf2 {
+fn drawAtlas(a: atlas::Atlas, p: th::Vf2): th::Vf2 {
 	a.i.draw({ p: p, s: { 1, 1 } })
 	idm := a.i.getDims()
 
 	for i:=1; i < a.dm.x; i++ {
-		canvas.drawLine(th.yellow,
+		canvas::drawLine(th::yellow,
 			{ p.x + i*a.cs.x, p.y },
 			{ p.x + i*a.cs.x, p.y + idm.y },
 			2
@@ -21,7 +21,7 @@ fn drawAtlas(a: atlas.Atlas, p: th.Vf2): th.Vf2 {
 	}
 
 	for i:=1; i < a.dm.y; i++ {
-		canvas.drawLine(th.yellow,
+		canvas::drawLine(th::yellow,
 			{ p.x, p.y + i*a.cs.y },
 			{ p.x + idm.x, p.y + i*a.cs.y },
 			2
@@ -32,27 +32,27 @@ fn drawAtlas(a: atlas.Atlas, p: th.Vf2): th.Vf2 {
 }
 
 fn init*() {
-	var err: std.Err
-	window.setup("Pack test", 400, 400)
+	var err: std::Err
+	window::setup("Pack test", 400, 400)
 
-	logos := []image.Image{
-		image.load("etc/logo/logo-hatonly-white.png").item0,
-		image.load("etc/logo/logo-hatonly.png").item0,
-		image.load("etc/logo/logo-normal-white.png").item0,
-		image.load("etc/logo/logo-normal.png").item0,
-		image.load("etc/logo/logo-notext-white.png").item0,
-		image.load("etc/logo/logo-notext.png").item0
+	logos := []image::Image{
+		image::load("etc/logo/logo-hatonly-white.png").item0,
+		image::load("etc/logo/logo-hatonly.png").item0,
+		image::load("etc/logo/logo-normal-white.png").item0,
+		image::load("etc/logo/logo-normal.png").item0,
+		image::load("etc/logo/logo-notext-white.png").item0,
+		image::load("etc/logo/logo-notext.png").item0
 	}
 
-	square, err := atlas.pack(logos, atlas.PackSquare)
-	std.exitif(err)
-	row, err := atlas.pack(logos, atlas.PackRow)
-	std.exitif(err)
-	column, err := atlas.pack(logos, atlas.PackColumn)
-	std.exitif(err)
+	square, err := atlas::pack(logos, atlas::PackSquare)
+	std::exitif(err)
+	row, err := atlas::pack(logos, atlas::PackRow)
+	std::exitif(err)
+	column, err := atlas::pack(logos, atlas::PackColumn)
+	std::exitif(err)
 
-	window.onFrame.register(|square, row, column| {
-		p := th.Vf2{ 1, 1 }
+	window::onFrame.register(|square, row, column| {
+		p := th::Vf2{ 1, 1 }
 		p = drawAtlas(square, p)
 		p = drawAtlas(row, p)
 		p = drawAtlas(column, p)

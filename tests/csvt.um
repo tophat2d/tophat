@@ -1,13 +1,12 @@
 
 import (
 	"csv.um"
-	"window.um"
 )
 
 fn init*() {
 	s := "a,b\\,b,c\r\nd,e\\\ne"
-	t := csv.parse(s)
+	t := csv::parse(s)
 	printf("%v\n", t)
-	printf("%s\n", csv.encode(t))
+	printf("%s\n", csv::encode(t))
 	exit(0)
 }

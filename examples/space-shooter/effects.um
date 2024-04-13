@@ -11,33 +11,33 @@ import (
 )
 
 var (
-	dmgEffect: lerp.Lerper
-	emitters: []particles.Emitter
+	dmgEffect: lerp::Lerper
+	emitters: []particles::Emitter
 )
 
 fn init*() {
-	dmgEffect = lerp.Lerper{}
-	emitters = []particles.Emitter{}
+	dmgEffect = lerp::Lerper{}
+	emitters = []particles::Emitter{}
 }
 
 fn handle*() { }
 
 fn damage*() {
 	dmgEffect.enqueue(
-		lerp.Item{0, 0xaa, 200, 0, false, null, fn(ctx: any){}})
+		lerp::Item{0, 0xaa, 200, 0, false, null, fn(ctx: any){}})
 	dmgEffect.enqueue(
-		lerp.Item{0xaa, 0, 200, 0, false, null, fn(ctx: any){}})
+		lerp::Item{0xaa, 0, 200, 0, false, null, fn(ctx: any){}})
 }
 
-fn enemyDestroy*(pos: th.Vf2) {
-	e := particles.Emitter{
+fn enemyDestroy*(pos: th::Vf2) {
+	e := particles::Emitter{
 		pos: pos,
-		dm: th.Vf2{0, 0},
-		gravity: th.Vf2{0.1, 0.1},
+		dm: th::Vf2{0, 0},
+		gravity: th::Vf2{0.1, 0.1},
 		repeat: false,
 		active: true,
 
-		angle: th.Vf2{0, 360},
+		angle: th::Vf2{0, 360},
 		lifetime: 400,
 		lifetimeRandomness: 0.4,
 
@@ -50,23 +50,23 @@ fn enemyDestroy*(pos: th.Vf2) {
 
 		colors: []uint32{0xFFA500ff, 0xFFA500dd, 0xe9330caa, 0xe9330c44} }
 
-	e.genParticles(th.time, 400, 0.5)
+	e.genParticles(th::time, 400, 0.5)
 
 	emitters = append(emitters, e)
 }
 
 fn draw*() {
 	if len(dmgEffect) != 0 {
-		val := round(dmgEffect.byDelta(th.delta))
+		val := round(dmgEffect.byDelta(th::delta))
 		if val < 0 { val = 0 }
-		canvas.drawRect(0xaa000000 | val, rect.fromVf2({}, window.wp))
+		canvas::drawRect(0xaa000000 | val, rect::fromVf2({}, window::wp))
 	}
 
 	for i:=0; i>=0 && i < len(emitters) && len(emitters) != 0; i++ {
-		emitters[i].draw(th.time)
+		emitters[i].draw(th::time)
 		if !emitters[i].active {
 			if len(emitters) == 1 {
-				emitters = []particles.Emitter{}
+				emitters = []particles::Emitter{}
 				continue
 			}
 			emitters = delete(emitters, i)

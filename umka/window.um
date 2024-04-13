@@ -39,33 +39,33 @@ var (
 //~~
 
 //~~Viewport size
-var wp*: th.Vf2
+var wp*: th::Vf2
 //~~
 
 //~~signal OnFrame
-var onFrame*: signal.Signal
+var onFrame*: signal::Signal
 //~~
 //~~signal OnDestroy
-var onDestroy*: signal.Signal
+var onDestroy*: signal::Signal
 //~~
 
 fn umth_window_setup(title: str, w, h: int)
 fn umth_window_get_dimensions(w, h: ^int32)
 
-fn umth_window_set_viewport(dm: th.Vf2)
+fn umth_window_set_viewport(dm: th::Vf2)
 //~~fn setViewport
 // Sets the dimensions of the viewport. The dimensions are saved in the `wp`
 // variable.
 //
 // `dm`
 // : dimension of the viewport
-fn setViewport*(dm: th.Vf2) {
+fn setViewport*(dm: th::Vf2) {
 //~~
 	wp = dm
 	umth_window_set_viewport(dm)
 }
 
-fn setIcon*(img: image.Image)
+fn setIcon*(img: image::Image)
 
 fn umth_window_is_dpi_enabled(): bool
 
@@ -76,12 +76,12 @@ fn isDpiEnabled*(): bool {
 	return umth_window_is_dpi_enabled()
 }
 
-fn umth_window_get_dpi_scale(): th.fu
+fn umth_window_get_dpi_scale(): th::fu
 
 //~~fn getDpiScaleFactor
 // Returns the DPI scaling of the current window.
 // If `dpiAware` was not enabled in window setup, this function will return 1.0 (default scaling).
-fn getDpiScaleFactor*(): th.fu {
+fn getDpiScaleFactor*(): th::fu {
 //~~
 	return umth_window_get_dpi_scale()
 }
@@ -100,17 +100,17 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	w, h = width, height
 	umth_window_setup(title, width, height)
 
-	th.platform = th.Platform(umth_window_get_platform_id())
+	th::platform = th::Platform(umth_window_get_platform_id())
 
-	audio.__setup()
-	placeholders.__setup()
+	audio::__setup()
+	placeholders::__setup()
 
-	setIcon(placeholders.icon)
+	setIcon(placeholders::icon)
 
-	clockOffset = std.clock() * 1000
-	start = std.clock() * 1000
+	clockOffset = std::clock() * 1000
+	start = std::clock() * 1000
 
-	setViewport(th.Vf2{width, height})
+	setViewport(th::Vf2{width, height})
 }
 
 //~~fn cycle
@@ -120,30 +120,30 @@ fn cycle(delta: real) {
 //~~
 	umth_window_set_viewport(wp)
 
-	th.delta = trunc(delta*1000.0)
-	if th.delta == 0 {
-		th.delta = 1
+	th::delta = trunc(delta*1000.0)
+	if th::delta == 0 {
+		th::delta = 1
 	}
 
-	start = std.clock()*1000
-	th.time = round(start - clockOffset)
+	start = std::clock()*1000
+	th::time = round(start - clockOffset)
 
 	umth_window_get_dimensions(&w, &h)
 
-	audio.__cycle()
-	canvas.drawRect(th.white, rect.mk(0, 0, wp.x, wp.y))
+	audio::__cycle()
+	canvas::drawRect(th::white, rect::mk(0, 0, wp.x, wp.y))
 }
 
-fn setViewportOffset*(s: th.Vf2)
-fn getViewportOffset*(): th.Vf2
+fn setViewportOffset*(s: th::Vf2)
+fn getViewportOffset*(): th::Vf2
 
 fn drawClear() {
 	of := getViewportOffset()
 	setViewportOffset({})
-	canvas.drawRect(th.black, rect.mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
-	canvas.drawRect(th.black, rect.mk(0, -4 * wp.y, wp.x, 4 * wp.y))
-	canvas.drawRect(th.black, rect.mk(wp.x, 0, 4 * wp.x, wp.y))
-	canvas.drawRect(th.black, rect.mk(0, wp.y, wp.x, 4 * wp.y))
+	canvas::drawRect(th::black, rect::mk(-4 * wp.x, 0, 4 * wp.x, wp.y))
+	canvas::drawRect(th::black, rect::mk(0, -4 * wp.y, wp.x, 4 * wp.y))
+	canvas::drawRect(th::black, rect::mk(wp.x, 0, 4 * wp.x, wp.y))
+	canvas::drawRect(th::black, rect::mk(0, wp.y, wp.x, 4 * wp.y))
 	setViewportOffset(of)
 }
 
@@ -176,9 +176,9 @@ fn isFullscreen*(): bool {
 
 //~~fn getDims
 // Returns dimensions of the window in screen pixels.
-fn getDims*(): th.Vf2 {
+fn getDims*(): th::Vf2 {
 //~~
-	return th.Vf2{w, h}
+	return th::Vf2{w, h}
 }
 
 fn umth_window_set_target_fps(fps: int)
@@ -195,24 +195,24 @@ fn setTargetFps*(fps: int) {
 	umth_window_set_target_fps(fps)
 }
 
-fn umth_window_set_dims(dm: th.Vf2)
+fn umth_window_set_dims(dm: th::Vf2)
 //~~fn setDims
 // Sets the dimensions of the window.
 //
 // `dm`
 // : the target dimensions in screen pixels
-fn setDims*(dm: th.Vf2) {
+fn setDims*(dm: th::Vf2) {
 //~~
 	umth_window_set_dims(dm)
 }
 
-fn umth_window_set_icon(img: image.Image)
+fn umth_window_set_icon(img: image::Image)
 //~~fn setIcon
 // Sets the window icon.
-fn setIcon*(img: image.Image) {
+fn setIcon*(img: image::Image) {
 //~~
 	if !img.validate() {
-		th.__error("invalid image")
+		th::__error("invalid image")
 	}
 
 	umth_window_set_icon(img)
@@ -270,20 +270,20 @@ fn getClipboard*(): str {
 	return str(buf)
 }
 
-fn umth_window_set_viewport_shift(s: th.Vf2)
+fn umth_window_set_viewport_shift(s: th::Vf2)
 //~~fn setViewportOffset
 // Sets the offset of the viewport.
-fn setViewportOffset*(s: th.Vf2) {
+fn setViewportOffset*(s: th::Vf2) {
 //~~
 	umth_window_set_viewport_shift(s)
 }
 
-fn umth_window_get_viewport_shift(s: ^th.Vf2)
+fn umth_window_get_viewport_shift(s: ^th::Vf2)
 //~~fn getViewportOffset
 // Gets the offset of the viewport (as set by `setViewportShift`)
-fn getViewportOffset*(): th.Vf2 {
+fn getViewportOffset*(): th::Vf2 {
 //~~
-	o := th.Vf2{}
+	o := th::Vf2{}
 
 	umth_window_get_viewport_shift(&o)
 	return o

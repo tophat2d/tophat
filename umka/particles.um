@@ -18,27 +18,27 @@ type Particle* = struct {
 //~~struct Emitter
 // Emitter. This is where everything is configured.
 type Emitter* = struct {
-	pos: th.Vf2 // position
-	dm: th.Vf2 // size of the emittion area
-	gravity: th.Vf2 // gravity
+	pos: th::Vf2 // position
+	dm: th::Vf2 // size of the emittion area
+	gravity: th::Vf2 // gravity
 	repeat: bool // if false, particle won't be renewed
 	active: bool // false, if there aren't any active particles anymore
 
-	angle: th.Vf2 // angle in which particles are emitted
+	angle: th::Vf2 // angle in which particles are emitted
 
-	lifetime: th.uu // lifetime of particles
-	lifetimeRandomness: th.fu // randomness in %/100
+	lifetime: th::uu // lifetime of particles
+	lifetimeRandomness: th::fu // randomness in %/100
 
-	velocity: th.fu // velocity
-	velocityRandomness: th.fu // randomness in %/100
+	velocity: th::fu // velocity
+	velocityRandomness: th::fu // randomness in %/100
 
-	size: th.fu // size
-	sizeRandomness: th.fu // randomness in %/100
-	maxSize: th.fu // size at the end of particles lifetime
+	size: th::fu // size
+	sizeRandomness: th::fu // randomness in %/100
+	maxSize: th::fu // size at the end of particles lifetime
 
-	rotation: th.fu
-	rotationRandomness: th.fu
-	maxRotation: th.fu
+	rotation: th::fu
+	rotationRandomness: th::fu
+	maxRotation: th::fu
 
 	colors: []uint32 // array of colors, which are interpolated between
 
@@ -65,7 +65,7 @@ fn (e: ^Emitter) draw*(t: int32) {
 /// ```umka
 /// e.lifetime / count * explosiveness
 /// ```
-fn (e: ^Emitter) genParticles*(time, count: uint, explosiveness: th.fu = 0.0) {
+fn (e: ^Emitter) genParticles*(time, count: uint, explosiveness: th::fu = 0.0) {
 //~~
 	p := make([]Particle, count)
 
@@ -73,7 +73,7 @@ fn (e: ^Emitter) genParticles*(time, count: uint, explosiveness: th.fu = 0.0) {
 	t := real32(time)
 
 	for i in p {
-		p[i] = { trunc(t), std.rand() }
+		p[i] = { trunc(t), std::rand() }
 		t += step
 	}
 

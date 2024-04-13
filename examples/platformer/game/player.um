@@ -19,19 +19,19 @@ import (
 )
 
 const (
-	gravity = 0.004 / global.tileSize
+	gravity = 0.004 / global::tileSize
 	jumpForce = -0.16
 	moveSpeed = 0.1
 )
 
 var (
-	body*: ent.Ent
-	feet: ent.Ent
+	body*: ent::Ent
+	feet: ent::Ent
 	plYMotion: real32
 	canJump: bool
 
-	Xlerper: lerp.Lerper
-	Ylerper: lerp.Lerper
+	Xlerper: lerp::Lerper
+	Ylerper: lerp::Lerper
 	dying: bool
 )
 
@@ -40,44 +40,44 @@ fn die*() {
 		return
 	}
 
-	Xlerper = append(Xlerper, lerp.mk(body.t.p.x, env.spawn.x, trunc(body.t.p.distanceTo(env.spawn) * 1), false))
-	Ylerper = append(Ylerper, lerp.mk(body.t.p.y, env.spawn.y, trunc(body.t.p.distanceTo(env.spawn) * 1), false))
+	Xlerper = append(Xlerper, lerp::mk(body.t.p.x, env::spawn.x, trunc(body.t.p.distanceTo(env::spawn) * 1), false))
+	Ylerper = append(Ylerper, lerp::mk(body.t.p.y, env::spawn.y, trunc(body.t.p.distanceTo(env::spawn) * 1), false))
 	dying = true
 }
 
 fn move() {
-	mot := th.Vf2{}
+	mot := th::Vf2{}
 	if !canJump {
-		plYMotion += gravity * th.delta
+		plYMotion += gravity * th::delta
 	}
 
-	if input.isJustPressedc(' ') && canJump {
+	if input::isJustPressedc(' ') && canJump {
 		body.t.p.y -= 1
 		plYMotion = jumpForce
 		canJump = false
 	}
 
-	if input.isPressed(input.Key.left) {
+	if input::isPressed(input::Key.left) {
 		mot.x = -1
 	}
 
-	if input.isPressed(input.Key.right) {
+	if input::isPressed(input::Key.right) {
 		mot.x = 1
 	}
 
-	mot.x *= th.delta * moveSpeed
-	mot.y = plYMotion * th.delta
+	mot.x *= th::delta * moveSpeed
+	mot.y = plYMotion * th::delta
 
 	const steps = 20
-	mot = mot.div(th.Vf2{steps, steps})
+	mot = mot.div(th::Vf2{steps, steps})
 
-	var vert: th.uu
-	var pos: th.Vf2
+	var vert: th::uu
+	var pos: th::Vf2
 
 	for i:=0; i < steps; i++ {
 		body.t.p.x += mot.x
 
-		if env.tm.getColl(body, null, &pos) {
+		if env::tm.getColl(body, null, &pos) {
 			body.t.p.x -= mot.x
 			break
 		}
@@ -87,14 +87,14 @@ fn move() {
 	for i:=0; i < steps; i++ {
 		feet.t.p.y += mot.y
 
-		if env.tm.getColl(feet, null, &pos) {
+		if env::tm.getColl(feet, null, &pos) {
 			//feet.t.p.y -= mot.y
 			plYMotion = 0
 			canJump = true
 			break
 		}
 
-		if env.tm.getColl(body, null, &pos) {
+		if env::tm.getColl(body, null, &pos) {
 			feet.t.p.y -= mot.y * steps * 2
 			plYMotion = 0
 			break
@@ -106,13 +106,13 @@ fn move() {
 	body.t.p = feet.t.p
 
 	if len(Xlerper) != 0 {
-		body.t.p.x = Xlerper.byDelta(th.delta)
+		body.t.p.x = Xlerper.byDelta(th::delta)
 	}
 
 	if len(Ylerper) != 0 {
-		body.t.p.y = Ylerper.byDelta(th.delta)
+		body.t.p.y = Ylerper.byDelta(th::delta)
 	} else if dying {
-		signal.emit("die", null)
+		signal::emit("die", null)
 		dying = false
 	}
 
@@ -120,46 +120,46 @@ fn move() {
 }
 
 fn setup*() {
-	im, err := image.load("res/hat.png")
-	std.exitif(err)
-	body = ent.mk(im, th.Transform{ p: env.spawn, s: th.Vf2{0.6, 0.6} })
-	body.r = rect.mk(0, 0, body.i.getDims().x, body.i.getDims().y - 0.4)
-	feet = ent.mk(image.Image{}, th.Transform{ s: th.Vf2{0.6, 0.6} })
-	feet.r = rect.mk(0, body.i.getDims().y - 2, body.i.getDims().x, 2)
-	feet.c = th.red
+	im, err := image::load("res/hat.png")
+	std::exitif(err)
+	body = ent::mk(im, th::Transform{ p: env::spawn, s: th::Vf2{0.6, 0.6} })
+	body.r = rect::mk(0, 0, body.i.getDims().x, body.i.getDims().y - 0.4)
+	feet = ent::mk(image::Image{}, th::Transform{ s: th::Vf2{0.6, 0.6} })
+	feet.r = rect::mk(0, body.i.getDims().y - 2, body.i.getDims().x, 2)
+	feet.c = th::red
 }
 
 fn reset*() {
-	body.t.p = env.spawn
+	body.t.p = env::spawn
 
-	Xlerper = lerp.Lerper{}
-	Ylerper = lerp.Lerper{}
+	Xlerper = lerp::Lerper{}
+	Ylerper = lerp::Lerper{}
 }
 
 fn handle*() {
 	move()
 
-	if !dying && body.t.p.distanceTo(env.end) < global.tileSize {
-		signal.emit("finish", null)
+	if !dying && body.t.p.distanceTo(env::end) < global::tileSize {
+		signal::emit("finish", null)
 	}
 
-	if colls := body.getColl(env.coins, 1); len(colls) != 0 {
-		env.coins = delete(env.coins, colls[0].index)
-		env.score++
+	if colls := body.getColl(env::coins, 1); len(colls) != 0 {
+		env::coins = delete(env::coins, colls[0].index)
+		env::score++
 	}
 
-	if body.t.p.y > env.tm.pos.y + len(env.tm.cells) / env.tm.w * global.tileSize * 2.2 {
+	if body.t.p.y > env::tm.pos.y + len(env::tm.cells) / env::tm.w * global::tileSize * 2.2 {
 		die()
 	}
 
-	if input.isJustPressed(input.Key.escape) {
-		body.t.p = env.spawn
+	if input::isJustPressed(input::Key.escape) {
+		body.t.p = env::spawn
 	}
 
-	wpoff := window.getViewportOffset()
-	window.setViewportOffset(th.Vf2{
-		(body.t.p.x + body.r.w*body.t.s.x - wpoff.x) - window.wp.x/2,
-		(body.t.p.y + body.r.h*body.t.s.y - wpoff.y) - window.wp.y/2 }.
+	wpoff := window::getViewportOffset()
+	window::setViewportOffset(th::Vf2{
+		(body.t.p.x + body.r.w*body.t.s.x - wpoff.x) - window::wp.x/2,
+		(body.t.p.y + body.r.h*body.t.s.y - wpoff.y) - window::wp.y/2 }.
 		add(wpoff))
 }
 

@@ -19,81 +19,81 @@ const (
 )
 
 var (
-	e*: ent.Ent
-	bulletPrefab: ent.Ent
-	bullets*: []ent.Ent
-	frames: []image.Image
+	e*: ent::Ent
+	bulletPrefab: ent::Ent
+	bullets*: []ent::Ent
+	frames: []image::Image
 	lastShot: int = -shootTimeout
 )
 
 fn init*() {
-	frames = []image.Image{
-		image.load("gfx/ship1.png").item0,
-		image.load("gfx/ship2.png").item0}
+	frames = []image::Image{
+		image::load("gfx/ship1.png").item0,
+		image::load("gfx/ship2.png").item0}
 
-	e = ent.mk(
+	e = ent::mk(
 		frames[0],
-		th.Transform{p: th.Vf2{y: window.wp.y * 0.8}, s: th.Vf2{1, 1}})
+		th::Transform{p: th::Vf2{y: window::wp.y * 0.8}, s: th::Vf2{1, 1}})
 
-	bulletPrefab.t.s = th.Vf2{1, 1}
+	bulletPrefab.t.s = th::Vf2{1, 1}
 	bulletPrefab.r.w = 1
 	bulletPrefab.r.h = 2
 	bulletPrefab.c = 0xAEAE0Cff
 
-	bullets = []ent.Ent{}
+	bullets = []ent::Ent{}
 }
 
 fn handle*() {
-	if input.isPressedc('A') {
-		e.t.p.x -= speed * th.delta
+	if input::isPressedc('A') {
+		e.t.p.x -= speed * th::delta
 		if e.t.p.x < -e.r.w {
-			e.t.p.x = window.wp.x
+			e.t.p.x = window::wp.x
 		}
 	}
-	if input.isPressedc('D') {
-		e.t.p.x += speed * th.delta
-		if e.t.p.x > window.wp.x {
+	if input::isPressedc('D') {
+		e.t.p.x += speed * th::delta
+		if e.t.p.x > window::wp.x {
 			e.t.p.x = -e.r.w
 		}
 	}
 
-	e.animate(4, &frames, th.time)
+	e.animate(4, &frames, th::time)
 
-	if input.isJustPressedc(' ') && th.time - lastShot >= shootTimeout {
-		sound.shoot.start()
+	if input::isJustPressedc(' ') && th::time - lastShot >= shootTimeout {
+		sound::shoot.start()
 		b := bulletPrefab
-		b.t.p = th.Vf2{e.t.p.x + 1, e.t.p.y - bulletPrefab.r.h}
+		b.t.p = th::Vf2{e.t.p.x + 1, e.t.p.y - bulletPrefab.r.h}
 
 		bullets = append(bullets, b)
 		b.t.p.x += 3
 		bullets = append(bullets, b)
 
-		lastShot = th.time
+		lastShot = th::time
 	}
 
-	enemies := enemy.getEnts()
+	enemies := enemy::getEnts()
 
 	for i:=0; i >= 0 && i < len(bullets); i++ {
-		bullets[i].t.p.y -= bulletSpeed * th.delta
+		bullets[i].t.p.y -= bulletSpeed * th::delta
 
-		if bullets[i].t.p.y < -window.wp.y {
+		if bullets[i].t.p.y < -window::wp.y {
 			bullets = delete(bullets, i)
 			i--
 			continue
 		}
 
-		var ic: th.Vf2
+		var ic: th::Vf2
 		if colls := bullets[i].getColl(enemies, 1); len(colls) != 0 {
-			if enemy.enemies[colls[0].index].ent.t.p.y < 0 {
+			if enemy::enemies[colls[0].index].ent.t.p.y < 0 {
 				continue
 			}
 
 			bullets = delete(bullets, i)
-			effects.enemyDestroy(enemy.enemies[colls[0].index].ent.t.p)
-			enemy.enemies = delete(enemy.enemies, colls[0].index)
-			enemies = enemy.getEnts()
-			global.score++
-			sound.explosion.start()
+			effects::enemyDestroy(enemy::enemies[colls[0].index].ent.t.p)
+			enemy::enemies = delete(enemy::enemies, colls[0].index)
+			enemies = enemy::getEnts()
+			global::score++
+			sound::explosion.start()
 			i--
 			continue
 		}

@@ -12,14 +12,14 @@ fn printHello()
 fn add(a, b: int): int
 
 fn init*() {
-	window.setup("title", 400, 400)
+	window::setup("title", 400, 400)
 
-	initExt(th.getGlobal(), th.getFuncs())
+	initExt(th::getGlobal(), th::getFuncs())
 
 	printf("result from c: %d\n", add(1, 3))
 
-	window.onFrame.register({
-		canvas.drawText("hello world", th.Vf2{2, 2}, th.black, 2)
+	window::onFrame.register({
+		canvas::drawText("hello world", th::Vf2{2, 2}, th::black, 2)
 		printHello()
 	})
 }

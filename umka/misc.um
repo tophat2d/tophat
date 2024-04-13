@@ -11,12 +11,12 @@ import (
 // Use std.freadall instaed.
 fn readall*(path: str): str {
 //~~
-	return std.freadall(std.fopen(path, "rb").item0).item0
+	return std::freadall(std::fopen(path, "rb").item0).item0
 }
 
 //~~fn stepify
 // Snaps a value to step.
-fn stepify*(val, step: th.fu): th.fu {
+fn stepify*(val, step: th::fu): th::fu {
 //~~
 	if step != 0 {
 		val = floor(val / step + 0.5) * step
@@ -25,14 +25,14 @@ fn stepify*(val, step: th.fu): th.fu {
 }
 
 //~~fn maxf
-fn maxf*(a, b: th.fu): th.fu {
+fn maxf*(a, b: th::fu): th::fu {
 //~~
 	if a > b { return a }
 	return b
 }
 
 //~~fn minf
-fn minf*(a, b: th.fu): th.fu {
+fn minf*(a, b: th::fu): th::fu {
 //~~
 	if a > b { return b }
 	return a

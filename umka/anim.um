@@ -8,7 +8,7 @@ import (
 // Anim allows you to animate between individual frames of an atlas.
 type Anim* = struct {
 	// the source atlas
-	atl: atlas.Atlas
+	atl: atlas::Atlas
 	// the first cell of the animation
 	min: int
 	// the last cell of the animation
@@ -21,10 +21,10 @@ type Anim* = struct {
 
 //~~fn mk
 // `Anim` constructor
-fn mk*(atl: atlas.Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 */, offset: int = -1 /* th.time */): Anim {
+fn mk*(atl: atlas::Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 */, offset: int = -1 /* th.time */): Anim {
 //~~
 	if !atl.i.validate() {
-		th.__error("invalid atlas image")
+		th::__error("invalid atlas image")
 	}
 
 	a := Anim{}
@@ -39,7 +39,7 @@ fn mk*(atl: atlas.Atlas, fps: int, min: int = 0, max: int = -1 /* len(atl) - 1 *
 	}
 
 	if offset == -1 {
-		a.offset = th.time
+		a.offset = th::time
 	} else {
 		a.offset = offset
 	}

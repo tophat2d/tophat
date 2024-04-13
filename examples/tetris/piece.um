@@ -12,7 +12,7 @@ fn canPut*(it: Piece, cell_x, cell_y: int): bool {
 	x_origin := cell_x
 	for _, chr in it.data {
 		if chr == '#' {
-			if !field.isFree(cell_x, cell_y) {
+			if !field::isFree(cell_x, cell_y) {
 				return false;
 			}
 		}
@@ -29,7 +29,7 @@ fn project*(it: Piece, cell_x, cell_y: int) {
 	x_origin := cell_x
 	for _, chr in it.data {
 		if chr == '#' {
-			field.put(cell_x, cell_y, it.color)
+			field::put(cell_x, cell_y, it.color)
 		}
 		cell_x += 1
 		if chr == '\n' {

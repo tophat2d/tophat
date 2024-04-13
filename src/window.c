@@ -10,27 +10,27 @@
 #include <umka_api.h>
 
 #include <umprof.h>
+#define MSG_LEN 1024
 
 extern th_global *thg;
 
 void
 th_print_umka_error_and_quit(int code)
 {
-	UmkaError error;
-	umkaGetError(thg->umka, &error);
+	UmkaError *error = umkaGetError(thg->umka);
 
-	if (*error.msg) {
-		th_error("%s (%d): %s\n", error.fileName, error.line, error.msg);
+	if (error->msg) {
+		th_error("%s (%d): %s\n", error->fileName, error->line, error->msg);
 
 		fprintf(stderr, "\tStack trace:\n");
 
 		for (int depth = 0; depth < 10; depth++) {
-			char fnName[UMKA_MSG_LEN + 1];
-			char file[UMKA_MSG_LEN + 1];
+			char fnName[MSG_LEN + 1];
+			char file[MSG_LEN + 1];
 			int line, offset;
 
 			if (!umkaGetCallStack(
-				thg->umka, depth, UMKA_MSG_LEN + 1, &offset, file, fnName, &line)) {
+				thg->umka, depth, MSG_LEN + 1, &offset, file, fnName, &line)) {
 				break;
 				fprintf(stderr, "\t\t...\n");
 			}

@@ -25,15 +25,15 @@ type LoadFlag* = enum (uint32) {
 }
 //~~
 
-fn umth_sound_load(Sound: ^Sound, path: str, flags: LoadFlag): th.ErrCode
+fn umth_sound_load(Sound: ^Sound, path: str, flags: LoadFlag): th::ErrCode
 //~~fn load
 // Loads a sounds at path, if there is an error, the underlying pointer
 // will be `NULL` and `validate` will return false.
-fn load*(path: str, flags: LoadFlag = LoadFlag.none): (Sound, std.Err) {
+fn load*(path: str, flags: LoadFlag = LoadFlag.none): (Sound, std::Err) {
 //~~
 	var snd: Sound
 	ec := umth_sound_load(&snd, path, flags)
-	return snd, th.__errFromCode(ec)
+	return snd, th::__errFromCode(ec)
 }
 
 //~~fn Sound.validate
@@ -43,19 +43,19 @@ fn (s: ^Sound) validate*(): bool {
 	return s._ != null
 }
 
-fn umth_sound_copy(out: ^Sound, s: Sound): th.ErrCode
+fn umth_sound_copy(out: ^Sound, s: Sound): th::ErrCode
 //~~fn Sound.copy
 // Copies the sound. This will create another sound which can be configured
 // and played independently from the original sound.
-fn (s: ^Sound) copy*(): (Sound, std.Err) {
+fn (s: ^Sound) copy*(): (Sound, std::Err) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	var out: Sound
 	ec := umth_sound_copy(&out, s^)
-	return out, th.__errFromCode(ec)
+	return out, th::__errFromCode(ec)
 }
 
 fn umth_sound_is_playing(s: Sound): bool
@@ -64,7 +64,7 @@ fn umth_sound_is_playing(s: Sound): bool
 fn (s: ^Sound) isPlaying*(): bool {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	return umth_sound_is_playing(s^)
@@ -76,7 +76,7 @@ fn umth_sound_play(s: Sound)
 fn (s: ^Sound) play*() {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_play(s^)
@@ -86,10 +86,10 @@ fn (s: ^Sound) play*() {
 // The start function allows you to play a single sound multiple times.
 // It will create a copy and return a pointer to it, so you can controll it
 // while it is playing. The returned pointer can be discarded.
-fn (s: ^Sound) start*(): (^Sound, std.Err) {
+fn (s: ^Sound) start*(): (^Sound, std::Err) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	cpyVal, err := s.copy()
@@ -111,7 +111,7 @@ fn umth_sound_stop(s: Sound)
 fn (s: ^Sound) stop*() {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_stop(s^)
@@ -123,7 +123,7 @@ fn umth_sound_set_volume(s: Sound, vol: real32)
 fn (s: ^Sound) setVol*(vol: real32) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_set_volume(s^, vol)
@@ -135,7 +135,7 @@ fn umth_sound_set_pan(s: Sound, pan: real32)
 fn (s: ^Sound) setPan*(pan: real32) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_set_pan(s^, pan)
@@ -147,7 +147,7 @@ fn umth_sound_set_pitch(s: Sound, pitch: real32)
 fn (s: ^Sound) setPitch*(pitch: real32) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_set_pitch(s^, pitch)
@@ -159,7 +159,7 @@ fn umth_sound_set_looping(s: Sound, looping: bool)
 fn (s: ^Sound) setLooping*(looping: bool) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_set_looping(s^, looping)
@@ -171,7 +171,7 @@ fn umth_sound_seek_to_frame(s: Sound, frame: uint)
 fn (s: ^Sound) seekToFrame*(frame: uint) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_seek_to_frame(s^, frame)
@@ -183,7 +183,7 @@ fn umth_sound_frame_count(s: Sound): uint
 fn (s: ^Sound) frameCount*(): uint {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	return umth_sound_frame_count(s^)
@@ -195,7 +195,7 @@ fn umth_sound_length_ms(s: Sound): uint
 fn (s: ^Sound) lengthMs*(): uint {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	return umth_sound_length_ms(s^)
@@ -206,7 +206,7 @@ fn umth_sound_set_start_time_ms(s: Sound, t: uint)
 fn (s: ^Sound) setStartTimeMs*(t: uint) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_set_start_time_ms(s^, t)
@@ -217,7 +217,7 @@ fn umth_sound_set_stop_time_ms(s: Sound, t: uint)
 fn (s: ^Sound) setStopTimeMs*(t: uint) {
 //~~
 	if !s.validate() {
-		th.__error("invalid sound")
+		th::__error("invalid sound")
 	}
 
 	umth_sound_set_stop_time_ms(s^, t)

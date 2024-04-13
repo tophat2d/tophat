@@ -18,13 +18,13 @@ type Filter* = enum {
 type Font* = struct { _: ^struct{} }
 //~~
 
-fn umth_font_load(f: ^Font, path: str, size: th.fu, filter: Filter): th.ErrCode
+fn umth_font_load(f: ^Font, path: str, size: th::fu, filter: Filter): th::ErrCode
 //~~fn load
-fn load*(path: str, size: th.fu, filter: Filter = Filter.linear): (Font, std.Err) {
+fn load*(path: str, size: th::fu, filter: Filter = Filter.linear): (Font, std::Err) {
 //~~
 	var f: Font
 	ec := umth_font_load(&f, path, size, filter)
-	return f, th.__errFromCode(ec)
+	return f, th::__errFromCode(ec)
 }
 
 //~~fn Font.validate
@@ -33,26 +33,26 @@ fn (f: ^Font) validate*(): bool {
 	return f._ != null
 }
 
-fn umth_font_draw(font: Font, s: str, x: th.fu, y: th.fu, color: uint32, scale: th.fu)
+fn umth_font_draw(font: Font, s: str, x: th::fu, y: th::fu, color: uint32, scale: th::fu)
 //~~fn Font.draw
-fn (f: ^Font) draw*(text: str, pos: th.Vf2, color: uint32, scale: th.fu = 1.0) {
+fn (f: ^Font) draw*(text: str, pos: th::Vf2, color: uint32, scale: th::fu = 1.0) {
 //~~
 	if !f.validate() {
-		th.__error("Invalid font")
+		th::__error("Invalid font")
 	}
 	umth_font_draw(f^, text, pos.x, pos.y, color, scale)
 }
 
-fn umth_font_measure(font: Font, s: str, o: ^th.Vf2)
+fn umth_font_measure(font: Font, s: str, o: ^th::Vf2)
 //~~fn Font.measure
-fn (f: ^Font) measure*(text: str): th.Vf2 {
+fn (f: ^Font) measure*(text: str): th::Vf2 {
 //~~
 	if !f.validate() {
-		th.__error("Invalid font")
+		th::__error("Invalid font")
 		return {}
 	}
 
-	var size: th.Vf2
+	var size: th::Vf2
 	umth_font_measure(f^, text, &size)
 	return size
 }

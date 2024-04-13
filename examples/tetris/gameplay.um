@@ -16,7 +16,7 @@ var (
 	combo: int = 1
 	lock_stash: bool = false
 	stash*: int = -1
-	bag*: m_bag.Bag
+	bag*: m_bag::Bag
 	speed*: real
 	places: int
 )
@@ -30,10 +30,10 @@ fn nextTetromino() {
 }
 
 fn init*() {
-	std.srand(std.time())
-	bag = m_bag.init()
-	falling_piece.init()
-	falling_piece.reset(kind())
+	std::srand(std::time())
+	bag = m_bag::init()
+	falling_piece::init()
+	falling_piece::reset(kind())
 	speed = 1
 	places = 0
 }
@@ -44,32 +44,32 @@ fn place() {
 		speed += 0.5
 	}
 
-	tspin := falling_piece.isTspin
-	falling_piece.place()
-	streak := field.clearRows()
+	tspin := falling_piece::isTspin
+	falling_piece::place()
+	streak := field::clearRows()
 
 	if tspin {
-		global.playSound(&global.audioClearMega)
+		global::playSound(&global::audioClearMega)
 		switch streak {
 			case 0:
-				crazytext.putText(sprintf("T-SPIN EMPTY! x%d", combo), 4)
+				crazytext::putText(sprintf("T-SPIN EMPTY! x%d", combo), 4)
 			case 1:
-				crazytext.putText(sprintf("T-SPIN SINGLE! x%d", combo), 4)
+				crazytext::putText(sprintf("T-SPIN SINGLE! x%d", combo), 4)
 			case 2:
-				crazytext.putText(sprintf("T-SPIN DOUBLE! x%d", combo), 5)
+				crazytext::putText(sprintf("T-SPIN DOUBLE! x%d", combo), 5)
 			case 3:
-				crazytext.putText(sprintf("T-SPIN TRIPLE! x%d", combo), 6)
+				crazytext::putText(sprintf("T-SPIN TRIPLE! x%d", combo), 6)
 		}
 	} else {
 		if streak == 4 {
-			crazytext.putText(sprintf("TETRIS! x%d", combo), 6)
-			global.playSound(&global.audioClearMega)
+			crazytext::putText(sprintf("TETRIS! x%d", combo), 6)
+			global::playSound(&global::audioClearMega)
 		} else if streak > 0 {
-			global.playSound(&global.audioClear)
+			global::playSound(&global::audioClear)
 		}
 	}
 
-	global.score += presets.getScore(streak, tspin) * combo
+	global::score += presets::getScore(streak, tspin) * combo
 
 	if streak == 4 || tspin {
 		combo += 1
@@ -79,7 +79,7 @@ fn place() {
 
 
 	nextTetromino()
-	falling_piece.reset(kind())
+	falling_piece::reset(kind())
 	lock_stash = false
 }
 
@@ -89,13 +89,13 @@ fn stashPiece() {
 	}
 	lock_stash = true
 	if stash == -1 {
-		stash = falling_piece.kind
+		stash = falling_piece::kind
 		nextTetromino()
-		falling_piece.reset(kind())
+		falling_piece::reset(kind())
 	} else {
-		tmp := falling_piece.kind
+		tmp := falling_piece::kind
 		hasUsedStash = true
-		falling_piece.reset(stash)
+		falling_piece::reset(stash)
 		stash = tmp
 	}
 }
@@ -103,18 +103,18 @@ fn stashPiece() {
 fn update*() {
 	hasPlaced = false
 	hasUsedStash = false
-	if field.lost {
+	if field::lost {
 		init()
-		global.score = 0
+		global::score = 0
 		combo = 0
-		crazytext.putText("YOU LOST! BAD LUCK.", 5.0, false)
-		field.init()
-		field.lost = false
+		crazytext::putText("YOU LOST! BAD LUCK.", 5.0, false)
+		field::init()
+		field::lost = false
 	}
-	if input.isJustPressed(input.Key.shift) {
+	if input::isJustPressed(input::Key.shift) {
 		stashPiece()
 	}
-	if falling_piece.placeTimer > 0.5 || falling_piece.groundTouchTimer > 5 {
+	if falling_piece::placeTimer > 0.5 || falling_piece::groundTouchTimer > 5 {
 		place()
 		hasPlaced = true
 	}

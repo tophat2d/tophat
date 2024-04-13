@@ -9,7 +9,7 @@ const (
 )
 
 fn readall*(path: str): str {
-	return std.freadall(std.fopen(path, "r").item0).item0
+	return std::freadall(std::fopen(path, "r").item0).item0
 }
 
 fn timeStr*(ms: int): str {
@@ -17,15 +17,15 @@ fn timeStr*(ms: int): str {
 
 	// hours
 	if ms > 60 * 60 * 1000 {
-		s += std.itoa(ms / 1000 / 60 / 60) + ":"
+		s += std::itoa(ms / 1000 / 60 / 60) + ":"
 	}
 
 	// minutes
 	if ms > 60 * 1000 {
-		s += std.itoa(ms / 1000 / 60 % 60) + ":"
+		s += std::itoa(ms / 1000 / 60 % 60) + ":"
 	}
 
-	s += std.itoa(ms / 1000 % 60) + "." + std.itoa(ms % 1000)
+	s += std::itoa(ms / 1000 % 60) + "." + std::itoa(ms % 1000)
 
 	return s
 }

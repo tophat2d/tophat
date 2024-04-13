@@ -2,30 +2,27 @@ import (
 	"font.um"
 	"th.um"
 	"std.um"
-	"canvas.um"
 	"window.um"
-	"rect.um"
-	"signal.um"
 )
 
-var f: font.Font
+var f: font::Font
 
 dpiEnabled := false
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-	window.setup("DPI Awareness Test", trunc(400*window.getDpiScaleFactor()), trunc(400*window.getDpiScaleFactor()))
-	window.setViewport(window.getDims())
-	f, err = font.load("etc/roboto.ttf", 64)
-	std.exitif(err)
+	window::setup("DPI Awareness Test", trunc(400*window::getDpiScaleFactor()), trunc(400*window::getDpiScaleFactor()))
+	window::setViewport(window::getDims())
+	f, err = font::load("etc/roboto.ttf", 64)
+	std::exitif(err)
 
-	dpiEnabled = window.isDpiEnabled()
+	dpiEnabled = window::isDpiEnabled()
 
-	window.onFrame.register(signal.Callback{
+	window::onFrame.register({
 		dpiStr := "DPI Awareness Test\n"
-		dpiStr += sprintf("Scale: %g\n", window.getDpiScaleFactor())
+		dpiStr += sprintf("Scale: %g\n", window::getDpiScaleFactor())
 		dpiStr += sprintf("DPI Enabled: %v\n", dpiEnabled)
-		f.draw(dpiStr, th.Vf2{0, 0}, 0x000000FF, window.getDpiScaleFactor()*0.5)
+		f.draw(dpiStr, th::Vf2{0, 0}, 0x000000FF, window::getDpiScaleFactor()*0.5)
 	})
 }

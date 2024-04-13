@@ -6,33 +6,33 @@ import (
 //~~opaque Shader
 // Shader allows you to define your own vertex and fragment GLSL shaders. This
 // is a low-level feature, so it's very easy to mess up.
-//  
+//
 // In tophat, instead of a main function, shaders provide th_vertex and
 // th_fragment. The signature of th_vertex is:
-// 
+//
 // ```
 // vec2 th_vertex(vec2 vert);
 // ```
-// 
+//
 // where vert is the position of the vertex taken from the vertex buffer.
 // The output is the vertex shader output.
-//  
+//
 // As for fragment shaders, there are two types of them. One for canvas
 // and one for images. In canvas shaders, the fragment function is very simple:
-// 
+//
 // ```
 // vec4 th_fragment(vec4 color);
 // ```
-//  
+//
 // Image fragment function looks like this:
-//  
+//
 // ```
 // vec4 th_fragment(sampler2D tex, vec2 coord);
 // ```
-//  
+//
 // where tex is the texture and coord are the texture coordinates. Be aware to
 // swap the output of the `texture2D` function. Example:
-// 
+//
 // ```
 // texture2D(tex, coord).abgr
 // ```
@@ -107,10 +107,10 @@ fn (u: ^Uniform) setInt*(value: int) {
 	umth_shader_set_uniform_int(u.s.handle, u.l, value)
 }
 
-fn umth_shader_set_uniform_vf2(shandle, uhandle: uint, value: th.Vf2)
+fn umth_shader_set_uniform_vf2(shandle, uhandle: uint, value: th::Vf2)
 //~~fn Uniform.setVf2
 // Sets a uniform to a vf2. Flushes both batches.
-fn (u: ^Uniform) setVf2*(value: th.Vf2) {
+fn (u: ^Uniform) setVf2*(value: th::Vf2) {
 //~~
 	umth_shader_set_uniform_vf2(u.s.handle, u.l, value)
 }

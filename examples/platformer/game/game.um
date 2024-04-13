@@ -24,23 +24,23 @@ var (
 )
 
 fn reset*() {
-	env.reset()
-	bees.reset()
-	player.reset()
+	env::reset()
+	bees::reset()
+	player::reset()
 }
 
 fn setup*() {
-	env.setup()
-	bees.setup()
-	player.setup()
+	env::setup()
+	bees::setup()
+	player::setup()
 
-	signal.register("die", {
+	signal::register("die", {
 		reset()
 		deathCount++
 	})
 
-	signal.register("finish", {
-		finishTime = th.time - env.start
+	signal::register("finish", {
+		finishTime = th::time - env::start
 		state = stateFinished
 	})
 
@@ -50,11 +50,11 @@ fn setup*() {
 fn handle*() {
 	switch state {
 	case stateGame:
-		env.handle()
-		bees.handle()
-		player.handle()
+		env::handle()
+		bees::handle()
+		player::handle()
 	case stateFinished:
-		if input.isJustPressed(input.Key.enter) {
+		if input::isJustPressed(input::Key.enter) {
 			state = stateGame
 			reset()
 		}
@@ -62,23 +62,23 @@ fn handle*() {
 }
 
 fn draw*() {
-	env.draw()
-	bees.draw()
-	player.draw()
+	env::draw()
+	bees::draw()
+	player::draw()
 
-	wpoff := window.getViewportOffset()
-	window.setViewportOffset({})
+	wpoff := window::getViewportOffset()
+	window::setViewportOffset({})
 
 	switch state {
 	case stateGame:
-		canvas.drawText(sprintf("%v\n%s", env.score, global.timeStr(th.time - env.start)),th.Vf2{1, 1}, 0xddddddff, 2)
+		canvas::drawText(sprintf("%v\n%s", env::score, global::timeStr(th::time - env::start)),th::Vf2{1, 1}, 0xddddddff, 2)
 	case stateFinished:
-		canvas.drawText(sprintf(
+		canvas::drawText(sprintf(
 			"TIME: %s\nNUMBER OF DEATHS: %d\nSCORE: %d\nPRESS ENTER\nTO TRY AGAIN",
-			global.timeStr(finishTime), deathCount, env.score),
+			global::timeStr(finishTime), deathCount, env::score),
 			{}, 0xddddddff, 2)
 	}
 
-	window.setViewportOffset(wpoff)
+	window::setViewportOffset(wpoff)
 }
 

@@ -10,16 +10,16 @@ import (
 // of length in ms. Additionally you can enable swap, which instead of
 // dequeueing swaps start and end and resets the progress.
 type Item* = struct {
-	start, end: th.fu
-	length: th.uu
-	progress: th.fu
+	start, end: th::fu
+	length: th::uu
+	progress: th::fu
 	swap: bool
 	ctx: any
 	callback: fn(ctx: any)
 }
 
 // Item's constructor
-fn mk*(start, end: th.fu, length: th.uu, swap: bool = false): Item {
+fn mk*(start, end: th::fu, length: th::uu, swap: bool = false): Item {
 	return Item{
 		start, end, length, 0, swap, null, fn(ctx: any) {}}
 }
@@ -46,7 +46,7 @@ fn (l: ^Lerper) enqueue*(i: Item) {
 }
 
 // Interpolates the front by delta. And returns it's value.
-fn (l: ^Lerper) byDelta*(delta: th.uu): th.fu {
+fn (l: ^Lerper) byDelta*(delta: th::uu): th::fu {
 	if len(l^) == 0 {
 		return 0
 	}
@@ -75,7 +75,7 @@ fn (l: ^Lerper) byDelta*(delta: th.uu): th.fu {
 		return end
 	}
 
-	l[0].progress += th.fu(delta)/l[0].length
+	l[0].progress += th::fu(delta)/l[0].length
 
 	return l[0].progress * (l[0].end-l[0].start) + l[0].start
 }

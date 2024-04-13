@@ -6,10 +6,7 @@ import (
 	"image.um"
 	"input.um"
 	"canvas.um"
-	"color.um"
 	"window.um"
-	"signal.um"
-
 	"placeholders.um"
 )
 
@@ -22,22 +19,22 @@ fn pixelsplit(inp: uint32): (uint8, uint8, uint8, uint8) {
 fn pixelmerge(r, g, b, a: uint8): uint32 { return r << 24 | g << 16 | b << 8 | a }
 
 var (
-	img, img2, img3: image.Image
-	target: image.RenderTarget
+	img, img2, img3: image::Image
+	target: image::RenderTarget
 )
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-	window.setup("image test", 600, 600)
-	window.setViewport(th.Vf2{600, 600})
+	window::setup("image test", 600, 600)
+	window::setViewport(th::Vf2{600, 600})
 
-	img, err = image.load("etc/test.png")
-	std.exitif(err)
+	img, err = image::load("etc/test.png")
+	std::exitif(err)
 	printf("etc/test.png: %v\n", img.validate())
 
 	img2, err = img.copy()
-	std.exitif(err)
+	std::exitif(err)
 	printf("copy: %v\n", img2.validate())
 	data := img.getData()
 	dm := img.getDims()
@@ -48,91 +45,91 @@ fn init*() {
 	}
 
 	//img2 := image.mk(data, dm)
-	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th.Vf2{dm.x, dm.y / 2})
+	img2.setData(slice(data, 0, trunc(dm.x * dm.y / 2)), th::Vf2{dm.x, dm.y / 2})
 
 	img3, err = img.copy()
-	std.exitif(err)
+	std::exitif(err)
 	img3.crop({ 0.5, 0.5 }, { 1, 1 })
 	img3.flipv(true)
 
-	target, err = image.createRenderTarget(th.Vf2{10, 10}, 0)
-	std.exitif(err)
+	target, err = image::createRenderTarget(th::Vf2{10, 10}, 0)
+	std::exitif(err)
 
-	window.onFrame.register({
-		var err: std.Err
+	window::onFrame.register({
+		var err: std::Err
 
-		p := th.Vf2{1, 1}
+		p := th::Vf2{1, 1}
 
-		canvas.drawText("drawOnQuad:", p, th.black, 2)
+		canvas::drawText("drawOnQuad:", p, th::black, 2)
 		p.y += 12
 
-		img.drawOnQuad([4]th.Vf2{
-			p.add(th.Vf2{10, 10}),
-			p.add(th.Vf2{20, 15}),
-			p.add(th.Vf2{20, 30}),
-			p.add(th.Vf2{0, 35})})
+		img.drawOnQuad([4]th::Vf2{
+			p.add(th::Vf2{10, 10}),
+			p.add(th::Vf2{20, 15}),
+			p.add(th::Vf2{20, 30}),
+			p.add(th::Vf2{0, 35})})
 
 		p.y += 36
 
-		canvas.drawText("draw:", p, th.black, 2)
+		canvas::drawText("draw:", p, th::black, 2)
 		p.y += 12
 
 		dig := sqrt(
 			img.getDims().x * img.getDims().x * 16 +
 			img.getDims().y * img.getDims().y * 64)
 
-		img.draw(th.Transform{
-			s: th.Vf2{4, 8},
-			p: th.Vf2{p.x + dig, p.y},
+		img.draw(th::Transform{
+			s: th::Vf2{4, 8},
+			p: th::Vf2{p.x + dig, p.y},
 			r: 45}, 0xaaaaffaa)
 
 		p.y += dig + 1
 
-		canvas.drawText("placeholders:", p, th.black, 2)
+		canvas::drawText("placeholders:", p, th::black, 2)
 		p.y += 12
 
-		placeholders.test.draw(th.Transform{
-			s: th.Vf2{4, 4},
+		placeholders::test.draw(th::Transform{
+			s: th::Vf2{4, 4},
 			p: p,
 			r: 0}, 0xFFFFFF99)
 
 		p.y += img.getDims().mulf(4).y
 
-		canvas.drawText("copy, setData:", p, th.black, 2)
+		canvas::drawText("copy, setData:", p, th::black, 2)
 		p.y += 12
-		img2.draw(th.Transform{
-			s: th.Vf2{10, 10},
+		img2.draw(th::Transform{
+			s: th::Vf2{10, 10},
 			p: p})
 
 		p.y += img2.getDims().y * 10 + 1
 
-		canvas.drawText("render target:", p, th.black, 2)
+		canvas::drawText("render target:", p, th::black, 2)
 		p.y += 12
 
 		err = target.begin()
-		std.exitif(err)
-			canvas.drawLine(0xFF, th.Vf2{0, 0}, th.Vf2{50, 50}, 0.1)
-			img.draw(th.Transform{
-				s: th.Vf2{0.5, 0.5},
-				p: th.Vf2{0, 0}}, 0xFFFFFF99)
-		err = target.end(window.wp)
-		std.exitif(err)
+		std::exitif(err)
+			canvas::drawLine(0xFF, th::Vf2{0, 0}, th::Vf2{50, 50}, 0.1)
+			img.draw(th::Transform{
+				s: th::Vf2{0.5, 0.5},
+				p: th::Vf2{0, 0}}, 0xFFFFFF99)
+		err = target.end(window::wp)
+		std::exitif(err)
 
-		target.toImage().draw(th.Transform{s: th.Vf2{10, 10}, p: p})
+		target.toImage().draw(th::Transform{s: th::Vf2{10, 10}, p: p})
 		p.y += target.toImage().getDims().y*10
-		canvas.drawText("nine patch:", p, th.black, 2)
+		canvas::drawText("nine patch:", p, th::black, 2)
 		p.y += 12
 
-		placeholders.button.drawNinepatch(rect.mk(0, 0, 5, 5), rect.mk(1, 1, 2, 2), rect.mk(0, p.y, 64, 64), 0xFFAAFFFF)
-		placeholders.button.drawNinepatch(rect.mk(0, 0, 5, 5), rect.mk(1, 1, 2, 2), rect.mk(64+2, p.y, 128, 128), 0xFFFFFFFF, 4)
-		placeholders.button.drawNinepatch(rect.mk(5, 0, 5, 5), rect.mk(2, 2, 1, 1), rect.mk(128+2+64+2, p.y, 64, 64), 0xCCCCCCFF, 2)
+		placeholders::button.drawNinepatch(rect::mk(0, 0, 5, 5), rect::mk(1, 1, 2, 2), rect::mk(0, p.y, 64, 64), 0xFFAAFFFF)
+		placeholders::button.drawNinepatch(rect::mk(0, 0, 5, 5), rect::mk(1, 1, 2, 2), rect::mk(64+2, p.y, 128, 128), 0xFFFFFFFF, 4)
+		placeholders::button.drawNinepatch(rect::mk(5, 0, 5, 5), rect::mk(2, 2, 1, 1), rect::mk(128+2+64+2, p.y, 64, 64), 0xCCCCCCFF, 2)
 		p.y += 128
 
-		canvas.drawText("flip crop:", p, th.black, 2)
+		canvas::drawText("flip crop:", p, th::black, 2)
 		p.y += 12
 
-		img3.draw({ s: th.Vf2{ 4, 4 }, p: p})
+		img3.draw({ s: th::Vf2{ 4, 4 }, p: p})
 
-		if input.isJustPressedc('Q') { exit(0) }
+		if input::isJustPressedc('Q') { exit(0) }
 	})
 }

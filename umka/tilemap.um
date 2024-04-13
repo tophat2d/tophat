@@ -21,20 +21,20 @@ const (
 //~~struct Tilemap
 // Tilemap struct
 type Tilemap* = struct {
-	atlas: atlas.Atlas
-	pos: th.Vf2
-	w: th.uu // width of tilemap
-	cells: []th.uu // all cells (this will draw the tile in tiles with number in cells - 1)
+	atlas: atlas::Atlas
+	pos: th::Vf2
+	w: th::uu // width of tilemap
+	cells: []th::uu // all cells (this will draw the tile in tiles with number in cells - 1)
 	collMask: []bool // if true, the tile collides
-	scale: th.fu
+	scale: th::fu
 }
 //~~
 
 //~~fn mk
-fn mk*(cells: []th.uu, w: th.uu, at: atlas.Atlas, scale: th.fu = 1): Tilemap {
+fn mk*(cells: []th::uu, w: th::uu, at: atlas::Atlas, scale: th::fu = 1): Tilemap {
 //~~
 	if !at.i.validate() {
-		th.__error("invalid atlas")
+		th::__error("invalid atlas")
 	}
 
 	t := Tilemap{}
@@ -64,7 +64,7 @@ fn (t: ^Tilemap) draw*() {
 	umth_tilemap_draw(t)
 }
 
-fn umth_tilemap_getcoll(pos: ^th.Vf2, vert: ^th.Vf2, t: ^Tilemap, e: ^ent.Ent): int32
+fn umth_tilemap_getcoll(pos: ^th::Vf2, vert: ^th::Vf2, t: ^Tilemap, e: ^ent::Ent): int32
 //~~fn Tilemap.getColl
 // Checks whether `e` collides with any of the tiles in `t`, which are in the
 // collmask.
@@ -74,11 +74,11 @@ fn umth_tilemap_getcoll(pos: ^th.Vf2, vert: ^th.Vf2, t: ^Tilemap, e: ^ent.Ent): 
 //
 // Note: While there may be multiple collisions with a tilemap, this function
 // will only return one.
-fn (t: ^Tilemap) getColl*(e: ent.Ent, ic: ^th.Vf2, pos: ^th.Vf2): bool {
+fn (t: ^Tilemap) getColl*(e: ent::Ent, ic: ^th::Vf2, pos: ^th::Vf2): bool {
 //~~
 	if len(t.cells) == 0 { return false }
 
-	_ := th.Vf2{}
+	_ := th::Vf2{}
 	if ic == null { ic = &_ }
 	if pos == null { pos = &_ }
 
@@ -87,16 +87,16 @@ fn (t: ^Tilemap) getColl*(e: ent.Ent, ic: ^th.Vf2, pos: ^th.Vf2): bool {
 	return bool(c)
 }
 
-fn umth_tilemap_getcoll_line(b, e: th.Vf2, t: ^Tilemap, ic: ^th.Vf2): bool
+fn umth_tilemap_getcoll_line(b, e: th::Vf2, t: ^Tilemap, ic: ^th::Vf2): bool
 //~~fn Tilemap.getCollLine
 // Check for a collision between a tilemap and a line. `ic` will be a point of
 // an intersection, if there is one.
-fn (t: ^Tilemap) getCollLine*(b, e: th.Vf2, ic: ^th.Vf2): bool {
+fn (t: ^Tilemap) getCollLine*(b, e: th::Vf2, ic: ^th::Vf2): bool {
 //~~
 	return umth_tilemap_getcoll_line(b, e, t, ic)
 }
 
-fn umth_tilemap_autotile(tgt: ^th.uu, w, h: th.uu, src, cfg: ^th.uu, tile: th.uu)
+fn umth_tilemap_autotile(tgt: ^th::uu, w, h: th::uu, src, cfg: ^th::uu, tile: th::uu)
 //~~fn Tilemap.autotile
 // Autotile turns all `tile` tiles in `src` into tiles in `tileCfg`, so they
 // follow up correctly. `tileCfg` is an array of 16 tiles. They are placed in
@@ -104,10 +104,10 @@ fn umth_tilemap_autotile(tgt: ^th.uu, w, h: th.uu, src, cfg: ^th.uu, tile: th.uu
 // right). The constants for them are defined in this file. Example:
 // tileCfg[top | bot] = 21
 // top | bot would look something like this: |
-fn (t: ^Tilemap) autotile*(src, tileCfg: []th.uu, tile: th.uu) {
+fn (t: ^Tilemap) autotile*(src, tileCfg: []th::uu, tile: th::uu) {
 //~~
 	if len(tileCfg) < 16 {
-		th.__error("autotile: tileCfg len isn't 16'")
+		th::__error("autotile: tileCfg len isn't 16'")
 	}
 
 	umth_tilemap_autotile(&t.cells[0], t.w, len(t.cells)/t.w, &src[0], &tileCfg[0], tile)

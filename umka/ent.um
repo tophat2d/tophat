@@ -12,11 +12,11 @@ import (
 // and rectangle.
 type Ent* = struct {
 	// used as a collider, used as backup when invalid image is supplied
-	r: rect.Rect
+	r: rect::Rect
 	// used in drawing
-	i: image.Image
+	i: image::Image
 	// used to transform and translate the image and rect
-	t: th.Transform
+	t: th::Transform
 	// used as a color of the rect and a color filter for the image
 	c: uint32
 }
@@ -26,8 +26,8 @@ type Ent* = struct {
 // Value returned by get coll. It contains a position where the collision
 // happened and the index of the entity involved in said collision.
 type Coll* = struct {
-	index: th.uu
-	pos: th.Vf2
+	index: th::uu
+	pos: th::Vf2
 }
 //~~
 
@@ -41,7 +41,7 @@ fn (e: ^Ent) draw*() {
 
 //~~fn mk
 // ent's constructor
-fn mk*(img: image.Image = image.Image{}, t: th.Transform = th.Transform{ s: th.Vf2{1, 1} }): Ent {
+fn mk*(img: image::Image = image::Image{}, t: th::Transform = th::Transform{ s: th::Vf2{1, 1} }): Ent {
 //~~
 	var e: Ent
 	e.i = img
@@ -51,21 +51,21 @@ fn mk*(img: image.Image = image.Image{}, t: th.Transform = th.Transform{ s: th.V
 		e.r.w = dm.x
 		e.r.h = dm.y
 	}
-	e.c = th.white
+	e.c = th::white
 
 	if t.s.x == 0 && t.s.y == 0 {
-		t.s = th.Vf2{ 1, 1 }
+		t.s = th::Vf2{ 1, 1 }
 	}
 
 	return e
 }
 
-fn umth_ent_getcoll(coll: ^Coll, collC: ^int, maxCount: th.uu, count: int32,
+fn umth_ent_getcoll(coll: ^Coll, collC: ^int, maxCount: th::uu, count: int32,
 	e: ^Ent, s: ^^Ent)
 //~~fn Ent.getColl
 // Checks collisions of e with entities in s. Checks at max maxColl collisions.
 // If s contains e, the collision won't be returned.
-fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
+fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th::uu): []Coll {
 //~~
 	if len(s) == 0 {
 		return []Coll{}
@@ -89,7 +89,7 @@ fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th.uu): []Coll {
 //~~fn Ent.animate
 // Animates the entity's image with one of the `anim` array. <b>Won't</b> begin on
 // the first frame. If you want that, use anim.Anim.
-fn (e: ^Ent) animate*(fps: int, frames: ^[]image.Image, t: int) {
+fn (e: ^Ent) animate*(fps: int, frames: ^[]image::Image, t: int) {
 //~~
 	if len(frames^) == 0 {
 		return

@@ -9,18 +9,18 @@ import (
 	"window.um"
 )
 
-var gui: ui.Gui
+var gui: ui::Gui
 
 fn init*() {
-	gui = ui.mk(rect.fromVf2({}, window.wp), ui.getDefaultStyle())
+	gui = ui::mk(rect::fromVf2({}, window::wp), ui::getDefaultStyle())
 	gui.getStyle().containerBox.color = 0
-	gui.getStyle().ftColor = th.white
-	gui.getStyle().ft = hud.mainFont
+	gui.getStyle().ftColor = th::white
+	gui.getStyle().ft = hud::mainFont
 	gui.getStyle().ftScale = 0.1
 }
 
 fn handle*() {
-	layout := ui.LayoutFn{
+	layout := ui::LayoutFn{
 		gui.stack({ padding: 2 })
 		gui.box({
 			dimension: 10,
@@ -36,27 +36,27 @@ fn handle*() {
 
 			gui.pushRect({ h: 10 })
 
-			gui.label(sprintf("%d : %d", global.score, global.hi),
+			gui.label(sprintf("%d : %d", global::score, global::hi),
 				{ centerX: true })
 
 
 		gui.popContainer()
 
 		gui.dupStyle()
-		gui.getStyle().ftColor = th.black
+		gui.getStyle().ftColor = th::black
 
 		gui.box({
 			dimension: 10,
 			padding: 2,
-			dir: ui.BoxDir.up })
+			dir: ui::BoxDir.up })
 
 			if gui.qbutton("EXIT") {
-				global.scene = global.NONE
+				global::scene = global::NONE
 			}
 
 			if gui.qbutton("PLAY") {
-				global.score = 0
-				global.scene = global.GAME
+				global::score = 0
+				global::scene = global::GAME
 			}
 
 		gui.popContainer()

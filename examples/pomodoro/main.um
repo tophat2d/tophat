@@ -12,7 +12,7 @@ import (
 
 type (
   ElemState = struct {
-    rect: th_rect.Rect
+    rect: th_rect::Rect
     color: uint32
   }
 
@@ -26,7 +26,7 @@ type (
 
   BoundRect = struct {
     elementName: str
-    rect: th_rect.Rect
+    rect: th_rect::Rect
   }
 
   Gui = struct {
@@ -49,7 +49,7 @@ const (
   cutSideRight = 3
 )
 
-fn rectVsPoint(rect: th_rect.Rect, p: th.Vf2): bool {
+fn rectVsPoint(rect: th_rect::Rect, p: th::Vf2): bool {
   return p.x >= rect.x && p.y >= rect.y && p.x <= (rect.x+rect.w) && p.y <= (rect.y+rect.h)
 }
 
@@ -57,7 +57,7 @@ fn guiInit(): Gui {
   return Gui {rectStack: make([]BoundRect, 0), elements: map[str]Elem{}}
 }
 
-fn guiPushRect(gui: ^Gui, rect: th_rect.Rect) {
+fn guiPushRect(gui: ^Gui, rect: th_rect::Rect) {
   gui.rectStack = append(gui.rectStack, BoundRect{rect: rect, elementName: ""})
 }
 
@@ -81,7 +81,7 @@ fn guiGetLastRect(gui: ^Gui): ^BoundRect {
 }
 
 fn guiDefaultElement(gui: ^Gui): Elem {
-  return Elem{tweenState: ElemState{rect: th_rect.mk(th_window.w/2, th_window.h/2, 0, 0)}}
+  return Elem{tweenState: ElemState{rect: th_rect::mk(th_window::w/2, th_window::h/2, 0, 0)}}
 }
 
 fn guiGetElement(gui: ^Gui, name: str): ^Elem {
@@ -95,8 +95,8 @@ fn guiGetElement(gui: ^Gui, name: str): ^Elem {
 fn guiGetButtonState(gui: ^Gui): ButtonState {
   lastRect := guiGetLastRect(gui).rect
   state := ButtonState{}
-  state.hovered = rectVsPoint(lastRect, th_input.getMousePos())
-  state.pressed = state.hovered && th_input.isJustPressed(th_input.Key.mouse1)
+  state.hovered = rectVsPoint(lastRect, th_input::getMousePos())
+  state.pressed = state.hovered && th_input::isJustPressed(th_input::Key.mouse1)
   return state
 }
 
@@ -123,33 +123,33 @@ fn guiSetElement(gui: ^Gui, name: str): ^ElemState {
   return &element.targetState
 }
 
-fn guiCutRect(gui: ^Gui, side: int, by: th.Vf2): th_rect.Rect {
+fn guiCutRect(gui: ^Gui, side: int, by: th::Vf2): th_rect::Rect {
   lastRect := &guiGetLastRect(gui).rect
-  rect := th_rect.mk(0, 0, 0, 0)
+  rect := th_rect::mk(0, 0, 0, 0)
 
   by.x += gui.padding*2
   by.y += gui.padding*2
 
   switch side {
     case cutSideTop:
-      rect = th_rect.mk(lastRect.x, lastRect.y, lastRect.w, by.y)
+      rect = th_rect::mk(lastRect.x, lastRect.y, lastRect.w, by.y)
 
       lastRect.y += by.y
       lastRect.h -= by.y
 
     case cutSideBottom:
-      rect = th_rect.mk(lastRect.x, lastRect.y+lastRect.h-by.y, lastRect.w, by.y)
+      rect = th_rect::mk(lastRect.x, lastRect.y+lastRect.h-by.y, lastRect.w, by.y)
 
       lastRect.h -= by.y
 
     case cutSideLeft:
-      rect = th_rect.mk(lastRect.x, lastRect.y, by.x, lastRect.h)
+      rect = th_rect::mk(lastRect.x, lastRect.y, by.x, lastRect.h)
 
       lastRect.x += by.x
       lastRect.w -= by.x
 
     case cutSideRight:
-      rect = th_rect.mk(lastRect.x+lastRect.w-by.x, lastRect.y, by.x, lastRect.h)
+      rect = th_rect::mk(lastRect.x+lastRect.w-by.x, lastRect.y, by.x, lastRect.h)
 
       lastRect.w -= by.x
   }
@@ -162,8 +162,8 @@ fn guiCutRect(gui: ^Gui, side: int, by: th.Vf2): th_rect.Rect {
   return rect
 }
 
-fn slerpUint32(tween: ^uint32, target: uint32, weight: th.fu) {
-  t := th.fu(tween^)+(target-tween^)*weight
+fn slerpUint32(tween: ^uint32, target: uint32, weight: th::fu) {
+  t := th::fu(tween^)+(target-tween^)*weight
 
   if t < 0 {
     return
@@ -172,7 +172,7 @@ fn slerpUint32(tween: ^uint32, target: uint32, weight: th.fu) {
   tween ^= trunc(t)
 }
 
-fn slerpUint32Color(tween: ^uint32, target: uint32, weight: th.fu) {
+fn slerpUint32Color(tween: ^uint32, target: uint32, weight: th::fu) {
   r := tween^&0xFF000000>>24
   g := tween^&0x00FF0000>>16
   b := tween^&0x0000FF00>>8
@@ -185,7 +185,7 @@ fn slerpUint32Color(tween: ^uint32, target: uint32, weight: th.fu) {
   tween ^= (r&0xFF<<24)|(g&0xFF<<16)|(b&0xFF<<8)|(a&0xFF<<0)
 }
 
-fn slerpReal(tween: ^th.fu, target: th.fu, weight: th.fu) {
+fn slerpReal(tween: ^th::fu, target: th::fu, weight: th::fu) {
   tween^ += (target-tween^)*weight
 }
 
@@ -211,22 +211,22 @@ fn guiUpdate(gui: ^Gui, delta: real) {
   }
 }
 
-fn drawRectLines*(color: uint32, r: th_rect.Rect) {
-  th_canvas.drawRect(color, th_rect.Rect{r.x, r.y, r.w, 1})
-  th_canvas.drawRect(color, th_rect.Rect{r.x, r.y+r.h-1, r.w, 1})
-  th_canvas.drawRect(color, th_rect.Rect{r.x, r.y+1, 1, r.h-1})
-  th_canvas.drawRect(color, th_rect.Rect{r.x+r.w-1, r.y+1, 1, r.h-1})
+fn drawRectLines*(color: uint32, r: th_rect::Rect) {
+  th_canvas::drawRect(color, th_rect::Rect{r.x, r.y, r.w, 1})
+  th_canvas::drawRect(color, th_rect::Rect{r.x, r.y+r.h-1, r.w, 1})
+  th_canvas::drawRect(color, th_rect::Rect{r.x, r.y+1, 1, r.h-1})
+  th_canvas::drawRect(color, th_rect::Rect{r.x+r.w-1, r.y+1, 1, r.h-1})
 }
 
 fn drawGuiElementFrame(name: str, element: ^Elem, mask: uint32, showTitle: bool = true) {
   rect := element.tweenState.rect
 
-  drawRectLines(th.red&mask, rect)
+  drawRectLines(th::red&mask, rect)
 
   if showTitle {
-    nameLabelSize := th_canvas.textSize(name, 1)
-    th_canvas.drawRect(th.red&mask, th_rect.mk(rect.x, rect.y, nameLabelSize.x+2, nameLabelSize.y+2))
-    th_canvas.drawText(name, th.Vf2{rect.x+1, rect.y+1}, th.white&mask, 1)
+    nameLabelSize := th_canvas::textSize(name, 1)
+    th_canvas::drawRect(th::red&mask, th_rect::mk(rect.x, rect.y, nameLabelSize.x+2, nameLabelSize.y+2))
+    th_canvas::drawText(name, th::Vf2{rect.x+1, rect.y+1}, th::white&mask, 1)
   }
 }
 
@@ -236,7 +236,7 @@ fn drawGuiElementFrames(gui: ^Gui) {
   for name := "ROOT"; name != ""; name = gui.elements[name].next {
     drawGuiElementFrame(name, &gui.elements[name], 0xFFFFFF77, false)
 
-    if rectVsPoint(gui.elements[name].tweenState.rect, th_input.getMousePos()) {
+    if rectVsPoint(gui.elements[name].tweenState.rect, th_input::getMousePos()) {
       hoveredOver = name
     }
   }
@@ -265,19 +265,19 @@ const (
 )
 
 var (
-  v_mainFont: th_font.Font
-  v_mainFontSmall: th_font.Font
-  v_rectBase: th_image.Image
+  v_mainFont: th_font::Font
+  v_mainFontSmall: th_font::Font
+  v_rectBase: th_image::Image
 
   isDark: bool = true
   v_colorscheme: Colorscheme = c_colorschemeDark
   v_lastTime: int
   v_countdown: Countdown
   v_countdownNumber: int
-  v_alarm: th_audio.Sound
+  v_alarm: th_audio::Sound
 )
 
-fn putGuiText(gui: ^Gui, text: str, small: bool = false, anchor: th.Vf2 = th.Vf2{0.0, 0.0}): th.Vf2 {
+fn putGuiText(gui: ^Gui, text: str, small: bool = false, anchor: th::Vf2 = th::Vf2{0.0, 0.0}): th::Vf2 {
   props := guiGetProperties(gui)
   font := v_mainFont
 
@@ -311,7 +311,7 @@ fn formatTime(time: real): str {
 fn putGuiRect(gui: ^Gui) {
   props := guiGetProperties(gui)
 
-  v_rectBase.drawNinepatch(th_rect.mk(0, 0, 16, 16), th_rect.mk(5, 5, 5, 5), props.rect, props.color)
+  v_rectBase.drawNinepatch(th_rect::mk(0, 0, 16, 16), th_rect::mk(5, 5, 5, 5), props.rect, props.color)
 }
 
 fn putGuiCountdown(id: str, gui: ^Gui, cd: Countdown) {
@@ -335,7 +335,7 @@ fn putGuiCountdown(id: str, gui: ^Gui, cd: Countdown) {
 
 
   timeRect := guiCutRect(gui, cutSideLeft, v_mainFont.measure(formatTime(cd.time)))
-  guiPushRect(gui, th_rect.mk(timeRect.x, lastRect.y, props.rect.w-timeRect.w-timeRect.x-5, props.rect.h))
+  guiPushRect(gui, th_rect::mk(timeRect.x, lastRect.y, props.rect.w-timeRect.w-timeRect.x-5, props.rect.h))
     guiSetElement(gui, id+"DASH").color = trunc(0xFF * mul2) | (props.color & 0xFFFFFF00)
     putGuiRect(gui)
   guiPopRect(gui)
@@ -349,7 +349,7 @@ fn putGuiCountdown(id: str, gui: ^Gui, cd: Countdown) {
 
 fn putGuiButton(gui: ^Gui, id: str, text: str, side: int = cutSideLeft): ButtonState {
 
-  guiPushRect(gui, guiCutRect(gui, side, th.Vf2{80, 0}))
+  guiPushRect(gui, guiCutRect(gui, side, th::Vf2{80, 0}))
     props := guiSetElement(gui, id)
     props.color = v_colorscheme.item
     putGuiRect(gui)
@@ -359,7 +359,7 @@ fn putGuiButton(gui: ^Gui, id: str, text: str, side: int = cutSideLeft): ButtonS
         props.color = v_colorscheme.itemHovered
       }
       guiSetElement(gui, id+"_TEXT").color = v_colorscheme.text
-      putGuiText(gui, text, true, th.Vf2{0.5, 0.5})
+      putGuiText(gui, text, true, th::Vf2{0.5, 0.5})
     guiPopRect(gui)
   guiPopRect(gui)
 
@@ -379,8 +379,8 @@ fn getCountdown(num: int): Countdown {
 }
 
 fn updateCountdown() {
-  v_countdown.time -= (th.time - v_lastTime) / 1000.0
-  v_lastTime = th.time
+  v_countdown.time -= (th::time - v_lastTime) / 1000.0
+  v_lastTime = th::time
   for v_countdown.time <= 0 {
     diff := -v_countdown.time
     v_countdownNumber += 1
@@ -390,7 +390,7 @@ fn updateCountdown() {
   }
 }
 
-screen := th_rect.Rect{0, 0, 512, 512}
+screen := th_rect::Rect{0, 0, 512, 512}
 started := false
 debug := false
 var (state: ^ElemState; gui: Gui)
@@ -402,7 +402,7 @@ const onFrame = fn(args: []any) {
     v_colorscheme = c_colorschemeLight
   }
 
-  if th_input.isJustPressed(th_input.Key.escape) {
+  if th_input::isJustPressed(th_input::Key.escape) {
     debug = !debug
   }
 
@@ -410,19 +410,19 @@ const onFrame = fn(args: []any) {
     updateCountdown()
   }
 
-  screen.w = th_window.w
-  screen.h = th_window.h
-  th_window.setViewport(th.Vf2{screen.w, screen.h})
+  screen.w = th_window::w
+  screen.h = th_window::h
+  th_window::setViewport(th::Vf2{screen.w, screen.h})
 
-  th_canvas.drawRect(v_colorscheme.background, screen)
+  th_canvas::drawRect(v_colorscheme.background, screen)
 
   guiPushRect(&gui, screen)
     guiSetElement(&gui, "ROOT").color = v_colorscheme.background
     putGuiRect(&gui)
 
-  elementCount := th_window.h/36-2
+  elementCount := th_window::h/36-2
     for i := 0; i < elementCount; i++ {
-      guiPushRect(&gui, guiCutRect(&gui, cutSideTop, th.Vf2{0, 32}))
+      guiPushRect(&gui, guiCutRect(&gui, cutSideTop, th::Vf2{0, 32}))
         id := sprintf("ENTRY%v", i+v_countdownNumber)
         state = guiSetElement(&gui, id)
 
@@ -436,7 +436,7 @@ const onFrame = fn(args: []any) {
       guiPopRect(&gui)
     }
 
-    guiPushRect(&gui, guiCutRect(&gui, cutSideBottom, th.Vf2{0, 40}))
+    guiPushRect(&gui, guiCutRect(&gui, cutSideBottom, th::Vf2{0, 40}))
       guiSetElement(&gui, "TOOLBAR").color = v_colorscheme.background&0xFFFFFFFF
 
       if started {
@@ -476,7 +476,7 @@ const onFrame = fn(args: []any) {
     guiPopRect(&gui)
   guiPopRect(&gui)
 
-  guiUpdate(&gui, real(th.delta/1000.0))
+  guiUpdate(&gui, real(th::delta/1000.0))
 
   if debug {
     drawGuiElementFrames(&gui)
@@ -484,28 +484,28 @@ const onFrame = fn(args: []any) {
 
   //v_mainFont.draw(sprintf("fps: %d", 1000/(th.delta)), th.Vf2{5, 5}, th.red)
 
-  v_lastTime = th.time
+  v_lastTime = th::time
 }
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-  v_lastTime = th.time
-  th_window.setup("Pomodoro", trunc(screen.w), trunc(screen.h))
-	th_window.setViewport(th.Vf2{screen.w, screen.h})
-  v_mainFont, err = th_font.load("Font.ttf", 32)
-	std.exitif(err)
-  v_mainFontSmall, err = th_font.load("Font.ttf", 20)
-	std.exitif(err)
+  v_lastTime = th::time
+  th_window::setup("Pomodoro", trunc(screen.w), trunc(screen.h))
+	th_window::setViewport(th::Vf2{screen.w, screen.h})
+  v_mainFont, err = th_font::load("Font.ttf", 32)
+	std::exitif(err)
+  v_mainFontSmall, err = th_font::load("Font.ttf", 20)
+	std::exitif(err)
   v_countdown = getCountdown(0)
-  v_alarm, err = th_audio.load("Alarm.wav")
-	std.exitif(err)
-  v_rectBase, err = th_image.load("rectbase.png")
-	std.exitif(err)
+  v_alarm, err = th_audio::load("Alarm.wav")
+	std::exitif(err)
+  v_rectBase, err = th_image::load("rectbase.png")
+	std::exitif(err)
 
   gui = guiInit()
 
   gui.padding = 2
 
-  th_window.onFrame.register(onFrame)
+  th_window::onFrame.register(onFrame)
 }

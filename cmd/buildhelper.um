@@ -2,7 +2,7 @@ import (
 	"std.um"
 )
 
-fn peekstr(f: std.File, next: int): str {
+fn peekstr(f: std::File, next: int): str {
 	tr := ""
 	var c: char
 	for i:=0; i < next; i++ {
@@ -13,7 +13,7 @@ fn peekstr(f: std.File, next: int): str {
 	return tr
 }
 
-fn peekn(f: std.File, next: int): int {
+fn peekn(f: std::File, next: int): int {
 	tr := 0
 	var c: char
 	for i:=0; i < next; i++ {
@@ -27,8 +27,8 @@ fn peekn(f: std.File, next: int): int {
 }
 
 fn loadFF*(path: str): ([]uint32, int, int, int) {
-	f, err := std.fopen(path, "r")
-	std.exitif(err)
+	f, err := std::fopen(path, "r")
+	std::exitif(err)
 	if f == null { return []uint32{}, -1, -1, 1 }
 	var w, h: int
 	var tr: []uint32
@@ -48,7 +48,7 @@ fn loadFF*(path: str): ([]uint32, int, int, int) {
 		}
 	}
 
-	std.fclose(f)
+	std::fclose(f)
 	return tr, w, h, 0
 }
 
@@ -87,37 +87,37 @@ fn strtoc(inp: str): str {
 }
 
 fn main() {
-	mode := std.argv(1)
+	mode := std::argv(1)
 
 	// embeds contents of a file as a string. TODO just as bytes
 	if mode == "em" {
-		printf("const char *%s[] = {\n", std.argv(2))
+		printf("const char *%s[] = {\n", std::argv(2))
 
-		for i:=3; i < std.argc(); i++ {
-			f, err := std.fopen(std.argv(i), "rb")
-			std.exitif(err)
-			data, err := std.freadall(f)
-			std.exitif(err)
+		for i:=3; i < std::argc(); i++ {
+			f, err := std::fopen(std::argv(i), "rb")
+			std::exitif(err)
+			data, err := std::freadall(f)
+			std::exitif(err)
 			printf("%s\n", strtoc(str(data))+",")
-			std.fclose(f)
+			std::fclose(f)
 		}
 
 		printf("};\n")
 	// creates a string array with args as values
 	} else if mode == "argarr" {
-		printf("const char *%s[] = { ", std.argv(2))
-		for i:=3; i < std.argc(); i++ {
-			printf("\"%s\", ", std.argv(i))
+		printf("const char *%s[] = { ", std::argv(2))
+		for i:=3; i < std::argc(); i++ {
+			printf("\"%s\", ", std::argv(i))
 		}
 
 		printf(" };\n")
-		printf("int %s_count = %d;\n", std.argv(2), std.argc() - 3)
+		printf("int %s_count = %d;\n", std::argv(2), std::argc() - 3)
 	} else if mode == "placeholders" {
 		ws := []int{}
 		hs := []int{}
 
-		for i:=2; i < std.argc(); i++ {
-			fname := std.argv(i)
+		for i:=2; i < std::argc(); i++ {
+			fname := std::argv(i)
 
 
 			data, w, h, err := loadFF(fname)
@@ -140,7 +140,7 @@ fn main() {
 		}
 
 		printf("th_em_placeholder th_em_placeholders[] = {\n")
-		for i:=2; i < std.argc(); i++ {
+		for i:=2; i < std::argc(); i++ {
 			printf("{ th_em_placeholder_data_%d, { .w = %d, .h = %d } },\n",
 				i, ws[i - 2], hs[i - 2])
 		}

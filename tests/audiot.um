@@ -3,40 +3,38 @@ import (
 	"std.um"
 	"audio.um"
 	"input.um"
-	"rect.um"
 	"th.um"
 	"window.um"
-	"signal.um"
 )
 
 var (
-	s, s2: audio.Sound
+	s, s2: audio::Sound
 )
 
 fn init*() {
-	var err: std.Err
+	var err: std::Err
 
-	window.setup("audio test")
-	window.setViewport(th.Vf2{400, 400})
+	window::setup("audio test")
+	window::setViewport(th::Vf2{400, 400})
 
-	s, err = audio.load("examples/tetris/IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
-	std.exitif(err)
+	s, err = audio::load("examples/tetris/IDontWantToInfringeCopyrightSoListenToThisMonstrosity.wav")
+	std::exitif(err)
 	s.play()
 
 	s.setVol(0.5)
 	s.setPitch(0.5)
 
-	s2, err = audio.load("examples/tetris/ClearMega.wav")
-	std.exitif(err)
+	s2, err = audio::load("examples/tetris/ClearMega.wav")
+	std::exitif(err)
 	s2.play()
 
-	window.onFrame.register(signal.Callback{
-		if input.isJustPressedc('s') {
+	window::onFrame.register({
+		if input::isJustPressedc('s') {
 			s.stop()
 			s.seekToFrame(0)
 		}
 
-		if input.isJustPressedc(' ') {
+		if input::isJustPressedc(' ') {
 			s.play()
 		}
 	})

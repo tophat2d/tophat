@@ -8,19 +8,19 @@ import (
 //~~struct Atlas
 // Atlas is an image containing tiles in a square grid.
 type Atlas* = struct {
-	i: image.Image // source image
-	cs: th.Vf2 // size of a cell in pixels
-	dm: th.Vf2 // amount of cells in image
+	i: image::Image // source image
+	cs: th::Vf2 // size of a cell in pixels
+	dm: th::Vf2 // amount of cells in image
 }
 //~~
 
 //~~fn mk
 // i: source image
 // dm: amount of cells
-fn mk*(i: image.Image, dm: th.Vf2): Atlas {
+fn mk*(i: image::Image, dm: th::Vf2): Atlas {
 //~~
 	if !i.validate() {
-		th.__error("Image is not valid")
+		th::__error("Image is not valid")
 	}
 
 	a := Atlas{}
@@ -34,26 +34,26 @@ fn mk*(i: image.Image, dm: th.Vf2): Atlas {
 
 //~~fn Atlas.coords
 // returns the coordinates of the nth tile
-fn (a: ^Atlas) coords*(n: int): (th.Vf2, std.Err) {
+fn (a: ^Atlas) coords*(n: int): (th::Vf2, std::Err) {
 //~~
-	o := th.Vf2{ n % trunc(a.dm.x), (n - n % trunc(a.dm.x)) / a.dm.x }
+	o := th::Vf2{ n % trunc(a.dm.x), (n - n % trunc(a.dm.x)) / a.dm.x }
 	if o.x > a.dm.x || o.y > a.dm.y {
-		return {}, th.__errFromCode(.out_of_bounds)
+		return {}, th::__errFromCode(.out_of_bounds)
 	}
 	return o, {}
 }
 
 //~~fn Atlas.cropSource
 // Crops the sourse image to only show a wanted tile
-fn (a: ^Atlas) cropSource*(at: th.Vf2): std.Err {
+fn (a: ^Atlas) cropSource*(at: th::Vf2): std::Err {
 //~~
 	if (at.x > a.dm.x || at.y > a.dm.y || at.x * at.y < 0) {
-		return th.__errFromCode(.out_of_bounds)
+		return th::__errFromCode(.out_of_bounds)
 	}
 
 	a.i.crop(
-		th.Vf2{at.x / a.dm.x, at.y / a.dm.y},
-		th.Vf2{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})
+		th::Vf2{at.x / a.dm.x, at.y / a.dm.y},
+		th::Vf2{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})
 
 	return {}
 }
@@ -66,28 +66,28 @@ const (
 )
 //~~
 
-fn umth_atlas_pack(a: ^Atlas, images: ^[]image.Image, strategy: int): th.ErrCode
+fn umth_atlas_pack(a: ^Atlas, images: ^[]image::Image, strategy: int): th::ErrCode
 
 //~~fn pack
 // Packs an array of images into an atlas
-fn pack*(images: []image.Image, strategy: int): (Atlas, std.Err) {
+fn pack*(images: []image::Image, strategy: int): (Atlas, std::Err) {
 //~~
 	var a: Atlas
 	ec := umth_atlas_pack(&a, &images, strategy)
-	return a, th.__errFromCode(ec)
+	return a, th::__errFromCode(ec)
 }
 
 //~~fn Atlas.draw
 // Draws the tile at `at`
-fn (a: ^Atlas) draw*(at: th.Vf2, t: th.Transform): std.Err {
+fn (a: ^Atlas) draw*(at: th::Vf2, t: th::Transform): std::Err {
 //~~
 	if (at.x > a.dm.x || at.y > a.dm.y || at.x * at.y < 0) {
-		return th.__errFromCode(.out_of_bounds)
+		return th::__errFromCode(.out_of_bounds)
 	}
 
 	a.cropSource(at)
-	a.i.draw(t, th.white)
-	a.i.crop(th.Vf2{}, th.Vf2{1, 1})
+	a.i.draw(t, th::white)
+	a.i.crop(th::Vf2{}, th::Vf2{1, 1})
 
 	return {}
 }

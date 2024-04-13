@@ -4,11 +4,11 @@ import("image.um")
 // These images are included with tophat and don't have to be loaded.
 var (
 	// an image useful for testing
-	test*: image.Image
+	test*: image::Image
 	// the image used for the app icon
-	icon*: image.Image
+	icon*: image::Image
 	// Windows 95 style button, to be used with ninepatch (image.um)
-	button*: image.Image
+	button*: image::Image
 )
 //~~
 
@@ -16,8 +16,8 @@ fn umth_placeholder_fetch(id: uint32): ^struct{}
 
 // **INTERNAL**
 fn __setup*() {
-	test = image.Image{umth_placeholder_fetch(0)}
-	icon = image.Image{umth_placeholder_fetch(1)}
-	button = image.Image{umth_placeholder_fetch(2)}
+	test = image::Image{umth_placeholder_fetch(0)}
+	icon = image::Image{umth_placeholder_fetch(1)}
+	button = image::Image{umth_placeholder_fetch(2)}
 }
 

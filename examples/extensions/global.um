@@ -9,6 +9,6 @@ const (
 )
 
 var (
-	scene*: th.uu
-	cam*: rect.Rect
+	scene*: th::uu
+	cam*: rect::Rect
 )
