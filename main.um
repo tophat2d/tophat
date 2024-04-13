@@ -11,29 +11,29 @@ import (
 )
 
 var (
-	logo: image.Image
+	logo: image::Image
 	fg: uint32
 	bg: uint32
 	lines: []str
-	loadedFont: font.Font
+	loadedFont: font::Font
 )
 
 fn onFrame(args: []any) {
-	canvas.drawRect(bg, rect.mk(0, 0, window.wp.x, window.wp.y))
+	canvas::drawRect(bg, rect::mk(0, 0, window::wp.x, window::wp.y))
 
-	p := th.Vf2{ 0, 1 }
+	p := th::Vf2{ 0, 1 }
 
-	if !input.isPressed(input.Key.leftAlt) {
+	if !input::isPressed(input::Key.leftAlt) {
 		for i in lines {
 			s := 1
 			if i == 1 {
 				s = 2
 			}
 
-			canvas.drawText(
+			canvas::drawText(
 				lines[i],
-				th.Vf2{
-					(window.wp.x - canvas.textSize(lines[i], s).x) / 2,
+				th::Vf2{
+					(window::wp.x - canvas::textSize(lines[i], s).x) / 2,
 					p.y},
 				fg, s)
 			p.y += 6 * s
@@ -47,8 +47,8 @@ fn onFrame(args: []any) {
 
 			loadedFont.draw(
 				lines[i],
-				th.Vf2{
-					(window.wp.x - loadedFont.measure(lines[i]).x * s) / 2,
+				th::Vf2{
+					(window::wp.x - loadedFont.measure(lines[i]).x * s) / 2,
 					p.y},
 				fg, s)
 			p.y += 16 * s
@@ -56,30 +56,30 @@ fn onFrame(args: []any) {
 	}
 
 
-	if input.isJustPressed(input.Key.enter) {
-		if th.platform == th.Platform.windows {
-			std.system("explorer \"https://tophat2d.dev/\"")
-		} else if th.platform == th.Platform.linux {
-			std.system("xdg-open https://tophat2d.dev/")
+	if input::isJustPressed(input::Key.enter) {
+		if th::platform == th::Platform.windows {
+			std::system("explorer \"https://tophat2d.dev/\"")
+		} else if th::platform == th::Platform.linux {
+			std::system("xdg-open https://tophat2d.dev/")
 		}
 	}
 
 	const s = 1.5
-	logo.draw(th.Transform{
-		p: p.add(window.wp.sub(p).sub(logo.getDims().mulf(s)).divf(2)),
-		s: th.vf2f(s)})
+	logo.draw(th::Transform{
+		p: p.add(window::wp.sub(p).sub(logo.getDims().mulf(s)).divf(2)),
+		s: th::vf2f(s)})
 }
 
 fn init*() {
-	window.setup("Hello world", 600, 600)
-	window.setViewport(th.Vf2{ 100, 100 })
-	var err: std.Err
+	window::setup("Hello world", 600, 600)
+	window::setViewport(th::Vf2{ 100, 100 })
+	var err: std::Err
 
-	loadedFont, err = font.load("etc/roboto.ttf", 16)
-	std.exitif(err)
+	loadedFont, err = font::load("etc/roboto.ttf", 16)
+	std::exitif(err)
 
-	logo, err = image.load("etc/logo/logo-normal-white.png")
-	std.exitif(err)
+	logo, err = image::load("etc/logo/logo-normal-white.png")
+	std::exitif(err)
 
 	fg = 0xadadd5ff
 	bg = 0x262626ff
@@ -97,6 +97,6 @@ fn init*() {
 		"HOMEPAGE" }
 
 
-	window.onFrame.register(onFrame)
+	window::onFrame.register(onFrame)
 }
 
