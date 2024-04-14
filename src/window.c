@@ -19,7 +19,7 @@ th_print_umka_error_and_quit(int code)
 {
 	UmkaError *error = umkaGetError(thg->umka);
 
-	if (error->msg) {
+	if (error->code != 0 && error->msg[0]) {
 		th_error("%s (%d): %s\n", error->fileName, error->line, error->msg);
 
 		fprintf(stderr, "\tStack trace:\n");
