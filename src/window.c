@@ -31,8 +31,8 @@ th_print_umka_error_and_quit(int code)
 
 			if (!umkaGetCallStack(
 				thg->umka, depth, MSG_LEN + 1, &offset, file, fnName, &line)) {
-				break;
 				fprintf(stderr, "\t\t...\n");
+				break;
 			}
 #ifndef _WIN32
 			fprintf(stderr, "\033[34m");

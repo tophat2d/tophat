@@ -5,8 +5,6 @@
 
 #include "tophat.h"
 
-#define MIN(a, b) (a < b ? a : b)
-
 // line to line is stolen from: http://jeffreythompson.org/collision-detection/table_of_contents.php
 int
 th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic1)
@@ -135,7 +133,7 @@ th_line_to_tilemap(th_vf2 b, th_vf2 e, th_tmap *t, th_vf2 *ic)
 	float lineLen = sqrt(mx * mx + my * my);
 	th_vector_normalize(&mx, &my);
 
-	float x = b.x, y = b.y, minlen = -1;
+	float x = b.x, y = b.y, minlen = FLT_MAX;
 	bool coll = false;
 	float len = 0;
 	while (len < lineLen) {
@@ -146,7 +144,7 @@ th_line_to_tilemap(th_vf2 b, th_vf2 e, th_tmap *t, th_vf2 *ic)
 		if (x >= t->pos.x && y >= t->pos.y && tx < tw && ty < th && tile >= 0 &&
 		    t->collmask.data[tile]) {
 			coll = true;
-			if (minlen == -1 || len < minlen)
+			if (len < minlen)
 				minlen = len;
 		}
 

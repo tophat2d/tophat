@@ -293,8 +293,10 @@ th_main(int argc, char *argv[])
 	th_regularize_path(scriptpath, "./", regularizedScriptPath, sizeof regularizedScriptPath);
 	th_regularize_path(respath, "./", thg->respath, sizeof thg->respath);
 
-	if (thg->respath[strlen(thg->respath) - 1] != '/' && thg->respath[0] != 0) {
-		if (strlen(thg->respath) == sizeof(thg->respath) - 1) {
+	size_t respath_len = strlen(thg->respath);
+
+	if (respath_len > 0 && thg->respath[respath_len - 1] != '/' && thg->respath[0] != 0) {
+		if (respath_len == sizeof(thg->respath) - 1) {
 			th_error("Respath is too long");
 			return 1;
 		}

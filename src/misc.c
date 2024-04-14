@@ -94,12 +94,15 @@ th_rotate_point(th_vf2 *p, th_vf2 o, fu rot)
 void
 th_vector_normalize(float *x, float *y)
 {
-	if (fabs(*x) > fabs(*y)) {
-		*y /= fabs(*x);
-		*x /= fabs(*x);
+	float fx = fabs(*x);
+	float fy = fabs(*y);
+
+	if (fx > fy) {
+		*x /= fx;
+		*y /= fx;
 	} else {
-		*x /= fabs(*y);
-		*y /= fabs(*y);
+		*x /= fy;
+		*y /= fy;
 	}
 }
 

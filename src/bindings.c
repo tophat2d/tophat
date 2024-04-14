@@ -923,18 +923,6 @@ umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_window_setup(title, w, h);
 }
 
-// draws text
-void
-umdrawtext(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	fu size = p[0].real32Val;
-	uint32_t color = (uint32_t)p[1].uintVal;
-	th_vf2 pos = *(th_vf2 *)&p[2];
-	char *text = (char *)p[3].ptrVal;
-
-	th_canvas_text(text, color, pos, size);
-}
-
 void
 umth_window_get_dimensions(UmkaStackSlot *p, UmkaStackSlot *r)
 {
