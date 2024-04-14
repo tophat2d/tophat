@@ -86,7 +86,7 @@ th_quad_to_quad(th_quad *q1, th_quad *q2, th_vf2 *ic)
 {
 	th_rect r1 = th_quad_bounding_box(*q1);
 	th_rect r2 = th_quad_bounding_box(*q2);
-	if (!th_rect_to_rect(&r1, &r2) && !th_rect_to_rect(&r1, &r2))
+	if (!th_rect_to_rect(&r1, &r2))
 		return 0;
 
 	for (uu i = 0; i < 4; i++)

@@ -250,12 +250,11 @@ void
 umth_image_get_dims(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_image *img = p[0].ptrVal;
-	if (!img)
-		return;
-	th_vf2 *out = (th_vf2 *)p[1].ptrVal;
 
 	if (!img)
 		return;
+
+	th_vf2 *out = (th_vf2 *)p[1].ptrVal;
 
 	*out = img->dm;
 }
