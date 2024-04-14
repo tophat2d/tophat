@@ -1,6 +1,7 @@
 [submodule "lib/umka"]
 	path = lib/umka
 	url = https://github.com/vtereshkov/umka-lang.git
+	branch = syntax-conv
 [submodule "lib/stb"]
 	path = lib/stb
 	url = https://github.com/nothings/stb.git
