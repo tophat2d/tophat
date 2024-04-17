@@ -29,6 +29,7 @@ type ErrCode* = enum (int32) {
 	already
 	out_of_bounds
 }
+//~~
 
 fn (e: ^ErrCode) toStr*(): str {
 	switch e^ {
