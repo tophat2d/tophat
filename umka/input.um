@@ -303,7 +303,7 @@ fn getMouseScroll*(): th::Vf2 {
 	//~~
 	var x, y: th::fu
 	umth_input_get_mouse_scroll(&x, &y)
-	return th::Vf2{x, y}
+	return {x, y}
 }
 
 fn umth_input_gamepad_get_gamepads*(out: ^[4]int)

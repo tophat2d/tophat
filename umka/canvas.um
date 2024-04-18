@@ -43,7 +43,7 @@ fn textSize*(text: str, scale: th::fu): th::Vf2 {
 		maxw = w
 	}
 
-	return th::Vf2{maxw * scale * 6 - scale, h * 6 * scale}
+	return {maxw * scale * 6 - scale, h * 6 * scale}
 }
 
 fn umth_canvas_draw_rect(color: uint32, r: rect::Rect)
@@ -67,13 +67,13 @@ fn drawLine*(color: uint32, b, e: th::Vf2, thickness: th::fu) {
 fn drawRectLines*(color: uint32, r: rect::Rect, thickness: real32 = 1.0) {
 //~~
   // top
-  drawLine(color, th::Vf2{r.x-1, r.y}, th::Vf2{r.x+r.w, r.y}, thickness)
+  drawLine(color, {r.x-1, r.y}, {r.x+r.w, r.y}, thickness)
   // bottom
-  drawLine(color, th::Vf2{r.x, r.y+r.h}, th::Vf2{r.x+r.w, r.y+r.h}, thickness)
+  drawLine(color, {r.x, r.y+r.h}, {r.x+r.w, r.y+r.h}, thickness)
   // left
-  drawLine(color, th::Vf2{r.x, r.y}, th::Vf2{r.x, r.y+r.h}, thickness)
+  drawLine(color, {r.x, r.y}, {r.x, r.y+r.h}, thickness)
   // right
-  drawLine(color, th::Vf2{r.x+r.w, r.y}, th::Vf2{r.x+r.w, r.y+r.h}, thickness)
+  drawLine(color, {r.x+r.w, r.y}, {r.x+r.w, r.y+r.h}, thickness)
 }
 
 fn umth_canvas_draw_quad(color: uint32, q: ^th::Quad)

@@ -617,7 +617,7 @@ fn (gui: ^Gui) label*(text: str, cfg: LabelConfig = {
 		y += (r.h-txtSize.y)/2.0
 	}
 
-	style.ft.draw(text, th::Vf2{x, y},
+	style.ft.draw(text, {x, y},
 		style.ftColor, style.ftScale)
 }
 

@@ -110,7 +110,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	clockOffset = std::clock() * 1000
 	start = std::clock() * 1000
 
-	setViewport(th::Vf2{width, height})
+	setViewport({width, height})
 }
 
 //~~fn cycle
@@ -178,7 +178,7 @@ fn isFullscreen*(): bool {
 // Returns dimensions of the window in screen pixels.
 fn getDims*(): th::Vf2 {
 //~~
-	return th::Vf2{w, h}
+	return {w, h}
 }
 
 fn umth_window_set_target_fps(fps: int)

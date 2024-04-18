@@ -33,20 +33,20 @@ fn fromVf2*(p: th::Vf2, dm: th::Vf2): Rect {
 //~~fn Rect.getPos
 fn (r: ^Rect) getPos*(): th::Vf2 {
 //~~
-	return th::Vf2{r.x, r.y}
+	return {r.x, r.y}
 }
 
 //~~fn Rect.getDims
 fn (r: ^Rect) getDims*(): th::Vf2 {
 //~~
-	return th::Vf2{r.w, r.h}
+	return {r.w, r.h}
 }
 
 //~~fn Rect.getEnd
 // returns where the second point of the rectangle lies.
 fn (r: ^Rect) getEnd*(): th::Vf2 {
 //~~
-	return th::Vf2{r.x+r.w, r.y+r.h}
+	return {r.x+r.w, r.y+r.h}
 }
 
 fn umth_transform_rect(ret: ^th::Quad, r: ^Rect, t: ^th::Transform)

@@ -41,7 +41,7 @@ fn (e: ^Ent) draw*() {
 
 //~~fn mk
 // ent's constructor
-fn mk*(img: image::Image = image::Image{}, t: th::Transform = th::Transform{ s: th::Vf2{1, 1} }): Ent {
+fn mk*(img: image::Image = image::Image{}, t: th::Transform = th::Transform{ s: {1, 1} }): Ent {
 //~~
 	var e: Ent
 	e.i = img
@@ -54,7 +54,7 @@ fn mk*(img: image::Image = image::Image{}, t: th::Transform = th::Transform{ s: 
 	e.c = th::white
 
 	if t.s.x == 0 && t.s.y == 0 {
-		t.s = th::Vf2{ 1, 1 }
+		t.s = { 1, 1 }
 	}
 
 	return e
