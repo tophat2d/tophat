@@ -213,7 +213,7 @@ th_main(int argc, char *argv[])
 
 			for (int i = 0; i < th_em_modulenames_count; i++) {
 				if (strcmp(argv[thg->argOffset + 1], th_em_modulenames[i]) == 0) {
-					th_info("%s\n", th_em_modulesrc[i]);
+					printf("%s\n", th_em_moduledocs[i]);
 					exit(0);
 				}
 			}
@@ -228,7 +228,7 @@ th_main(int argc, char *argv[])
 
 			for (int i = 0; i < th_em_modulenames_count; i++) {
 				if (strcmp(argv[thg->argOffset + 1], th_em_modulenames[i]) == 0) {
-					th_info("%s\n", th_em_moduledocs[i]);
+					printf("%s\n", th_em_moduledocs[i]);
 					exit(0);
 				}
 			}
