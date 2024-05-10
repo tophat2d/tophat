@@ -1,7 +1,7 @@
 #define SOKOL_NO_ENTRY
 #define SOKOL_IMPL
 #if defined(_MSC_VER)
-#define SOKOL_GLCORE33
+#define SOKOL_GLCORE
 #define SOKOL_LOG(str) OutputDebugStringA(str)
 #elif defined(__EMSCRIPTEN__)
 #define SOKOL_GLES3
@@ -9,7 +9,7 @@
 // NOTE: on macOS, sokol.c is compiled explicitly as ObjC
 #define SOKOL_METAL
 #else
-#define SOKOL_GLCORE33
+#define SOKOL_GLCORE
 #endif
 
 #include <sokol_app.h>

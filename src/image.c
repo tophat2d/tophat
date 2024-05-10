@@ -158,12 +158,17 @@ th_image_create_render_target(th_render_target **out, int width, int height, int
 static th_err
 gen_tex(th_image *img, uint32_t *data)
 {
-	img->tex = sg_make_image(&(sg_image_desc){.width = img->dm.w,
+	img->tex = sg_make_image(&(sg_image_desc){
+	    .width = img->dm.w,
 	    .height = img->dm.h,
 	    .data.subimage[0][0] =
-		(sg_range){.ptr = data, .size = img->dm.w * img->dm.h * sizeof(uint32_t)},
+		(sg_range){
+		    .ptr = data,
+		    .size = img->dm.w * img->dm.h * sizeof(uint32_t),
+		},
 	    .pixel_format = SG_PIXELFORMAT_RGBA8,
-	    .usage = SG_USAGE_IMMUTABLE});
+	    .usage = SG_USAGE_IMMUTABLE,
+	});
 
 	img->smp = sg_make_sampler(&(sg_sampler_desc){
 	    .mag_filter = img->filter,
