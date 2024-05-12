@@ -50,6 +50,7 @@ th_image_free_render_target(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_render_target *t = p[0].ptrVal;
 	sg_destroy_image(t->depth);
+	sg_destroy_attachments(t->attachments);
 	th_image_free(t->image);
 }
 
@@ -58,7 +59,7 @@ th_render_target_alloc()
 {
 	th_render_target *t =
 	    umkaAllocData(thg->umka, sizeof(th_render_target), th_image_free_render_target);
-	t->image = calloc(sizeof(th_image), 1);
+	t->image = calloc(1, sizeof(th_image));
 	return t;
 }
 
