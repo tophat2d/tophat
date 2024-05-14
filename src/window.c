@@ -119,6 +119,7 @@ static void
 event(const sapp_event *ev)
 {
 	switch (ev->type) {
+	case SAPP_EVENTTYPE_UNFOCUSED: th_input_reset(); break;
 	case SAPP_EVENTTYPE_MOUSE_MOVE:
 		thg->mouse_delta = (th_vf2){.x = ev->mouse_dx, .y = ev->mouse_dy};
 		thg->mouse = (th_vf2){.x = ev->mouse_x, .y = ev->mouse_y};

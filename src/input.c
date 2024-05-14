@@ -68,6 +68,13 @@ th_input_cycle()
 	memset(thg->press_repeat, 0, 512 * sizeof(uu));
 }
 
+void
+th_input_reset()
+{
+	th_input_cycle();
+	memset(thg->pressed, 0, 512 * sizeof(uu));
+}
+
 // Deadzone and drift fix
 static float
 i_fix(float value)

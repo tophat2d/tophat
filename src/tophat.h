@@ -518,6 +518,8 @@ th_input_sync_fake_keys();
 void
 th_input_cycle();
 void
+th_input_reset();
+void
 th_input_update_gamepads();
 
 // misc
