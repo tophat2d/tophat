@@ -39,7 +39,6 @@ int
 th_init(const char *scriptpath, const char *script_src)
 {
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
-			    "fn main() {}\n"
 			    "fn __th_init*() {\n"
 			    "  _ := window::w\n"
 			    "  mainmod::init()\n"
