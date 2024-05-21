@@ -9,7 +9,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 where cmake
 if %ERRORLEVEL% NEQ 0 (
-  echo ERROR: You need cmake.    
+  echo ERROR: You need cmake.
   exit /b
 )
 
@@ -26,6 +26,6 @@ set target=Release
 md bin
 cd bin
 
-cmake -DCMAKE_BUILD_TYPE=%target% .. && msbuild tophat.sln /property:Configuration=%target%
+cmake -DCMAKE_BUILD_TYPE=%target% -G Ninja .. && cmake --build .
 cd ..
-copy bin\%target%\tophat.exe tophat.exe
+copy bin\tophat.exe tophat.exe
