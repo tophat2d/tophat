@@ -39,7 +39,7 @@ IMAGES = etc/test.ff etc/icon.ff etc/button.ff
 
 %.md: %.um
 	@echo BU $@
-	@$(MMDOC) $< > $@
+	@$(MMDOC) -t $< > $@
 
 $(EM_TARGET): $(UMKA_MODULES) $(UMKA_DOCS) $(IMAGES_MOD) LICENSE version $(HELPER_SCRIPT) $(UMKA_BIN) $(IMAGES)
 	@echo EM $@

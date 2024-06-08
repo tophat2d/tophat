@@ -5,7 +5,8 @@
     "license": "BSD-3",
     "description": "A 2d game framework",
     "readme": "README.md",
-    "link": "https://tophat2d.dev",
+    "source": "https://github.com/marekmaskarinec/tophat",
+    "homepage": "https://tophat2d.dev",
     "dependencies": [],
     "include": ["tophat", "tophat.exe"],
     "run": "./tophat"
