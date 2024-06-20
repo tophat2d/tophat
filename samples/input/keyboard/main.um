@@ -1,0 +1,46 @@
+
+import (
+	"canvas.um"
+	"input.um"
+	"th.um"
+	"window.um"
+)
+
+pressCount := 0
+repeatCount := 0
+releaseCount := 0
+
+fn init*() {
+	window::setup("Keyboard Input Sample", 640, 480)
+
+	window::onFrame.register({
+		p := th::Vf2{ 5, 5 }
+
+		if input::isPressed(.space) {
+			canvas::drawText("SPACE IS PRESSED", p, th::green, 4)
+		} else {
+			canvas::drawText("SPACE IS NOT PRESSED", p, th::red, 4)
+		}
+
+		p.y += 44
+
+		if input::isJustPressed(.space) {
+			pressCount++
+		}
+
+		if input::isPressedRepeat(.space) {
+			repeatCount++
+		}
+
+		if input::isJustReleased(.space) {
+			releaseCount++
+		}
+
+		canvas::drawText(sprintf("PRESS COUNT:   %4d", pressCount), p, th::black, 4)
+		p.y += 44
+		canvas::drawText(sprintf("REPEAT COUNT:  %4d", repeatCount), p, th::black, 4)
+		p.y += 44
+		canvas::drawText(sprintf("RELEASE COUNT: %4d", releaseCount), p, th::black, 4)
+		p.y += 44
+	})
+}
