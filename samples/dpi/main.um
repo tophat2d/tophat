@@ -1,0 +1,22 @@
+import (
+	"canvas.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+dpiEnabled := false
+
+fn init*() {
+	window::setup("DPI Awareness Sample", trunc(400*window::getDpiScaleFactor()), trunc(400*window::getDpiScaleFactor()))
+	window::setViewport(window::getDims())
+
+	dpiEnabled = window::isDpiEnabled()
+
+	window::onFrame.register({
+		dpiStr := "DPI AWARENESS SAMPLE\n"
+		dpiStr += sprintf("SCALE: %g\n", window::getDpiScaleFactor())
+		dpiStr += sprintf("DPI ENABLED: %v\n", dpiEnabled)
+		canvas::drawText(dpiStr, { 5, 5 }, th::black, window::getDpiScaleFactor()*2)
+	})
+}
