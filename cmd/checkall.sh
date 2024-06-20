@@ -7,7 +7,7 @@ for f in tests/*.um; do
 	./tophat -check -main $f
 done
 
-cd examples/extensions
+cd demos/extensions
 ../../tophat -check
 
 cd ../flappy
