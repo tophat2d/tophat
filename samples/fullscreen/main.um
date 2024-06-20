@@ -1,0 +1,31 @@
+import (
+	"window.um"
+	"canvas.um"
+	"input.um"
+	"th.um"
+	"signal.um"
+)
+
+fn init*() {
+	window::setup("Fullscreen Sample", 640, 480)
+
+	window::onFrame.register(signal::Callback{
+		canvas::drawText("[ALT + ENTER] TO ENTER FULLSCREEN", th::Vf2{0, 0}, th::black, 2)
+		canvas::drawText("[ESC] TO EXIT FULLSCREEN", th::Vf2{0, 11}, th::black, 2)
+		canvas::drawText("NOTE: THE FULLSCREEN HOTKEYS ARE CONFIGURED MANUALLY", th::Vf2{0, 22}, th::black, 2)
+
+		if window::isFullscreen() {
+			canvas::drawText("FULLSCREEN ON", th::Vf2{0, 33}, th::green, 4)
+		} else {
+			canvas::drawText("FULLSCREEN OFF", th::Vf2{0, 33}, th::red, 4)
+		}
+
+		if input::isPressed(input::Key.alt) && input::isJustPressed(input::Key.enter) {
+			window::setFullscreen(true)
+		}
+
+		if input::isJustPressed(input::Key.escape) {
+			window::setFullscreen(false)
+		}
+	})
+}
