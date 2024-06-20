@@ -1,0 +1,92 @@
+
+import (
+	"th.um"
+	"input.um"
+	"canvas.um"
+	"window.um"
+	"signal.um"
+)
+
+fn getButtonState(pos: th::Vf2, gamepad: input::Gamepad, button: input::GamepadButton): str {
+	info := ""
+
+	switch button {
+	case .a:
+		info += "A"
+	case .b:
+		info += "B"
+	case .x:
+		info += "X"
+	case .y:
+		info += "Y"
+	case .lb:
+		info += "LEFT BUMPER"
+	case .rb:
+		info += "RIGHT BUMPER"
+	case .lt:
+		info += "LEFT TRIGGER"
+	case .rt:
+		info += "RIGHT TRIGGER"
+	case .select:
+		info += "BACK/SELECT"
+	case .start:
+		info += "START"
+	case .up:
+		info += "UP"
+	case .down:
+		info += "DOWN"
+	case .left:
+		info += "LEFT"
+	case .right:
+		info += "RIGHT"
+	case .lstick:
+		info += "LEFT STICK"
+	case .rstick:
+		info += "RIGHT STICK"
+	}
+
+	for len(info) < 14 {
+		info += " "
+	}
+
+	if gamepad.isPressed(button) {
+		info += "PRESSED"
+	}
+
+	for len(info) < 21 {
+		info += " "
+	}
+
+	info += sprintf(" %g", gamepad.pressure(button))
+
+	return info
+}
+
+fn showGamepadInfo(pos: th::Vf2, gamepad: input::Gamepad) {
+	if gamepad.id == -1 {
+		canvas::drawText("No gamepad connected", pos, th::black, 2)
+		return
+	}
+
+	gamepad.rumble(gamepad.pressure(.lt), gamepad.pressure(.rt))
+
+	info := ""
+
+	for i := 0; i <  int(input::GamepadButton._count); i++ {
+		info += getButtonState(pos, gamepad, input::GamepadButton(i))+"\n"
+	}
+
+	info += sprintf("LEFT STICK  x%9f y%9f\n", gamepad.stick(.left).x, gamepad.stick(.left).y)
+	info += sprintf("RIGHT STICK x%9f y%9f\n", gamepad.stick(.right).x, gamepad.stick(.right).y)
+	canvas::drawText(info, pos, th::black, 2)
+}
+
+fn init*() {
+	window::setup("Gamepad Sample", 500, 500)
+
+	window::onFrame.register(signal::Callback{
+		canvas::drawText(sprintf("CONNECTED: %v\n", input::gamepads()), {0, 0}, th::red, 2)
+		showGamepadInfo({0, 10}, input::gamepad())
+	})
+}
+
