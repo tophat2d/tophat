@@ -1,18 +1,17 @@
 import (
-	"th.um"
-	"rect.um"
-	"window.um"
 	"canvas.um"
 	"color.um"
-	"signal.um"
+	"rect.um"
+	"th.um"
+	"window.um"
 )
 
 fn init*() {
-	window::setup("Test", 512, 512)
-	window::setViewport(th::Vf2{256, 256})
+	window::setup("Color Sample", 512, 512)
+	window::setViewport({256, 256})
 
 	printf("%x\n", color::alpha(color::rgb(0.5, 0.5, 0.5, 0.6), 0.1));
-	window::onFrame.register(signal::Callback{
+	window::onFrame.register({
 		t := (sin(th::time/1000.0)+1)*128
 		t2 := th::time/5000.0
 		for x := 0; x < 256; x++ {
