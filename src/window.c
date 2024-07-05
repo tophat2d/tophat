@@ -66,10 +66,11 @@ init()
 
 	UmkaStackSlot s;
 
-	int code =
-	    umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
-	if (!umkaAlive(thg->umka)) {
-		th_print_umka_error_and_quit(code);
+	if (umkaAlive(thg->umka)) {
+		int code = umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+		if (!umkaAlive(thg->umka)) {
+			th_print_umka_error_and_quit(code);
+		}
 	}
 }
 
@@ -97,7 +98,7 @@ frame()
 	thg->target_size = (th_vf2){.w = window_width, .h = window_height};
 
 	UmkaStackSlot s;
-	if (thg->umth_frame_callback != -1) {
+	if (thg->umka && umkaAlive(thg->umka) && thg->umth_frame_callback != -1) {
 		s.realVal = sapp_frame_duration();
 
 		int code = umkaCall(thg->umka, thg->umth_frame_callback, 1, &s, &s);

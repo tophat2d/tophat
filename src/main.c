@@ -122,11 +122,14 @@ th_deinit()
 			umprofPrintInfo(stdout, arr, len);
 		}
 	}
-
+	
 	UmkaStackSlot s;
-	umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
+	if (umkaAlive(thg->umka))
+		umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
+	if (umkaAlive(thg->umka))	
+		umkaRun(thg->umka);
 
-	umkaRun(thg->umka);
+
 	umkaFree(thg->umka);
 
 	th_audio_deinit();
@@ -145,8 +148,10 @@ run_playground(const char *src)
 	UmkaStackSlot s;
 
 	if (thg->umka) {
-		umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
-		umkaRun(thg->umka);
+		if (umkaAlive(thg->umka))
+			umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
+		if (umkaAlive(thg->umka)) 
+			umkaRun(thg->umka);
 		umkaFree(thg->umka);
 		thg->umka = NULL;
 	}
@@ -155,10 +160,11 @@ run_playground(const char *src)
 		return 1;
 	}
 
-	int code =
-	    umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
-	if (!umkaAlive(thg->umka)) {
-		th_print_umka_error_and_quit(code);
+	if (umkaAlive(thg->umka)) {
+		int code = umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+		if (!umkaAlive(thg->umka)) {
+			th_print_umka_error_and_quit(code);
+		}
 	}
 
 	fprintf(stderr, "inited\n");
