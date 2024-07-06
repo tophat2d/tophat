@@ -12,6 +12,9 @@
 #include <umprof.h>
 #ifdef _WIN32
 #include <windows.h>
+#else
+#include <sys/wait.h>
+#include <unistd.h>
 #endif
 #include <sokol_app.h>
 
@@ -122,13 +125,12 @@ th_deinit()
 			umprofPrintInfo(stdout, arr, len);
 		}
 	}
-	
+
 	UmkaStackSlot s;
 	if (umkaAlive(thg->umka))
 		umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
-	if (umkaAlive(thg->umka))	
+	if (umkaAlive(thg->umka))
 		umkaRun(thg->umka);
-
 
 	umkaFree(thg->umka);
 
@@ -150,7 +152,7 @@ run_playground(const char *src)
 	if (thg->umka) {
 		if (umkaAlive(thg->umka))
 			umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
-		if (umkaAlive(thg->umka)) 
+		if (umkaAlive(thg->umka))
 			umkaRun(thg->umka);
 		umkaFree(thg->umka);
 		thg->umka = NULL;
@@ -161,7 +163,8 @@ run_playground(const char *src)
 	}
 
 	if (umkaAlive(thg->umka)) {
-		int code = umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+		int code = umkaCall(
+		    thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
 		if (!umkaAlive(thg->umka)) {
 			th_print_umka_error_and_quit(code);
 		}
@@ -233,7 +236,27 @@ th_main(int argc, char *argv[])
 
 			for (int i = 0; i < th_em_modulenames_count; i++) {
 				if (strcmp(argv[thg->argOffset + 1], th_em_modulenames[i]) == 0) {
+#ifdef _WIN32
 					printf("%s\n", th_em_moduledocs[i]);
+#else
+					int fd[2];
+					pipe(fd);
+					int pid = fork();
+					if (pid < 0) {
+						perror("pid");
+						exit(1);
+					} else if (pid == 0) {
+						close(fd[1]);
+						dup2(fd[0], STDIN_FILENO);
+						close(fd[0]);
+						exit(execlp("less", "less", "-R", NULL));
+					} else {
+						close(fd[0]);
+						dprintf(fd[1], "%s", th_em_moduledocs[i]);
+						close(fd[1]);
+						wait(NULL);
+					}
+#endif
 					exit(0);
 				}
 			}
