@@ -1,6 +1,7 @@
 
 import (
 	"canvas.um"
+	"coll.um"
 	"color.um"
 	"rect.um"
 	"th.um"
@@ -65,6 +66,10 @@ fn umth_nav_mesh_nav(cameFrom: ^[]th::Vf2, cameFromType: ^void, m: ^Mesh, p1, p2
 // returns an empty array.
 fn (m: ^Mesh) nav*(p1, p2: th::Vf2): []th::Vf2 {
 //~~
+	if !coll::vf2ToRect(p1, m.r) || !coll::vf2ToRect(p2, m.r) {
+		return {}
+	}
+
 	var cameFrom: []th::Vf2
 	umth_nav_mesh_nav(&cameFrom, typeptr([]th::Vf2), m, p1, p2)
 
