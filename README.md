@@ -1,9 +1,18 @@
 # tophat
 
-Tophat is a friendly 2d game library for the
-[Umka](https://github.com/vtereshkov/umka-lang) programming language.  Visit
-the [homepage](https://tophat2d.dev) for more info.  You can browse the API
-reference [here](https://docs.tophat2d.dev)
+![](etc/icon.png)
+
+Tophat is a friendly 2d game framework for the
+[Umka](https://github.com/vtereshkov/umka-lang) programming language. It offers
+primitives for 2d graphics, audio and user input as well as high-level modules
+like user interfaces, particle systems or tilemaps. Tophat can run on Windows
+and Linux machines as well as in a web browser.
+
+* [Website](https://tophat2d.dev)
+* [Downloads](https://tophat2d.dev/dl)
+* [API reference](https://docs.tophat2d.dev)
+* [Samples](https://github.com/tophat2d/tophat/tree/main/samples)
+* [Demos](https://github.com/tophat2d/tophat/tree/main/demos)
 
 ## screenshots
 
@@ -36,7 +45,7 @@ git clone https://github.com/tophat2d/tophat --recursive
 
 2. On Linux run `make`, on Windows `msbuild.bat`.
 
-You can also download precompiled binaries [here](https://tophat2d.dev/dl).
+You can also download precompiled binaries [here](https://github.com/tophat2d/tophat/releases).
 
 ## contributing
 
