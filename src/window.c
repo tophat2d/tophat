@@ -67,7 +67,8 @@ init()
 	UmkaStackSlot s;
 
 	if (umkaAlive(thg->umka)) {
-		int code = umkaCall(thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+		int code = umkaCall(
+		    thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
 		if (!umkaAlive(thg->umka)) {
 			th_print_umka_error_and_quit(code);
 		}
@@ -286,7 +287,6 @@ th_window_set_dims(th_vf2 dm)
 {
 	RECT r;
 	int w = dm.x, h = dm.y;
-	fu dpi_scale = th_window_dpi_scale();
 	w32_get_client_window_size(&w, &h);
 	HWND hwnd = th_get_window_handle();
 	if (GetWindowRect(hwnd, &r)) {
