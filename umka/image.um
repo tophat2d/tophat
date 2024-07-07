@@ -192,7 +192,8 @@ fn (i: ^Image) cropRect*(r: rect::Rect) {
 		th::__error("image is invalid")
 	}
 
-	umth_image_crop(i^, r.getPos(), r.getEnd())
+	dm := i.getDims()
+	umth_image_crop(i^, r.getPos().div(dm), r.getEnd().div(dm))
 }
 
 fn umth_image_crop_quad(img: Image, q: ^th::Quad)
