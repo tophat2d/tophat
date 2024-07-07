@@ -14,7 +14,7 @@ echo #include "tophat.h" > %em_target%
 for %%f in (%modules%) do (
 	set pat=%%f
 	set pat=!pat:.um=.md!
-	%umka% cmd\mmdoc\mmdoc.um %%f > !pat!
+	%umka% cmd\mmdoc\mmdoc.um -t %%f > !pat!
 )
 
 %run% em th_em_modulesrc %modules% >> %em_target%
