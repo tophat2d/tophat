@@ -46,7 +46,7 @@ fn (rt: ^RenderTarget) end*(wp: th::Vf2): std::Err {
 	return th::__errFromCode(ec)
 }
 
-fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
+fn umth_image_render_target_to_image(rt: RenderTarget): Image
 //~~fn RenderTarget.toImage
 // Returns the image of the render target. The resulting image has the same
 // lifetime as the base RenderTarget. If you need to use it past the lifetime
@@ -54,9 +54,7 @@ fn umth_image_render_target_to_image(ret: ^Image, rt: RenderTarget)
 // Do not call `setfilter` on the resulting image.
 fn (rt: ^RenderTarget) toImage*(): Image {
 //~~
-	img := Image{}
-	umth_image_render_target_to_image(&img, rt^)
-	return img
+	return umth_image_render_target_to_image(rt^)
 }
 
 fn umth_image_load(ret: ^Image, path: str): th::ErrCode
@@ -100,7 +98,7 @@ fn (i: ^Image) fliph*(flip: bool) {
 	umth_image_fliph(i^, flip)
 }
 
-fn umth_image_draw(img: Image, t: ^th::Transform, color: uint32)
+fn umth_image_draw(img: Image, t: th::Transform, color: uint32)
 //~~fn Image.draw
 // Draws the image in screen coordinates. It transforms it with t and
 // applies color as a color filter.
@@ -110,10 +108,10 @@ fn (i: ^Image) draw*(t: th::Transform, color: uint32 = th::white) {
 		th::__error("image is invalid")
 	}
 
-	umth_image_draw(i^, &t, color)
+	umth_image_draw(i^, t, color)
 }
 
-fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: ^rect::Rect,
+fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: rect::Rect,
 	color: uint32, scale: real)
 //~~fn Image.drawNinepatch
 // Draws "nine-patch" image.
@@ -128,7 +126,7 @@ fn (i: ^Image) drawNinepatch*(outer, inner, dest: rect::Rect, color: uint32 = th
 		th::__error("image is invalid")
 	}
 
-	umth_image_draw_nine_patch(i^, &outer, &inner, &dest, color, scale)
+	umth_image_draw_nine_patch(i^, outer, inner, dest, color, scale)
 }
 
 fn umth_image_draw_on_quad(img: Image, color: uint32, q: th::Quad)
@@ -144,7 +142,7 @@ fn (i: ^Image) drawOnQuad*(q: th::Quad, color: uint32 = th::white) {
 	umth_image_draw_on_quad(i^, color, q)
 }
 
-fn umth_image_get_dims(dm: ^th::Vf2, i: Image)
+fn umth_image_get_dims(i: Image): th::Vf2
 //~~fn Image.getDims
 // Returns width and heigth.
 fn (i: ^Image) getDims*(): th::Vf2 {
@@ -153,10 +151,7 @@ fn (i: ^Image) getDims*(): th::Vf2 {
 		th::__error("image is invalid")
 	}
 
-	out := th::Vf2{}
-	umth_image_get_dims(&out, i^)
-
-	return out
+	return umth_image_get_dims(i^)
 }
 
 fn umth_image_crop(img: Image, tl, br: th::Vf2)
@@ -196,7 +191,7 @@ fn (i: ^Image) cropRect*(r: rect::Rect) {
 	umth_image_crop(i^, r.getPos().div(dm), r.getEnd().div(dm))
 }
 
-fn umth_image_crop_quad(img: Image, q: ^th::Quad)
+fn umth_image_crop_quad(img: Image, q: th::Quad)
 //~~fn Image.cropQuad
 // Crop an image using a quad.
 fn (i: ^Image) cropQuad*(q: th::Quad) {
@@ -205,10 +200,10 @@ fn (i: ^Image) cropQuad*(q: th::Quad) {
 		th::__error("image is invalid")
 	}
 
-	umth_image_crop_quad(i^, &q)
+	umth_image_crop_quad(i^, q)
 }
 
-fn umth_image_get_crop_quad(img: Image, q: ^th::Quad)
+fn umth_image_get_crop_quad(img: Image): th::Quad
 //~~fn Image.getCropQuad
 // Crop an image using a quad.
 fn (i: ^Image) getCropQuad*(): th::Quad {
@@ -217,9 +212,7 @@ fn (i: ^Image) getCropQuad*(): th::Quad {
 		th::__error("image is invalid")
 	}
 
-	var (q: th::Quad)
-	umth_image_get_crop_quad(i^, &q)
-	return q
+	return umth_image_get_crop_quad(i^)
 }
 
 fn umth_image_from_data(ret: ^Image, data: ^uint32, dm: th::Vf2): th::ErrCode

@@ -44,19 +44,20 @@ conv_path(char *path)
 void
 umth_fopen(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	char *name = (char *)p[1].ptrVal;
-	const char *mode = (const char *)p[0].ptrVal;
+	char *name = (char *)umkaGetParam(p, 0)->ptrVal;
+	const char *mode = (const char *)umkaGetParam(p, 1)->ptrVal;
 
 	char *path = conv_path(name);
 	FILE *f = fopen(path, mode);
 	free(path);
-	r->ptrVal = f;
+
+	umkaGetResult(p, r)->ptrVal = f;
 }
 
 void
 umth_th_getglobal(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	r->ptrVal = thg;
+	umkaGetResult(p, r)->ptrVal = thg;
 }
 
 void
@@ -73,25 +74,28 @@ umth_th_getfuncs(UmkaStackSlot *p, UmkaStackSlot *r)
 #define THEXT(ret, name, ...) arr[idx++] = &name
 #include "thextdata.h"
 #undef THEXT
-	r->ptrVal = arr;
+	umkaGetResult(p, r)->ptrVal = arr;
 }
 
 ///////////////////////////
 // COLOUR
 
-// fn umth_hsv2rgb_uint32((3) h, (2) s, (1) v, (0) a: th.fu): uint32
+// fn umth_hsv2rgb_uint32(h, s, v, a: th.fu): uint32
 static void
 umth_hsv2rgb_uint32(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	r->uintVal =
-	    th_color_hsv2rgb(p[3].real32Val, p[2].real32Val, p[1].real32Val, p[0].real32Val);
+	umkaGetResult(p, r)->uintVal =
+	    th_color_hsv2rgb(umkaGetParam(p, 0)->real32Val, umkaGetParam(p, 1)->real32Val,
+		umkaGetParam(p, 2)->real32Val, umkaGetParam(p, 3)->real32Val);
 }
 
-// fn umth_rgb_uint32((3) r, (2) g, (1) b, (0) a: th.fu): uint32
+// fn umth_rgb_uint32(r, g, b, a: th.fu): uint32
 static void
 umth_rgb_uint32(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	r->uintVal = th_color_rgb(p[3].real32Val, p[2].real32Val, p[1].real32Val, p[0].real32Val);
+	umkaGetResult(p, r)->uintVal =
+	    th_color_rgb(umkaGetParam(p, 0)->real32Val, umkaGetParam(p, 1)->real32Val,
+		umkaGetParam(p, 2)->real32Val, umkaGetParam(p, 3)->real32Val);
 }
 
 ///////////////////////////
@@ -99,65 +103,66 @@ umth_rgb_uint32(UmkaStackSlot *p, UmkaStackSlot *r)
 
 extern th_em_placeholder th_em_placeholders[];
 
-// fn umth_placeholder_fetch((0) id: uint): ^struct{}
+// fn umth_placeholder_fetch(id: uint): ^struct{}
 static void
 umth_placeholder_fetch(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	uint32_t id = p[0].intVal;
+	uint32_t id = umkaGetParam(p, 0)->uintVal;
 
 	th_image *img = th_image_alloc();
 	th_image_from_data(img, th_em_placeholders[id].data, th_em_placeholders[id].dm);
-	r->ptrVal = img;
+	umkaGetResult(p, r)->ptrVal = img;
 }
 
 ///////////////////////////
 // FONT
 
-// fn umth_font_load((3) out: ^Font, (2) path: str, (1) size: real, (0) filter: uint32): th.ErrCode
+// fn umth_font_load(out: ^Font, path: str, size: real, filter: uint32): th::ErrCode
 static void
 umth_font_load(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	uint32_t filter = p[0].uintVal;
-	double size = p[1].real32Val;
-	char *path = conv_path(p[2].ptrVal);
-	th_font **ft = p[3].ptrVal;
+	th_font **ft = umkaGetParam(p, 0)->ptrVal;
+	char *path = conv_path(umkaGetParam(p, 1)->ptrVal);
+	double size = umkaGetParam(p, 2)->real32Val;
+	uint32_t filter = umkaGetParam(p, 3)->uintVal;
 
-	r->intVal = th_font_load(ft, path, size, filter);
+	umkaGetResult(p, r)->intVal = th_font_load(ft, path, size, filter);
 	free(path);
 }
 
-// fn umth_font_draw((5) font: Font, (4) s: str, (3) x: real, (2) y: real, (1) color: uint32, (0)
-// scale: real)
+// fn umth_font_draw(font: Font, s: str, x: real, y: real, color: uint32, scale: real)
 static void
 umth_font_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	double scale = p[0].real32Val;
-	uint32_t color = p[1].uintVal;
-	double y = p[2].real32Val;
-	double x = p[3].real32Val;
-	const char *s = p[4].ptrVal;
-	th_font *font = p[5].ptrVal;
+	th_font *font = umkaGetParam(p, 0)->ptrVal;
+	const char *s = umkaGetParam(p, 1)->ptrVal;
+	double x = umkaGetParam(p, 2)->real32Val;
+	double y = umkaGetParam(p, 3)->real32Val;
+	uint32_t color = umkaGetParam(p, 4)->uintVal;
+	double scale = umkaGetParam(p, 5)->real32Val;
 
 	th_font_draw(font, s, x, y, color, scale);
 }
 
-// fn umth_font_measure((2) font: Font, (1) s: str, (0) o: ^th.Vf2)
+// fn umth_font_measure(font: Font, s: str): th::Vf2
 static void
 umth_font_measure(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	const char *s = p[1].ptrVal;
-	th_font *font = p[2].ptrVal;
+	th_font *font = umkaGetParam(p, 0)->ptrVal;
+	const char *s = umkaGetParam(p, 1)->ptrVal;
 
-	*((th_vf2 *)p[0].ptrVal) = th_font_measure(font, s);
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = th_font_measure(font, s);
 }
 
 ///////////////////////
 // particles
-void
+
+// fn umth_particles_draw(emitter: ^Particles, t: int)
+static void
 umth_particles_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_particles *emitter = (th_particles *)p[1].ptrVal;
-	int t = p[0].intVal;
+	th_particles *emitter = (th_particles *)umkaGetParam(p, 0)->ptrVal;
+	int t = umkaGetParam(p, 1)->intVal;
 
 	th_particles_draw(emitter, t);
 }
@@ -165,47 +170,53 @@ umth_particles_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 ///////////////////////
 // tilemaps
 // draws a tilemap takes a rectangle as a camera and the tilemap itself
+
+// fn umth_tilemap_draw(t: ^Tilemap)
 void
 umth_tilemap_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_tmap *t = (th_tmap *)p[0].ptrVal;
+	th_tmap *t = umkaGetParam(p, 0)->ptrVal;
 	th_tmap_draw(t);
 }
 
 // checks, if tilemap collides with entity.
 // ent - entity to collide with, t - tilemap, x and y - pointers to ints used to return, where the
 // collision occured
+
+// fn umth_tilemap_getcoll(tc: ^th::Vf2, ic: ^th::Vf2, t: ^Tilemap, ent: ^Entity): int
 void
 umth_tilemap_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_ent *ent = (th_ent *)p[0].ptrVal;
-	th_tmap *t = (th_tmap *)p[1].ptrVal;
-	th_vf2 *ic = (th_vf2 *)p[2].ptrVal;
-	th_vf2 *tc = (th_vf2 *)p[3].ptrVal;
+	th_vf2 *tc = umkaGetParam(p, 0)->ptrVal;
+	th_vf2 *ic = umkaGetParam(p, 1)->ptrVal;
+	th_tmap *t = umkaGetParam(p, 2)->ptrVal;
+	th_ent *ent = umkaGetParam(p, 3)->ptrVal;
 
-	r->intVal = th_coll_on_tilemap(ent, t, ic, tc);
+	umkaGetResult(p, r)->intVal = th_coll_on_tilemap(ent, t, ic, tc);
 }
 
+// fn umth_tilemap_getcoll_line(b: th::Vf2, e: th::Vf2, t: ^Tilemap, ic: ^th::Vf2): int
 void
 umth_tilemap_getcoll_line(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 b = *(th_vf2 *)&p[3];
-	th_vf2 e = *(th_vf2 *)&p[2];
-	th_tmap *t = p[1].ptrVal;
-	th_vf2 *ic = p[0].ptrVal;
+	th_vf2 b = *(th_vf2 *)umkaGetParam(p, 0);
+	th_vf2 e = *(th_vf2 *)umkaGetParam(p, 1);
+	th_tmap *t = umkaGetParam(p, 2)->ptrVal;
+	th_vf2 *ic = umkaGetParam(p, 3)->ptrVal;
 
-	r->intVal = th_line_to_tilemap(b, e, t, ic);
+	umkaGetResult(p, r)->intVal = th_line_to_tilemap(b, e, t, ic);
 }
 
+// fn umth_tilemap_autotile(tgt: ^th::uu, w, h: th::uu, src, cfg: ^th::uu, tile: th::uu)
 void
 umth_tilemap_autotile(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	uu tile = p[0].intVal;
-	uu *cfg = (uu *)p[1].ptrVal;
-	uu *src = (uu *)p[2].ptrVal;
-	uu h = p[3].intVal;
-	uu w = p[4].intVal;
-	uu *tgt = (uu *)p[5].ptrVal;
+	uu *tgt = umkaGetParam(p, 0)->ptrVal;
+	uu w = umkaGetParam(p, 1)->uintVal;
+	uu h = umkaGetParam(p, 2)->uintVal;
+	uu *src = umkaGetParam(p, 3)->ptrVal;
+	uu *cfg = umkaGetParam(p, 4)->ptrVal;
+	uu tile = umkaGetParam(p, 5)->uintVal;
 
 	th_tmap_autotile(tgt, src, w, h, cfg, tile);
 }
@@ -213,107 +224,114 @@ umth_tilemap_autotile(UmkaStackSlot *p, UmkaStackSlot *r)
 ///////////////////////
 // images
 // loads an image at respath + path
+
+// fn umth_image_load(ret: ^Image, path: str): th::ErrCode
 void
 umth_image_load(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image **img = p[1].ptrVal;
-	char *path = (char *)p[0].ptrVal;
+	th_image **img = umkaGetParam(p, 0)->ptrVal;
+	char *path = conv_path(umkaGetParam(p, 1)->ptrVal);
 
-	char *pathcpy = conv_path(path);
-	r->intVal = th_load_image(img, pathcpy);
-	free(pathcpy);
+	umkaGetResult(p, r)->intVal = th_load_image(img, path);
+	free(path);
 }
 
 // flips image
+
+// fn umth_image_flipv(i: Image, f: bool)
 void
 umth_image_flipv(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[1].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
 
-	img->flipv = p[0].intVal;
+	img->flipv = umkaGetParam(p, 1)->intVal;
 }
 
 // flips image
+
+// fn umth_image_fliph(i: Image, f: bool)
 void
 umth_image_fliph(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[1].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
 
-	img->fliph = p[0].intVal;
+	img->fliph = umkaGetParam(p, 1)->intVal;
 }
 
+// fn umth_image_get_dims(i: Image, dm: ^th::Vf2)
 void
 umth_image_get_dims(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[0].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 
 	if (!img)
 		return;
 
-	th_vf2 *out = (th_vf2 *)p[1].ptrVal;
-
-	*out = img->dm;
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = img->dm;
 }
 
+// fn umth_image_crop(img: Image, tl, br: th::Vf2)
 void
 umth_image_crop(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[2].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
-	th_vf2 tl = *(th_vf2 *)&p[1];
-	th_vf2 br = *(th_vf2 *)&p[0];
+	th_vf2 tl = *(th_vf2 *)umkaGetParam(p, 1);
+	th_vf2 br = *(th_vf2 *)umkaGetParam(p, 2);
 
 	th_image_crop(img, tl, br);
 }
 
+// fn umth_image_crop_quad(img: Image, q: ^th::Quad)
 void
 umth_image_crop_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[1].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
-	th_quad *q = p[0].ptrVal;
-
-	img->crop = *q;
+	img->crop = *(th_quad *)umkaGetParam(p, 1);
 }
 
+// fn umth_image_get_crop_quad(img: Image, q: ^th::Quad)
 void
 umth_image_get_crop_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[1].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
-	th_quad *q = p[0].ptrVal;
 
-	*q = img->crop;
+	*(th_quad *)umkaGetResult(p, r)->ptrVal = img->crop;
 }
 
 // returns a pointer to an image from data
+
+// fn umth_image_from_data(ret: ^Image, data: ^uint32, dm: th::Vf2): th::ErrCode
 void
 umth_image_from_data(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 dm = *(th_vf2 *)&p[0];
-	uint32_t *data = (uint32_t *)p[1].ptrVal;
-	th_image **ret = p[2].ptrVal;
+	th_image **ret = umkaGetParam(p, 0)->ptrVal;
+	uint32_t *data = umkaGetParam(p, 1)->ptrVal;
+	th_vf2 dm = *(th_vf2 *)umkaGetParam(p, 2);
 
 	th_image *img = th_image_alloc();
 	if (!img)
 		return;
-	r->intVal = th_image_from_data(img, data, dm);
 
+	umkaGetResult(p, r)->intVal = th_image_from_data(img, data, dm);
 	*ret = img;
 }
 
+// fn umth_image_copy(ret: ^Image, data: Image): th::ErrCode
 void
 umth_image_copy(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img1 = p[0].ptrVal;
-	th_image **ret = p[1].ptrVal;
+	th_image **ret = umkaGetParam(p, 0)->ptrVal;
+	th_image *img1 = umkaGetParam(p, 1)->ptrVal;
 	if (!img1)
 		return;
 
@@ -323,7 +341,7 @@ umth_image_copy(UmkaStackSlot *p, UmkaStackSlot *r)
 
 	uint32_t *data = th_image_get_data(img1);
 
-	r->intVal = th_image_from_data(img2, data, img1->dm);
+	umkaGetResult(p, r)->intVal = th_image_from_data(img2, data, img1->dm);
 	img2->flipv = img1->flipv;
 	img2->fliph = img1->fliph;
 	img2->crop = img1->crop;
@@ -333,36 +351,39 @@ umth_image_copy(UmkaStackSlot *p, UmkaStackSlot *r)
 	free(data);
 }
 
+// fn umth_image_set_filter(data: Image, filter: int): th::ErrCode
 void
 umth_image_set_filter(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[1].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
-	int filter = p[0].intVal;
+	int filter = umkaGetParam(p, 1)->intVal;
 
-	r->intVal = th_image_set_filter(img, filter);
+	umkaGetResult(p, r)->intVal = th_image_set_filter(img, filter);
 }
 
+// fn umth_image_update_data(img: Image, data: ^uint32, dm: th::Vf2): th::ErrCode
 void
 umth_image_update_data(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[2].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
-	uint32_t *data = p[1].ptrVal;
-	th_vf2 dm = *(th_vf2 *)&p[0];
+	uint32_t *data = umkaGetParam(p, 1)->ptrVal;
+	th_vf2 dm = *(th_vf2 *)umkaGetParam(p, 2);
 
-	r->intVal = th_image_update_data(img, data, dm);
+	umkaGetResult(p, r)->intVal = th_image_update_data(img, data, dm);
 }
 
+// fn umth_image_get_data(img: Image, data: ^uint32)
 void
 umth_image_get_data(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[1].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
-	uint32_t *o = p[0].ptrVal;
+	uint32_t *o = umkaGetParam(p, 1)->ptrVal;
 
 	uint32_t *data = th_image_get_data(img);
 	memcpy(o, data, img->dm.w * img->dm.h * sizeof(uint32_t));
@@ -370,55 +391,71 @@ umth_image_get_data(UmkaStackSlot *p, UmkaStackSlot *r)
 	free(data);
 }
 
+// fn umth_image_render_target_begin(rt: RenderTarget): th::ErrCode
 void
 umth_image_render_target_begin(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_render_target *t = p[0].ptrVal;
+	th_render_target *t = umkaGetParam(p, 0)->ptrVal;
 	if (!t)
 		return;
 
-	r->intVal = th_image_set_as_render_target(t);
+	umkaGetResult(p, r)->intVal = th_image_set_as_render_target(t);
 }
 
+// fn umth_image_render_target_end(rt: RenderTarget, wp: th::Vf2): th::ErrCode
 void
 umth_image_render_target_end(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_render_target *t = p[1].ptrVal;
-	th_vf2 wp = *(th_vf2 *)&p[0];
+	th_render_target *t = umkaGetParam(p, 0)->ptrVal;
+	th_vf2 wp = *(th_vf2 *)umkaGetParam(p, 1);
 
-	r->intVal = th_image_remove_render_target(t, wp);
+	umkaGetResult(p, r)->intVal = th_image_remove_render_target(t, wp);
 }
 
+// fn umth_image_draw(img: Image, t: th::Transform, color: uint32)
 void
 umth_image_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image_render_transformed(
-	    (th_image *)p[2].ptrVal, *(th_transform *)p[1].ptrVal, (uint32_t)p[0].uintVal);
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
+	if (!img)
+		return;
+
+	th_transform t = *(th_transform *)umkaGetParam(p, 1);
+	uint32_t color = umkaGetParam(p, 2)->uintVal;
+
+	th_image_render_transformed(img, t, color);
 }
 
+// fn umth_image_draw_on_quad(img: Image, color: uint32, q: th::Quad)
 void
 umth_image_draw_on_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_quad q;
-	q = *(th_quad *)&p[0];
-	uint32_t filter = p[4].uintVal;
-	th_image *img = p[5].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
+	if (!img)
+		return;
+
+	uint32_t filter = umkaGetParam(p, 1)->uintVal;
+	th_quad q = *(th_quad *)umkaGetParam(p, 2);
 
 	th_blit_tex(img, q, filter);
 }
 
+// fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: rect::Rect,
+//                               color: uint32, scale: real)
+
 void
 umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = p[5].ptrVal;
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
 	if (!img)
 		return;
 
-	th_rect outer = *(th_rect *)p[4].ptrVal, inner = *(th_rect *)p[3].ptrVal,
-		dest = *(th_rect *)p[2].ptrVal;
+	th_rect outer = *(th_rect *)umkaGetParam(p, 1);
+	th_rect inner = *(th_rect *)umkaGetParam(p, 2);
+	th_rect dest = *(th_rect *)umkaGetParam(p, 3);
 
-	uint32_t tint = p[1].uintVal;
-	fu scale = p[0].realVal;
+	uint32_t tint = umkaGetParam(p, 4)->uintVal;
+	fu scale = umkaGetParam(p, 5)->realVal;
 
 	if (dest.w < 0) {
 		dest.x += dest.w;
@@ -471,23 +508,26 @@ umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r)
 	}
 }
 
+// fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: int):
+// th::ErrCode
 void
 umth_image_create_render_target(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_render_target **result = p[3].ptrVal;
-	int filter = p[0].intVal;
-	int height = p[1].intVal;
-	int width = p[2].intVal;
+	th_render_target **result = umkaGetParam(p, 0)->ptrVal;
+	int width = umkaGetParam(p, 1)->intVal;
+	int height = umkaGetParam(p, 2)->intVal;
+	int filter = umkaGetParam(p, 3)->intVal;
 
-	r->intVal = th_image_create_render_target(result, width, height, filter);
+	umkaGetResult(p, r)->intVal = th_image_create_render_target(result, width, height, filter);
 }
 
+// fn umth_image_render_target_to_image(rt: RenderTarget): Image
 void
 umth_image_render_target_to_image(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image **result = p[1].ptrVal;
+	th_render_target *rt = umkaGetParam(p, 0)->ptrVal;
 
-	*result = ((th_render_target *)p[0].ptrVal)->image;
+	*(th_image **)umkaGetResult(p, r)->ptrVal = rt->image;
 }
 
 ///////////////////////
@@ -506,7 +546,7 @@ umth_input_is_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	int keycode = p[0].intVal;
 
-	r->intVal = thg->pressed[keycode];
+	umkaGetResult(p, r)->intVal = thg->pressed[keycode];
 }
 
 void
@@ -514,7 +554,7 @@ umth_input_is_just_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	int keycode = p[0].intVal;
 
-	r->intVal = thg->just_pressed[keycode];
+	umkaGetResult(p, r)->intVal = thg->just_pressed[keycode];
 }
 
 void
@@ -522,7 +562,7 @@ umth_input_is_pressed_repeat(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	int keycode = p[0].intVal;
 
-	r->intVal = thg->press_repeat[keycode];
+	umkaGetResult(p, r)->intVal = thg->press_repeat[keycode];
 }
 
 void
@@ -530,7 +570,7 @@ umth_input_is_just_released(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	int keycode = p[0].intVal;
 
-	r->intVal = thg->just_released[keycode];
+	umkaGetResult(p, r)->intVal = thg->just_released[keycode];
 }
 
 void
@@ -548,7 +588,7 @@ void
 umth_input_get_str(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	thg->input_string[thg->input_string_len] = 0;
-	r->ptrVal = umkaMakeStr(thg->umka, thg->input_string);
+	umkaGetResult(p, r)->ptrVal = umkaMakeStr(thg->umka, thg->input_string);
 }
 
 void
@@ -580,12 +620,12 @@ umth_input_gamepad_get_gamepad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	for (int i = 0; i < 4; i++) {
 		if (thg->gamepad[i].connected) {
-			r->intVal = i;
+			umkaGetResult(p, r)->intVal = i;
 			return;
 		}
 	}
 
-	r->intVal = -1;
+	umkaGetResult(p, r)->intVal = -1;
 }
 
 void
@@ -595,11 +635,11 @@ umth_input_gamepad_is_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = p[1].intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
-		r->intVal = 0;
+		umkaGetResult(p, r)->intVal = 0;
 		return;
 	}
 
-	r->intVal = thg->gamepad[gamepad].buttons[button].pressed;
+	umkaGetResult(p, r)->intVal = thg->gamepad[gamepad].buttons[button].pressed;
 }
 
 void
@@ -609,11 +649,11 @@ umth_input_gamepad_is_just_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = p[1].intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
-		r->intVal = 0;
+		umkaGetResult(p, r)->intVal = 0;
 		return;
 	}
 
-	r->intVal = thg->gamepad[gamepad].buttons[button].just_pressed;
+	umkaGetResult(p, r)->intVal = thg->gamepad[gamepad].buttons[button].just_pressed;
 }
 
 void
@@ -623,11 +663,11 @@ umth_input_gamepad_is_just_released(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = p[1].intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
-		r->intVal = 0;
+		umkaGetResult(p, r)->intVal = 0;
 		return;
 	}
 
-	r->intVal = thg->gamepad[gamepad].buttons[button].just_released;
+	umkaGetResult(p, r)->intVal = thg->gamepad[gamepad].buttons[button].just_released;
 }
 
 void
@@ -637,11 +677,11 @@ umth_input_gamepad_pressure(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = p[1].intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
-		r->realVal = 0;
+		umkaGetResult(p, r)->realVal = 0;
 		return;
 	}
 
-	r->realVal = thg->gamepad[gamepad].buttons[button].pressure;
+	umkaGetResult(p, r)->realVal = thg->gamepad[gamepad].buttons[button].pressure;
 }
 
 void
@@ -733,7 +773,7 @@ umth_sound_load(UmkaStackSlot *p, UmkaStackSlot *r)
 	char *path = (char *)p[1].ptrVal;
 	uint32_t flags = p[0].intVal;
 
-	r->intVal = th_audio_load(out, path, flags);
+	umkaGetResult(p, r)->intVal = th_audio_load(out, path, flags);
 }
 
 void
@@ -742,7 +782,7 @@ umth_sound_copy(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_sound **out = p[1].ptrVal;
 	th_sound *s = p[0].ptrVal;
 
-	r->intVal = th_sound_copy(out, s);
+	umkaGetResult(p, r)->intVal = th_sound_copy(out, s);
 }
 
 void
@@ -750,7 +790,7 @@ umth_sound_is_playing(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_sound *s = p[0].ptrVal;
 
-	r->intVal = ma_sound_is_playing(&s->inst);
+	umkaGetResult(p, r)->intVal = ma_sound_is_playing(&s->inst);
 }
 
 void
@@ -819,7 +859,7 @@ umth_sound_frame_count(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_sound *s = p[0].ptrVal;
 
-	ma_sound_get_length_in_pcm_frames(&s->inst, (ma_uint64 *)&r->uintVal);
+	ma_sound_get_length_in_pcm_frames(&s->inst, (ma_uint64 *)&umkaGetResult(p, r)->uintVal);
 }
 
 void
@@ -830,7 +870,7 @@ umth_sound_length_ms(UmkaStackSlot *p, UmkaStackSlot *r)
 	float len;
 	ma_sound_get_length_in_seconds(&s->inst, &len);
 
-	r->intVal = len * 1000;
+	umkaGetResult(p, r)->intVal = len * 1000;
 }
 
 void
@@ -892,7 +932,7 @@ umth_window_get_clipboard(UmkaStackSlot *p, UmkaStackSlot *r)
 void
 umth_window_get_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	r->uintVal = th_window_is_fullscreen();
+	umkaGetResult(p, r)->uintVal = th_window_is_fullscreen();
 }
 
 void
@@ -904,13 +944,13 @@ umth_window_set_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r)
 void
 umth_window_is_dpi_enabled(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	r->intVal = thg->dpi_aware;
+	umkaGetResult(p, r)->intVal = thg->dpi_aware;
 }
 
 void
 umth_window_get_dpi_scale(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	r->realVal = th_window_dpi_scale();
+	umkaGetResult(p, r)->realVal = th_window_dpi_scale();
 }
 
 void
@@ -962,7 +1002,7 @@ umth_window_sleep(UmkaStackSlot *p, UmkaStackSlot *r)
 #endif
 }
 
-// fn umth_window_set_viewport(dm: th.Vf2)
+// fn umth_window_set_viewport(dm: th::Vf2)
 void
 umth_window_set_viewport(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -1032,13 +1072,13 @@ void
 umth_window_get_platform_id(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 #ifdef _WIN32
-	r->intVal = 2;
+	umkaGetResult(p, r)->intVal = 2;
 #elif __linux__
-	r->intVal = 1;
+	umkaGetResult(p, r)->intVal = 1;
 #elif defined(__EMSCRIPTEN__)
-	r->intVal = 4;
+	umkaGetResult(p, r)->intVal = 4;
 #else
-	r->intVal = 0;
+	umkaGetResult(p, r)->intVal = 0;
 #endif
 }
 
@@ -1140,7 +1180,7 @@ umth_coll_line_to_line(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_vf2 *e2 = p[1].ptrVal;
 	th_vf2 *ic = p[0].ptrVal;
 
-	r->intVal = th_line_to_line(*b1, *e1, *b2, *e2, ic);
+	umkaGetResult(p, r)->intVal = th_line_to_line(*b1, *e1, *b2, *e2, ic);
 }
 
 void
@@ -1150,7 +1190,7 @@ umth_coll_point_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_quad *q = p[1].ptrVal;
 	th_vf2 *ic = p[0].ptrVal;
 
-	r->intVal = th_point_to_quad(*v, q, ic);
+	umkaGetResult(p, r)->intVal = th_point_to_quad(*v, q, ic);
 }
 
 void
@@ -1162,7 +1202,7 @@ umth_coll_line_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_vf2 *ic1 = p[1].ptrVal;
 	th_vf2 *ic2 = p[0].ptrVal;
 
-	r->intVal = th_line_to_quad(*b, *e, q, ic1, ic2);
+	umkaGetResult(p, r)->intVal = th_line_to_quad(*b, *e, q, ic1, ic2);
 }
 
 void
@@ -1172,7 +1212,7 @@ umth_coll_quad_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_quad *q2 = p[1].ptrVal;
 	th_vf2 *ic = p[0].ptrVal;
 
-	r->intVal = th_quad_to_quad(q1, q2, ic);
+	umkaGetResult(p, r)->intVal = th_quad_to_quad(q1, q2, ic);
 }
 
 void
@@ -1181,7 +1221,7 @@ umth_coll_point_to_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_vf2 v = *(th_vf2 *)&p[1];
 	th_rect *re = p[0].ptrVal;
 
-	r->intVal = th_coll_point_on_rect(v, re);
+	umkaGetResult(p, r)->intVal = th_coll_point_on_rect(v, re);
 }
 
 void
@@ -1190,7 +1230,7 @@ umth_coll_rect_to_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_rect *r1 = p[1].ptrVal;
 	th_rect *r2 = p[0].ptrVal;
 
-	r->intVal = th_rect_to_rect(r1, r2);
+	umkaGetResult(p, r)->intVal = th_rect_to_rect(r1, r2);
 }
 
 void
@@ -1248,7 +1288,7 @@ umth_atlas_pack(UmkaStackSlot *p, UmkaStackSlot *r)
 	UmkaDynArray(th_image *) *images = p[1].ptrVal;
 	th_atlas_pack_strategy strategy = p[0].intVal;
 
-	r->intVal = th_atlas_pack(a, images, strategy);
+	umkaGetResult(p, r)->intVal = th_atlas_pack(a, images, strategy);
 }
 
 void
