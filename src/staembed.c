@@ -1,4 +1,4 @@
-#include "tophat.h"
+#include "tophat.h" 
 const char *th_em_modulesrc[] = {
 "\n"
 "import (\n"
@@ -1268,6 +1268,7 @@ const char *th_em_modulesrc[] = {
 "\t\t\tif w > maxw {\n"
 "\t\t\t\tmaxw = w\n"
 "\t\t\t}\n"
+"\t\t\tw = 0\n"
 "\n"
 "\t\t\tcontinue\n"
 "\t\t}\n"
