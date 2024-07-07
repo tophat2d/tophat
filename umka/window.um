@@ -113,11 +113,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	setViewport({width, height})
 }
 
-//~~fn cycle
-// Cycle needs to be called every cycle for the window to work. If the window
-// was closed, it returns false.
 fn cycle(delta: real) {
-//~~
 	umth_window_set_viewport(wp)
 
 	th::delta = trunc(delta*1000.0)
