@@ -754,24 +754,48 @@ umth_input_gamepad_rumble(UmkaStackSlot *p, UmkaStackSlot *r)
 ///////////////////////
 // entities
 // draws an entity
+
+// fn umth_ent_draw(e: ^Ent)
 void
 umth_ent_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_ent *e = (th_ent *)p[0].ptrVal;
+	th_ent *e = umkaGetParam(p, 0)->ptrVal;
 	th_ent_draw(e);
 }
 
+// fn umth_ent_getcoll(maxcolls: uint, e: ^Ent, s: ^[]^Ent, t: ^void): []Coll
 void
 umth_ent_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_ent **scene = (th_ent **)p[0].ptrVal;
-	th_ent *e = (th_ent *)p[1].ptrVal;
-	int count = p[2].intVal;
-	uu maxColls = p[3].intVal;
-	uu *collC = (uu *)p[4].ptrVal;
-	th_coll *colls = (th_coll *)p[5].ptrVal;
+	size_t maxcolls = umkaGetParam(p, 0)->uintVal;
+	th_ent *e = umkaGetParam(p, 1)->ptrVal;
+	UmkaDynArray(th_ent *) *s = umkaGetParam(p, 2)->ptrVal;
+	void *t = umkaGetParam(p, 3)->ptrVal;
 
-	th_ent_getcoll(e, scene, count, collC, maxColls, colls);
+	if (maxcolls == 0) {
+		maxcolls = 1;
+	}
+
+	size_t count = umkaGetDynArrayLen(s);
+	if (maxcolls > count) {
+		maxcolls = count;
+	}
+
+	th_coll *colls = malloc(sizeof(th_coll) * maxcolls);
+
+	uu collC;
+	th_ent_getcoll(e, s->data, count, &collC, maxcolls, colls);
+
+	typedef UmkaDynArray(th_coll) T;
+
+	T result;
+	umkaMakeDynArray(thg->umka, &result, t, collC);
+
+	memcpy(result.data, colls, collC * sizeof(th_coll));
+
+	free(colls);
+
+	*(T *)umkaGetResult(p, r)->ptrVal = result;
 }
 
 static int
@@ -780,11 +804,12 @@ _th_ysort_test(const void *a, const void *b)
 	return ((th_ent *)a)->t.pos.y - ((th_ent *)b)->t.pos.y;
 }
 
+// fn umth_ent_ysort(ents: ^Ent, count: int)
 void
 umth_ent_ysort(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_ent *ents = (th_ent *)p[1].ptrVal;
-	int count = p[0].intVal;
+	th_ent *ents = (th_ent *)umkaGetParam(p, 0);
+	int count = umkaGetParam(p, 1)->intVal;
 
 	qsort(ents, count, sizeof(th_ent), _th_ysort_test);
 }

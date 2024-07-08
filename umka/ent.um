@@ -60,8 +60,7 @@ fn mk*(img: image::Image = image::Image{}, t: th::Transform = th::Transform{ s: 
 	return e
 }
 
-fn umth_ent_getcoll(coll: ^Coll, collC: ^int, maxCount: th::uu, count: int32,
-	e: ^Ent, s: ^^Ent)
+fn umth_ent_getcoll(maxcolls: uint, e: ^Ent, s: ^[]^Ent, t: ^void): []Coll
 //~~fn Ent.getColl
 // Checks collisions of e with entities in s. Checks at max maxColl collisions.
 // If s contains e, the collision won't be returned.
@@ -71,19 +70,7 @@ fn (e: ^Ent) getColl*(s: []^Ent, maxColls: th::uu): []Coll {
 		return []Coll{}
 	}
 
-	if maxColls > len(s) {
-		maxColls = len(s)
-	}
-
-	if maxColls == 0 {
-		maxColls = 1
-	}
-
-	colls := make([]Coll, maxColls)
-	count := 0
-	umth_ent_getcoll(&colls[0], &count, maxColls, len(s), e, &s[0])
-
-	return slice(colls, 0, count)
+	return umth_ent_getcoll(maxColls, e, &s, typeptr([]Coll))
 }
 
 //~~fn Ent.animate
