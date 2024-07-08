@@ -771,19 +771,18 @@ umth_ent_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_ent *e = umkaGetParam(p, 1)->ptrVal;
 	UmkaDynArray(th_ent *) *s = umkaGetParam(p, 2)->ptrVal;
 	void *t = umkaGetParam(p, 3)->ptrVal;
-
+	size_t count = umkaGetDynArrayLen(s);
 	if (maxcolls == 0) {
 		maxcolls = 1;
 	}
 
-	size_t count = umkaGetDynArrayLen(s);
 	if (maxcolls > count) {
 		maxcolls = count;
 	}
 
 	th_coll *colls = malloc(sizeof(th_coll) * maxcolls);
 
-	uu collC;
+	uu collC = 0;
 	th_ent_getcoll(e, s->data, count, &collC, maxcolls, colls);
 
 	typedef UmkaDynArray(th_coll) T;
