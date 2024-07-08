@@ -41,6 +41,7 @@ conv_path(char *path)
 	return out;
 }
 
+// fn umth_fopen(name: str, mode: str): std::File
 void
 umth_fopen(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -54,12 +55,14 @@ umth_fopen(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->ptrVal = f;
 }
 
+// fn umth_th_getglobal(): ^struct{}
 void
 umth_th_getglobal(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	umkaGetResult(p, r)->ptrVal = thg;
 }
 
+// fn umth_th_getfuncs(): ^struct{}
 void
 umth_th_getfuncs(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -262,7 +265,7 @@ umth_image_fliph(UmkaStackSlot *p, UmkaStackSlot *r)
 	img->fliph = umkaGetParam(p, 1)->intVal;
 }
 
-// fn umth_image_get_dims(i: Image, dm: ^th::Vf2)
+// fn umth_image_get_dims(i: Image): th::Vf2
 void
 umth_image_get_dims(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -287,7 +290,7 @@ umth_image_crop(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_image_crop(img, tl, br);
 }
 
-// fn umth_image_crop_quad(img: Image, q: ^th::Quad)
+// fn umth_image_crop_quad(img: Image, q: th::Quad)
 void
 umth_image_crop_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -297,7 +300,7 @@ umth_image_crop_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 	img->crop = *(th_quad *)umkaGetParam(p, 1);
 }
 
-// fn umth_image_get_crop_quad(img: Image, q: ^th::Quad)
+// fn umth_image_get_crop_quad(img: Image): th::Quad
 void
 umth_image_get_crop_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -442,7 +445,6 @@ umth_image_draw_on_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 
 // fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: rect::Rect,
 //                               color: uint32, scale: real)
-
 void
 umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -532,51 +534,58 @@ umth_image_render_target_to_image(UmkaStackSlot *p, UmkaStackSlot *r)
 
 ///////////////////////
 // input
-// gets position of mouse cursor
+
+// fn umth_input_get_mouse(): th::Vf2
 void
 umth_input_get_mouse(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 *out = (th_vf2 *)p[0].ptrVal;
-	out->x = (thg->mouse.x - thg->offset.x) / thg->scaling;
-	out->y = (thg->mouse.y - thg->offset.y) / thg->scaling;
+	th_vf2 out = {.x = (thg->mouse.x - thg->offset.x) / thg->scaling,
+	    .y = (thg->mouse.y - thg->offset.y) / thg->scaling};
+
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = out;
 }
 
+// fn umth_input_is_pressed(key: Key): bool
 void
 umth_input_is_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int keycode = p[0].intVal;
+	int keycode = umkaGetParam(p, 0)->intVal;
 
-	umkaGetResult(p, r)->intVal = thg->pressed[keycode];
+	umkaGetResult(p, r)->intVal = !!thg->pressed[keycode];
 }
 
+// fn umth_input_is_just_pressed(key: Key): bool
 void
 umth_input_is_just_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int keycode = p[0].intVal;
+	int keycode = umkaGetParam(p, 0)->intVal;
 
-	umkaGetResult(p, r)->intVal = thg->just_pressed[keycode];
+	umkaGetResult(p, r)->intVal = !!thg->just_pressed[keycode];
 }
 
+// fn umth_input_is_pressed_repeat(key: Key): bool
 void
 umth_input_is_pressed_repeat(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int keycode = p[0].intVal;
+	int keycode = umkaGetParam(p, 0)->intVal;
 
-	umkaGetResult(p, r)->intVal = thg->press_repeat[keycode];
+	umkaGetResult(p, r)->intVal = !!thg->press_repeat[keycode];
 }
 
+// fn umth_input_is_just_released(key: Key): bool
 void
 umth_input_is_just_released(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int keycode = p[0].intVal;
+	int keycode = umkaGetParam(p, 0)->intVal;
 
-	umkaGetResult(p, r)->intVal = thg->just_released[keycode];
+	umkaGetResult(p, r)->intVal = !!thg->just_released[keycode];
 }
 
+// fn umth_input_clear*(code: Key)
 void
 umth_input_clear(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int keycode = p[0].intVal;
+	int keycode = umkaGetParam(p, 0)->intVal;
 
 	thg->just_pressed[keycode] = 0;
 	thg->just_released[keycode] = 0;
@@ -584,6 +593,7 @@ umth_input_clear(UmkaStackSlot *p, UmkaStackSlot *r)
 	thg->press_repeat[keycode] = 0;
 }
 
+// fn umth_input_get_str(): str
 void
 umth_input_get_str(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -591,30 +601,40 @@ umth_input_get_str(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->ptrVal = umkaMakeStr(thg->umka, thg->input_string);
 }
 
+// fn umth_input_get_mouse_delta(): th::Vf2
 void
 umth_input_get_mouse_delta(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 *o = (th_vf2 *)p[0].ptrVal;
-	o->x = thg->mouse_delta.x / thg->scaling;
-	o->y = thg->mouse_delta.y / thg->scaling;
+	th_vf2 out = {
+	    .x = thg->mouse_delta.x / thg->scaling, .y = thg->mouse_delta.y / thg->scaling};
+
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = out;
 }
 
+// fn umth_input_get_mouse_scroll(): th::Vf2
 void
 umth_input_get_mouse_scroll(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	*(fu *)(p[0].ptrVal) = thg->mouse_wheel.y;
-	*(fu *)(p[1].ptrVal) = thg->mouse_wheel.x;
+	th_vf2 out = {.x = thg->mouse_wheel.x, .y = thg->mouse_wheel.y};
+
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = out;
 }
 
+// fn umth_input_gamepad_get_gamepads*(): [4]int
 void
 umth_input_gamepad_get_gamepads(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	((int64_t *)p[0].ptrVal)[0] = thg->gamepad[0].connected ? 0 : -1;
-	((int64_t *)p[0].ptrVal)[1] = thg->gamepad[1].connected ? 1 : -1;
-	((int64_t *)p[0].ptrVal)[2] = thg->gamepad[2].connected ? 2 : -1;
-	((int64_t *)p[0].ptrVal)[3] = thg->gamepad[3].connected ? 3 : -1;
+	int64_t states[4] = {
+	    thg->gamepad[0].connected ? 0 : -1,
+	    thg->gamepad[1].connected ? 1 : -1,
+	    thg->gamepad[2].connected ? 2 : -1,
+	    thg->gamepad[3].connected ? 3 : -1,
+	};
+
+	memcpy(umkaGetResult(p, r)->ptrVal, states, sizeof(states));
 }
 
+// fn umth_input_gamepad_get_gamepad*(): int
 void
 umth_input_gamepad_get_gamepad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -628,11 +648,12 @@ umth_input_gamepad_get_gamepad(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = -1;
 }
 
+// fn umth_input_gamepad_is_pressed(gamepad: int, button: GamepadButton): bool
 void
 umth_input_gamepad_is_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int button = p[0].intVal;
-	int gamepad = p[1].intVal;
+	int gamepad = umkaGetParam(p, 0)->intVal;
+	int button = umkaGetParam(p, 1)->intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
 		umkaGetResult(p, r)->intVal = 0;
@@ -642,11 +663,12 @@ umth_input_gamepad_is_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = thg->gamepad[gamepad].buttons[button].pressed;
 }
 
+// fn umth_input_gamepad_is_just_pressed(gamepad: int, button: GamepadButton): bool
 void
 umth_input_gamepad_is_just_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int button = p[0].intVal;
-	int gamepad = p[1].intVal;
+	int gamepad = umkaGetParam(p, 0)->intVal;
+	int button = umkaGetParam(p, 1)->intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
 		umkaGetResult(p, r)->intVal = 0;
@@ -656,11 +678,12 @@ umth_input_gamepad_is_just_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = thg->gamepad[gamepad].buttons[button].just_pressed;
 }
 
+// fn umth_input_gamepad_is_just_released(gamepad: int, button: GamepadButton): bool
 void
 umth_input_gamepad_is_just_released(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int button = p[0].intVal;
-	int gamepad = p[1].intVal;
+	int gamepad = umkaGetParam(p, 0)->intVal;
+	int button = umkaGetParam(p, 1)->intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
 		umkaGetResult(p, r)->intVal = 0;
@@ -670,11 +693,12 @@ umth_input_gamepad_is_just_released(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = thg->gamepad[gamepad].buttons[button].just_released;
 }
 
+// fn umth_input_gamepad_pressure(gamepad: int, button: GamepadButton): th::fu
 void
 umth_input_gamepad_pressure(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int button = p[0].intVal;
-	int gamepad = p[1].intVal;
+	int gamepad = umkaGetParam(p, 0)->intVal;
+	int button = umkaGetParam(p, 1)->intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
 		umkaGetResult(p, r)->realVal = 0;
@@ -684,30 +708,31 @@ umth_input_gamepad_pressure(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->realVal = thg->gamepad[gamepad].buttons[button].pressure;
 }
 
+// fn umth_input_gamepad_stick(gamepad: int, stick: GamepadStick): th::Vf2
 void
 umth_input_gamepad_stick(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 *out = p[0].ptrVal;
-	int stick = p[1].intVal;
-	int gamepad = p[2].intVal;
+	int gamepad = umkaGetParam(p, 0)->intVal;
+	int stick = umkaGetParam(p, 1)->intVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
-		*out = (th_vf2){0};
+		*(th_vf2 *)umkaGetResult(p, r)->ptrVal = (th_vf2){0};
 		return;
 	}
 
 	switch (stick) {
-	case 0: *out = thg->gamepad[gamepad].left_stick; break;
-	case 1: *out = thg->gamepad[gamepad].right_stick; break;
+	case 0: *(th_vf2 *)umkaGetResult(p, r)->ptrVal = thg->gamepad[gamepad].left_stick; break;
+	case 1: *(th_vf2 *)umkaGetResult(p, r)->ptrVal = thg->gamepad[gamepad].right_stick; break;
 	}
 }
 
+// fn umth_input_gamepad_rumble(gamepad: int, left, right: th::fu)
 void
 umth_input_gamepad_rumble(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int gamepad = p[2].intVal;
-	float left = p[1].realVal;
-	float right = p[0].realVal;
+	int gamepad = umkaGetParam(p, 0)->intVal;
+	float left = umkaGetParam(p, 1)->realVal;
+	float right = umkaGetParam(p, 2)->realVal;
 
 	if (gamepad < 0 || gamepad >= 4) {
 		return;
