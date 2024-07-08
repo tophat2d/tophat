@@ -785,16 +785,13 @@ umth_ent_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 	uu collC = 0;
 	th_ent_getcoll(e, s->data, count, &collC, maxcolls, colls);
 
-	typedef UmkaDynArray(th_coll) T;
+	UmkaDynArray(th_coll) *result = umkaGetResult(p, r)->ptrVal;
 
-	T result;
-	umkaMakeDynArray(thg->umka, &result, t, collC);
+	umkaMakeDynArray(thg->umka, result, t, collC);
 
-	memcpy(result.data, colls, collC * sizeof(th_coll));
+	memcpy(result->data, colls, collC * sizeof(th_coll));
 
 	free(colls);
-
-	*(T *)umkaGetResult(p, r)->ptrVal = result;
 }
 
 static int
