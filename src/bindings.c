@@ -786,9 +786,7 @@ umth_ent_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_ent_getcoll(e, s->data, count, &collC, maxcolls, colls);
 
 	UmkaDynArray(th_coll) *result = umkaGetResult(p, r)->ptrVal;
-
 	umkaMakeDynArray(thg->umka, result, t, collC);
-
 	memcpy(result->data, colls, collC * sizeof(th_coll));
 
 	free(colls);
@@ -804,7 +802,7 @@ _th_ysort_test(const void *a, const void *b)
 void
 umth_ent_ysort(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_ent *ents = (th_ent *)umkaGetParam(p, 0);
+	th_ent *ents = (th_ent *)umkaGetParam(p, 0)->ptrVal;
 	int count = umkaGetParam(p, 1)->intVal;
 
 	qsort(ents, count, sizeof(th_ent), _th_ysort_test);
