@@ -80,7 +80,6 @@ frame()
 {
 	thg->dpi_scale_factor = sapp_dpi_scale();
 	th_input_update_gamepads();
-	th_input_sync_fake_keys();
 
 	thg->pass_action = (sg_pass_action){
 	    .colors[0] =
@@ -135,6 +134,7 @@ event(const sapp_event *ev)
 	case SAPP_EVENTTYPE_KEY_DOWN:
 	case SAPP_EVENTTYPE_KEY_UP:
 		th_input_repeated(ev->key_code, ev->type == SAPP_EVENTTYPE_KEY_DOWN);
+		th_input_modifiers(ev->modifiers);
 		if (ev->key_repeat)
 			break;
 

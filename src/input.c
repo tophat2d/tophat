@@ -12,29 +12,10 @@ extern th_global *thg;
 #define ANY_ALT 18
 
 void
-th_input_sync_fake_keys()
-{
-	// emit fake scancodes for any ctrl/shift/alt
-	thg->pressed[ANY_CONTROL] =
-	    thg->pressed[SAPP_KEYCODE_LEFT_CONTROL] || thg->pressed[SAPP_KEYCODE_RIGHT_CONTROL];
-	thg->pressed[ANY_SHIFT] =
-	    thg->pressed[SAPP_KEYCODE_LEFT_SHIFT] || thg->pressed[SAPP_KEYCODE_RIGHT_SHIFT];
-	thg->pressed[ANY_ALT] =
-	    thg->pressed[SAPP_KEYCODE_LEFT_ALT] || thg->pressed[SAPP_KEYCODE_RIGHT_ALT];
-
-	thg->just_pressed[ANY_CONTROL] = thg->just_pressed[SAPP_KEYCODE_LEFT_CONTROL] ||
-	    thg->just_pressed[SAPP_KEYCODE_RIGHT_CONTROL];
-	thg->just_pressed[ANY_SHIFT] = thg->just_pressed[SAPP_KEYCODE_LEFT_SHIFT] ||
-	    thg->just_pressed[SAPP_KEYCODE_RIGHT_SHIFT];
-	thg->just_pressed[ANY_ALT] =
-	    thg->just_pressed[SAPP_KEYCODE_LEFT_ALT] || thg->just_pressed[SAPP_KEYCODE_RIGHT_ALT];
-}
-
-void
 th_input_key(int keycode, int bDown)
 {
 	if (!bDown) {
-		thg->just_released[keycode] = 1;
+		thg->just_released[keycode] = thg->pressed[keycode];
 		thg->pressed[keycode] = 0;
 		thg->just_pressed[keycode] = 0;
 		return;
@@ -54,7 +35,39 @@ th_input_repeated(int keycode, int bDown)
 {
 	if (bDown) {
 		thg->press_repeat[keycode] = true;
+
+		switch (keycode) {
+		case SAPP_KEYCODE_LEFT_CONTROL:
+		case SAPP_KEYCODE_RIGHT_CONTROL: thg->press_repeat[ANY_CONTROL] = true; break;
+		case SAPP_KEYCODE_LEFT_SHIFT:
+		case SAPP_KEYCODE_RIGHT_SHIFT: thg->press_repeat[ANY_SHIFT] = true; break;
+		case SAPP_KEYCODE_LEFT_ALT:
+		case SAPP_KEYCODE_RIGHT_ALT: thg->press_repeat[ANY_ALT] = true; break;
+		}
 	}
+}
+
+void
+th_input_modifiers(uint32_t modifiers)
+{
+	// Release the keys that might have stuck.
+	if ((modifiers & SAPP_MODIFIER_CTRL) == 0) {
+		th_input_key(SAPP_KEYCODE_LEFT_CONTROL, false);
+		th_input_key(SAPP_KEYCODE_RIGHT_CONTROL, false);
+	}
+	if ((modifiers & SAPP_MODIFIER_SHIFT) == 0) {
+		th_input_key(SAPP_KEYCODE_LEFT_SHIFT, false);
+		th_input_key(SAPP_KEYCODE_RIGHT_SHIFT, false);
+	}
+	if ((modifiers & SAPP_MODIFIER_ALT) == 0) {
+		th_input_key(SAPP_KEYCODE_LEFT_ALT, false);
+		th_input_key(SAPP_KEYCODE_RIGHT_ALT, false);
+	}
+
+	// Update fake keys.
+	th_input_key(ANY_CONTROL, modifiers & SAPP_MODIFIER_CTRL);
+	th_input_key(ANY_SHIFT, modifiers & SAPP_MODIFIER_SHIFT);
+	th_input_key(ANY_ALT, modifiers & SAPP_MODIFIER_ALT);
 }
 
 void
