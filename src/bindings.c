@@ -810,301 +810,193 @@ umth_ent_ysort(UmkaStackSlot *p, UmkaStackSlot *r)
 
 ///////////////////////
 // audio
+
+// fn umth_sound_load(Sound: ^Sound, path: str, flags: LoadFlag): th::ErrCode
 void
 umth_sound_load(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound **out = p[2].ptrVal;
-	char *path = (char *)p[1].ptrVal;
-	uint32_t flags = p[0].intVal;
+	th_sound **out = umkaGetParam(p, 0)->ptrVal;
+	char *path = conv_path(umkaGetParam(p, 1)->ptrVal);
+	uint32_t flags = umkaGetParam(p, 2)->uintVal;
 
 	umkaGetResult(p, r)->intVal = th_audio_load(out, path, flags);
+	free(path);
 }
 
+// fn umth_sound_copy(out: ^Sound, s: Sound): th::ErrCode
 void
 umth_sound_copy(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound **out = p[1].ptrVal;
-	th_sound *s = p[0].ptrVal;
+	th_sound **out = umkaGetParam(p, 0)->ptrVal;
+	th_sound *s = umkaGetParam(p, 1)->ptrVal;
 
 	umkaGetResult(p, r)->intVal = th_sound_copy(out, s);
 }
 
+// fn umth_sound_is_playing(s: Sound): bool
 void
 umth_sound_is_playing(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = p[0].ptrVal;
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
 
 	umkaGetResult(p, r)->intVal = ma_sound_is_playing(&s->inst);
 }
 
+// fn umth_sound_play(s: Sound)
 void
 umth_sound_play(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = p[0].ptrVal;
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
 
 	ma_sound_start(&s->inst);
 }
 
-void
-umth_sound_set_volume(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_sound *s = p[1].ptrVal;
-	float vol = p[0].real32Val;
-
-	ma_sound_set_volume(&s->inst, vol);
-}
-
-void
-umth_sound_set_pan(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_sound *s = p[1].ptrVal;
-	float pan = p[0].real32Val;
-
-	ma_sound_set_pan(&s->inst, pan);
-}
-
-void
-umth_sound_set_pitch(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_sound *s = p[1].ptrVal;
-	float pitch = p[0].real32Val;
-
-	ma_sound_set_pitch(&s->inst, pitch);
-}
-
-void
-umth_sound_set_looping(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_sound *s = p[1].ptrVal;
-	int looping = p[0].intVal;
-
-	ma_sound_set_looping(&s->inst, looping);
-}
-
+// fn umth_sound_stop(s: Sound)
 void
 umth_sound_stop(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = p[0].ptrVal;
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
 
 	ma_sound_stop(&s->inst);
 }
 
+// fn umth_sound_set_volume(s: Sound, vol: real32)
+void
+umth_sound_set_volume(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
+	float vol = umkaGetParam(p, 1)->real32Val;
+
+	ma_sound_set_volume(&s->inst, vol);
+}
+
+// fn umth_sound_set_pan(s: Sound, pan: real32)
+void
+umth_sound_set_pan(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
+	float pan = umkaGetParam(p, 1)->real32Val;
+
+	ma_sound_set_pan(&s->inst, pan);
+}
+
+// fn umth_sound_set_pitch(s: Sound, pitch: real32)
+void
+umth_sound_set_pitch(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
+	float pitch = umkaGetParam(p, 1)->real32Val;
+
+	ma_sound_set_pitch(&s->inst, pitch);
+}
+
+// fn umth_sound_set_looping(s: Sound, looping: bool)
+void
+umth_sound_set_looping(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
+	bool looping = umkaGetParam(p, 1)->intVal;
+
+	ma_sound_set_looping(&s->inst, looping);
+}
+
+// fn umth_sound_seek_to_frame(s: Sound, frame: uint)
 void
 umth_sound_seek_to_frame(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = p[1].ptrVal;
-	int frame = p[0].intVal;
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
+	uu frame = umkaGetParam(p, 1)->uintVal;
 
 	ma_sound_seek_to_pcm_frame(&s->inst, frame);
 }
 
+// fn umth_sound_frame_count(s: Sound): uint
 void
 umth_sound_frame_count(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = p[0].ptrVal;
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
+	ma_uint64 frame = 0;
 
-	ma_sound_get_length_in_pcm_frames(&s->inst, (ma_uint64 *)&umkaGetResult(p, r)->uintVal);
+	ma_sound_get_length_in_pcm_frames(&s->inst, &frame);
+	umkaGetResult(p, r)->uintVal = frame;
 }
 
+// fn umth_sound_length_ms(s: Sound): uint
 void
 umth_sound_length_ms(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = p[0].ptrVal;
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
 
-	float len;
+	float len = 0;
 	ma_sound_get_length_in_seconds(&s->inst, &len);
 
 	umkaGetResult(p, r)->intVal = len * 1000;
 }
 
+// fn umth_sound_set_start_time_ms(s: Sound, t: uint)
 void
 umth_sound_set_start_time_ms(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = p[1].ptrVal;
-	uint64_t t = p[0].uintVal;
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
+	ma_uint64 t = umkaGetParam(p, 1)->uintVal;
 
 	ma_sound_set_start_time_in_milliseconds(&s->inst, t);
 }
 
+// fn umth_sound_set_stop_time_ms(s: Sound, t: uint)
 void
 umth_sound_set_stop_time_ms(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = p[1].ptrVal;
-	uint64_t t = p[0].uintVal;
+	th_sound *s = umkaGetParam(p, 0)->ptrVal;
+	ma_uint64 t = umkaGetParam(p, 1)->uintVal;
 
 	ma_sound_set_stop_time_in_milliseconds(&s->inst, t);
 }
 
 ///////////////////////
-// misc
+// window
 
-void
-umth_window_set_viewport_shift(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	thg->wp_offset = *(th_vf2 *)&p[0];
-}
-
-void
-umth_window_get_viewport_shift(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_vf2 *o = p[0].ptrVal;
-
-	*o = thg->wp_offset;
-}
-
-void
-umth_window_set_clipboard(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	char *str = p[0].ptrVal;
-
-	if (str == NULL) {
-		return;
-	}
-
-	sapp_set_clipboard_string(str);
-}
-
-void
-umth_window_get_clipboard(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	char *str = p[0].ptrVal;
-
-	const char *str2 = sapp_get_clipboard_string();
-	strcpy(str, str2);
-}
-
-void
-umth_window_get_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	umkaGetResult(p, r)->uintVal = th_window_is_fullscreen();
-}
-
-void
-umth_window_set_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_window_set_fullscreen(p->uintVal);
-}
-
-void
-umth_window_is_dpi_enabled(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	umkaGetResult(p, r)->intVal = thg->dpi_aware;
-}
-
-void
-umth_window_get_dpi_scale(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	umkaGetResult(p, r)->realVal = th_window_dpi_scale();
-}
-
+// fn umth_window_setup(title: str, w, h: int)
 void
 umth_window_setup(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	char *title = (char *)p[2].ptrVal;
-	int w = p[1].intVal;
-	int h = p[0].intVal;
+	char *title = umkaGetParam(p, 0)->ptrVal;
+	int w = umkaGetParam(p, 1)->intVal;
+	int h = umkaGetParam(p, 2)->intVal;
 
 	th_window_setup(title, w, h);
 }
 
+// fn umth_window_get_dimensions(w, h: ^int32)
 void
 umth_window_get_dimensions(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	int *w = (int *)p[1].ptrVal;
-	int *h = (int *)p[0].ptrVal;
+	int32_t *w = (int32_t *)umkaGetParam(p, 0)->ptrVal;
+	int32_t *h = (int32_t *)umkaGetParam(p, 1)->ptrVal;
 
 	th_window_get_dimensions(w, h);
-}
-
-#ifdef _WIN32
-static double
-time_now()
-{
-	LARGE_INTEGER cnt, frq;
-	QueryPerformanceCounter(&cnt);
-	QueryPerformanceFrequency(&frq);
-
-	return (double)cnt.QuadPart / (double)frq.QuadPart;
-}
-#endif
-
-void
-umth_window_sleep(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	int ms = p[0].intVal;
-
-#ifdef _WIN32
-	double sec = ms / 1000.0;
-	double time_start = time_now();
-	double time = time_start;
-	while ((time - time_start) < sec) {
-		Sleep(0);
-		time = time_now();
-	}
-#else
-	usleep(ms * 1000);
-#endif
 }
 
 // fn umth_window_set_viewport(dm: th::Vf2)
 void
 umth_window_set_viewport(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 dm = *(th_vf2 *)&p[0];
+	th_vf2 dm = *(th_vf2 *)umkaGetParam(p, 0);
 	th_calculate_scaling(dm.w, dm.h);
 }
 
+// fn umth_window_is_dpi_enabled(): bool
 void
-umth_window_set_dims(UmkaStackSlot *p, UmkaStackSlot *r)
+umth_window_is_dpi_enabled(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 dm = *(th_vf2 *)&p[0];
-	th_window_set_dims(dm);
+	umkaGetResult(p, r)->intVal = thg->dpi_aware;
 }
 
+// fn umth_window_get_dpi_scale(): th::fu
 void
-umth_window_set_icon(UmkaStackSlot *p, UmkaStackSlot *r)
+umth_window_get_dpi_scale(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image *img = (th_image *)p[0].ptrVal;
-
-	th_window_set_icon(img);
-}
-
-void
-umth_window_show_cursor(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	bool show = p[0].intVal;
-	th_window_show_cursor(show);
-}
-
-void
-umth_window_freeze_cursor(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	bool freeze = p[0].intVal;
-	th_window_freeze_cursor(freeze);
-}
-
-void
-umth_window_set_cursor(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	int cursor = p[0].intVal;
-	th_window_set_cursor(cursor);
-}
-
-void
-umth_window_request_exit(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_window_request_exit();
-}
-
-extern int *th_sapp_swap_interval;
-void
-umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	int fps = p[0].intVal;
-	if (fps < 0) {
-		fps = 0;
-	}
-	*th_sapp_swap_interval = fps;
+	umkaGetResult(p, r)->realVal = th_window_dpi_scale();
 }
 
 // 0 = other/unknown
@@ -1112,6 +1004,7 @@ umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r)
 // 2 = windows
 // 3 = macos (unsupported currently)
 // 4 = emscripten
+// fn umth_window_get_platform_id(): th::Platform
 void
 umth_window_get_platform_id(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -1124,6 +1017,111 @@ umth_window_get_platform_id(UmkaStackSlot *p, UmkaStackSlot *r)
 #else
 	umkaGetResult(p, r)->intVal = 0;
 #endif
+}
+
+// fn umth_window_set_viewport_offset(s: th::Vf2)
+void
+umth_window_set_viewport_offset(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	thg->wp_offset = *(th_vf2 *)umkaGetParam(p, 0);
+}
+
+// fn umth_window_get_viewport_offset(): th::Vf2
+void
+umth_window_get_viewport_offset(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = thg->wp_offset;
+}
+
+// fn umth_window_set_clipboard(s: str)
+void
+umth_window_set_clipboard(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	char *str = umkaGetParam(p, 0)->ptrVal;
+
+	if (str == NULL) {
+		return;
+	}
+
+	sapp_set_clipboard_string(str);
+}
+
+// fn umth_window_get_clipboard(): str
+void
+umth_window_get_clipboard(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	const char *clip = sapp_get_clipboard_string();
+	umkaGetResult(p, r)->ptrVal = umkaMakeStr(thg->umka, clip);
+}
+
+// fn umth_window_set_fullscreen(fullscreen: bool)
+void
+umth_window_set_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_window_set_fullscreen(umkaGetParam(p, 0)->uintVal);
+}
+
+void
+umth_window_get_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	umkaGetResult(p, r)->uintVal = th_window_is_fullscreen();
+}
+
+// fn umth_window_set_dims(dm: th::Vf2)
+void
+umth_window_set_dims(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_vf2 dm = *(th_vf2 *)umkaGetParam(p, 0);
+	th_window_set_dims(dm);
+}
+
+// fn umth_window_set_icon(img: image::Image)
+void
+umth_window_set_icon(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_image *img = (th_image *)umkaGetParam(p, 0)->ptrVal;
+
+	th_window_set_icon(img);
+}
+
+// fn umth_window_show_cursor(show: bool)
+void
+umth_window_show_cursor(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_window_show_cursor(umkaGetParam(p, 0)->uintVal);
+}
+
+// fn umth_window_freeze_cursor(freeze: bool)
+void
+umth_window_freeze_cursor(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_window_freeze_cursor(umkaGetParam(p, 0)->uintVal);
+}
+
+// fn umth_window_set_cursor(cursor: Cursor)
+void
+umth_window_set_cursor(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_window_set_cursor(umkaGetParam(p, 0)->uintVal);
+}
+
+// fn umth_window_request_exit()
+void
+umth_window_request_exit(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_window_request_exit();
+}
+
+// fn umth_window_set_target_fps(fps: int)
+extern int *th_sapp_swap_interval;
+void
+umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	int fps = umkaGetParam(p, 0)->intVal;
+	if (fps < 0) {
+		fps = 0;
+	}
+	*th_sapp_swap_interval = fps;
 }
 
 // draws text
@@ -1428,8 +1426,8 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_sound_set_stop_time_ms", &umth_sound_set_stop_time_ms);
 
 	// window
-	umkaAddFunc(umka, "umth_window_set_viewport_shift", &umth_window_set_viewport_shift);
-	umkaAddFunc(umka, "umth_window_get_viewport_shift", &umth_window_get_viewport_shift);
+	umkaAddFunc(umka, "umth_window_set_viewport_offset", &umth_window_set_viewport_offset);
+	umkaAddFunc(umka, "umth_window_get_viewport_offset", &umth_window_get_viewport_offset);
 	umkaAddFunc(umka, "umth_window_set_clipboard", &umth_window_set_clipboard);
 	umkaAddFunc(umka, "umth_window_get_clipboard", &umth_window_get_clipboard);
 	umkaAddFunc(umka, "umth_window_get_fullscreen", &umth_window_get_fullscreen);
@@ -1438,7 +1436,6 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_window_is_dpi_enabled", &umth_window_is_dpi_enabled);
 	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);
 	umkaAddFunc(umka, "umth_window_get_dimensions", &umth_window_get_dimensions);
-	umkaAddFunc(umka, "umth_window_sleep", &umth_window_sleep);
 	umkaAddFunc(umka, "umth_window_set_viewport", &umth_window_set_viewport);
 	umkaAddFunc(umka, "umth_window_set_dims", &umth_window_set_dims);
 	umkaAddFunc(umka, "umth_window_set_icon", &umth_window_set_icon);
