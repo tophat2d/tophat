@@ -191,7 +191,17 @@ fn setTargetFps*(fps: int) {
 	umth_window_set_target_fps(fps)
 }
 
+fn umth_window_set_title(title: str)
+
+//~~fn setTitle
+// Sets the title of the window.
+fn setTitle*(title: str) {
+//~~
+	umth_window_set_title(title)
+}
+
 fn umth_window_set_dims(dm: th::Vf2)
+
 //~~fn setDims
 // Sets the dimensions of the window.
 //

@@ -283,6 +283,12 @@ w32_get_client_window_size(int *w, int *h)
 }
 
 void
+th_window_set_title(const char *title)
+{
+	sapp_set_window_title(title);
+}
+
+void
 th_window_set_dims(th_vf2 dm)
 {
 	RECT r;
