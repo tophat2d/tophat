@@ -43,7 +43,7 @@ fn (f: ^Font) draw*(text: str, pos: th::Vf2, color: uint32, scale: th::fu = 1.0)
 	umth_font_draw(f^, text, pos.x, pos.y, color, scale)
 }
 
-fn umth_font_measure(font: Font, s: str, o: ^th::Vf2)
+fn umth_font_measure(font: Font, s: str): th::Vf2
 //~~fn Font.measure
 fn (f: ^Font) measure*(text: str): th::Vf2 {
 //~~
@@ -52,7 +52,5 @@ fn (f: ^Font) measure*(text: str): th::Vf2 {
 		return {}
 	}
 
-	var size: th::Vf2
-	umth_font_measure(f^, text, &size)
-	return size
+	return umth_font_measure(f^, text)
 }

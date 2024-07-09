@@ -250,18 +250,15 @@ fn mkTransform*(p: Vf2, s: Vf2 = Vf2{1, 1}, o: Vf2 = Vf2{0, 0}, r: fu = 0.0): Tr
 	return Transform{p: p, s: s, o: o, r: r}
 }
 
-fn umth_transform_transform(o, t: ^Transform)
+fn umth_transform_transform(o, t: Transform): Transform
 //~~fn Transform.transformed
 // Transforms a transform with another transform.
 fn (o: ^Transform) transformed*(t: Transform): Transform {
 //~~
-	ret := o^
-	umth_transform_transform(&ret, &t)
-
-	return ret
+	return umth_transform_transform(o^, t)
 }
 
-fn umth_transform_vf2(v: ^Vf2, t: ^Transform)
+fn umth_transform_vf2(v: Vf2, t: Transform): Vf2
 //~~fn Vf2.transformed
 // Transforms a vf2 to another vf2.
 // Order:
@@ -272,33 +269,36 @@ fn umth_transform_vf2(v: ^Vf2, t: ^Transform)
 // This allows conversion from a relative to an absolute vf2.
 fn (v: ^Vf2) transformed*(t: Transform): Vf2 {
 //~~
-	ret := v^
-	umth_transform_vf2(&ret, &t)
-	return ret
+	return umth_transform_vf2(v^, t)
 }
 
 //~~type Quad
 type Quad* = [4]Vf2
 //~~
 
-fn umth_quad_max(o: ^Vf2, q: ^Quad)
+fn umth_transform_quad(q: Quad, t: Transform): Quad
+
+//~~fn Quad.transformed
+// Transforms a quad with a transform.
+fn (q: ^Quad) transformed*(t: Transform): Quad {
+//~~
+	return umth_transform_quad(q^, t)
+}
+
+fn umth_quad_max(q: Quad): Vf2
 //~~fn Quad.getMax
 // Gets the maximum coordinate.
 fn (q: ^Quad) getMax*(): Vf2 {
 //~~
-	o := Vf2{}
-	umth_quad_max(&o, q)
-	return o
+	return umth_quad_max(q^)
 }
 
-fn umth_quad_min(o: ^Vf2, q: ^Quad)
+fn umth_quad_min(q: Quad): Vf2
 //~~fn Quad.getMin
 // Gets the minimum coordinate.
 fn (q: ^Quad) getMin*(): Vf2 {
 //~~
-	o := Vf2{}
-	umth_quad_min(&o, q)
-	return o
+	return umth_quad_min(q^)
 }
 
 //~~fn Quad.getDims

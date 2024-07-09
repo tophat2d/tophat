@@ -33,7 +33,6 @@ th_ent_draw(th_ent *o)
 void
 th_ent_getcoll(th_ent *e, th_ent **scene, uu count, uu *collC, uu maxColls, th_coll *colls)
 {
-
 	for (int i = 0; i < count && *collC < maxColls; i++) {
 		if (e == scene[i])
 			continue;

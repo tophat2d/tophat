@@ -87,11 +87,11 @@ fn getDpiScaleFactor*(): th::fu {
 }
 
 // 0 = other/unknown
-// 2 = linux
-// 3 = windows
-// 4 = macos (unsupported currently)
-// 5 = emscripten
-fn umth_window_get_platform_id(): int
+// 1 = linux
+// 2 = windows
+// 3 = macos (unsupported currently)
+// 4 = emscripten
+fn umth_window_get_platform_id(): th::Platform
 
 //~~fn setup
 // Sets up the engine and opens a window.
@@ -100,7 +100,7 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	w, h = width, height
 	umth_window_setup(title, width, height)
 
-	th::platform = th::Platform(umth_window_get_platform_id())
+	th::platform = umth_window_get_platform_id()
 
 	audio::__setup()
 	placeholders::__setup()
@@ -256,31 +256,26 @@ fn setClipboard*(s: str) {
 	umth_window_set_clipboard(s)
 }
 
-fn umth_window_get_clipboard(s: ^char)
+fn umth_window_get_clipboard(): str
 //~~fn getClipboard
 // Gets a string from the system clipboard.
 fn getClipboard*(): str {
 //~~
-	buf := make([]char, 8192)
-	umth_window_get_clipboard(&buf[0])
-	return str(buf)
+	return umth_window_get_clipboard()
 }
 
-fn umth_window_set_viewport_shift(s: th::Vf2)
+fn umth_window_set_viewport_offset(s: th::Vf2)
 //~~fn setViewportOffset
 // Sets the offset of the viewport.
 fn setViewportOffset*(s: th::Vf2) {
 //~~
-	umth_window_set_viewport_shift(s)
+	umth_window_set_viewport_offset(s)
 }
 
-fn umth_window_get_viewport_shift(s: ^th::Vf2)
+fn umth_window_get_viewport_offset(): th::Vf2
 //~~fn getViewportOffset
 // Gets the offset of the viewport (as set by `setViewportShift`)
 fn getViewportOffset*(): th::Vf2 {
 //~~
-	o := th::Vf2{}
-
-	umth_window_get_viewport_shift(&o)
-	return o
+	return umth_window_get_viewport_offset()
 }

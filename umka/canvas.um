@@ -77,17 +77,17 @@ fn drawRectLines*(color: uint32, r: rect::Rect, thickness: real32 = 1.0) {
   drawLine(color, {r.x+r.w, r.y}, {r.x+r.w, r.y+r.h}, thickness)
 }
 
-fn umth_canvas_draw_quad(color: uint32, q: ^th::Quad)
+fn umth_canvas_draw_quad(color: uint32, q: th::Quad)
 //~~fn drawQuad
 // Draws a convex quad.
 fn drawQuad*(color: uint32, q: th::Quad) {
 //~~
-	umth_canvas_draw_quad(color, &q)
+	umth_canvas_draw_quad(color, q)
 }
 
 var scissor: []rect::Rect
 
-fn umth_canvas_begin_scissor_rect(x, y, w, h: real)
+fn umth_canvas_begin_scissor_rect(r: rect::Rect)
 fn umth_canvas_end_scissor()
 
 fn rectDiff(a, b: rect::Rect): rect::Rect {
@@ -116,7 +116,7 @@ fn beginScissorRect*(r: rect::Rect, debug: bool = false) {
 		drawRectLines(th::red, r2, 0.1) 
 	}
 	
-	umth_canvas_begin_scissor_rect(r2.x, r2.y, r2.w, r2.h)
+	umth_canvas_begin_scissor_rect(r2)
 }
 
 //~~fn endScissor
@@ -127,10 +127,9 @@ fn endScissor*() {
 		scissor = delete(scissor, len(scissor) - 1)
 		if len(scissor) > 0 {
 			last := scissor[len(scissor)-1]
-			umth_canvas_begin_scissor_rect(last.x, last.y, last.w, last.h)
+			umth_canvas_begin_scissor_rect(last)
 		} else {
 			umth_canvas_end_scissor();
 		}
 	}
-	
 }
