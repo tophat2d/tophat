@@ -1124,211 +1124,240 @@ umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r)
 	*th_sapp_swap_interval = fps;
 }
 
-// draws text
+///////////////////////
+// canvas
+
+// fn umth_canvas_draw_text(text: str, pos: th::Vf2, color: uint32, size: th::fu)
 void
 umth_canvas_draw_text(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	fu size = p[0].real32Val;
-	uint32_t color = (uint32_t)p[1].uintVal;
-	th_vf2 pos = *(th_vf2 *)&p[2];
-	char *text = (char *)p[3].ptrVal;
+	char *text = umkaGetParam(p, 0)->ptrVal;
+	th_vf2 pos = *(th_vf2 *)umkaGetParam(p, 1);
+	uint32_t color = umkaGetParam(p, 2)->uintVal;
+	fu size = umkaGetParam(p, 3)->real32Val;
 
 	th_canvas_text(text, color, pos, size);
 }
 
+// fn umth_canvas_draw_rect(color: uint32, r: rect::Rect)
 void
 umth_canvas_draw_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	uint32_t color = p[2].uintVal;
-	th_rect re = *(th_rect *)&p[0];
+	uint32_t color = umkaGetParam(p, 0)->uintVal;
+	th_rect re = *(th_rect *)umkaGetParam(p, 1);
 	th_canvas_rect(color, re);
 }
 
+// fn umth_canvas_draw_line(color: uint32, b, e: th::Vf2, thickness: th::fu)
 void
 umth_canvas_draw_line(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	float thickness = p[0].real32Val;
-	th_vf2 e = *(th_vf2 *)&p[1];
-	th_vf2 b = *(th_vf2 *)&p[2];
-	uint32_t color = p[3].uintVal;
+	uint32_t color = umkaGetParam(p, 0)->uintVal;
+	th_vf2 b = *(th_vf2 *)umkaGetParam(p, 1);
+	th_vf2 e = *(th_vf2 *)umkaGetParam(p, 2);
+	float thickness = umkaGetParam(p, 3)->real32Val;
 
 	th_canvas_line(color, b, e, thickness);
 }
 
+// fn umth_canvas_draw_quad(color: uint32, q: th::Quad)
 void
 umth_canvas_draw_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	uint32_t color = p[1].uintVal;
-	th_quad *q = p[0].ptrVal;
+	uint32_t color = umkaGetParam(p, 0)->uintVal;
+	th_quad *q = (th_quad *)umkaGetParam(p, 1);
 
 	th_canvas_quad(q, color);
 }
 
+// fn umth_canvas_begin_scissor_rect(r: rect::Rect)
 void
 umth_canvas_begin_scissor_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_canvas_begin_scissor_rect(
-	    (th_rect){p[3].realVal, p[2].realVal, p[1].realVal, p[0].realVal});
+	th_canvas_begin_scissor_rect(*(th_rect *)umkaGetParam(p, 0));
 }
 
+// fn umth_canvas_end_scissor()
 void
 umth_canvas_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_canvas_end_scissor();
 }
 
+// fn umth_transform_rect(r: Rect, t: th::Transform): th::Quad
 void
-umth_transform_rect(UmkaStackSlot *p, UmkaStackSlot *_)
+umth_transform_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_quad *ret = p[2].ptrVal;
-	th_rect *r = p[1].ptrVal;
-	th_transform *t = p[0].ptrVal;
+	th_rect rc = *(th_rect *)umkaGetParam(p, 0);
+	th_transform t = *(th_transform *)umkaGetParam(p, 1);
 
-	th_transform_rect(ret, *t, *r);
+	th_transform_rect(umkaGetResult(p, r)->ptrVal, t, rc);
 }
 
+// fn umth_transform_quad(q: Quad, t: Transform): Quad
 void
 umth_transform_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_quad *q = p[1].ptrVal;
-	th_transform *t = p[0].ptrVal;
+	th_quad q = *(th_quad *)umkaGetParam(p, 0);
+	th_transform t = *(th_transform *)umkaGetParam(p, 1);
 
-	th_transform_quad(q, *t);
+	th_transform_quad(&q, t);
+
+	*(th_quad *)umkaGetResult(p, r)->ptrVal = q;
 }
 
+// fn umth_transform_vf2(v: Vf2, t: Transform): Vf2
 void
 umth_transform_vf2(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 *v = p[1].ptrVal;
-	th_transform *t = p[0].ptrVal;
+	th_vf2 v = *(th_vf2 *)umkaGetParam(p, 0);
+	th_transform t = *(th_transform *)umkaGetParam(p, 1);
 
-	th_transform_vf2(v, *t);
+	th_transform_vf2(&v, t);
+
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = v;
 }
 
+// fn umth_transform_transform(o, t: Transform): Transform
 void
 umth_transform_transform(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_transform *o = (th_transform *)p[1].ptrVal;
-	th_transform *t = p[0].ptrVal;
-	th_transform_transform(o, *t);
+	th_transform o = *(th_transform *)umkaGetParam(p, 0);
+	th_transform t = *(th_transform *)umkaGetParam(p, 1);
+
+	th_transform_transform(&o, t);
+
+	*(th_transform *)umkaGetResult(p, r)->ptrVal = o;
 }
 
+// fn umth_quad_max(q: Quad): Vf2
+void
+umth_quad_max(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_quad *q = (th_quad *)umkaGetParam(p, 0);
+
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = th_quad_max(*q);
+}
+
+// fn umth_quad_min(q: Quad): Vf2
+void
+umth_quad_min(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_quad *q = (th_quad *)umkaGetParam(p, 0);
+
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = th_quad_min(*q);
+}
+
+// TODO: This isn't in th.um right now, as it would create a cyclic dependency between rect.um and
+// th.um
+// fn umth_quad_bounding_box(q: Quad): Rect
+void
+umth_quad_bounding_box(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_quad q = *(th_quad *)umkaGetParam(p, 0);
+
+	*(th_rect *)umkaGetResult(p, r)->ptrVal = th_quad_bounding_box(q);
+}
+
+// fn umth_coll_line_to_line(b1, e1, b2, e2: th::Vf2, ic: ^th::Vf2): bool
 void
 umth_coll_line_to_line(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 *b1 = p[4].ptrVal;
-	th_vf2 *e1 = p[3].ptrVal;
-	th_vf2 *b2 = p[2].ptrVal;
-	th_vf2 *e2 = p[1].ptrVal;
-	th_vf2 *ic = p[0].ptrVal;
+	th_vf2 b1 = *(th_vf2 *)umkaGetParam(p, 0);
+	th_vf2 e1 = *(th_vf2 *)umkaGetParam(p, 1);
+	th_vf2 b2 = *(th_vf2 *)umkaGetParam(p, 2);
+	th_vf2 e2 = *(th_vf2 *)umkaGetParam(p, 3);
+	th_vf2 *ic = umkaGetParam(p, 4)->ptrVal;
 
-	umkaGetResult(p, r)->intVal = th_line_to_line(*b1, *e1, *b2, *e2, ic);
+	umkaGetResult(p, r)->intVal = th_line_to_line(b1, e1, b2, e2, ic);
 }
 
+// fn umth_coll_point_to_quad(v: th::Vf2, q: th::Quad, ic: ^th::Vf2): bool
 void
 umth_coll_point_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 *v = p[2].ptrVal;
-	th_quad *q = p[1].ptrVal;
-	th_vf2 *ic = p[0].ptrVal;
+	th_vf2 v = *(th_vf2 *)umkaGetParam(p, 0);
+	th_quad q = *(th_quad *)umkaGetParam(p, 1);
+	th_vf2 *ic = umkaGetParam(p, 2)->ptrVal;
 
-	umkaGetResult(p, r)->intVal = th_point_to_quad(*v, q, ic);
+	umkaGetResult(p, r)->intVal = th_point_to_quad(v, &q, ic);
 }
 
+// fn umth_coll_line_to_quad(b, e: th::Vf2, q: th::Quad, ic1, ic2: ^th::Vf2): bool
 void
 umth_coll_line_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 *b = p[4].ptrVal;
-	th_vf2 *e = p[3].ptrVal;
-	th_quad *q = p[2].ptrVal;
-	th_vf2 *ic1 = p[1].ptrVal;
-	th_vf2 *ic2 = p[0].ptrVal;
+	th_vf2 b = *(th_vf2 *)umkaGetParam(p, 0);
+	th_vf2 e = *(th_vf2 *)umkaGetParam(p, 1);
+	th_quad q = *(th_quad *)umkaGetParam(p, 2);
+	th_vf2 *ic1 = umkaGetParam(p, 3)->ptrVal;
+	th_vf2 *ic2 = umkaGetParam(p, 4)->ptrVal;
 
-	umkaGetResult(p, r)->intVal = th_line_to_quad(*b, *e, q, ic1, ic2);
+	umkaGetResult(p, r)->intVal = th_line_to_quad(b, e, &q, ic1, ic2);
 }
 
+// fn umth_coll_quad_to_quad(q1, q2: th::Quad, ic: ^th::Vf2): bool
 void
 umth_coll_quad_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_quad *q1 = p[2].ptrVal;
-	th_quad *q2 = p[1].ptrVal;
-	th_vf2 *ic = p[0].ptrVal;
+	th_quad q1 = *(th_quad *)umkaGetParam(p, 0);
+	th_quad q2 = *(th_quad *)umkaGetParam(p, 1);
+	th_vf2 *ic = umkaGetParam(p, 2)->ptrVal;
 
-	umkaGetResult(p, r)->intVal = th_quad_to_quad(q1, q2, ic);
+	umkaGetResult(p, r)->intVal = th_quad_to_quad(&q1, &q2, ic);
 }
 
+// fn umth_coll_point_to_rect(p: th::Vf2, r: rect::Rect): bool
 void
 umth_coll_point_to_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2 v = *(th_vf2 *)&p[1];
-	th_rect *re = p[0].ptrVal;
+	th_vf2 v = *(th_vf2 *)umkaGetParam(p, 0);
+	th_rect rc = *(th_rect *)umkaGetParam(p, 1);
 
-	umkaGetResult(p, r)->intVal = th_coll_point_on_rect(v, re);
+	umkaGetResult(p, r)->intVal = th_coll_point_on_rect(v, &rc);
 }
 
+// fn umth_coll_rect_to_rect(r1, r2: rect::Rect): bool
 void
 umth_coll_rect_to_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_rect *r1 = p[1].ptrVal;
-	th_rect *r2 = p[0].ptrVal;
+	th_rect r1 = *(th_rect *)umkaGetParam(p, 0);
+	th_rect r2 = *(th_rect *)umkaGetParam(p, 1);
 
-	umkaGetResult(p, r)->intVal = th_rect_to_rect(r1, r2);
+	umkaGetResult(p, r)->intVal = th_rect_to_rect(&r1, &r2);
 }
 
+// fn umth_nav_mesh_add_quad(m: ^Mesh, q: th::Quad)
 void
 umth_nav_mesh_add_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_navmesh *m = p[1].ptrVal;
-	th_quad *q = p[0].ptrVal;
+	th_navmesh *m = umkaGetParam(p, 0)->ptrVal;
+	th_quad q = *(th_quad *)umkaGetParam(p, 1);
 
-	th_navmesh_add_quad(m, q);
+	th_navmesh_add_quad(m, &q);
 }
 
+// fn umth_nav_mesh_nav(t: ^void, m: ^Mesh, p1, p2: th::Vf2): []th::Vf2
 void
 umth_nav_mesh_nav(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_vf2s *cameFrom = p[4].ptrVal;
-	void *cameFromType = p[3].ptrVal;
-	th_navmesh *m = p[2].ptrVal;
-	th_vf2 p1 = *(th_vf2 *)&p[1];
-	th_vf2 p2 = *(th_vf2 *)&p[0];
+	void *cameFromType = umkaGetParam(p, 0)->ptrVal;
+	th_navmesh *m = umkaGetParam(p, 1)->ptrVal;
+	th_vf2 p1 = *(th_vf2 *)umkaGetParam(p, 2);
+	th_vf2 p2 = *(th_vf2 *)umkaGetParam(p, 3);
+
+	th_vf2s *cameFrom = umkaGetResult(p, r)->ptrVal;
 
 	th_navmesh_nav(cameFrom, cameFromType, m, p1, p2);
 }
 
-void
-umth_quad_min(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_vf2 *o = (th_vf2 *)p[1].ptrVal;
-	th_quad *q = (th_quad *)p[0].ptrVal;
-
-	*o = th_quad_min(*q);
-}
-
-void
-umth_quad_max(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_vf2 *o = (th_vf2 *)p[1].ptrVal;
-	th_quad *q = (th_quad *)p[0].ptrVal;
-
-	*o = th_quad_max(*q);
-}
-
-void
-umth_quad_bounding_box(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_rect *o = (th_rect *)p[1].ptrVal;
-	th_quad *q = (th_quad *)p[0].ptrVal;
-
-	*o = th_quad_bounding_box(*q);
-}
-
+// fn umth_atlas_pack(a: ^Atlas, images: ^[]image::Image, strategy: int): th::ErrCode
 void
 umth_atlas_pack(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_atlas *a = p[2].ptrVal;
-	UmkaDynArray(th_image *) *images = p[1].ptrVal;
-	th_atlas_pack_strategy strategy = p[0].intVal;
+	th_atlas *a = umkaGetParam(p, 0)->ptrVal;
+	UmkaDynArray(th_image *) *images = umkaGetParam(p, 1)->ptrVal;
+	th_atlas_pack_strategy strategy = umkaGetParam(p, 2)->intVal;
 
 	umkaGetResult(p, r)->intVal = th_atlas_pack(a, images, strategy);
 }
