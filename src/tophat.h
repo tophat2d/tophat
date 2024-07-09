@@ -514,7 +514,7 @@ th_input_key(int keycode, int bDown);
 void
 th_input_repeated(int keycode, int bDown);
 void
-th_input_sync_fake_keys();
+th_input_modifiers(uint32_t modifiers);
 void
 th_input_cycle();
 void
