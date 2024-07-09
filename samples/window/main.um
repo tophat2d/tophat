@@ -1,0 +1,33 @@
+import (
+	"window.um"
+	"canvas.um"
+	"th.um"
+	"input.um"
+	"image.um"
+)
+
+i := 0
+var icon: image::Image
+
+fn init*() {
+	window::setup("Test window", 800, 600)
+
+	icon = image::load("../../etc/test.png").item0
+
+	window::onFrame.register({
+		canvas::drawText("Press space to change window title", {0, 0}, th::black, 2)
+		canvas::drawText("Press z to change window icon", {0, 10}, th::black, 2)
+		canvas::drawText("Press x to change window size", {0, 20}, th::black, 2)
+
+		if input::isJustPressed(.space) {
+			i++
+			window::setTitle(sprintf("New title %d", i))
+		}
+		if input::isJustPressed(.z) {
+			window::setIcon(icon)
+		}
+		if input::isJustPressed(.x) {
+			window::setDims({640, 480})
+		}
+	})
+}

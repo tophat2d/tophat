@@ -106,16 +106,50 @@ th_vector_normalize(float *x, float *y)
 	}
 }
 
-// implemented in umka_common.c
-bool
-moduleRegularizePath(const char *path, const char *curFolder, char *regularizedPath, int size);
-
-th_err
+void
 th_regularize_path(const char *path, const char *cur_folder, char *regularized_path, int size)
 {
-	if (!moduleRegularizePath(path, cur_folder, regularized_path, size)) {
-		return 1;
+	size_t o = 0;
+
+	// for now simply convert all backslashes to forward slashes and ignore `./`
+	for (size_t i = 0; cur_folder[i] && size; i++) {
+		if ((i == 0 || cur_folder[i-1] == '/' || cur_folder[i-1] == '\\') && cur_folder[i] == '.' &&
+		    (cur_folder[i + 1] == '/' || cur_folder[i + 1] == '\\')) {
+			i++;
+			continue;
+		}
+
+		size--;
+		if (cur_folder[i] == '\\') {
+			regularized_path[o] = '/';
+		} else {
+			regularized_path[o] = cur_folder[i];
+		}
+		o++;
 	}
 
-	return 0;
+	for (size_t i = 0; path[i] && size; i++) {
+		if ((i == 0 || path[i-1] == '/' || path[i-1] == '\\') && path[i] == '.' &&
+		    (path[i + 1] == '/' || path[i + 1] == '\\')) {
+			i++;
+			continue;
+		}
+
+		size--;
+		if (path[i] == '\\') {
+			regularized_path[o] = '/';
+		} else {
+			regularized_path[o] = path[i];
+		}
+		o++;
+	}
+
+	if (size) {
+		regularized_path[o] = '\0';
+		printf("regularized_path: %s\n", regularized_path);
+		return;
+	}
+
+	th_error("Path too long: %s%s", cur_folder, path);
+	exit(-1);
 }

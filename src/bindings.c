@@ -1067,6 +1067,13 @@ umth_window_get_fullscreen(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->uintVal = th_window_is_fullscreen();
 }
 
+// fn umth_window_set_title(title: str)
+void
+umth_window_set_title(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_window_set_title(umkaGetParam(p, 0)->ptrVal);
+}
+
 // fn umth_window_set_dims(dm: th::Vf2)
 void
 umth_window_set_dims(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1466,6 +1473,7 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_window_setup", &umth_window_setup);
 	umkaAddFunc(umka, "umth_window_get_dimensions", &umth_window_get_dimensions);
 	umkaAddFunc(umka, "umth_window_set_viewport", &umth_window_set_viewport);
+	umkaAddFunc(umka, "umth_window_set_title", &umth_window_set_title);
 	umkaAddFunc(umka, "umth_window_set_dims", &umth_window_set_dims);
 	umkaAddFunc(umka, "umth_window_set_icon", &umth_window_set_icon);
 	umkaAddFunc(umka, "umth_window_show_cursor", &umth_window_show_cursor);

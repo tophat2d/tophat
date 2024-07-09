@@ -526,6 +526,8 @@ th_input_update_gamepads();
 void
 th_error(char *text, ...);
 void
+th_check_err(th_err err);
+void
 th_info(char *text, ...);
 void
 th_calculate_scaling(float camw, float camh);
@@ -535,7 +537,7 @@ void
 th_deinit();
 void
 th_print_umka_error_and_quit(int code);
-th_err
+void
 th_regularize_path(const char *path, const char *cur_folder, char *regularized_path, int size);
 
 // navmesh
@@ -605,6 +607,8 @@ void
 th_window_get_dimensions(int *w, int *h);
 th_window_handle
 th_get_window_handle();
+void
+th_window_set_title(const char *);
 void
 th_window_set_dims(th_vf2 dm);
 void

@@ -60,3 +60,19 @@ THEXT(void, th_tmap_autotile, uu *, uu *, uu, uu, uu *, uu);
 
 THEXT(void, th_utf8_decode, uint32_t *, const char *);
 THEXT(void, th_utf8_encode, char *, uint32_t);
+
+THEXT(fu, th_window_dpi_scale);
+THEXT(void, th_window_setup, char *title, int w, int h);
+THEXT(void, th_window_get_dimensions, int *w, int *h);
+THEXT(th_window_handle, th_get_window_handle);
+THEXT(void, th_window_set_title, const char *title);
+THEXT(void, th_window_set_dims, th_vf2 dm);
+THEXT(void, th_window_set_icon, th_image *img);
+THEXT(void, th_window_show_cursor, bool show);
+THEXT(void, th_window_freeze_cursor, bool freeze);
+THEXT(void, th_window_set_cursor, int cursor);
+THEXT(void, th_window_request_exit);
+THEXT(bool, th_window_is_fullscreen);
+THEXT(void, th_window_set_fullscreen, bool fullscreen);
+THEXT(sapp_desc, th_window_sapp_desc);
+
