@@ -481,8 +481,6 @@ th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 uint32_t *
 th_image_get_data(th_image *img);
 
-unsigned int
-th_gen_texture(uint32_t *data, th_vf2 dm, unsigned filter);
 void
 th_blit_tex(th_image *img, th_quad q, uint32_t color);
 void
@@ -525,8 +523,6 @@ th_input_update_gamepads();
 // misc
 void
 th_error(char *text, ...);
-void
-th_check_err(th_err err);
 void
 th_info(char *text, ...);
 void
