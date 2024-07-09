@@ -6,6 +6,10 @@ import (
 	"window.um"
 )
 
+fakePressCount := 0
+fakeRepeatCount := 0
+fakeReleaseCount := 0
+
 pressCount := 0
 repeatCount := 0
 releaseCount := 0
@@ -24,6 +28,42 @@ fn init*() {
 
 		p.y += 44
 
+		if input::isPressed(.shift) {
+			canvas::drawText("SHIFT IS PRESSED", p, th::green, 4)
+		} else {
+			canvas::drawText("SHIFT IS NOT PRESSED", p, th::red, 4)
+		}
+
+		p.y += 44
+
+		if input::isPressed(.leftShift) {
+			canvas::drawText("LSHIFT IS PRESSED", p, th::green, 4)
+		} else {
+			canvas::drawText("LSHIFT IS NOT PRESSED", p, th::red, 4)
+		}
+
+		p.y += 44
+
+		if input::isPressed(.rightShift) {
+			canvas::drawText("RSHIFT IS PRESSED", p, th::green, 4)
+		} else {
+			canvas::drawText("RSHIFT IS NOT PRESSED", p, th::red, 4)
+		}
+
+		p.y += 44
+
+		if input::isJustPressed(.shift) {
+			fakePressCount++
+		}
+
+		if input::isPressedRepeat(.shift) {
+			fakeRepeatCount++
+		}
+
+		if input::isJustReleased(.shift) {
+			fakeReleaseCount++
+		}
+
 		if input::isJustPressed(.space) {
 			pressCount++
 		}
@@ -36,11 +76,18 @@ fn init*() {
 			releaseCount++
 		}
 
-		canvas::drawText(sprintf("PRESS COUNT:   %4d", pressCount), p, th::black, 4)
+		canvas::drawText(sprintf("SHIFT PRESS COUNT:   %4d", fakePressCount), p, th::black, 4)
 		p.y += 44
-		canvas::drawText(sprintf("REPEAT COUNT:  %4d", repeatCount), p, th::black, 4)
+		canvas::drawText(sprintf("SHIFT REPEAT COUNT:  %4d", fakeRepeatCount), p, th::black, 4)
 		p.y += 44
-		canvas::drawText(sprintf("RELEASE COUNT: %4d", releaseCount), p, th::black, 4)
+		canvas::drawText(sprintf("SHIFT RELEASE COUNT: %4d", fakeReleaseCount), p, th::black, 4)
+		p.y += 44
+
+		canvas::drawText(sprintf("SPACE PRESS COUNT:   %4d", pressCount), p, th::black, 4)
+		p.y += 44
+		canvas::drawText(sprintf("SPACE REPEAT COUNT:  %4d", repeatCount), p, th::black, 4)
+		p.y += 44
+		canvas::drawText(sprintf("SPACE RELEASE COUNT: %4d", releaseCount), p, th::black, 4)
 		p.y += 44
 	})
 }
