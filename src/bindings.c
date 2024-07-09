@@ -1234,18 +1234,18 @@ umth_transform_transform(UmkaStackSlot *p, UmkaStackSlot *r)
 void
 umth_quad_max(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_quad *q = (th_quad *)umkaGetParam(p, 0);
+	th_quad q = *(th_quad *)umkaGetParam(p, 0);
 
-	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = th_quad_max(*q);
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = th_quad_max(q);
 }
 
 // fn umth_quad_min(q: Quad): Vf2
 void
 umth_quad_min(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_quad *q = (th_quad *)umkaGetParam(p, 0);
+	th_quad q = *(th_quad *)umkaGetParam(p, 0);
 
-	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = th_quad_min(*q);
+	*(th_vf2 *)umkaGetResult(p, r)->ptrVal = th_quad_min(q);
 }
 
 // TODO: This isn't in th.um right now, as it would create a cyclic dependency between rect.um and
