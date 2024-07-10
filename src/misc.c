@@ -146,7 +146,6 @@ th_regularize_path(const char *path, const char *cur_folder, char *regularized_p
 
 	if (size) {
 		regularized_path[o] = '\0';
-		printf("regularized_path: %s\n", regularized_path);
 		return;
 	}
 
