@@ -486,9 +486,10 @@ th_err
 th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm);
 uint32_t *
 th_image_get_data(th_image *img);
-
 void
-th_blit_tex(th_image *img, th_quad q, uint32_t color);
+th_image_draw_quad(th_image *img, th_quad q, uint32_t color);
+void
+th_image_blit(th_image *img, th_rect src, th_rect dest, uint32_t color, float rot, th_vf2 origin);
 void
 th_image_render_transformed(th_image *img, th_transform trans, uint32_t color);
 void

@@ -429,6 +429,24 @@ umth_image_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_image_render_transformed(img, t, color);
 }
 
+// fn umth_image_blit(img: Image, src, dest: rect::Rect, color: uint32, rot: th::fu, origin:
+// th::Vf2)
+void
+umth_image_blit(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_image *img = umkaGetParam(p, 0)->ptrVal;
+	if (!img)
+		return;
+
+	th_rect src = *(th_rect *)umkaGetParam(p, 1);
+	th_rect dest = *(th_rect *)umkaGetParam(p, 2);
+	uint32_t color = umkaGetParam(p, 3)->uintVal;
+	float rot = umkaGetParam(p, 4)->real32Val;
+	th_vf2 origin = *(th_vf2 *)umkaGetParam(p, 5);
+
+	th_image_blit(img, src, dest, color, rot, origin);
+}
+
 // fn umth_image_draw_on_quad(img: Image, color: uint32, q: th::Quad)
 void
 umth_image_draw_on_quad(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -440,7 +458,7 @@ umth_image_draw_on_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 	uint32_t filter = umkaGetParam(p, 1)->uintVal;
 	th_quad q = *(th_quad *)umkaGetParam(p, 2);
 
-	th_blit_tex(img, q, filter);
+	th_image_draw_quad(img, q, filter);
 }
 
 // fn umth_image_draw_nine_patch(img: Image, outer, inner, dest: rect::Rect,
@@ -1435,6 +1453,7 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_image_render_target_begin", &umth_image_render_target_begin);
 	umkaAddFunc(umka, "umth_image_render_target_end", &umth_image_render_target_end);
 	umkaAddFunc(umka, "umth_image_draw", &umth_image_draw);
+	umkaAddFunc(umka, "umth_image_blit", &umth_image_blit);
 	umkaAddFunc(umka, "umth_image_draw_on_quad", &umth_image_draw_on_quad);
 	umkaAddFunc(umka, "umth_image_draw_nine_patch", &umth_image_draw_nine_patch);
 	umkaAddFunc(umka, "umth_image_create_render_target", &umth_image_create_render_target);

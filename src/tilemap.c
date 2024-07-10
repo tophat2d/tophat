@@ -59,7 +59,7 @@ th_tmap_draw(th_tmap *t)
 
 			th_quad q = {0};
 			th_transform_rect(&q, tt, (th_rect){.w = t->a.cs.x, .h = t->a.cs.y});
-			th_blit_tex(a, q, 0xffffffff);
+			th_image_draw_quad(a, q, 0xffffffff);
 		}
 }
 

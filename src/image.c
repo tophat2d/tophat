@@ -285,7 +285,7 @@ th_image_render_transformed(th_image *img, th_transform trans, uint32_t color)
 	trans.origin.x += min.x * trans.scale.x;
 	trans.origin.y += min.y * trans.scale.y;
 	th_transform_quad(&q, trans);
-	th_blit_tex(img, q, color);
+	th_image_draw_quad(img, q, color);
 }
 
 #define SWAP(a, b) \
@@ -296,7 +296,7 @@ th_image_render_transformed(th_image *img, th_transform trans, uint32_t color)
 	}
 
 void
-th_blit_tex(th_image *img, th_quad q, uint32_t color)
+th_image_draw_quad(th_image *img, th_quad q, uint32_t color)
 {
 	for (uu i = 0; i < 4; i++) {
 		q.v[i].x = trunc((q.v[i].x - thg->wp_offset.x) * thg->scaling + thg->offset.x);
@@ -329,6 +329,21 @@ th_blit_tex(th_image *img, th_quad q, uint32_t color)
 	    q.bl.y / sh, bounds.bl.x, bounds.bl.y, colors[0], colors[1], colors[2], colors[3]};
 
 	th_canvas_batch_push_auto_flush(img, verts, sizeof(verts) / sizeof(verts[0]));
+}
+
+void
+th_image_blit(th_image *img, th_rect src, th_rect dest, uint32_t color, float rot, th_vf2 origin)
+{
+	th_vf2 dims = img->dm;
+	th_image_crop(img, (th_vf2){{src.x / dims.x, src.y / dims.y}},
+	    (th_vf2){{(src.x + src.w) / dims.x, (src.y + src.h) / dims.y}});
+	th_transform t = (th_transform){
+	    .origin = origin,
+	    .rot = rot,
+	    .pos = (th_vf2){{dest.x, dest.y}},
+	    .scale = (th_vf2){{dest.w / src.w, dest.h / src.h}},
+	};
+	th_image_render_transformed(img, t, color);
 }
 
 th_err

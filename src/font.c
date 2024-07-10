@@ -332,7 +332,7 @@ th_font_draw(th_font *font, const char *s, double x, double y, uint32_t color, d
 	while (f_iterator_going(&iter)) {
 		f_glyph glyph = f_iterator_next_glyph(&iter);
 
-		th_blit_tex(glyph.img, glyph.quad, color);
+		th_image_draw_quad(glyph.img, glyph.quad, color);
 	}
 
 	return;
