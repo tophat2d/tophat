@@ -262,6 +262,12 @@ th_window_request_exit()
 	sapp_request_quit();
 }
 
+void
+th_window_set_title(const char *title)
+{
+	sapp_set_window_title(title);
+}
+
 // ---- PLATFORM DEPENDENT CODE
 
 #ifdef _WIN32
@@ -280,12 +286,6 @@ w32_get_client_window_size(int *w, int *h)
 	AdjustWindowRect(&rect, WS_OVERLAPPEDWINDOW, FALSE);
 	*w = rect.right - rect.left;
 	*h = rect.bottom - rect.top;
-}
-
-void
-th_window_set_title(const char *title)
-{
-	sapp_set_window_title(title);
 }
 
 void
