@@ -14,8 +14,11 @@ pressCount := 0
 repeatCount := 0
 releaseCount := 0
 
+mousePressCount := 0
+mouseReleaseCount := 0
+
 fn init*() {
-	window::setup("Keyboard Input Sample", 640, 480)
+	window::setup("Keyboard Input Sample", 640, 640)
 
 	window::onFrame.register({
 		p := th::Vf2{ 5, 5 }
@@ -52,6 +55,14 @@ fn init*() {
 
 		p.y += 44
 
+		if input::isPressed(.mouse1) {
+			canvas::drawText("LMB IS PRESSED", p, th::green, 4)
+		} else {
+			canvas::drawText("LMB IS NOT PRESSED", p, th::red, 4)
+		}
+
+		p.y += 44
+
 		if input::isJustPressed(.shift) {
 			fakePressCount++
 		}
@@ -76,6 +87,14 @@ fn init*() {
 			releaseCount++
 		}
 
+		if input::isJustPressed(.mouse1) {
+			mousePressCount++
+		}
+
+		if input::isJustReleased(.mouse1) {
+			mouseReleaseCount++
+		}
+
 		canvas::drawText(sprintf("SHIFT PRESS COUNT:   %4d", fakePressCount), p, th::black, 4)
 		p.y += 44
 		canvas::drawText(sprintf("SHIFT REPEAT COUNT:  %4d", fakeRepeatCount), p, th::black, 4)
@@ -88,6 +107,11 @@ fn init*() {
 		canvas::drawText(sprintf("SPACE REPEAT COUNT:  %4d", repeatCount), p, th::black, 4)
 		p.y += 44
 		canvas::drawText(sprintf("SPACE RELEASE COUNT: %4d", releaseCount), p, th::black, 4)
+		p.y += 44
+
+		canvas::drawText(sprintf("LMB PRESS COUNT:     %4d", mousePressCount), p, th::black, 4)
+		p.y += 44
+		canvas::drawText(sprintf("LMB RELEASE COUNT:   %4d", mouseReleaseCount), p, th::black, 4)
 		p.y += 44
 	})
 }

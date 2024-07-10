@@ -285,6 +285,8 @@ typedef struct
 	void *umka;
 
 	uu pressed[512];
+	// since `input::clear` clears `pressed`, there will be no way to detect releases.
+	uu internal_pressed_state[512];
 	uu just_pressed[512];
 	uu just_released[512];
 	uu press_repeat[512];

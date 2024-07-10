@@ -214,9 +214,9 @@ fn (this: ^Gui) eval*(layout: LayoutFn) {
 	layout(this)
 
 	if this.hover(this.container[0].getDims()) {
-			input::clear(input::Key.mouse1)
-			input::clear(input::Key.mouse2)
-			input::clear(input::Key.mouse3)
+		input::clear(input::Key.mouse1)
+		input::clear(input::Key.mouse2)
+		input::clear(input::Key.mouse3)
 	}
 }
 

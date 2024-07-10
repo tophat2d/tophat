@@ -15,14 +15,16 @@ void
 th_input_key(int keycode, int bDown)
 {
 	if (!bDown) {
-		thg->just_released[keycode] = thg->pressed[keycode];
+		thg->just_released[keycode] = thg->internal_pressed_state[keycode];
 		thg->pressed[keycode] = 0;
+		thg->internal_pressed_state[keycode] = 0;
 		thg->just_pressed[keycode] = 0;
 		return;
 	}
 
 	if (!thg->pressed[keycode]) {
 		thg->pressed[keycode] = 1;
+		thg->internal_pressed_state[keycode] = 1;
 		thg->just_pressed[keycode] = 1;
 		return;
 	}
