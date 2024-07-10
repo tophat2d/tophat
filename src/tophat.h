@@ -446,6 +446,8 @@ uu
 th_rect_to_rect(th_rect *r1, th_rect *r2);
 uu
 th_line_to_tilemap(th_vf2 b, th_vf2 e, th_tmap *t, th_vf2 *ic);
+th_rect
+th_rect_intersect(th_rect a, th_rect b);
 
 // entity
 th_quad

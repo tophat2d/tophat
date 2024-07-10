@@ -55,3 +55,11 @@ fn rectToRect*(r1, r2: rect::Rect): bool {
 	return umth_coll_rect_to_rect(r1, r2)
 }
 
+fn umth_coll_rect_intersect(r1, r2: rect::Rect): rect::Rect
+//~~fn rectIntersect
+// Get the intersection of two rects.
+fn rectIntersect*(r1, r2: rect::Rect): rect::Rect {
+//~~
+	return umth_coll_rect_intersect(r1, r2)
+}
+

@@ -214,3 +214,14 @@ th_coll_point_on_rect(th_vf2 p, th_rect *r)
 {
 	return p.x >= r->x && p.y >= r->y && p.x <= r->x + r->w && p.y <= r->y + r->h;
 }
+
+th_rect
+th_rect_intersect(th_rect a, th_rect b)
+{
+	float x = fmax(a.x, b.x);
+	float y = fmax(a.y, b.y);
+	float w = fmin(a.x + a.w, b.x + b.w) - x;
+	float h = fmin(a.y + a.h, b.y + b.h) - y;
+
+	return (th_rect){x, y, w, h};
+}

@@ -1,0 +1,26 @@
+import (
+	"window.um"
+	"canvas.um"
+	"th.um"
+	"input.um"
+	"image.um"
+	"rect.um"
+	"coll.um"
+)
+
+fn init*() {
+	window::setup("Rect test", 800, 600)
+
+	window::onFrame.register({
+		a := rect::mk(400-40, 300-40, 80, 80)
+		b := rect::mk(input::getMousePos().x-25, input::getMousePos().y-25, 50, 50)
+
+		canvas::drawRectLines(0x999999FF, a)
+		canvas::drawRectLines(0x000000FF, b)
+
+		if coll::rectToRect(a, b) {
+			r := coll::rectIntersect(a, b)
+			canvas::drawRectLines(0xFF0000FF, r)
+		}
+	})
+}

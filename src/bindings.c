@@ -1334,6 +1334,15 @@ umth_coll_rect_to_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = th_rect_to_rect(&r1, &r2);
 }
 
+void
+umth_coll_rect_intersect(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_rect r1 = *(th_rect *)umkaGetParam(p, 0);
+	th_rect r2 = *(th_rect *)umkaGetParam(p, 1);
+
+	*(th_rect *)umkaGetResult(p, r)->ptrVal = th_rect_intersect(r1, r2);
+}
+
 // fn umth_nav_mesh_add_quad(m: ^Mesh, q: th::Quad)
 void
 umth_nav_mesh_add_quad(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1497,13 +1506,14 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_transform_vf2", &umth_transform_vf2);
 	umkaAddFunc(umka, "umth_transform_transform", &umth_transform_transform);
 
-	// colisions
+	// collisions
 	umkaAddFunc(umka, "umth_coll_line_to_line", &umth_coll_line_to_line);
 	umkaAddFunc(umka, "umth_coll_point_to_quad", &umth_coll_point_to_quad);
 	umkaAddFunc(umka, "umth_coll_line_to_quad", &umth_coll_line_to_quad);
 	umkaAddFunc(umka, "umth_coll_quad_to_quad", &umth_coll_quad_to_quad);
 	umkaAddFunc(umka, "umth_coll_point_to_rect", &umth_coll_point_to_rect);
 	umkaAddFunc(umka, "umth_coll_rect_to_rect", &umth_coll_rect_to_rect);
+	umkaAddFunc(umka, "umth_coll_rect_intersect", &umth_coll_rect_intersect);
 
 	// nav
 	umkaAddFunc(umka, "umth_nav_mesh_add_quad", &umth_nav_mesh_add_quad);

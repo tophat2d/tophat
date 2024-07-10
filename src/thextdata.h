@@ -28,6 +28,7 @@ THEXT(uu, th_coll_on_tilemap, th_ent *e, th_tmap *t, th_vf2 *ic, th_vf2 *tc);
 THEXT(uu, th_coll_point_on_rect, th_vf2 p, th_rect *r);
 THEXT(uu, th_rect_to_rect, th_rect *r1, th_rect *r2);
 THEXT(uu, th_line_to_tilemap, th_vf2 b, th_vf2 e, th_tmap *t, th_vf2 *ic);
+THEXT(th_rect, th_rect_intersect, th_rect a, th_rect b);
 THEXT(th_quad, th_ent_transform, th_ent *e);
 THEXT(void, th_ent_draw, th_ent *o);
 THEXT(void, th_ent_getcoll, th_ent *e, th_ent **scene, uu count, uu *collC, uu maxColls, th_coll *colls);
