@@ -9,6 +9,7 @@ THEXT(void, _th_umka_bind, void *umka);
 THEXT(void, th_canvas_rect, uint32_t color, th_rect r);
 THEXT(void, th_canvas_init);
 THEXT(void, th_canvas_line, uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
+THEXT(void, th_canvas_draw_rect_lines, uint32_t color, th_rect r, fu thickness);
 THEXT(void, th_canvas_text, char *text, uint32_t color, th_vf2 p, fu size);
 THEXT(void, th_canvas_triangle, uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);
 THEXT(void, th_canvas_quad, th_quad *q, uint32_t color);

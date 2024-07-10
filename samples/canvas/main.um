@@ -1,0 +1,13 @@
+import (
+	"window.um"
+	"canvas.um"
+)
+
+fn init*() {
+	window::setup("Canvas test", 800, 600)
+
+	window::onFrame.register({
+		canvas::drawRectLines(0x000000FF, {30, 30, 100, 100}, 3)
+		canvas::drawRectLines(0xFF000066, {80, 80, 100, 110}, 5)
+	})
+}

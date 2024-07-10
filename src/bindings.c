@@ -1167,6 +1167,17 @@ umth_canvas_draw_line(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_canvas_line(color, b, e, thickness);
 }
 
+// fn umth_canvas_draw_rect_lines(color: uint32, r: rect::Rect, thickness: real32)
+void
+umth_canvas_draw_rect_lines(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	uint32_t color = umkaGetParam(p, 0)->uintVal;
+	th_rect rect = *(th_rect *)umkaGetParam(p, 1);
+	float thickness = umkaGetParam(p, 2)->real32Val;
+
+	th_canvas_draw_rect_lines(color, rect, thickness);
+}
+
 // fn umth_canvas_draw_quad(color: uint32, q: th::Quad)
 void
 umth_canvas_draw_quad(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1334,6 +1345,7 @@ umth_coll_rect_to_rect(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = th_rect_to_rect(&r1, &r2);
 }
 
+// fn umth_coll_rect_intersect(r1, r2: rect::Rect): rect::Rect
 void
 umth_coll_rect_intersect(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -1496,6 +1508,7 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);
 	umkaAddFunc(umka, "umth_canvas_draw_rect", &umth_canvas_draw_rect);
 	umkaAddFunc(umka, "umth_canvas_draw_line", &umth_canvas_draw_line);
+	umkaAddFunc(umka, "umth_canvas_draw_rect_lines", &umth_canvas_draw_rect_lines);
 	umkaAddFunc(umka, "umth_canvas_draw_quad", &umth_canvas_draw_quad);
 	umkaAddFunc(umka, "umth_canvas_begin_scissor_rect", &umth_canvas_begin_scissor_rect);
 	umkaAddFunc(umka, "umth_canvas_end_scissor", &umth_canvas_end_scissor);

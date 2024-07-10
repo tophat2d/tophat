@@ -407,6 +407,8 @@ th_canvas_init();
 void
 th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness);
 void
+th_canvas_draw_rect_lines(uint32_t color, th_rect rect, fu thickness);
+void
 th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size);
 void
 th_canvas_triangle(uint32_t color, th_vf2 a, th_vf2 b, th_vf2 c);

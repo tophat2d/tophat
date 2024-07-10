@@ -63,18 +63,12 @@ fn drawLine*(color: uint32, b, e: th::Vf2, thickness: th::fu) {
 	umth_canvas_draw_line(color, b, e, thickness)
 }
 
+fn umth_canvas_draw_rect_lines(color: uint32, r: rect::Rect, thickness: real32)
 //~~fn drawRectLines
 // Draws rect border.
 fn drawRectLines*(color: uint32, r: rect::Rect, thickness: real32 = 1.0) {
 //~~
-  // top
-  drawLine(color, {r.x-1, r.y}, {r.x+r.w, r.y}, thickness)
-  // bottom
-  drawLine(color, {r.x, r.y+r.h}, {r.x+r.w, r.y+r.h}, thickness)
-  // left
-  drawLine(color, {r.x, r.y}, {r.x, r.y+r.h}, thickness)
-  // right
-  drawLine(color, {r.x+r.w, r.y}, {r.x+r.w, r.y+r.h}, thickness)
+	umth_canvas_draw_rect_lines(color, r, thickness)
 }
 
 fn umth_canvas_draw_quad(color: uint32, q: th::Quad)

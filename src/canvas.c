@@ -353,6 +353,24 @@ th_canvas_line(uint32_t color, th_vf2 f, th_vf2 t, fu thickness)
 }
 
 void
+th_canvas_draw_rect_lines(uint32_t color, th_rect r, fu thickness)
+{
+	fu t2 = thickness * 0.5;
+	// top
+	th_canvas_line(color, (th_vf2){.x = r.x - t2, .y = r.y},
+	    (th_vf2){.x = r.x + r.w + t2, .y = r.y}, thickness);
+	// bottom
+	th_canvas_line(color, (th_vf2){.x = r.x - t2, .y = r.y + r.h},
+	    (th_vf2){.x = r.x + r.w + t2, .y = r.y + r.h}, thickness);
+	// left
+	th_canvas_line(color, (th_vf2){.x = r.x, .y = r.y + t2},
+	    (th_vf2){.x = r.x, .y = r.y + r.h - t2}, thickness);
+	// right
+	th_canvas_line(color, (th_vf2){.x = r.x + r.w, .y = r.y + t2},
+	    (th_vf2){.x = r.x + r.w, .y = r.y + r.h - t2}, thickness);
+}
+
+void
 th_canvas_text(char *text, uint32_t color, th_vf2 p, fu size)
 {
 	if (text == NULL)
