@@ -50,7 +50,7 @@ th_print_umka_error_and_quit(int code)
 }
 
 static void
-init()
+init(void)
 {
 	th_audio_init();
 	sg_setup(&(sg_desc){
@@ -76,7 +76,7 @@ init()
 }
 
 static void
-frame()
+frame(void)
 {
 	thg->dpi_scale_factor = sapp_dpi_scale();
 	th_input_update_gamepads();
@@ -152,7 +152,7 @@ event(const sapp_event *ev)
 }
 
 static void
-cleanup()
+cleanup(void)
 {
 	th_deinit();
 	sg_shutdown();
@@ -274,7 +274,7 @@ th_window_set_title(const char *title)
 th_window_handle
 th_get_window_handle()
 {
-	return sapp_win32_get_hwnd();
+	return (void *)sapp_win32_get_hwnd();
 }
 
 void
