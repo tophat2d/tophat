@@ -145,7 +145,13 @@
       clearButton.onclick = (ev) => {
         outputArea.value = "";
       }
-
+			
+      var canvas = document.getElementById('canvas')
+      canvas.addEventListener("click", (e) => {
+        window.focus();
+        canvas.focus();
+      });
+			
       var chooseExample = () => {
           switch (examplesCombo.value) {
 					case "":
