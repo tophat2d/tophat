@@ -115,6 +115,7 @@ fn umth_image_blit(img: Image, src, dest: rect::Rect, color: uint32, rot: th::fu
 //~~fn Image.blit
 // Copies source rectangle (texture coordinates) to destination rectangle (screen coordinates).
 fn (i: ^Image) blit*(src, dest: rect::Rect, color: uint32 = 0xFFFFFFFF, rot: th::fu = 0, origin: th::Vf2 = {0, 0}) {
+//~~
 	umth_image_blit(i^, src, dest, color, rot, origin)
 }
 
