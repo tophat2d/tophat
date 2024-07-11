@@ -83,6 +83,11 @@ th_init(const char *scriptpath, const char *script_src)
 		char *buf = umkaAsm(thg->umka);
 
 		FILE *f = fopen(path, "wb");
+		if (!f) {
+			th_error("Could not open %s for writing", path);
+			return 1;
+		}
+
 		fprintf(f, "%s\n", buf);
 		fclose(f);
 
