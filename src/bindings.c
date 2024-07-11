@@ -504,6 +504,27 @@ umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r)
 		return;
 	}
 
+	float mx = 1;
+	float my = 1;
+
+	if (img->flipv) {
+		mx = -1;
+		src.x += outer.w - stepSrc[2].x;
+		float temp = stepDst[0].x;
+		stepDst[0].x = stepDst[2].x;
+		stepDst[2].x = temp;
+	}
+
+	if (img->fliph) {
+		my = -1;
+		src.y += outer.h - stepSrc[2].y;
+		float temp = stepDst[0].y;
+		stepDst[0].y = stepDst[2].y;
+		stepDst[2].y = temp;
+	}
+
+	float startY = src.y;
+
 	for (int x = 0; x < 3; x++) {
 		float ssX = stepSrc[x].x;
 		float sdX = stepDst[x].x;
@@ -511,19 +532,17 @@ umth_image_draw_nine_patch(UmkaStackSlot *p, UmkaStackSlot *r)
 			float ssY = stepSrc[y].y;
 			float sdY = stepDst[y].y;
 
-			th_image_crop(img, (th_vf2){{src.x / imgDims.x, src.y / imgDims.y}},
-			    (th_vf2){{(src.x + ssX) / imgDims.x, (src.y + ssY) / imgDims.y}});
-			th_image_render_transformed(img,
-			    (th_transform){
-				.scale = {{sdX / ssX, sdY / ssY}}, .pos = {{dst.x, dst.y}}},
-			    tint);
+			th_rect srcr = {src.x, src.y, ssX, ssY};
+			th_rect dstr = {dst.x, dst.y, sdX, sdY};
 
-			src.y += ssY;
+			th_image_blit(img, srcr, dstr, tint, 0, (th_vf2){0});
+
+			src.y += ssY * my;
 			dst.y += sdY;
 		}
-		src.x += ssX;
+		src.x += ssX * mx;
 		dst.x += sdX;
-		src.y = outer.y;
+		src.y = startY;
 		dst.y = dest.y;
 	}
 }
