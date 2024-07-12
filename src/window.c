@@ -126,7 +126,10 @@ event(const sapp_event *ev)
 		thg->mouse = (th_vf2){.x = ev->mouse_x, .y = ev->mouse_y};
 		break;
 	case SAPP_EVENTTYPE_CHAR:
-		if (ev->char_code < ' ' || ev->char_code == 127 /* DEL character */)
+		// NOTE: Here is a hotfix for a strange behaviour where sokol would insert the space
+		// character if Ctrl is pressed.
+		if (ev->char_code < ' ' || ev->char_code == 127 /* DEL character */ ||
+		    ((ev->modifiers & SAPP_MODIFIER_CTRL) && ev->char_code == ' '))
 			break;
 
 		thg->input_string_len = th_utf8_encode(thg->input_string, ev->char_code);
