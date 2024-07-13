@@ -65,8 +65,7 @@ init(void)
 	th_image_init();
 
 	if (umkaAlive(thg->umka)) {
-		int code =
-		    umkaCall(thg->umka, thg->umka_init.addr, thg->umka_init.p, thg->umka_init.r);
+		int code = umkaCall(thg->umka, &thg->umka_init);
 		if (!umkaAlive(thg->umka)) {
 			th_print_umka_error_and_quit(code);
 		}
@@ -96,10 +95,9 @@ frame(void)
 	thg->target_size = (th_vf2){.w = window_width, .h = window_height};
 
 	if (thg->umka && umkaAlive(thg->umka)) {
-		umkaGetParam(thg->umka_frame.p, 0)->realVal = sapp_frame_duration();
+		umkaGetParam(thg->umka_frame.params, 0)->realVal = sapp_frame_duration();
 
-		int code =
-		    umkaCall(thg->umka, thg->umka_frame.addr, thg->umka_frame.p, thg->umka_frame.r);
+		int code = umkaCall(thg->umka, &thg->umka_frame);
 		if (!umkaAlive(thg->umka)) {
 			th_print_umka_error_and_quit(code);
 		}

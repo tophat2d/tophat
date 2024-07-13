@@ -273,13 +273,6 @@ typedef struct
 	float rumble_right;
 } th_generic_gamepad;
 
-typedef struct
-{
-	int addr;
-	UmkaStackSlot *p;
-	UmkaStackSlot *r;
-} th_umka_func;
-
 // struct holding all tophat's global variables.
 typedef struct
 {
@@ -340,9 +333,9 @@ typedef struct
 
 	float dpi_scale_factor;
 
-	th_umka_func umka_init;
-	th_umka_func umka_destroy;
-	th_umka_func umka_frame;
+	UmkaFuncContext umka_init;
+	UmkaFuncContext umka_destroy;
+	UmkaFuncContext umka_frame;
 
 	ma_engine audio_engine;
 } th_global;

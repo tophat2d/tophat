@@ -100,23 +100,16 @@ th_init(const char *scriptpath, const char *script_src)
 		exit(0);
 	}
 
-	thg->umka_init.addr = umkaGetFunc(
-	    thg->umka, "tophat_main.um", "__th_init", &thg->umka_init.p, &thg->umka_init.r);
-	thg->umka_frame.addr = umkaGetFunc(
-	    thg->umka, "window.um", "umth_frame_callback", &thg->umka_frame.p, &thg->umka_frame.r);
-	thg->umka_destroy.addr = umkaGetFunc(thg->umka, "window.um", "umth_destroy_callback",
-	    &thg->umka_destroy.p, &thg->umka_destroy.r);
-
-	if (thg->umka_init.addr == -1) {
-		th_error("Internal error: umka_init == -1");
+	if (!umkaGetFunc(thg->umka, "tophat_main.um", "__th_init", &thg->umka_init)) {
+		th_error("Internal error: __th_init not found");
 	}
 
-	if (thg->umka_frame.addr == -1) {
-		th_error("Internal error: umth_frame_callback == -1");
+	if (!umkaGetFunc(thg->umka, "window.um", "umth_frame_callback", &thg->umka_frame)) {
+		th_error("Internal error: umth_frame_callback not found");
 	}
 
-	if (thg->umka_destroy.addr == -1) {
-		th_error("Internal error: umth_destroy_callback == -1");
+	if (!umkaGetFunc(thg->umka, "window.um", "umth_destroy_callback", &thg->umka_destroy)) {
+		th_error("Internal error: umth_destroy_callback not found");
 	}
 
 	thg->scaling = 1;
@@ -140,8 +133,7 @@ th_deinit()
 	}
 
 	if (umkaAlive(thg->umka))
-		umkaCall(
-		    thg->umka, thg->umka_destroy.addr, thg->umka_destroy.p, thg->umka_destroy.r);
+		umkaCall(thg->umka, &thg->umka_destroy);
 	if (umkaAlive(thg->umka))
 		umkaRun(thg->umka);
 
@@ -162,8 +154,7 @@ run_playground(const char *src)
 {
 	if (thg->umka) {
 		if (umkaAlive(thg->umka))
-			umkaCall(thg->umka, thg->umka_destroy.addr, thg->umka_destroy.p,
-			    thg->umka_destroy.r);
+			umkaCall(thg->umka, &thg->umka_destroy);
 		if (umkaAlive(thg->umka))
 			umkaRun(thg->umka);
 		umkaFree(thg->umka);
@@ -175,8 +166,7 @@ run_playground(const char *src)
 	}
 
 	if (umkaAlive(thg->umka)) {
-		int code =
-		    umkaCall(thg->umka, thg->umka_init.addr, thg->umka_init.p, thg->umka_init.r);
+		int code = umkaCall(thg->umka, &thg->umka_init);
 		if (!umkaAlive(thg->umka)) {
 			th_print_umka_error_and_quit(code);
 		}
