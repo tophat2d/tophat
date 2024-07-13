@@ -160,11 +160,10 @@ th_deinit()
 int
 run_playground(const char *src)
 {
-	UmkaStackSlot s;
-
 	if (thg->umka) {
 		if (umkaAlive(thg->umka))
-			umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
+			umkaCall(thg->umka, thg->umka_destroy.addr, thg->umka_destroy.p,
+			    thg->umka_destroy.r);
 		if (umkaAlive(thg->umka))
 			umkaRun(thg->umka);
 		umkaFree(thg->umka);
@@ -176,8 +175,8 @@ run_playground(const char *src)
 	}
 
 	if (umkaAlive(thg->umka)) {
-		int code = umkaCall(
-		    thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+		int code =
+		    umkaCall(thg->umka, thg->umka_init.addr, thg->umka_init.p, thg->umka_init.r);
 		if (!umkaAlive(thg->umka)) {
 			th_print_umka_error_and_quit(code);
 		}
