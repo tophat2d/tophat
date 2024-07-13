@@ -100,14 +100,22 @@ th_init(const char *scriptpath, const char *script_src)
 		exit(0);
 	}
 
-	thg->umth_frame_callback = umkaGetFunc(thg->umka, "window.um", "umth_frame_callback");
-	thg->umth_destroy_callback = umkaGetFunc(thg->umka, "window.um", "umth_destroy_callback");
+	thg->umka_init.addr = umkaGetFunc(
+	    thg->umka, "tophat_main.um", "__th_init", &thg->umka_init.p, &thg->umka_init.r);
+	thg->umka_frame.addr = umkaGetFunc(
+	    thg->umka, "window.um", "umth_frame_callback", &thg->umka_frame.p, &thg->umka_frame.r);
+	thg->umka_destroy.addr = umkaGetFunc(thg->umka, "window.um", "umth_destroy_callback",
+	    &thg->umka_destroy.p, &thg->umka_destroy.r);
 
-	if (thg->umth_frame_callback == -1) {
+	if (thg->umka_init.addr == -1) {
+		th_error("Internal error: umka_init == -1");
+	}
+
+	if (thg->umka_frame.addr == -1) {
 		th_error("Internal error: umth_frame_callback == -1");
 	}
 
-	if (thg->umth_destroy_callback == -1) {
+	if (thg->umka_destroy.addr == -1) {
 		th_error("Internal error: umth_destroy_callback == -1");
 	}
 
@@ -131,9 +139,9 @@ th_deinit()
 		}
 	}
 
-	UmkaStackSlot s;
 	if (umkaAlive(thg->umka))
-		umkaCall(thg->umka, thg->umth_destroy_callback, 0, &s, &s);
+		umkaCall(
+		    thg->umka, thg->umka_destroy.addr, thg->umka_destroy.p, thg->umka_destroy.r);
 	if (umkaAlive(thg->umka))
 		umkaRun(thg->umka);
 

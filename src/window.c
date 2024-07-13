@@ -64,11 +64,9 @@ init(void)
 	th_canvas_init();
 	th_image_init();
 
-	UmkaStackSlot s;
-
 	if (umkaAlive(thg->umka)) {
-		int code = umkaCall(
-		    thg->umka, umkaGetFunc(thg->umka, "tophat_main.um", "__th_init"), 0, &s, &s);
+		int code =
+		    umkaCall(thg->umka, thg->umka_init.addr, thg->umka_init.p, thg->umka_init.r);
 		if (!umkaAlive(thg->umka)) {
 			th_print_umka_error_and_quit(code);
 		}
@@ -97,11 +95,11 @@ frame(void)
 	th_window_get_dimensions(&window_width, &window_height);
 	thg->target_size = (th_vf2){.w = window_width, .h = window_height};
 
-	UmkaStackSlot s;
-	if (thg->umka && umkaAlive(thg->umka) && thg->umth_frame_callback != -1) {
-		s.realVal = sapp_frame_duration();
+	if (thg->umka && umkaAlive(thg->umka)) {
+		umkaGetParam(thg->umka_frame.p, 0)->realVal = sapp_frame_duration();
 
-		int code = umkaCall(thg->umka, thg->umth_frame_callback, 1, &s, &s);
+		int code =
+		    umkaCall(thg->umka, thg->umka_frame.addr, thg->umka_frame.p, thg->umka_frame.r);
 		if (!umkaAlive(thg->umka)) {
 			th_print_umka_error_and_quit(code);
 		}
