@@ -179,7 +179,8 @@ void
 umth_tilemap_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_tmap *t = umkaGetParam(p, 0)->ptrVal;
-	th_tmap_draw(t);
+	th_transform tr = *(th_transform *)umkaGetParam(p, 1);
+	th_tmap_draw(t, tr);
 }
 
 // checks, if tilemap collides with entity.

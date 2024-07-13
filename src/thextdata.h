@@ -32,27 +32,31 @@ THEXT(uu, th_line_to_tilemap, th_vf2 b, th_vf2 e, th_tmap *t, th_vf2 *ic);
 THEXT(th_rect, th_rect_intersect, th_rect a, th_rect b);
 THEXT(th_quad, th_ent_transform, th_ent *e);
 THEXT(void, th_ent_draw, th_ent *o);
-THEXT(void, th_ent_getcoll, th_ent *e, th_ent **scene, uu count, uu *collC, uu maxColls, th_coll *colls);
+THEXT(void, th_ent_getcoll, th_ent *e, th_ent **scene, uu count, uu *collC, uu maxColls,
+    th_coll *colls);
 THEXT(uint32_t, th_color_rgb, float r, float g, float b, float a);
 THEXT(uint32_t, th_color_hsv2rgb, float h, float s, float v, float a);
 THEXT(th_err, th_font_load, th_font **out, char *path, double size, uint32_t filter);
-THEXT(void, th_font_draw, th_font *font, const char *s, double x, double y, uint32_t color, double scale);
+THEXT(void, th_font_draw, th_font *font, const char *s, double x, double y, uint32_t color,
+    double scale);
 THEXT(th_vf2, th_font_measure, th_font *font, const char *s);
 THEXT(void, th_font_deinit);
 THEXT(th_err, th_load_image, th_image **out, char *path);
 THEXT(void, th_image_free, th_image *img);
 THEXT(th_err, th_image_from_data, th_image *img, uint32_t *data, th_vf2 dm);
-THEXT(uint32_t*, th_image_get_data, th_image *img);
+THEXT(uint32_t *, th_image_get_data, th_image *img);
 THEXT(void, th_image_draw_quad, th_image *img, th_quad q, uint32_t color);
-THEXT(void, th_image_blit, th_image *img, th_rect src, th_rect dest, uint32_t color, float rot, th_vf2 origin);
+THEXT(void, th_image_blit, th_image *img, th_rect src, th_rect dest, uint32_t color, float rot,
+    th_vf2 origin);
 THEXT(void, th_image_render_transformed, th_image *img, th_transform trans, uint32_t color);
 THEXT(void, th_image_crop, th_image *img, th_vf2 tl, th_vf2 br);
 THEXT(th_err, th_image_set_filter, th_image *img, sg_filter filter);
 THEXT(th_err, th_image_update_data, th_image *img, uint32_t *data, th_vf2 dm);
-THEXT(th_image*, th_image_alloc);
+THEXT(th_image *, th_image_alloc);
 THEXT(void, th_image_init);
 THEXT(void, th_image_deinit);
-THEXT(th_err, th_image_create_render_target, th_render_target **out, int width, int height, int filter);
+THEXT(th_err, th_image_create_render_target, th_render_target **out, int width, int height,
+    int filter);
 THEXT(th_err, th_image_set_as_render_target, th_render_target *t);
 THEXT(th_err, th_image_remove_render_target, th_render_target *t, th_vf2 wp);
 THEXT(void, th_input_key, int keycode, int bDown);
@@ -67,9 +71,11 @@ THEXT(void, th_calculate_scaling, float camw, float camh);
 THEXT(int, th_init, const char *scriptpath, const char *script_path);
 THEXT(void, th_deinit);
 THEXT(void, th_print_umka_error_and_quit, int code);
-THEXT(void, th_regularize_path, const char *path, const char *cur_folder, char *regularized_path, int size);
+THEXT(void, th_regularize_path, const char *path, const char *cur_folder, char *regularized_path,
+    int size);
 THEXT(void, th_navmesh_add_quad, th_navmesh *m, th_quad *q);
-THEXT(th_err, th_navmesh_nav, th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2);
+THEXT(th_err, th_navmesh_nav, th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1,
+    th_vf2 p2);
 THEXT(void, th_nav_init, void);
 THEXT(void, th_particles_draw, th_particles *p, int t);
 THEXT(th_vf2, th_quad_min, th_quad q);
@@ -82,11 +88,11 @@ THEXT(void, th_transform_transform, th_transform *o, th_transform t);
 THEXT(void, th_rotate_point, th_vf2 *p, th_vf2 o, fu rot);
 THEXT(void, th_vector_normalize, float *x, float *y);
 THEXT(uint32_t, th_sg_get_gl_image, sg_image img);
-THEXT(void, th_tmap_draw, th_tmap *t);
+THEXT(void, th_tmap_draw, th_tmap *t, th_transform tr);
 THEXT(void, th_tmap_autotile, uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
-THEXT(th_shader*, th_get_shader, uu index);
-THEXT(th_shader*, th_get_shader_err, uu index);
-THEXT(th_shader*, th_alloc_shader);
+THEXT(th_shader *, th_get_shader, uu index);
+THEXT(th_shader *, th_get_shader_err, uu index);
+THEXT(th_shader *, th_alloc_shader);
 THEXT(size_t, th_utf8_decode, uint32_t *out, const char *s);
 THEXT(size_t, th_utf8_encode, char *out, uint32_t r);
 THEXT(fu, th_window_dpi_scale);

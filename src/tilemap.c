@@ -8,37 +8,13 @@
 extern th_global *thg;
 
 void
-th_tmap_draw(th_tmap *t)
+th_tmap_draw(th_tmap *t, th_transform tr)
 {
 	th_image *a = t->a.i;
 	if (!a)
 		return;
 
 	int tw = t->w, th = umkaGetDynArrayLen(&t->cells) / t->w;
-
-	/*fu
-		camx = thg->wp_offset.x,
-		camy = thg->wp_offset.y;
-
-	if (camx > t->pos.x + tw*t->scale * t->a.cs.x)
-		return;
-	if (camy > t->pos.y + th*t->scale * t->a.cs.y)
-		return;*/
-
-	/*int sx = fabs((fabs(t->pos.x)-abs(camx))) / (t->scale * t->a.cs.x);
-	int sy = fabs((fabs(t->pos.y)-abs(camy))) / (t->scale * t->a.cs.y);
-	int sw = thg->viewport.x/(t->scale * t->a.cs.x) * 2;
-	int sh = thg->viewport.y/(t->scale * t->a.cs.y) * 2;
-
-	if (t->pos.x>=camx)
-		sx = 0;
-	if (t->pos.y>=camy)
-		sy = 0;
-
-	if (sw > tw)
-		sw = tw - sx;
-	if (sh > th)
-		sh = th - sy;*/
 
 	for (int i = 0; i < tw; i++)
 		for (int j = 0; j < th; j++) {
@@ -59,6 +35,7 @@ th_tmap_draw(th_tmap *t)
 
 			th_quad q = {0};
 			th_transform_rect(&q, tt, (th_rect){.w = t->a.cs.x, .h = t->a.cs.y});
+			th_transform_quad(&q, tr);
 			th_image_draw_quad(a, q, 0xffffffff);
 		}
 }

@@ -3,6 +3,7 @@ import (
 	"th.um"
 	"std.um"
 	"image.um"
+	"rect.um"
 )
 
 //~~struct Atlas
@@ -43,6 +44,17 @@ fn (a: ^Atlas) coords*(n: int): (th::Vf2, std::Err) {
 	return o, {}
 }
 
+//~~fn Atlas.rect
+// returns the rectangle of the nth tile
+fn (a: ^Atlas) rect*(n: int): (rect::Rect, std::Err) {
+//~~
+	o := th::Vf2{ n % trunc(a.dm.x), (n - n % trunc(a.dm.x)) / a.dm.x }
+	if o.x > a.dm.x || o.y > a.dm.y {
+		return {}, th::__errFromCode(.out_of_bounds)
+	}
+	return {o.x*a.cs.x, o.y*a.cs.y, a.cs.x, a.cs.y}, {}
+}
+
 //~~fn Atlas.cropSource
 // Crops the sourse image to only show a wanted tile
 fn (a: ^Atlas) cropSource*(at: th::Vf2): std::Err {
@@ -59,18 +71,18 @@ fn (a: ^Atlas) cropSource*(at: th::Vf2): std::Err {
 }
 
 //~~enum PackStrategy
-const (
-	PackSquare* = 0
-	PackRow*
-	PackColumn*
-)
+type PackStrategy = enum {
+	square
+	row
+	column
+}
 //~~
 
-fn umth_atlas_pack(a: ^Atlas, images: ^[]image::Image, strategy: int): th::ErrCode
+fn umth_atlas_pack(a: ^Atlas, images: ^[]image::Image, strategy: PackStrategy): th::ErrCode
 
 //~~fn pack
 // Packs an array of images into an atlas
-fn pack*(images: []image::Image, strategy: int): (Atlas, std::Err) {
+fn pack*(images: []image::Image, strategy: PackStrategy): (Atlas, std::Err) {
 //~~
 	var a: Atlas
 	ec := umth_atlas_pack(&a, &images, strategy)
