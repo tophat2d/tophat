@@ -74,6 +74,20 @@ fn (a: ^Atlas) index*(at: th::Vf2): int {
 	return int(trunc(at.x) + trunc(at.y) * trunc(a.dm.x)) - 1
 }
 
+//~~fn Atlas.has
+// returns true if the tile at the given coordinates exists
+fn (a: ^Atlas) has*(at: th::Vf2): bool {
+//~~
+	return at.x >= 0 && at.y >= 0 && at.x < a.dm.x && at.y < a.dm.y
+}
+
+//~~fn Atlas.hasIndex
+// returns true if the tile at the given index exists
+fn (a: ^Atlas) hasIndex*(n: int): bool {
+//~~
+	return n > 0 && n <= trunc(a.dm.x * a.dm.y)
+}
+
 //~~fn Atlas.cropSource
 // Crops the sourse image to only show a wanted tile
 fn (a: ^Atlas) cropSource*(at: th::Vf2) {
