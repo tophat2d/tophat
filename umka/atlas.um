@@ -33,41 +33,55 @@ fn mk*(i: image::Image, dm: th::Vf2): Atlas {
 	return a
 }
 
+//~~fn mk2
+// i: source image
+// cs: size of a cell in pixels
+fn mk2*(i: image::Image, cs: th::Vf2): Atlas {
+//~~
+	if !i.validate() {
+		th::__error("Image is not valid")
+	}
+
+	a := Atlas{}
+
+	a.i = i
+	a.cs = cs
+	a.dm = i.getDims().div(cs)
+
+	return a
+}
+
 //~~fn Atlas.coords
 // returns the coordinates of the nth tile
-fn (a: ^Atlas) coords*(n: int): (th::Vf2, std::Err) {
+fn (a: ^Atlas) coords*(n: int): th::Vf2 {
 //~~
-	o := th::Vf2{ n % trunc(a.dm.x), (n - n % trunc(a.dm.x)) / a.dm.x }
-	if o.x > a.dm.x || o.y > a.dm.y {
-		return {}, th::__errFromCode(.out_of_bounds)
-	}
-	return o, {}
+	n--
+	return th::Vf2{ n % trunc(a.dm.x), (n - n % trunc(a.dm.x)) / a.dm.x }
 }
 
 //~~fn Atlas.rect
 // returns the rectangle of the nth tile
-fn (a: ^Atlas) rect*(n: int): (rect::Rect, std::Err) {
+fn (a: ^Atlas) rect*(n: int): rect::Rect {
 //~~
-	o := th::Vf2{ n % trunc(a.dm.x), (n - n % trunc(a.dm.x)) / a.dm.x }
-	if o.x > a.dm.x || o.y > a.dm.y {
-		return {}, th::__errFromCode(.out_of_bounds)
-	}
-	return {o.x*a.cs.x, o.y*a.cs.y, a.cs.x, a.cs.y}, {}
+	n--
+	return {(n % trunc(a.dm.x))*a.cs.x, ((n - n % trunc(a.dm.x)) / a.dm.x)*a.cs.y, a.cs.x, a.cs.y}
+}
+
+//~~fn Atlas.index
+// returns the index of the tile at the given coordinates
+fn (a: ^Atlas) index*(at: th::Vf2): int {
+//~~
+	return int(trunc(at.x) + trunc(at.y) * trunc(a.dm.x)) - 1
 }
 
 //~~fn Atlas.cropSource
 // Crops the sourse image to only show a wanted tile
-fn (a: ^Atlas) cropSource*(at: th::Vf2): std::Err {
+fn (a: ^Atlas) cropSource*(at: th::Vf2) {
 //~~
-	if (at.x > a.dm.x || at.y > a.dm.y || at.x * at.y < 0) {
-		return th::__errFromCode(.out_of_bounds)
-	}
-
 	a.i.crop(
 		{at.x / a.dm.x, at.y / a.dm.y},
-		{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y})
-
-	return {}
+		{(at.x+1) / a.dm.x, (at.y+1) / a.dm.y}
+	)
 }
 
 //~~enum PackStrategy
@@ -91,15 +105,9 @@ fn pack*(images: []image::Image, strategy: PackStrategy): (Atlas, std::Err) {
 
 //~~fn Atlas.draw
 // Draws the tile at `at`
-fn (a: ^Atlas) draw*(at: th::Vf2, t: th::Transform): std::Err {
+fn (a: ^Atlas) draw*(at: th::Vf2, t: th::Transform) {
 //~~
-	if (at.x > a.dm.x || at.y > a.dm.y || at.x * at.y < 0) {
-		return th::__errFromCode(.out_of_bounds)
-	}
-
 	a.cropSource(at)
 	a.i.draw(t, th::white)
 	a.i.crop({}, {1, 1})
-
-	return {}
 }

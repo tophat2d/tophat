@@ -31,7 +31,26 @@ type Tilemap* = struct {
 //~~
 
 //~~fn mk
-fn mk*(cells: []th::uu, w: th::uu, at: atlas::Atlas, scale: th::fu = 1): Tilemap {
+// Make a tilemap with all cells set to 0.
+fn mk*(w, h: th::uu, at: atlas::Atlas, scale: th::fu = 1): Tilemap {
+//~~
+	if !at.i.validate() {
+		th::__error("invalid atlas")
+	}
+
+	t := Tilemap{}
+	t.cells = make([]th::uu, w*h)
+	t.w = w
+	t.atlas = at
+	t.collMask = make([]bool, 10) //  TODO
+	t.scale = scale
+
+	return t
+}
+
+//~~fn mk2
+// Make a tilemap from a list of cells.
+fn mk2*(cells: []th::uu, w: th::uu, at: atlas::Atlas, scale: th::fu = 1): Tilemap {
 //~~
 	if !at.i.validate() {
 		th::__error("invalid atlas")
@@ -47,12 +66,6 @@ fn mk*(cells: []th::uu, w: th::uu, at: atlas::Atlas, scale: th::fu = 1): Tilemap
 	return t
 }
 
-//~~fn Tilemap.edit
-// Sets tile at [x, y] to tile.
-fn (t: ^Tilemap) edit*(x, y, tile: int) {
-//~~
-	t.cells[y*t.w + x] = tile
-}
 
 fn umth_tilemap_draw(ct: ^Tilemap, tr: th::Transform)
 //~~fn Tilemap.draw
@@ -64,7 +77,7 @@ fn (t: ^Tilemap) draw*(tr: th::Transform) {
 	umth_tilemap_draw(t, tr)
 }
 
-fn umth_tilemap_getcoll(pos: ^th::Vf2, vert: ^th::Vf2, t: ^Tilemap, e: ^ent::Ent): int32
+fn umth_tilemap_getcoll(pos: ^th::Vf2, vert: ^th::Vf2, t: ^Tilemap, e: ^ent::Ent): bool
 //~~fn Tilemap.getColl
 // Checks whether `e` collides with any of the tiles in `t`, which are in the
 // collmask.
@@ -82,9 +95,7 @@ fn (t: ^Tilemap) getColl*(e: ent::Ent, ic: ^th::Vf2, pos: ^th::Vf2): bool {
 	if ic == null { ic = &_ }
 	if pos == null { pos = &_ }
 
-	c := umth_tilemap_getcoll(pos, ic, t, &e)
-
-	return bool(c)
+	return umth_tilemap_getcoll(pos, ic, t, &e)
 }
 
 fn umth_tilemap_getcoll_line(b, e: th::Vf2, t: ^Tilemap, ic: ^th::Vf2): bool
