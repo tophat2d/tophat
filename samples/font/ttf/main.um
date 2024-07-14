@@ -1,0 +1,25 @@
+
+import (
+	"canvas.um"
+	"th.um"
+	"window.um"
+	"std.um"
+	"font.um"
+)
+
+var f: font::Font
+
+fn init*() {
+	window::setup("font sample", 640, 480)
+
+	var err: std::Err
+	f, err = font::load("../../../etc/roboto.ttf", 16, .nearest)
+	std::exitif(err)
+
+	window::onFrame.register({
+		const scale = 2.0
+		m := f.measure("Hello World!").mulf(scale)
+		pos := window::wp.sub(m).divf(2)
+		f.draw("Hello World!", pos, th::black, scale)
+	})
+}

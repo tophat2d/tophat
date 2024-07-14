@@ -1,0 +1,33 @@
+
+import (
+	"canvas.um"
+	"font.um"
+	"input.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+var fonts: [2]font::Font
+var idx: int
+
+fn init*() {
+	window::setup("combined font sample", 640, 480)
+
+	var err: std::Err
+	fonts[0], err = font::load("../../../etc/roboto.ttf", 16, .nearest)
+	std::exitif(err)
+
+	fonts[1] = canvas::pixelFont
+
+	window::onFrame.register({
+		const scale = 2.0
+		m := fonts[idx].measure("Press SPACE").mulf(scale)
+		pos := window::wp.sub(m).divf(2)
+		fonts[idx].draw("Press SPACE", pos, th::black, scale)
+
+		if input::isJustPressed(.space) {
+			idx = (idx + 1) % len(fonts)
+		}
+	})
+}

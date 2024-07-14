@@ -14,43 +14,51 @@ type Filter* = enum {
 }
 //~~
 
-//~~opaque Font
-type Font* = struct { _: ^struct{} }
-//~~
+// TODO: should this be exported and documented?
+type TrueType* = struct { _: ^struct{} }
 
-fn umth_font_load(f: ^Font, path: str, size: th::fu, filter: Filter): th::ErrCode
-//~~fn load
-fn load*(path: str, size: th::fu, filter: Filter = Filter.linear): (Font, std::Err) {
-//~~
-	var f: Font
-	ec := umth_font_load(&f, path, size, filter)
-	return f, th::__errFromCode(ec)
-}
+fn umth_ttf_font_load(f: ^TrueType, path: str, size: th::fu, filter: Filter): th::ErrCode
+fn umth_ttf_font_draw(font: TrueType, s: str, x: th::fu, y: th::fu, color: uint32, scale: th::fu)
+fn umth_ttf_font_measure(font: TrueType, s: str): th::Vf2
 
-//~~fn Font.validate
-fn (f: ^Font) validate*(): bool {
-//~~
+fn (f: ^TrueType) validate*(): bool {
 	return f._ != null
 }
 
-fn umth_font_draw(font: Font, s: str, x: th::fu, y: th::fu, color: uint32, scale: th::fu)
-//~~fn Font.draw
-fn (f: ^Font) draw*(text: str, pos: th::Vf2, color: uint32, scale: th::fu = 1.0) {
-//~~
+fn (f: ^TrueType) draw*(text: str, pos: th::Vf2, color: uint32, scale: th::fu = 1.0) {
 	if !f.validate() {
 		th::__error("Invalid font")
 	}
-	umth_font_draw(f^, text, pos.x, pos.y, color, scale)
+	umth_ttf_font_draw(f^, text, pos.x, pos.y, color, scale)
 }
 
-fn umth_font_measure(font: Font, s: str): th::Vf2
-//~~fn Font.measure
-fn (f: ^Font) measure*(text: str): th::Vf2 {
-//~~
+fn (f: ^TrueType) measure*(text: str): th::Vf2 {
 	if !f.validate() {
 		th::__error("Invalid font")
 		return {}
 	}
 
-	return umth_font_measure(f^, text)
+	return umth_ttf_font_measure(f^, text)
+}
+
+//~~interface Font
+// A generic interface for fonts. Fonts can be loaded from file using
+// `font::load`, or a built in canvas can be used from `canvas::pixelFont`.
+type Font* = interface {
+	// Draw text to the viewport
+	draw(text: str, pos: th::Vf2, color: uint32, scale: th::fu = 1.0)
+	// Return the dimensions of the text at scale 1
+	measure(text: str): th::Vf2
+	// Return true if the font is valid
+	validate(): bool
+}
+//~~
+
+//~~fn load
+// Loads a font from a path and returns it.
+fn load*(path: str, size: th::fu, filter: Filter = Filter.linear): (Font, std::Err) {
+//~~
+	var f: TrueType
+	ec := umth_ttf_font_load(&f, path, size, filter)
+	return f, th::__errFromCode(ec)
 }

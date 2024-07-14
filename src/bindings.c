@@ -120,9 +120,9 @@ umth_placeholder_fetch(UmkaStackSlot *p, UmkaStackSlot *r)
 ///////////////////////////
 // FONT
 
-// fn umth_font_load(out: ^Font, path: str, size: real, filter: uint32): th::ErrCode
+// fn umth_ttf_font_load(out: ^TtfFont, path: str, size: real, filter: uint32): th::ErrCode
 static void
-umth_font_load(UmkaStackSlot *p, UmkaStackSlot *r)
+umth_ttf_font_load(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_font **ft = umkaGetParam(p, 0)->ptrVal;
 	char *path = conv_path(umkaGetParam(p, 1)->ptrVal);
@@ -133,9 +133,9 @@ umth_font_load(UmkaStackSlot *p, UmkaStackSlot *r)
 	free(path);
 }
 
-// fn umth_font_draw(font: Font, s: str, x: real, y: real, color: uint32, scale: real)
+// fn umth_ttf_font_draw(font: TtfFont, s: str, x: real, y: real, color: uint32, scale: real)
 static void
-umth_font_draw(UmkaStackSlot *p, UmkaStackSlot *r)
+umth_ttf_font_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_font *font = umkaGetParam(p, 0)->ptrVal;
 	const char *s = umkaGetParam(p, 1)->ptrVal;
@@ -147,9 +147,9 @@ umth_font_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_font_draw(font, s, x, y, color, scale);
 }
 
-// fn umth_font_measure(font: Font, s: str): th::Vf2
+// fn umth_ttf_font_measure(font: TtfFont, s: str): th::Vf2
 static void
-umth_font_measure(UmkaStackSlot *p, UmkaStackSlot *r)
+umth_ttf_font_measure(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_font *font = umkaGetParam(p, 0)->ptrVal;
 	const char *s = umkaGetParam(p, 1)->ptrVal;
@@ -1441,9 +1441,9 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_rgb_uint32", &umth_rgb_uint32);
 
 	// font
-	umkaAddFunc(umka, "umth_font_load", &umth_font_load);
-	umkaAddFunc(umka, "umth_font_draw", &umth_font_draw);
-	umkaAddFunc(umka, "umth_font_measure", &umth_font_measure);
+	umkaAddFunc(umka, "umth_ttf_font_load", &umth_ttf_font_load);
+	umkaAddFunc(umka, "umth_ttf_font_draw", &umth_ttf_font_draw);
+	umkaAddFunc(umka, "umth_ttf_font_measure", &umth_ttf_font_measure);
 
 	// particles
 	umkaAddFunc(umka, "umth_particles_draw", &umth_particles_draw);
