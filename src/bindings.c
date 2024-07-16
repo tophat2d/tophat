@@ -187,7 +187,7 @@ umth_tilemap_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 // ent - entity to collide with, t - tilemap, x and y - pointers to ints used to return, where the
 // collision occured
 
-// fn umth_tilemap_getcoll(tc: ^th::Vf2, ic: ^th::Vf2, t: ^Tilemap, ent: ^Entity): int
+// fn umth_tilemap_getcoll(tc: ^th::Vf2, ic: ^th::Vf2, t: ^Tilemap, ent: ^Entity): bool
 void
 umth_tilemap_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 {
@@ -199,7 +199,7 @@ umth_tilemap_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = th_coll_on_tilemap(ent, t, ic, tc);
 }
 
-// fn umth_tilemap_getcoll_line(b: th::Vf2, e: th::Vf2, t: ^Tilemap, ic: ^th::Vf2): int
+// fn umth_tilemap_getcoll_line(b: th::Vf2, e: th::Vf2, t: ^Tilemap, ic: ^th::Vf2): bool
 void
 umth_tilemap_getcoll_line(UmkaStackSlot *p, UmkaStackSlot *r)
 {
