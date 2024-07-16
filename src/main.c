@@ -15,16 +15,10 @@
 #include <umprof.h>
 #ifdef _WIN32
 #include <windows.h>
-<<<<<<< HEAD
-#else
-#include <sys/wait.h>
-#include <unistd.h>
-=======
-#define mkdir(p, m) mkdir(p)
-#else
 #include <sys/stat.h>
 #include <sys/types.h>
->>>>>>> be2473a (Fix windows compile)
+#define mkdir(p, m) mkdir(p)
+#else
 #endif
 #include <sokol_app.h>
 
@@ -32,6 +26,8 @@
 #define TH_VERSION ""
 #define TH_GITVER ""
 #endif
+
+#define PATH_MAX 512
 
 th_global *thg;
 
