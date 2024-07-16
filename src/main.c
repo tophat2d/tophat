@@ -41,6 +41,14 @@ warning(UmkaError *error)
 int
 th_init(const char *scriptpath, const char *script_src)
 {
+	{
+		thg->res_prefix = strdup(scriptpath);
+		char *fname = strrchr(thg->res_prefix, '/');
+		ssize_t len = fname == NULL ? strlen(thg->res_prefix) : fname - thg->res_prefix + 1;
+		thg->res_prefix[strlen(thg->res_prefix) - len] = '\0';
+		printf("res pfx: %s\n", thg->res_prefix);
+	}
+
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
 			    "fn __th_init*() {\n"
 			    "  _ := window::w\n"
@@ -143,6 +151,8 @@ th_deinit()
 	th_font_deinit();
 	th_image_deinit();
 
+	free(thg->res_prefix);
+
 	free(thg);
 	thg = NULL;
 }
@@ -196,9 +206,6 @@ th_main(int argc, char *argv[])
 	thg->argc = argc;
 	thg->argv = argv;
 
-	const char *respath = "";
-
-	thg->respath[0] = 0;
 	const char *scriptpath = "main.um";
 
 	thg->argOffset = 1;
@@ -281,14 +288,6 @@ th_main(int argc, char *argv[])
 					   "\n%s\n",
 			    umkaGetVersion());
 			exit(0);
-		} else if (strcmp(argv[thg->argOffset], "-dir") == 0) {
-			if ((argc - thg->argOffset) < 2) {
-				th_error("dir takes 1 argument.\n");
-				exit(1);
-			}
-
-			respath = argv[thg->argOffset + 1];
-			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-help") == 0) {
 			th_info("tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um\n"
@@ -300,7 +299,7 @@ th_main(int argc, char *argv[])
 				"  -dpiaware - enable DPI awareness\n"
 				"  -help - show this help\n"
 				"  -license - print the license\n"
-				"  -main - specify the main file (dir/main.um by default)\n"
+				"  -main - specify the main file (./main.um by default)\n"
 				"  -modsrc <module name> - print source of a builtin module\n"
 				"  -prof - use the profiler\n"
 				"  -profjson - output profiler stuff as Google JSON profile\n"
