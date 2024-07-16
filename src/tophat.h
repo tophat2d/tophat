@@ -276,7 +276,8 @@ typedef struct
 // struct holding all tophat's global variables.
 typedef struct
 {
-	char *res_prefix;
+	char *res_dir;
+	char *data_dir;
 	fu scaling;
 	th_vf2 offset;
 	th_vf2 viewport;
