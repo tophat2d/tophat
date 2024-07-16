@@ -75,10 +75,10 @@ fn init*() {
 	window::setViewport(th::Vf2{ 100, 100 })
 	var err: std::Err
 
-	loadedFont, err = font::load("etc/roboto.ttf", 16)
+	loadedFont, err = font::load("res://etc/roboto.ttf", 16)
 	std::exitif(err)
 
-	logo, err = image::load("etc/logo/logo-normal-white.png")
+	logo, err = image::load("res://etc/logo/logo-normal-white.png")
 	std::exitif(err)
 
 	fg = 0xadadd5ff
@@ -94,8 +94,8 @@ fn init*() {
 		"",
 		"PRESS ENTER TO",
 		"OPEN THE",
-		"HOMEPAGE" }
-
+		"HOMEPAGE"
+	}
 
 	window::onFrame.register(onFrame)
 }

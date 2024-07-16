@@ -16,6 +16,14 @@
 #include <stdint.h>
 #include <umka_api.h>
 
+#if _WIN32 || _WIN64
+#if _WIN64
+typedef int64_t ssize_t;
+#else
+typedef int32_t ssize_t;
+#endif
+#endif
+
 #define PI 3.1415926535897932
 
 #define INPUT_STRING_SIZE 256
@@ -276,7 +284,8 @@ typedef struct
 // struct holding all tophat's global variables.
 typedef struct
 {
-	char respath[4096];
+	char *res_dir;
+	char *data_dir;
 	fu scaling;
 	th_vf2 offset;
 	th_vf2 viewport;

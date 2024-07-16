@@ -24,20 +24,47 @@ extern int th_em_modulenames_count;
 static char *
 conv_path(char *path)
 {
-	const char *RAW_PFX = "raw://";
-	const int RAW_PFX_LEN = strlen(RAW_PFX);
+	enum prefix
+	{
+		PFX_RAW,
+		PFX_RES,
+		PFX_DATA,
+	};
 
-	if (strncmp(path, RAW_PFX, RAW_PFX_LEN) == 0) {
-		char *out = malloc(strlen(path) - RAW_PFX_LEN + 1);
-		out[strlen(path) - RAW_PFX_LEN] = 0;
-		strcpy(out, path + RAW_PFX_LEN);
-		return out;
+	const char *prefixes[] = {
+	    [PFX_RAW] = "raw://",
+	    [PFX_RES] = "res://",
+	    [PFX_DATA] = "data://",
+	};
+
+	const ssize_t path_len = strlen(path);
+	enum prefix pfx = PFX_RAW;
+
+	for (int i = 0; i < sizeof(prefixes) / sizeof(prefixes[0]); ++i) {
+		const ssize_t prefix_len = strlen(prefixes[i]);
+		if (path_len >= prefix_len && memcmp(path, prefixes[i], prefix_len) == 0) {
+			pfx = i;
+			path += prefix_len;
+			break;
+		}
 	}
 
-	size_t len = strlen(thg->respath) + strlen(path);
-	char *out = malloc(len + 1);
-	out[len] = 0;
-	sprintf(out, "%s%s", thg->respath, path);
+	char *out = NULL;
+
+	switch (pfx) {
+	case PFX_RAW: out = strdup(path); break;
+	case PFX_RES:
+		out = calloc(1, strlen(thg->res_dir) + strlen(path) + 1);
+		strcpy(out, thg->res_dir);
+		strcat(out, path);
+		break;
+	case PFX_DATA:
+		out = calloc(1, strlen(thg->data_dir) + strlen(path) + 1);
+		strcpy(out, thg->data_dir);
+		strcat(out, path);
+		break;
+	}
+
 	return out;
 }
 
@@ -47,6 +74,8 @@ umth_fopen(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	char *name = (char *)umkaGetParam(p, 0)->ptrVal;
 	const char *mode = (const char *)umkaGetParam(p, 1)->ptrVal;
+
+	printf("fopen\n");
 
 	char *path = conv_path(name);
 	FILE *f = fopen(path, mode);
@@ -1433,6 +1462,7 @@ _th_umka_bind(void *umka)
 {
 	// etc
 	umkaAddFunc(umka, "umth_fopen", &umth_fopen);
+	umkaAddFunc(umka, "rtlfopen", &umth_fopen);
 	umkaAddFunc(umka, "umth_th_getglobal", &umth_th_getglobal);
 	umkaAddFunc(umka, "umth_th_getfuncs", &umth_th_getfuncs);
 

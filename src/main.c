@@ -1,6 +1,9 @@
 #define __USE_MINGW_ANSI_STDIO 1
 
+#include <errno.h>
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "bindings.h"
@@ -12,9 +15,10 @@
 #include <umprof.h>
 #ifdef _WIN32
 #include <windows.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#define mkdir(p, m) mkdir(p)
 #else
-#include <sys/wait.h>
-#include <unistd.h>
 #endif
 #include <sokol_app.h>
 
@@ -22,6 +26,8 @@
 #define TH_VERSION ""
 #define TH_GITVER ""
 #endif
+
+#define PATH_MAX 512
 
 th_global *thg;
 
@@ -41,6 +47,57 @@ warning(UmkaError *error)
 int
 th_init(const char *scriptpath, const char *script_src)
 {
+	{
+		thg->res_dir = strdup(scriptpath);
+		char *fname = strrchr(thg->res_dir, '/');
+		ssize_t len = fname == NULL ? strlen(thg->res_dir) : strlen(fname) - 1;
+		thg->res_dir[strlen(thg->res_dir) - len] = '\0';
+	}
+
+	{
+		char *res_dir = thg->res_dir[0] == '\0' ? "./" : thg->res_dir;
+#ifdef _WIN32
+		char abs[PATH_MAX];
+		GetFullPathNameA(res_dir, PATH_MAX - 1, abs, NULL);
+#else
+		char *abs = realpath(res_dir, NULL);
+#endif
+		char *dirname = strrchr(abs, '/');
+		ssize_t dirlen = dirname == NULL ? 0 : strlen(dirname);
+
+		bool data_path_allocd = 0;
+#ifdef _WIN32
+		char *data_path = getenv("APPDATA");
+#else
+		char *data_path = getenv("XDG_DATA_HOME");
+		if (data_path == NULL) {
+			data_path = getenv("HOME");
+			if (data_path == NULL) {
+				th_error("Could not find home directory");
+			}
+			data_path_allocd = 1;
+			char *tmp = calloc(1, strlen(data_path) + strlen("/.local/share") + 1);
+			sprintf(tmp, "%s/.local/share", data_path);
+			data_path = tmp;
+		}
+#endif
+
+		thg->data_dir = calloc(1, strlen(data_path) + strlen("/tophat") + dirlen + 1);
+		strcpy(thg->data_dir, data_path);
+
+		strcat(thg->data_dir, "/tophat");
+		mkdir(thg->data_dir, 0777);
+
+		strcat(thg->data_dir, dirname == NULL ? "" : dirname);
+		mkdir(thg->data_dir, 0777);
+
+		if (data_path_allocd)
+			free(data_path);
+#ifndef _WIN32
+		free(abs);
+#endif
+	}
+
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
 			    "fn __th_init*() {\n"
 			    "  _ := window::w\n"
@@ -143,6 +200,9 @@ th_deinit()
 	th_font_deinit();
 	th_image_deinit();
 
+	free(thg->res_dir);
+	free(thg->data_dir);
+
 	free(thg);
 	thg = NULL;
 }
@@ -196,9 +256,6 @@ th_main(int argc, char *argv[])
 	thg->argc = argc;
 	thg->argv = argv;
 
-	const char *respath = "";
-
-	thg->respath[0] = 0;
 	const char *scriptpath = "main.um";
 
 	thg->argOffset = 1;
@@ -281,14 +338,6 @@ th_main(int argc, char *argv[])
 					   "\n%s\n",
 			    umkaGetVersion());
 			exit(0);
-		} else if (strcmp(argv[thg->argOffset], "-dir") == 0) {
-			if ((argc - thg->argOffset) < 2) {
-				th_error("dir takes 1 argument.\n");
-				exit(1);
-			}
-
-			respath = argv[thg->argOffset + 1];
-			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-help") == 0) {
 			th_info("tophat - a minimalist game engine for making games in umka.\n"
 				"Just launching tophat without flags will run main.um\n"
@@ -300,7 +349,7 @@ th_main(int argc, char *argv[])
 				"  -dpiaware - enable DPI awareness\n"
 				"  -help - show this help\n"
 				"  -license - print the license\n"
-				"  -main - specify the main file (dir/main.um by default)\n"
+				"  -main - specify the main file (./main.um by default)\n"
 				"  -modsrc <module name> - print source of a builtin module\n"
 				"  -prof - use the profiler\n"
 				"  -profjson - output profiler stuff as Google JSON profile\n"
@@ -321,18 +370,6 @@ th_main(int argc, char *argv[])
 
 	char regularizedScriptPath[BUFSIZ];
 	th_regularize_path(scriptpath, "./", regularizedScriptPath, sizeof regularizedScriptPath);
-	th_regularize_path(respath, "./", thg->respath, sizeof thg->respath);
-
-	size_t respath_len = strlen(thg->respath);
-
-	if (respath_len > 0 && thg->respath[respath_len - 1] != '/' && thg->respath[0] != 0) {
-		if (respath_len == sizeof(thg->respath) - 1) {
-			th_error("Respath is too long");
-			return 1;
-		}
-
-		strncat(thg->respath, "/", sizeof(thg->respath) - 1);
-	}
 
 	FILE *f;
 	if ((f = fopen(regularizedScriptPath, "r"))) {
