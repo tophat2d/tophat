@@ -47,6 +47,25 @@ fn textSize*(text: str, scale: th::fu): th::Vf2 {
 	return {maxw * scale * 6 - scale, h * 6 * scale}
 }
 
+type PixelFont = struct { }
+
+fn (p: ^PixelFont) draw*(text: str, pos: th::Vf2, color: uint32, scale: th::fu = 1.0) {
+	drawText(text, pos, color, scale)
+}
+
+fn (p: ^PixelFont) measure*(text: str): th::Vf2 {
+	return textSize(text, 1)
+}
+
+fn (p: ^PixelFont) validate*(): bool {
+	return true
+}
+
+//~~Pixel Font
+// The `pixelFont` variable exposes the canvas pixel font as a generic font.
+var pixelFont*: PixelFont
+//~~
+
 fn umth_canvas_draw_rect(color: uint32, r: rect::Rect)
 //~~fn drawRect
 // Draws a Rectangle.
@@ -88,7 +107,7 @@ fn rectDiff(a, b: rect::Rect): rect::Rect {
 	x := misc::maxf(a.x, b.x);
 	y := misc::maxf(a.y, b.y);
 	return rect::Rect{
-		x,y, 
+		x,y,
 		misc::minf(a.x + a.w, b.x + b.w) - x,
 		misc::minf(a.y + a.h, b.y + b.h) - y};
 }
@@ -107,9 +126,9 @@ fn beginScissorRect*(r: rect::Rect, debug: bool = false) {
 	}
 
 	if debug {
-		drawRectLines(th::red, r2, 0.1) 
+		drawRectLines(th::red, r2, 0.1)
 	}
-	
+
 	umth_canvas_begin_scissor_rect(r2)
 }
 
