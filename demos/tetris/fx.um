@@ -5,7 +5,6 @@ import (
 	"window.um"
 	"gameplay.um"
 	"presets.um"
-	"global.um"
 	"piece.um"
 	"field.um"
 	"falling_piece.um"

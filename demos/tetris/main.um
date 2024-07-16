@@ -11,12 +11,12 @@ import (
 	"falling_piece.um"
 	"background.um"
 	"crazytext.um"
-	"signal.um"
 )
 
 bgPlaying := true
 var (
 	scoreText: ^crazytext::Entry
+	clearedText: ^crazytext::Entry
 )
 
 fn init*() {
@@ -31,6 +31,7 @@ fn init*() {
 	gameplay::init()
 	crazytext::init()
 	scoreText = crazytext::putText("SCORE: 0", crazytext::lifetimeForever)
+	clearedText = crazytext::putText("CLEARED: 0", crazytext::lifetimeForever, false)
 	crazytext::putText("ARROW KEYS - MOVE", crazytext::lifetimeForever, false)
 	crazytext::putText("Z, X, C - ROTATE", crazytext::lifetimeForever, false)
 	crazytext::putText("M - MUTE", crazytext::lifetimeForever, false)
@@ -46,6 +47,7 @@ fn init*() {
 			bgPlaying = !bgPlaying
 		}
 		scoreText.text = sprintf("SCORE: %d", global::score)
+		clearedText.text = sprintf("CLEARED: %d", gameplay::clears)
 		gameplay::update()
 		falling_piece::update(gameplay::speed)
 		canvas::drawRect(0x000000FF, rect::mk(0, 0, window::wp.x, window::wp.y))

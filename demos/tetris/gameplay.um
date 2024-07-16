@@ -1,6 +1,5 @@
 import (
 	"falling_piece.um"
-	"th.um"
 	"field.um"
 	"input.um"
 	"presets.um"
@@ -19,6 +18,7 @@ var (
 	bag*: m_bag::Bag
 	speed*: real
 	places: int
+	clears*: int
 )
 
 fn kind(): int {
@@ -36,17 +36,21 @@ fn init*() {
 	falling_piece::reset(kind())
 	speed = 1
 	places = 0
+	clears = 0
 }
 
 fn place() {
 	places += 1
-	if places % 25 == 0 {
-		speed += 0.5
-	}
 
 	tspin := falling_piece::isTspin
 	falling_piece::place()
 	streak := field::clearRows()
+	clears += streak
+
+	if ((clears/10) + 1) != speed {
+		crazytext::putText("SPEED UP!", 3)
+	}
+	speed = (clears/10) + 1
 
 	if tspin {
 		global::playSound(&global::audioClearMega)
