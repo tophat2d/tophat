@@ -5,14 +5,10 @@ import (
 	"std.um"
 	"lerp.um"
 	"rect.um"
-	"atlas.um"
 	"image.um"
 	"input.um"
-	"canvas.um"
 	"signal.um"
 	"window.um"
-	"tilemap.um"
-	"../strings.um"
 
 	"env.um"
 	"../global.um"
@@ -71,7 +67,6 @@ fn move() {
 	const steps = 20
 	mot = mot.div(th::Vf2{steps, steps})
 
-	var vert: th::uu
 	var pos: th::Vf2
 
 	for i:=0; i < steps; i++ {

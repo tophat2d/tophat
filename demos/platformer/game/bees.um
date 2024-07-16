@@ -3,18 +3,9 @@ import (
 	"th.um"
 	"ent.um"
 	"std.um"
-	"rect.um"
-	"atlas.um"
 	"image.um"
-	"input.um"
-	"canvas.um"
-	"window.um"
-	"tilemap.um"
-	"../strings.um"
-
 	"env.um"
 	"player.um"
-	"../global.um"
 )
 
 const (

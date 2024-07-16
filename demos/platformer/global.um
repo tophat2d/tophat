@@ -1,7 +1,6 @@
 
 import (
 	"std.um"
-	"rect.um"
 )
 
 const (

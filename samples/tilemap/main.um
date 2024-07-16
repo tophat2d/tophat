@@ -1,0 +1,45 @@
+import (
+	"window.um"
+	"tilemap.um"
+	"canvas.um"
+	"atlas.um"
+	"image.um"
+	"input.um"
+)
+
+fn init*() {
+	window::setup("Tilemap test", 512, 512)
+
+	img := image::load("../../etc/tileset.png").item0
+	atlas := atlas::mk2(img, {16, 16})
+	tilemap := new(tilemap::Tilemap, tilemap::mk(32, 32, atlas))
+	tile := new(int, 0)
+
+	window::onFrame.register(|tilemap, tile| {
+		canvas::drawRect(0x333399FF, {0, 0, 512, 512})
+
+		put := input::isPressed(.mouse1)
+		x := floor(input::getMousePos().x/16)
+		y := floor(input::getMousePos().y/16)
+
+		tile^ += trunc(input::getMouseScroll().y) > 0 ? 1 : 0
+		tile^ += trunc(input::getMouseScroll().y) < 0 ? -1 : 0
+		tile^ %= 13
+
+		if put && tilemap.has(x, y) {
+			tilemap.edit(x, y, tile^)
+		}
+
+		tilemap.draw({p: {0, 0}, s: {1, 1}})
+
+		canvas::drawRect(0x000022FF, {0, 0, 512, 16})
+		canvas::drawText("Press on the screen to put a tile", {0, 0}, 0xFFFFFFFF, 1)
+		canvas::drawText("Use scrollwheel to change the tile", {0, 5}, 0xFFFFFFFF, 1)
+
+		canvas::drawRect(0x000055FF, {512-16, 0, 512, 16})
+
+		if tilemap.atlas.hasIndex(tile^) {
+			tilemap.atlas.draw(tilemap.atlas.coords(tile^), {p: {512-16, 0}, s: {1, 1}})
+		}
+	})
+}

@@ -1,0 +1,25 @@
+import (
+	"window.um"
+	"canvas.um"
+	"atlas.um"
+	"image.um"
+)
+
+fn init*() {
+	window::setup("Atlas test", 512, 512)
+
+	img := image::load("../../etc/tileset.png").item0
+	atlas := atlas::mk2(img, {16, 16})
+	tc := 13
+
+	window::onFrame.register(|atlas, tc| {
+		canvas::drawRect(0x333399FF, {0, 0, 512, 512})
+
+		for i := 0; i < tc; i++ {
+			if atlas.hasIndex(i) {
+				atlas.draw(atlas.coords(i), {p: {i*36+4, 4}, s: {2, 2}})
+			}
+			canvas::drawRectLines(0xFF0000FF, {i*36+4, 4, 32, 32})
+		}
+	})
+}
