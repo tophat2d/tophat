@@ -18,16 +18,19 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #define mkdir(p, m) mkdir(p)
+#define PATH_MAX 512
 #else
+#include <sys/stat.h>
+#include <unistd.h>
+#include <sys/wait.h>
 #endif
 #include <sokol_app.h>
+
 
 #ifndef TH_VERSION
 #define TH_VERSION ""
 #define TH_GITVER ""
 #endif
-
-#define PATH_MAX 512
 
 th_global *thg;
 
@@ -295,7 +298,7 @@ th_main(int argc, char *argv[])
 
 			for (int i = 0; i < th_em_modulenames_count; i++) {
 				if (strcmp(argv[thg->argOffset + 1], th_em_modulenames[i]) == 0) {
-#ifdef _WIN32
+#if defined(_WIN32) || defined(__EMSCRIPTEN__)
 					printf("%s\n", th_em_moduledocs[i]);
 #else
 					int fd[2];
