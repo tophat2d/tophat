@@ -201,6 +201,7 @@ th_deinit()
 	th_image_deinit();
 
 	free(thg->res_dir);
+	free(thg->data_dir);
 
 	free(thg);
 	thg = NULL;

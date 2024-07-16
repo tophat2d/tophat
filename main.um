@@ -94,8 +94,8 @@ fn init*() {
 		"",
 		"PRESS ENTER TO",
 		"OPEN THE",
-		"HOMEPAGE" }
-
+		"HOMEPAGE"
+	}
 
 	window::onFrame.register(onFrame)
 }
