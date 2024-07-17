@@ -62,6 +62,8 @@ th_init(const char *scriptpath, const char *script_src)
 		char abs[PATH_MAX];
 		GetFullPathNameA(res_dir, PATH_MAX - 1, abs, NULL);
 #else
+		if (res_dir[0] == 0)
+			res_dir = ".";
 		char *abs = realpath(res_dir, NULL);
 #endif
 		char *dirname = strrchr(abs, '/');

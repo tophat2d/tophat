@@ -1,4 +1,4 @@
-#include "tophat.h" 
+#include "tophat.h"
 const char *th_em_modulesrc[] = {
 "\n"
 "import (\n"
@@ -59,7 +59,7 @@ const char *th_em_modulesrc[] = {
 "\n"
 "\tn := (round(real(time-anm.offset)/round((1000.0/anm.fps))) % anm.max) + anm.min\n"
 "\n"
-"\tanm.atl.cropSource(anm.atl.coords(n).item0)\n"
+"\tanm.atl.cropSource(anm.atl.coords(n))\n"
 "}\n"
 "\n"
 "//~~fn Anim.framesPlayed\n"
