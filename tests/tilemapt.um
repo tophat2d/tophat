@@ -53,6 +53,6 @@ fn init*() {
 	window::onFrame.register(|t|{
 		canvas::drawRect(th::white, cam)
 
-		t.draw()
+		t.draw({p: {0, 0}, s: {1, 1}})
 	})
 }
