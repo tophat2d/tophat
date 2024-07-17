@@ -28,7 +28,7 @@ fn init*() {
 	w := 8
 	h := len(src) / w
 
-	t = tilemap::mk(make([]th::uu, w * h), w, atl, 2)
+	t = tilemap::mk(w, h, atl, 2)
 
 	cfg := make([]th::uu, 16)
 	cfg[tilemap::top | tilemap::bot] = 1

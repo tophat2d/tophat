@@ -44,11 +44,11 @@ fn init*() {
 		image::load("etc/logo/logo-notext.png").item0
 	}
 
-	square, err := atlas::pack(logos, atlas::PackSquare)
+	square, err := atlas::pack(logos, .square)
 	std::exitif(err)
-	row, err := atlas::pack(logos, atlas::PackRow)
+	row, err := atlas::pack(logos, .row)
 	std::exitif(err)
-	column, err := atlas::pack(logos, atlas::PackColumn)
+	column, err := atlas::pack(logos, .column)
 	std::exitif(err)
 
 	window::onFrame.register(|square, row, column| {
