@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -49,21 +50,19 @@ conv_path(char *path)
 		}
 	}
 
-	char *out = NULL;
+	const char *dir = NULL;
 
 	switch (pfx) {
-	case PFX_RAW: out = strdup(path); break;
-	case PFX_RES:
-		out = calloc(1, strlen(thg->res_dir) + strlen(path) + 1);
-		strcpy(out, thg->res_dir);
-		strcat(out, path);
-		break;
-	case PFX_DATA:
-		out = calloc(1, strlen(thg->data_dir) + strlen(path) + 1);
-		strcpy(out, thg->data_dir);
-		strcat(out, path);
-		break;
+	case PFX_RAW: dir = "./"; break;
+	case PFX_RES: dir = thg->res_dir; break;
+	case PFX_DATA: dir = thg->data_dir; break;
+	default: assert(0 && "Invalid PFX");
 	}
+
+	size_t sz = strlen(dir) + strlen(path) + 2;
+	char *out = calloc(1, sz);
+
+	th_regularize_path(path, dir, out, sz);
 
 	return out;
 }
@@ -1269,6 +1268,21 @@ umth_canvas_end_scissor(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_canvas_end_scissor();
 }
 
+/////////////////////////
+// Tophat
+
+// fn umth_conv_path(path: str): str
+void
+umth_conv_path(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	char *s = conv_path(umkaGetParam(p, 0)->ptrVal);
+	umkaGetResult(p, r)->ptrVal = umkaMakeStr(thg->umka, s);
+	free(s);
+}
+
+/////////////////////////
+// Transform
+
 // fn umth_transform_rect(r: Rect, t: th::Transform): th::Quad
 void
 umth_transform_rect(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1581,6 +1595,9 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_canvas_draw_quad", &umth_canvas_draw_quad);
 	umkaAddFunc(umka, "umth_canvas_begin_scissor_rect", &umth_canvas_begin_scissor_rect);
 	umkaAddFunc(umka, "umth_canvas_end_scissor", &umth_canvas_end_scissor);
+
+	// th
+	umkaAddFunc(umka, "umth_conv_path", &umth_conv_path);
 
 	// transform
 	umkaAddFunc(umka, "umth_transform_rect", &umth_transform_rect);

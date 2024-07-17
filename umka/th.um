@@ -389,3 +389,11 @@ var (
 	platform*: Platform
 )
 //~~
+
+fn umth_conv_path(path: str): str
+//~~fn convPath
+// Expands the path to a platform specific path.
+fn convPath*(path: str): str {
+//~~
+	return umth_conv_path(path)
+}

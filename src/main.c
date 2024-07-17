@@ -14,18 +14,17 @@
 #define UMPROF_IMPL
 #include <umprof.h>
 #ifdef _WIN32
-#include <windows.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <windows.h>
 #define mkdir(p, m) mkdir(p)
 #define PATH_MAX 512
 #else
 #include <sys/stat.h>
-#include <unistd.h>
 #include <sys/wait.h>
+#include <unistd.h>
 #endif
 #include <sokol_app.h>
-
 
 #ifndef TH_VERSION
 #define TH_VERSION ""
@@ -50,7 +49,7 @@ warning(UmkaError *error)
 int
 th_init(const char *scriptpath, const char *script_src)
 {
-	{
+	if (thg->res_dir == NULL) {
 		thg->res_dir = strdup(scriptpath);
 		char *fname = strrchr(thg->res_dir, '/');
 		ssize_t len = fname == NULL ? strlen(thg->res_dir) : strlen(fname) - 1;
@@ -58,7 +57,7 @@ th_init(const char *scriptpath, const char *script_src)
 	}
 
 	{
-		char *res_dir = thg->res_dir[0] == '\0' ? "./" : thg->res_dir;
+		char *res_dir = thg->res_dir;
 #ifdef _WIN32
 		char abs[PATH_MAX];
 		GetFullPathNameA(res_dir, PATH_MAX - 1, abs, NULL);
@@ -289,6 +288,15 @@ th_main(int argc, char *argv[])
 			}
 
 			th_error("No module named %s\n", argv[thg->argOffset + 1]);
+			thg->argOffset += 2;
+		} else if (strcmp(argv[thg->argOffset], "-dir") == 0) {
+			if ((argc - thg->argOffset) < 2) {
+				printf("dir takes one argument\n");
+				exit(1);
+			}
+
+			thg->res_dir = strdup(argv[thg->argOffset + 1]);
+
 			thg->argOffset += 2;
 		} else if (strcmp(argv[thg->argOffset], "-doc") == 0) {
 			if ((argc - thg->argOffset) < 2) {

@@ -110,12 +110,15 @@ void
 th_regularize_path(const char *path, const char *cur_folder, char *regularized_path, int size)
 {
 	size_t o = 0;
+	bool is_slash = true;
 
 	// for now simply convert all backslashes to forward slashes and ignore `./`
 	for (size_t i = 0; cur_folder[i] && size; i++) {
-		if ((i == 0 || cur_folder[i-1] == '/' || cur_folder[i-1] == '\\') && cur_folder[i] == '.' &&
+		if ((i == 0 || cur_folder[i - 1] == '/' || cur_folder[i - 1] == '\\') &&
+		    cur_folder[i] == '.' &&
 		    (cur_folder[i + 1] == '/' || cur_folder[i + 1] == '\\')) {
 			i++;
+			is_slash = true;
 			continue;
 		}
 
@@ -125,11 +128,20 @@ th_regularize_path(const char *path, const char *cur_folder, char *regularized_p
 		} else {
 			regularized_path[o] = cur_folder[i];
 		}
+
+		is_slash = regularized_path[o] == '/';
+
 		o++;
 	}
 
+	if (!is_slash && size) {
+		regularized_path[o] = '/';
+		o++;
+		size--;
+	}
+
 	for (size_t i = 0; path[i] && size; i++) {
-		if ((i == 0 || path[i-1] == '/' || path[i-1] == '\\') && path[i] == '.' &&
+		if ((i == 0 || path[i - 1] == '/' || path[i - 1] == '\\') && path[i] == '.' &&
 		    (path[i + 1] == '/' || path[i + 1] == '\\')) {
 			i++;
 			continue;
