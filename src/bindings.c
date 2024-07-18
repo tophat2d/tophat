@@ -1254,6 +1254,18 @@ umth_canvas_draw_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_canvas_quad(q, color);
 }
 
+// fn umth_canvas_draw_trig(color: uint32, a, b, c: th::Vf2)
+void
+umth_canvas_draw_trig(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	uint32_t color = umkaGetParam(p, 0)->uintVal;
+	th_vf2 a = *(th_vf2 *)umkaGetParam(p, 1);
+	th_vf2 b = *(th_vf2 *)umkaGetParam(p, 2);
+	th_vf2 c = *(th_vf2 *)umkaGetParam(p, 3);
+
+	th_canvas_triangle(color, a, b, c);
+}
+
 // fn umth_canvas_begin_scissor_rect(r: rect::Rect)
 void
 umth_canvas_begin_scissor_rect(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1593,6 +1605,7 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_canvas_draw_line", &umth_canvas_draw_line);
 	umkaAddFunc(umka, "umth_canvas_draw_rect_lines", &umth_canvas_draw_rect_lines);
 	umkaAddFunc(umka, "umth_canvas_draw_quad", &umth_canvas_draw_quad);
+	umkaAddFunc(umka, "umth_canvas_draw_trig", &umth_canvas_draw_trig);
 	umkaAddFunc(umka, "umth_canvas_begin_scissor_rect", &umth_canvas_begin_scissor_rect);
 	umkaAddFunc(umka, "umth_canvas_end_scissor", &umth_canvas_end_scissor);
 

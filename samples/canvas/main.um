@@ -9,5 +9,6 @@ fn init*() {
 	window::onFrame.register({
 		canvas::drawRectLines(0x000000FF, {30, 30, 100, 100}, 3)
 		canvas::drawRectLines(0xFF000066, {80, 80, 100, 110}, 5)
+		canvas::drawTrig(0x00FF0066, { 30, 200 }, { 120, 200 }, { 30, 300 })
 	})
 }

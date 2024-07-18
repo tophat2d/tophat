@@ -98,6 +98,14 @@ fn drawQuad*(color: uint32, q: th::Quad) {
 	umth_canvas_draw_quad(color, q)
 }
 
+fn umth_canvas_draw_trig(color: uint32, a, b, c: th::Vf2)
+//~~fn drawTrig
+// Draws a triangle.
+fn drawTrig*(color: uint32, a, b, c: th::Vf2) {
+//~~
+	umth_canvas_draw_trig(color, a, b, c)
+}
+
 var scissor: []rect::Rect
 
 fn umth_canvas_begin_scissor_rect(r: rect::Rect)
