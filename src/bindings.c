@@ -858,22 +858,6 @@ umth_ent_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 	free(colls);
 }
 
-static int
-_th_ysort_test(const void *a, const void *b)
-{
-	return ((th_ent *)a)->t.pos.y - ((th_ent *)b)->t.pos.y;
-}
-
-// fn umth_ent_ysort(ents: ^Ent, count: int)
-void
-umth_ent_ysort(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	th_ent *ents = (th_ent *)umkaGetParam(p, 0)->ptrVal;
-	int count = umkaGetParam(p, 1)->intVal;
-
-	qsort(ents, count, sizeof(th_ent), _th_ysort_test);
-}
-
 ///////////////////////
 // audio
 
@@ -1559,7 +1543,6 @@ _th_umka_bind(void *umka)
 	// entities
 	umkaAddFunc(umka, "umth_ent_draw", &umth_ent_draw);
 	umkaAddFunc(umka, "umth_ent_getcoll", &umth_ent_getcoll);
-	umkaAddFunc(umka, "umth_ent_ysort", &umth_ent_ysort);
 
 	// audio
 	umkaAddFunc(umka, "umth_sound_load", &umth_sound_load);
