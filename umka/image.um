@@ -29,7 +29,7 @@ fn createRenderTarget*(size: th::Vf2, filter: int): (RenderTarget, std::Err) {
 }
 
 fn umth_image_render_target_begin(rt: RenderTarget): th::ErrCode
-//~~fn RenderTarget.end
+//~~fn RenderTarget.begin
 // Begins the render target rendering pass.
 fn (rt: ^RenderTarget) begin*(): std::Err {
 //~~
