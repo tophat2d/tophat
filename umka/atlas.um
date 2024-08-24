@@ -119,9 +119,9 @@ fn pack*(images: []image::Image, strategy: PackStrategy): (Atlas, std::Err) {
 
 //~~fn Atlas.draw
 // Draws the tile at `at`
-fn (a: ^Atlas) draw*(at: th::Vf2, t: th::Transform) {
+fn (a: ^Atlas) draw*(at: th::Vf2, t: th::Transform, tint: uint32 = 0xFFFFFFFF) {
 //~~
 	a.cropSource(at)
-	a.i.draw(t, th::white)
+	a.i.draw(t, tint)
 	a.i.crop({}, {1, 1})
 }
