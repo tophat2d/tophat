@@ -5,19 +5,13 @@
 import (
 	"th.um"
 	"std.um"
+	"image.um"
 )
-
-//~~Filtering constants
-type Filter* = enum {
-	nearest = 0
-	linear = 1
-}
-//~~
 
 // TODO: should this be exported and documented?
 type TrueType* = struct { _: ^struct{} }
 
-fn umth_ttf_font_load(f: ^TrueType, path: str, size: th::fu, filter: Filter): th::ErrCode
+fn umth_ttf_font_load(f: ^TrueType, path: str, size: th::fu, filter: image::Filter): th::ErrCode
 fn umth_ttf_font_draw(font: TrueType, s: str, x: th::fu, y: th::fu, color: uint32, scale: th::fu)
 fn umth_ttf_font_measure(font: TrueType, s: str): th::Vf2
 
@@ -56,7 +50,7 @@ type Font* = interface {
 
 //~~fn load
 // Loads a font from a path and returns it.
-fn load*(path: str, size: th::fu, filter: Filter = Filter.linear): (Font, std::Err) {
+fn load*(path: str, size: th::fu, filter: image::Filter = .linear): (Font, std::Err) {
 //~~
 	var f: TrueType
 	ec := umth_ttf_font_load(&f, path, size, filter)
