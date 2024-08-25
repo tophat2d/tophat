@@ -174,6 +174,8 @@ th_window_sapp_desc()
 	    .icon.sokol_default = true,
 	    .logger.func = slog_func,
 	    .high_dpi = thg->dpi_aware,
+	    .gl_major_version = 4,
+	    .gl_minor_version = 1,
 #ifdef __EMSCRIPTEN__
 	    .html5_bubble_mouse_events = true,
 	    .html5_bubble_touch_events = true,
