@@ -1,9 +1,10 @@
+#include "tophat.h"
 #include <math.h>
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "tophat.h"
+#define MSG_LEN 1024
 
 extern th_global *thg;
 
@@ -163,4 +164,39 @@ th_regularize_path(const char *path, const char *cur_folder, char *regularized_p
 
 	th_error("Path too long: %s%s", cur_folder, path);
 	exit(-1);
+}
+
+void
+th_print_umka_error_and_quit(int code)
+{
+	UmkaError *error = umkaGetError(thg->umka);
+
+	if (error->code != 0 && error->msg[0]) {
+		th_error("%s (%d): %s\n", error->fileName, error->line, error->msg);
+
+		fprintf(stderr, "\tStack trace:\n");
+
+		for (int depth = 0; depth < 10; depth++) {
+			char fnName[MSG_LEN + 1];
+			char file[MSG_LEN + 1];
+			int line, offset;
+
+			if (!umkaGetCallStack(
+				thg->umka, depth, MSG_LEN + 1, &offset, file, fnName, &line)) {
+				fprintf(stderr, "\t\t...\n");
+				break;
+			}
+#ifndef _WIN32
+			fprintf(stderr, "\033[34m");
+#endif
+			fprintf(stderr, "\t\t%s:%06d: ", file, line);
+#ifndef _WIN32
+			fprintf(stderr, "\033[0m");
+#endif
+			fprintf(stderr, "%s\n", fnName);
+		}
+	}
+
+	th_deinit();
+	exit(code);
 }
