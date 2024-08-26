@@ -223,7 +223,7 @@ run_playground(const char *src)
 {
 	if (thg->umka) {
 		if (umkaAlive(thg->umka)) {
-			umkaCall(thg->umka, &thg->umka_destroy);
+			int code = umkaCall(thg->umka, &thg->umka_destroy);
 			if (!umkaAlive(thg->umka) || code != 0) {
 				th_print_umka_error_and_quit(code);
 			}
