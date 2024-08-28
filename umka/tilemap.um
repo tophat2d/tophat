@@ -11,10 +11,10 @@ import (
 
 //~~Direction constants used for autotile
 const (
-	top* = 1
+	top*   = 1
 	right* = 2
-	bot* = 4
-	left* = 8
+	bot*   = 4
+	left*  = 8
 )
 //~~
 
