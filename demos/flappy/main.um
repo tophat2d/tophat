@@ -25,10 +25,8 @@ const (
 )
 
 // The different frames for the bird
-const (
-	BirdAnimJump = th::Vf2{ 0, 0 }
-	BirdAnimFall = th::Vf2{ 1, 0 }
-)
+BirdAnimJump := th::Vf2{ 0, 0 }
+BirdAnimFall := th::Vf2{ 1, 0 }
 
 var (
 	// atlas containing the bird textures

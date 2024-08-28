@@ -259,10 +259,8 @@ type (
   }
 )
 
-const (
-  c_colorschemeDark = Colorscheme{item: 0x565758FF, itemHovered: 0x727475FF, text: 0xFFFFFFFF, background: 0x202122FF, current: 0x4ffa7aFF}
-  c_colorschemeLight = Colorscheme{item: 0xd7d7d7FF, itemHovered: 0xC4C4C4FF, text: 0x000000FF, background: 0xEEEEEFFF, current: 0x178c35FF}
-)
+c_colorschemeDark := Colorscheme{item: 0x565758FF, itemHovered: 0x727475FF, text: 0xFFFFFFFF, background: 0x202122FF, current: 0x4ffa7aFF}
+c_colorschemeLight := Colorscheme{item: 0xd7d7d7FF, itemHovered: 0xC4C4C4FF, text: 0x000000FF, background: 0xEEEEEFFF, current: 0x178c35FF}
 
 var (
   v_mainFont: th_font::Font
@@ -270,7 +268,7 @@ var (
   v_rectBase: th_image::Image
 
   isDark: bool = true
-  v_colorscheme: Colorscheme = c_colorschemeDark
+  v_colorscheme: Colorscheme
   v_lastTime: int
   v_countdown: Countdown
   v_countdownNumber: int
@@ -490,6 +488,7 @@ const onFrame = fn(args: []any) {
 fn init*() {
 	var err: std::Err
 
+	v_colorscheme = c_colorschemeDark
   v_lastTime = th::time
   th_window::setup("Pomodoro", trunc(screen.w), trunc(screen.h))
 	th_window::setViewport(th::Vf2{screen.w, screen.h})

@@ -19,7 +19,7 @@ fn init*() {
 	hearth, err = image::load("gfx/hearth.png")
 	std::exitif(err)
 
-	mainFont, err = font::load("gfx/marediv-regular.ttf", 64, font::Filter.nearest)
+	mainFont, err = font::load("gfx/marediv-regular.ttf", 64, .nearest)
 	std::exitif(err)
 }
 

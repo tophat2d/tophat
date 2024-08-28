@@ -10,16 +10,18 @@ const (
 
 	FieldWidth* = 10
 	FieldHeight* = 22
-	Colors* = [8]int{
-		/*None*/  0x000000FF,
-		/*Red*/   0xFF0000FF,
-		/*Green*/ 0x00FF00FF,
-		/*Blue*/  0x0000FFFF,
-		/*Yellow*/0xFFFF00FF,
-		/*Purple*/0xFF00FFFF,
-		/*Orange*/0xFF9900FF,
-		/*Cyan*/  0x00CCFFFF}
 )
+
+colors* := [8]int{
+	/*None*/  0x000000FF,
+	/*Red*/   0xFF0000FF,
+	/*Green*/ 0x00FF00FF,
+	/*Blue*/  0x0000FFFF,
+	/*Yellow*/0xFFFF00FF,
+	/*Purple*/0xFF00FFFF,
+	/*Orange*/0xFF9900FF,
+	/*Cyan*/  0x00CCFFFF}
+
 
 var (
 	lost*: bool

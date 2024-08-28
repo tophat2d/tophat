@@ -11,203 +11,203 @@ type Kick* = struct {
 
 const (
 	pieceTypeT* = 5
-
-	// I will not implement matrix rotation stuff
-	I* = [4]piece::Piece{
-		piece::Piece {
-		"....\n"+
-		"....\n"+
-		"####\n"+
-		"....\n",
-		field::Cyan},
-		piece::Piece {
-		".#..\n"+
-		".#..\n"+
-		".#..\n"+
-		".#..\n",
-		field::Cyan},
-		piece::Piece {
-		"....\n"+
-		"####\n"+
-		"....\n"+
-		"....\n",
-		field::Cyan},
-		piece::Piece {
-		"..#.\n"+
-		"..#.\n"+
-		"..#.\n"+
-		"..#.\n",
-		field::Cyan}}
-	J* = [4]piece::Piece{
-		piece::Piece {
-		"#..\n"+
-		"###\n"+
-		"...\n",
-		field::Blue},
-		piece::Piece {
-		".##\n"+
-		".#.\n"+
-		".#.\n",
-		field::Blue},
-		piece::Piece {
-		"...\n"+
-		"###\n"+
-		"..#\n",
-		field::Blue},
-		piece::Piece {
-		".#.\n"+
-		".#.\n"+
-		"##.\n",
-		field::Blue}}
-	L* = [4]piece::Piece{
-		piece::Piece {
-		"..#\n"+
-		"###\n"+
-		"...\n",
-		field::Orange},
-		piece::Piece {
-		".#.\n"+
-		".#.\n"+
-		".##\n",
-		field::Orange},
-		piece::Piece {
-		"...\n"+
-		"###\n"+
-		"#..\n",
-		field::Orange},
-		piece::Piece {
-		"##.\n"+
-		".#.\n"+
-		".#.\n",
-		field::Orange}}
-	O* = [4]piece::Piece{
-		piece::Piece {
-		"...\n"+
-		".##\n"+
-		".##\n",
-		field::Yellow},
-		piece::Piece {
-		"...\n"+
-		".##\n"+
-		".##\n",
-		field::Yellow},
-		piece::Piece {
-		"...\n"+
-		".##\n"+
-		".##\n",
-		field::Yellow},
-		piece::Piece {
-		"...\n"+
-		".##\n"+
-		".##\n",
-		field::Yellow}}
-       S* = [4]piece::Piece{
-		piece::Piece {
-		".##\n"+
-		"##.\n"+
-		"...\n",
-		field::Green},
-		piece::Piece {
-		".#.\n"+
-		".##\n"+
-		"..#\n",
-		field::Green},
-		piece::Piece {
-		"...\n"+
-		".##\n"+
-		"##.\n",
-		field::Green},
-		piece::Piece {
-		"#..\n"+
-		"##.\n"+
-		".#.\n",
-		field::Green}}
-       T* = [4]piece::Piece{
-		piece::Piece {
-		".#.\n"+
-		"###\n"+
-		"...\n",
-		field::Purple},
-		piece::Piece {
-		".#.\n"+
-		".##\n"+
-		".#.\n",
-		field::Purple},
-		piece::Piece {
-		"...\n"+
-		"###\n"+
-		".#.\n",
-		field::Purple},
-		piece::Piece {
-		".#.\n"+
-		"##.\n"+
-		".#.\n",
-		field::Purple}}
-       Z* = [4]piece::Piece{
-		piece::Piece {
-		"...\n"+
-		"##.\n"+
-		".##\n",
-		field::Red},
-		piece::Piece {
-		".#.\n"+
-		"##.\n"+
-		"#..\n",
-		field::Red},
-		piece::Piece {
-		"##.\n"+
-		".##\n"+
-		"...\n",
-		field::Red},
-		piece::Piece {
-		"..#\n"+
-		".##\n"+
-		".#.\n",
-		field::Red}}
-
-	// SRS kick tables
-	ClockwiseNI* = [4][4]Kick{
-		// 0>>1
-		[4]Kick {Kick {-1, 0},Kick{-1,1},Kick{0,-2},Kick{-1,-2}},
-		// 1>>2
-		[4]Kick {Kick { 1, 0},Kick{1,-1},Kick{0, 2},Kick{ 1, 2}},
-		// 2>>3
-		[4]Kick {Kick { 1, 0},Kick{ 1, 1},Kick{0,-2},Kick{ 1,-2}},
-		// 3>>0
-		[4]Kick {Kick {-1, 0},Kick{-1,-1},Kick{0, 2},Kick{0,-2}}}
-
-
-	CounterclockwiseNI* = [4][4]Kick{
-		// 0>>3
-		[4]Kick {Kick { 1, 0},Kick{ 1,1},Kick{0,-2},Kick{ 1,-2}},
-		// 1>>0
-		[4]Kick {Kick { 1, 0},Kick{1,-1},Kick{0, 2},Kick{ 1, 2}},
-		// 2>>1
-		[4]Kick {Kick {-1, 0},Kick{-1, 1},Kick{0,-2},Kick{-1,-2}},
-		// 3>>2
-		[4]Kick {Kick {-1, 0},Kick{-1,-1},Kick{0, 2},Kick{-1, 2}}}
-
-	ClockwiseI* = [4][4]Kick{
-		// 0>>1
-		[4]Kick {Kick {-2, 0},Kick{ 1,0},Kick{-2,-1},Kick{ 1,2}},
-		// 1>>2
-		[4]Kick {Kick {-1, 0},Kick{2, 0},Kick{-1, 2},Kick{ 2,-1}},
-		// 2>>3
-		[4]Kick {Kick {2, 0},Kick{-1, 0},Kick{2,1},Kick{-1,-2}},
-		// 3>>0
-		[4]Kick {Kick {1, 0},Kick{-2,0},Kick{1, -2},Kick{-2, 1}}}
-
-
-	CounterclockwiseI* = [4][4]Kick{
-		// 0>>3
-		[4]Kick {Kick {-1, 0},Kick{ 2,0},Kick{-1,2},Kick{ 2,-1}},
-		// 1>>0
-		[4]Kick {Kick {2, 0},Kick{-1, 0},Kick{2, 1},Kick{-1,-2}},
-		// 2>>1
-		[4]Kick {Kick {1, 0},Kick{-2, 0},Kick{1,-2},Kick{-2,1}},
-		// 3>>2
-		[4]Kick {Kick {-2, 0},Kick{1,0},Kick{-2, -1},Kick{1, 2}}}
 )
+
+// I will not implement matrix rotation stuff
+I* := [4]piece::Piece{
+	piece::Piece {
+	"....\n"+
+	"....\n"+
+	"####\n"+
+	"....\n",
+	field::Cyan},
+	piece::Piece {
+	".#..\n"+
+	".#..\n"+
+	".#..\n"+
+	".#..\n",
+	field::Cyan},
+	piece::Piece {
+	"....\n"+
+	"####\n"+
+	"....\n"+
+	"....\n",
+	field::Cyan},
+	piece::Piece {
+	"..#.\n"+
+	"..#.\n"+
+	"..#.\n"+
+	"..#.\n",
+	field::Cyan}}
+J* := [4]piece::Piece{
+	piece::Piece {
+	"#..\n"+
+	"###\n"+
+	"...\n",
+	field::Blue},
+	piece::Piece {
+	".##\n"+
+	".#.\n"+
+	".#.\n",
+	field::Blue},
+	piece::Piece {
+	"...\n"+
+	"###\n"+
+	"..#\n",
+	field::Blue},
+	piece::Piece {
+	".#.\n"+
+	".#.\n"+
+	"##.\n",
+	field::Blue}}
+L* := [4]piece::Piece{
+	piece::Piece {
+	"..#\n"+
+	"###\n"+
+	"...\n",
+	field::Orange},
+	piece::Piece {
+	".#.\n"+
+	".#.\n"+
+	".##\n",
+	field::Orange},
+	piece::Piece {
+	"...\n"+
+	"###\n"+
+	"#..\n",
+	field::Orange},
+	piece::Piece {
+	"##.\n"+
+	".#.\n"+
+	".#.\n",
+	field::Orange}}
+O* := [4]piece::Piece{
+	piece::Piece {
+	"...\n"+
+	".##\n"+
+	".##\n",
+	field::Yellow},
+	piece::Piece {
+	"...\n"+
+	".##\n"+
+	".##\n",
+	field::Yellow},
+	piece::Piece {
+	"...\n"+
+	".##\n"+
+	".##\n",
+	field::Yellow},
+	piece::Piece {
+	"...\n"+
+	".##\n"+
+	".##\n",
+	field::Yellow}}
+S* := [4]piece::Piece{
+	piece::Piece {
+	".##\n"+
+	"##.\n"+
+	"...\n",
+	field::Green},
+	piece::Piece {
+	".#.\n"+
+	".##\n"+
+	"..#\n",
+	field::Green},
+	piece::Piece {
+	"...\n"+
+	".##\n"+
+	"##.\n",
+	field::Green},
+	piece::Piece {
+	"#..\n"+
+	"##.\n"+
+	".#.\n",
+	field::Green}}
+T* := [4]piece::Piece{
+	piece::Piece {
+	".#.\n"+
+	"###\n"+
+	"...\n",
+	field::Purple},
+	piece::Piece {
+	".#.\n"+
+	".##\n"+
+	".#.\n",
+	field::Purple},
+	piece::Piece {
+	"...\n"+
+	"###\n"+
+	".#.\n",
+	field::Purple},
+	piece::Piece {
+	".#.\n"+
+	"##.\n"+
+	".#.\n",
+	field::Purple}}
+Z* := [4]piece::Piece{
+	piece::Piece {
+	"...\n"+
+	"##.\n"+
+	".##\n",
+	field::Red},
+	piece::Piece {
+	".#.\n"+
+	"##.\n"+
+	"#..\n",
+	field::Red},
+	piece::Piece {
+	"##.\n"+
+	".##\n"+
+	"...\n",
+	field::Red},
+	piece::Piece {
+	"..#\n"+
+	".##\n"+
+	".#.\n",
+	field::Red}}
+
+// SRS kick tables
+ClockwiseNI* := [4][4]Kick{
+	// 0>>1
+	[4]Kick {Kick {-1, 0},Kick{-1,1},Kick{0,-2},Kick{-1,-2}},
+	// 1>>2
+	[4]Kick {Kick { 1, 0},Kick{1,-1},Kick{0, 2},Kick{ 1, 2}},
+	// 2>>3
+	[4]Kick {Kick { 1, 0},Kick{ 1, 1},Kick{0,-2},Kick{ 1,-2}},
+	// 3>>0
+	[4]Kick {Kick {-1, 0},Kick{-1,-1},Kick{0, 2},Kick{0,-2}}}
+
+
+CounterclockwiseNI* := [4][4]Kick{
+	// 0>>3
+	[4]Kick {Kick { 1, 0},Kick{ 1,1},Kick{0,-2},Kick{ 1,-2}},
+	// 1>>0
+	[4]Kick {Kick { 1, 0},Kick{1,-1},Kick{0, 2},Kick{ 1, 2}},
+	// 2>>1
+	[4]Kick {Kick {-1, 0},Kick{-1, 1},Kick{0,-2},Kick{-1,-2}},
+	// 3>>2
+	[4]Kick {Kick {-1, 0},Kick{-1,-1},Kick{0, 2},Kick{-1, 2}}}
+
+ClockwiseI* := [4][4]Kick{
+	// 0>>1
+	[4]Kick {Kick {-2, 0},Kick{ 1,0},Kick{-2,-1},Kick{ 1,2}},
+	// 1>>2
+	[4]Kick {Kick {-1, 0},Kick{2, 0},Kick{-1, 2},Kick{ 2,-1}},
+	// 2>>3
+	[4]Kick {Kick {2, 0},Kick{-1, 0},Kick{2,1},Kick{-1,-2}},
+	// 3>>0
+	[4]Kick {Kick {1, 0},Kick{-2,0},Kick{1, -2},Kick{-2, 1}}}
+
+
+CounterclockwiseI* := [4][4]Kick{
+	// 0>>3
+	[4]Kick {Kick {-1, 0},Kick{2, 0},Kick{-1,2},Kick{ 2,-1}},
+	// 1>>0
+	[4]Kick {Kick {2, 0},Kick{-1, 0},Kick{2, 1},Kick{-1,-2}},
+	// 2>>1
+	[4]Kick {Kick {1, 0},Kick{-2, 0},Kick{1,-2},Kick{-2,1}},
+	// 3>>2
+	[4]Kick {Kick {-2, 0},Kick{1,0},Kick{-2, -1},Kick{1, 2}}}
 
 fn pieceValue*(kind, rotation: int): piece::Piece {
 	rotation %= 4
