@@ -31,6 +31,7 @@
       var statusElement = document.getElementById('status');
       var progressElement = document.getElementById('progress');
       var spinnerElement = document.getElementById('spinner');
+      var canvas = document.getElementById('canvas');
 
       var Module = {
         postRun: [],
@@ -59,14 +60,33 @@
         }
       };
       window.addEventListener("resize", (e) => {
-        var canvas = document.getElementById('canvas')
         window.focus();
         canvas.focus();
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
       })
+      window.addEventListener("mousedown", (e) => {
+        e.preventDefault()
+        window.focus();
+        canvas.focus();
+      })
+      canvas.addEventListener("wheel", (e) => {
+        e.preventDefault();
+      })
+      canvas.addEventListener("mousewheel", (e) => {
+        e.preventDefault();
+      })
+      window.addEventListener("mouseup", (e) => {
+        e.preventDefault()
+        window.focus();
+        canvas.focus();
+      })
+      window.addEventListener("scroll", (e) => {
+        e.preventDefault()
+        window.focus();
+        canvas.focus();
+      })
       window.addEventListener("click", (e) => {
-        var canvas = document.getElementById('canvas')
         window.focus();
         canvas.focus();
       })
