@@ -593,7 +593,7 @@ th_sg_get_gl_image(sg_image img);
 
 // tilemap
 void
-th_tmap_draw(th_tmap *t, th_transform tr);
+th_tmap_draw(th_tmap *t, th_transform tr, uint32_t tint);
 void
 th_tmap_autotile(uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 

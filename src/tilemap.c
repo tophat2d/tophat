@@ -8,7 +8,7 @@
 extern th_global *thg;
 
 void
-th_tmap_draw(th_tmap *t, th_transform tr)
+th_tmap_draw(th_tmap *t, th_transform tr, uint32_t tint)
 {
 	th_image *a = t->a.i;
 	if (!a)
@@ -36,7 +36,7 @@ th_tmap_draw(th_tmap *t, th_transform tr)
 			th_quad q = {0};
 			th_transform_rect(&q, tt, (th_rect){.w = t->a.cs.x, .h = t->a.cs.y});
 			th_transform_quad(&q, tr);
-			th_image_draw_quad(a, q, 0xffffffff);
+			th_image_draw_quad(a, q, tint);
 		}
 }
 

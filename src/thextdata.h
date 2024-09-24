@@ -88,7 +88,7 @@ THEXT(void, th_transform_transform, th_transform *o, th_transform t);
 THEXT(void, th_rotate_point, th_vf2 *p, th_vf2 o, fu rot);
 THEXT(void, th_vector_normalize, float *x, float *y);
 THEXT(uint32_t, th_sg_get_gl_image, sg_image img);
-THEXT(void, th_tmap_draw, th_tmap *t, th_transform tr);
+THEXT(void, th_tmap_draw, th_tmap *t, th_transform tr, uint32_t tint);
 THEXT(void, th_tmap_autotile, uu *tgt, uu *src, uu w, uu h, uu *tiles, uu limiter);
 THEXT(th_shader *, th_get_shader, uu index);
 THEXT(th_shader *, th_get_shader_err, uu index);

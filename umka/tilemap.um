@@ -11,10 +11,10 @@ import (
 
 //~~Direction constants used for autotile
 const (
-	top* = 1
+	top*   = 1
 	right* = 2
-	bot* = 4
-	left* = 8
+	bot*   = 4
+	left*  = 8
 )
 //~~
 
@@ -88,14 +88,14 @@ fn (t: ^Tilemap) get*(x, y: int): int {
 }
 
 
-fn umth_tilemap_draw(ct: ^Tilemap, tr: th::Transform)
+fn umth_tilemap_draw(ct: ^Tilemap, tr: th::Transform, tint: uint32)
 //~~fn Tilemap.draw
 // Draws the tilemap.
-fn (t: ^Tilemap) draw*(tr: th::Transform) {
+fn (t: ^Tilemap) draw*(tr: th::Transform, tint: uint32 = 0xFFFFFFFF) {
 //~~
 	if len(t.cells) == 0 { return }
 
-	umth_tilemap_draw(t, tr)
+	umth_tilemap_draw(t, tr, tint)
 }
 
 fn umth_tilemap_getcoll(pos: ^th::Vf2, vert: ^th::Vf2, t: ^Tilemap, e: ^ent::Ent): bool

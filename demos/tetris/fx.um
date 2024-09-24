@@ -11,19 +11,12 @@ import (
 	"crazytext.um"
 )
 
-const (
-	reference_frame = rect::Rect{
-		0, 0,
-		field::FieldWidth*16+6*16,
-		field::FieldHeight*16 }
-
-	EffectClearRow = 0
-)
+reference_frame := rect::Rect{ 0, 0, field::FieldWidth*16+6*16, field::FieldHeight*16 }
+const EffectClearRow = 0
 
 type Effect = struct {
 	kind: int
 	life: real
-
 	int_data: int
 }
 
@@ -95,14 +88,14 @@ fn drawCell(c: uint32, r: rect::Rect) {
 }
 
 fn cellRec(x, y: int) {
-	drawCell(field::Colors[field::playfield[x][y]], rect::Rect { offset_x + x * 16, offset_y + y * 16, 15, 15 })
+	drawCell(field::colors[field::playfield[x][y]], rect::Rect { offset_x + x * 16, offset_y + y * 16, 15, 15 })
 }
 
 fn drawPiece(it: piece::Piece, x, y: int, mask: int) {
 	x_origin := x
 	for _, chr in it.data {
 		if chr == '#' {
-			drawCell(field::Colors[it.color] & mask, rect::Rect { x, y, 15, 15 })
+			drawCell(field::colors[it.color] & mask, rect::Rect { x, y, 15, 15 })
 		}
 		x += 16
 		if chr == '\n' {
@@ -116,7 +109,7 @@ fn drawStash() {
 	canvas::drawRect(0xFFFFFF11, rect::Rect {16*11-1+offset_x, 1*16-1+offset_y, 16*4+1, 16*4+1})
 	for i := 0; i < 4; i += 1 {
 		for j := 0; j < 4; j += 1 {
-			drawCell(field::Colors[field::None], rect::Rect{ (11+i)*16+offset_x, (1+j)*16+offset_y, 15, 15 })
+			drawCell(field::colors[field::None], rect::Rect{ (11+i)*16+offset_x, (1+j)*16+offset_y, 15, 15 })
 		}
 	}
 	if gameplay::stash < 0 {

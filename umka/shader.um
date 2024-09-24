@@ -43,10 +43,8 @@ type Shader* = struct {
 
 
 //~~Default shader constants
-const (
-	defaultImageShader* = Shader{1}
-	defaultCanvasShader* = Shader{2}
-)
+defaultImageShader* := Shader{1}
+defaultCanvasShader* := Shader{2}
 //~~
 
 //~~struct Uniform

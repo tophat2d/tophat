@@ -4,6 +4,14 @@ import (
 	"th.um"
 )
 
+//~~enum Filter
+// Filtering mode for images, render targets, and fonts.
+type Filter* = enum {
+	nearest = 0
+	linear  = 1
+}
+//~~
+
 //~~opaque Image
 // Represents a drawable image. It is an opaque structure.
 // Images support a color filter. It is applied by multiplying the color
@@ -16,12 +24,12 @@ type Image* = struct{ _: ^struct{} }
 type RenderTarget* = struct { _: ^struct{} }
 //~~
 
-fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: int): th::ErrCode
+fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: Filter): th::ErrCode
 //~~fn createRenderTarget
 // Creates a render target you can draw to, like to a window.
 // Filter specifies specfifies filtering for resulting image.
 // Image can be retrieved via `toImage`.
-fn createRenderTarget*(size: th::Vf2, filter: int): (RenderTarget, std::Err) {
+fn createRenderTarget*(size: th::Vf2, filter: Filter): (RenderTarget, std::Err) {
 //~~
 	rt := RenderTarget{}
 	ec := umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y), filter)
@@ -249,14 +257,14 @@ fn (i: ^Image) copy*(): (Image, std::Err) {
 	return img, th::__errFromCode(ec)
 }
 
-fn umth_image_set_filter(data: Image, filter: int): th::ErrCode
+fn umth_image_set_filter(data: Image, filter: Filter): th::ErrCode
 //~~fn Image.setfilter
 // Sets a mag/min filter. 0 is nearest, others are linear.
 // This function will regenerate the texture. This means it shouldn't be
 // used in a loop.
 // https://learnopengl.com/img/getting-started/texture_filtering.png
 // left is nearest, right is linear.
-fn (i: ^Image) setfilter*(filter: int): std::Err {
+fn (i: ^Image) setfilter*(filter: Filter): std::Err {
 //~~
 	if !i.validate() {
 		th::__error("image is invalid")

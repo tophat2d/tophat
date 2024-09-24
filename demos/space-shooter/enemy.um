@@ -15,8 +15,8 @@ type Enemy* = struct {
 	ent: ent::Ent
 }
 
+speed := th::Vf2{0.015, 0.04}
 const (
-	speed = th::Vf2{0.015, 0.04}
 	maxEnemies = 4
 )
 
