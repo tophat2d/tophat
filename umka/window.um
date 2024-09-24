@@ -284,7 +284,7 @@ fn setViewportOffset*(s: th::Vf2) {
 
 fn umth_window_get_viewport_offset(): th::Vf2
 //~~fn getViewportOffset
-// Gets the offset of the viewport (as set by `setViewportShift`)
+// Gets the offset of the viewport (as set by `setViewportOffset`)
 fn getViewportOffset*(): th::Vf2 {
 //~~
 	return umth_window_get_viewport_offset()
