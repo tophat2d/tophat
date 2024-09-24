@@ -1,0 +1,12 @@
+{
+	"name": "tophat_box",
+	"author": "unknown",
+	"version": "v0.1.0",
+	"license": "BSD-3",
+	"readme": "README.md",
+	"include": [],
+	"description": "My Tophat based box",
+	"dependencies": [ "tophat" ],
+	"run_posix": "./umbox/tophat/tophat",
+	"run_windows": "./umbox/tophat/tophat.exe"
+}

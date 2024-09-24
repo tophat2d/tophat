@@ -1,0 +1,14 @@
+
+import (
+	"canvas.um"
+	"th.um"
+	"window.um"
+)
+
+fn init*() {
+	window::setup("Hello Tophat!", 640, 480)
+
+	window::onFrame.register({
+		canvas::drawText("Hello Tophat!", { 5, 5 }, th::black, 4)
+	})
+}
