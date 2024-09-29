@@ -197,6 +197,8 @@ th_print_umka_error_and_quit(int code)
 		}
 	}
 
+#ifndef __EMSCRIPTEN__
 	th_deinit();
+#endif
 	exit(code);
 }
