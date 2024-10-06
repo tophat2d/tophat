@@ -52,7 +52,7 @@ fn init*() {
 	img3.crop({ 0.5, 0.5 }, { 1, 1 })
 	img3.flipv(true)
 
-	target, err = image::createRenderTarget(th::Vf2{10, 10}, 0)
+	target, err = image::createRenderTarget(th::Vf2{10, 10}, .nearest)
 	std::exitif(err)
 
 	window::onFrame.register({

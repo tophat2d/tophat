@@ -19,52 +19,6 @@ type Filter* = enum {
 type Image* = struct{ _: ^struct{} }
 //~~
 
-//~~opaque RenderTarget
-// An image you can render to.
-type RenderTarget* = struct { _: ^struct{} }
-//~~
-
-fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: Filter): th::ErrCode
-//~~fn createRenderTarget
-// Creates a render target you can draw to, like to a window.
-// Filter specifies specfifies filtering for resulting image.
-// Image can be retrieved via `toImage`.
-fn createRenderTarget*(size: th::Vf2, filter: Filter): (RenderTarget, std::Err) {
-//~~
-	rt := RenderTarget{}
-	ec := umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y), filter)
-	return rt, th::__errFromCode(ec)
-}
-
-fn umth_image_render_target_begin(rt: RenderTarget): th::ErrCode
-//~~fn RenderTarget.begin
-// Begins the render target rendering pass.
-fn (rt: ^RenderTarget) begin*(): std::Err {
-//~~
-	ec := umth_image_render_target_begin(rt^)
-	return th::__errFromCode(ec)
-}
-
-fn umth_image_render_target_end(rt: RenderTarget, wp: th::Vf2): th::ErrCode
-//~~fn RenderTarget.end
-// Ends the render target rendering pass.
-fn (rt: ^RenderTarget) end*(wp: th::Vf2): std::Err {
-//~~
-	ec := umth_image_render_target_end(rt^, wp)
-	return th::__errFromCode(ec)
-}
-
-fn umth_image_render_target_to_image(rt: RenderTarget): Image
-//~~fn RenderTarget.toImage
-// Returns the image of the render target. The resulting image has the same
-// lifetime as the base RenderTarget. If you need to use it past the lifetime
-// of the RenderTarget, use the copy method.
-// Do not call `setfilter` on the resulting image.
-fn (rt: ^RenderTarget) toImage*(): Image {
-//~~
-	return umth_image_render_target_to_image(rt^)
-}
-
 fn umth_image_load(ret: ^Image, path: str): th::ErrCode
 //~~fn load
 // Loads an image at path.

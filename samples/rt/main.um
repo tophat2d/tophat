@@ -1,0 +1,31 @@
+
+import (
+	"canvas.um"
+	"th.um"
+	"window.um"
+	"rt.um"
+	"std.um"
+)
+
+fn init*() {
+	window::setup("Render target sample", 640, 480)
+
+	target, err := rt::mk(th::Vf2{10, 10}, .nearest)
+	std::exitif(err)
+
+	window::onFrame.register(|target| {
+		std::exitif(target.begin())
+
+			r := 5
+			a := th::time / 2000.0 * 360
+			s := th::Vf2{ r, 0 }.rotated({ r, r }, a)
+			e := th::Vf2{ r, 2 * r }.rotated({ r, r }, a)
+			canvas::drawLine(th::black, s, e, 1)
+
+		std::exitif(target.end())
+
+		target.toImage().draw({
+			s: { 64, 48 }
+		})
+	})
+}

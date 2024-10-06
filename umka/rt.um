@@ -1,0 +1,64 @@
+
+import (
+	"image.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+//~~opaque RenderTarget
+// An image you can render to.
+type RenderTarget* = struct { _: ^struct{} }
+//~~
+
+fn umth_image_create_render_target(ret: ^RenderTarget, width: int, height: int, filter: image::Filter): th::ErrCode
+//~~fn mk
+// Creates a render target you can draw to, like to a window.
+// Filter specifies specfifies filtering for resulting image.
+// Image can be retrieved via `toImage`.
+fn mk*(size: th::Vf2, filter: image::Filter): (RenderTarget, std::Err) {
+//~~
+	rt := RenderTarget{}
+	ec := umth_image_create_render_target(&rt, trunc(size.x), trunc(size.y), filter)
+	return rt, th::__errFromCode(ec)
+}
+
+var wpBackup: th::Vf2
+
+fn (rt: ^RenderTarget) toImage*(): image::Image
+fn umth_image_render_target_begin(rt: RenderTarget): th::ErrCode
+//~~fn RenderTarget.begin
+// Begins the render target rendering pass.
+fn (rt: ^RenderTarget) begin*(): std::Err {
+//~~
+	ec := umth_image_render_target_begin(rt^)
+	if ec != .ok {
+		return th::__errFromCode(ec)
+	}
+
+	wpBackup = window::wp
+	window::wp = rt.toImage().getDims()
+
+	return {}
+}
+
+fn umth_image_render_target_end(rt: RenderTarget, wp: th::Vf2): th::ErrCode
+//~~fn RenderTarget.end
+// Ends the render target rendering pass.
+fn (rt: ^RenderTarget) end*(): std::Err {
+//~~
+	ec := umth_image_render_target_end(rt^, wpBackup)
+	window::wp = wpBackup
+	return th::__errFromCode(ec)
+}
+
+fn umth_image_render_target_to_image(rt: RenderTarget): image::Image
+//~~fn RenderTarget.toImage
+// Returns the image of the render target. The resulting image has the same
+// lifetime as the base RenderTarget. If you need to use it past the lifetime
+// of the RenderTarget, use the copy method.
+// Do not call `setfilter` on the resulting image.
+fn (rt: ^RenderTarget) toImage*(): image::Image {
+//~~
+	return umth_image_render_target_to_image(rt^)
+}

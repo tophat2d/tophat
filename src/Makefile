@@ -10,28 +10,29 @@ HELPER_SCRIPT = cmd/buildhelper.um
 EM_TARGET = src/staembed.c
 UMKA_MODULES = \
 	umka/anim.um \
+	umka/atlas.um \
 	umka/audio.um \
+	umka/canvas.um \
+	umka/coll.um \
+	umka/color.um \
 	umka/csv.um \
 	umka/ent.um \
+	umka/font.um \
 	umka/image.um \
 	umka/input.um \
-	umka/misc.um \
-	umka/canvas.um \
-	umka/rect.um \
-	umka/tilemap.um \
-	umka/window.um \
-	umka/particles.um \
 	umka/lerp.um \
-	umka/font.um \
-	umka/th.um \
-	umka/signal.um \
-	umka/atlas.um \
-	umka/shader.um \
-	umka/color.um \
-	umka/coll.um \
-	umka/placeholders.um \
+	umka/misc.um \
 	umka/nav.um \
-	umka/ui.um
+	umka/particles.um \
+	umka/placeholders.um \
+	umka/rect.um \
+	umka/rt.um \
+	umka/shader.um \
+	umka/signal.um \
+	umka/th.um \
+	umka/tilemap.um \
+	umka/ui.um \
+	umka/window.um
 UMKA_DOCS=$(UMKA_MODULES:.um=.md)
 MMDOC=$(UMKA_BIN) cmd/mmdoc/mmdoc.um
 IMAGES_MOD = umka/placeholders.um
