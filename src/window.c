@@ -27,6 +27,7 @@ init(void)
 	th_nav_init();
 	th_canvas_init();
 	th_image_init();
+	th_input_init();
 
 	if (umkaAlive(thg->umka)) {
 		int code = umkaCall(thg->umka, &thg->umka_init);

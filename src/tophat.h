@@ -536,6 +536,8 @@ void
 th_input_reset();
 void
 th_input_update_gamepads();
+void
+th_input_init(void);
 
 // misc
 void

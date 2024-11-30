@@ -108,21 +108,31 @@ i_update_button(th_gamepad_button *btn, float value)
 	btn->pressure = value;
 }
 
+#ifdef _WIN32
+typedef DWORD(WINAPI *XInputGetState_t)(DWORD, XINPUT_STATE *);
+XInputGetState_t _th_XInputGetState = NULL;
+typedef DWORD(WINAPI *XInputSetState_t)(DWORD, XINPUT_VIBRATION *);
+XInputSetState_t _th_XInputSetState = NULL;
+#endif
+
 void
 th_input_update_gamepads()
 {
 #ifdef _WIN32
+	if (!_th_XInputGetState)
+		return;
+
 	XINPUT_STATE state;
 	for (int i = 0; i < 4; i++) {
 		state = (XINPUT_STATE){0};
 
 		th_generic_gamepad *gp = &thg->gamepad[i];
 
-		if (XInputGetState(i, &state) == ERROR_SUCCESS) {
+		if (_th_XInputGetState(i, &state) == ERROR_SUCCESS) {
 			XINPUT_VIBRATION vib = {0};
 			vib.wLeftMotorSpeed = (gp->rumble_left * 65535);
 			vib.wRightMotorSpeed = (gp->rumble_right * 65535);
-			XInputSetState(i, &vib);
+			_th_XInputSetState(i, &vib);
 
 			gp->rumble_left = 0;
 			gp->rumble_right = 0;
@@ -168,5 +178,24 @@ th_input_update_gamepads()
 			gp->connected = false;
 		}
 	}
+#endif
+}
+
+void
+th_input_init(void)
+{
+#ifdef _WIN32
+	HMODULE xinput = LoadLibraryA("xinput1_4.dll");
+	if (!xinput) {
+		printf("Failed to load xinput1_4.dll, falling back to xinput1_3.dll\n");
+		xinput = LoadLibraryA("xinput1_3.dll");
+		if (!xinput) {
+			printf("Failed to load xinput1_3.dll, gamepad support will be disabled\n");
+			return;
+		}
+	}
+
+	_th_XInputGetState = (XInputGetState_t)GetProcAddress(xinput, "XInputGetState");
+	_th_XInputSetState = (XInputSetState_t)GetProcAddress(xinput, "XInputSetState");
 #endif
 }
