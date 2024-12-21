@@ -453,8 +453,10 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShow
 	get_argv_argc(&argc, &argv);
 
 	int code = th_main(argc, argv);
-	if (code != 0)
+	if (code != 0) {
+		free_argv(argc, argv);
 		return code;
+	}
 
 	desc = th_window_sapp_desc();
 
