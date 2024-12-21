@@ -234,9 +234,9 @@ th_canvas_init()
 	uint32_t white = 0xffffffff;
 	th_image_from_data(&white_img, &white, (th_vf2){.w = 1, .h = 1});
 
-	thg->canvas_bind.fs.images[SLOT_tex] = white_img.tex;
+	thg->canvas_bind.images[0] = white_img.tex;
 	thg->canvas_image = &white_img;
-	thg->canvas_bind.fs.samplers[SLOT_smp] = white_img.smp;
+	thg->canvas_bind.samplers[0] = white_img.smp;
 }
 
 void
@@ -265,13 +265,12 @@ th_canvas_flush()
 		phase *phs = &phases[i];
 		switch (phs->scissor_stage) {
 		case SCISSOR_NONE:
-			thg->canvas_bind.fs.images[SLOT_tex] = phs->img->tex;
-			thg->canvas_bind.fs.samplers[SLOT_smp] = phs->img->smp;
+			thg->canvas_bind.images[0] = phs->img->tex;
+			thg->canvas_bind.samplers[0] = phs->img->smp;
 			// Targets are premultiplied
 			fs_params.premultiply = phs->img->target ? 0 : 1;
 			sg_apply_bindings(&thg->canvas_bind);
-			sg_apply_uniforms(
-			    SG_SHADERSTAGE_FS, SLOT_th_fs_params, &SG_RANGE(fs_params));
+			sg_apply_uniforms(0, &SG_RANGE(fs_params));
 			sg_draw(
 			    phs->start / BATCH_VERTEX, (phs->end - phs->start) / BATCH_VERTEX, 1);
 			break;

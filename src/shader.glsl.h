@@ -11,26 +11,24 @@
     =========
     Shader program: 'th':
         Get shader desc: th_shader_desc(sg_query_backend());
-        Vertex shader: th_vs
-            Attributes:
-                ATTR_th_vs_pos => 0
-                ATTR_th_vs_uv0 => 1
-                ATTR_th_vs_color0 => 2
-        Fragment shader: th_fs
-            Uniform block 'th_fs_params':
-                C struct: th_fs_params_t
-                Bind slot: SLOT_th_fs_params => 0
-            Image 'tex':
-                Image type: SG_IMAGETYPE_2D
-                Sample type: SG_IMAGESAMPLETYPE_FLOAT
-                Multisampled: false
-                Bind slot: SLOT_tex => 0
-            Sampler 'smp':
-                Type: SG_SAMPLERTYPE_FILTERING
-                Bind slot: SLOT_smp => 0
-            Image Sampler Pair 'tex_smp':
-                Image: tex
-                Sampler: smp
+        Vertex Shader: th_vs
+        Fragment Shader: th_fs
+        Attributes:
+            ATTR_th_pos => 0
+            ATTR_th_uv0 => 1
+            ATTR_th_color0 => 2
+    Bindings:
+        Uniform block 'th_fs_params':
+            C struct: th_fs_params_t
+            Bind slot: UB_th_fs_params => 0
+        Image 'tex':
+            Image type: SG_IMAGETYPE_2D
+            Sample type: SG_IMAGESAMPLETYPE_FLOAT
+            Multisampled: false
+            Bind slot: IMG_tex => 0
+        Sampler 'smp':
+            Type: SG_SAMPLERTYPE_FILTERING
+            Bind slot: SMP_smp => 0
 */
 #if !defined(SOKOL_GFX_INCLUDED)
 #error "Please include sokol_gfx.h before shader.glsl.h"
@@ -42,12 +40,12 @@
 #define SOKOL_SHDC_ALIGN(a) __attribute__((aligned(a)))
 #endif
 #endif
-#define ATTR_th_vs_pos (0)
-#define ATTR_th_vs_uv0 (1)
-#define ATTR_th_vs_color0 (2)
-#define SLOT_th_fs_params (0)
-#define SLOT_tex (0)
-#define SLOT_smp (0)
+#define ATTR_th_pos (0)
+#define ATTR_th_uv0 (1)
+#define ATTR_th_color0 (2)
+#define UB_th_fs_params (0)
+#define IMG_tex (0)
+#define SMP_smp (0)
 #pragma pack(push,1)
 SOKOL_SHDC_ALIGN(16) typedef struct th_fs_params_t {
     float premultiply;
@@ -163,28 +161,29 @@ static inline const sg_shader_desc* th_shader_desc(sg_backend backend) {
         static bool valid;
         if (!valid) {
             valid = true;
-            desc.attrs[0].name = "pos";
-            desc.attrs[1].name = "uv0";
-            desc.attrs[2].name = "color0";
-            desc.vs.source = (const char*)th_vs_source_glsl410;
-            desc.vs.entry = "main";
-            desc.fs.source = (const char*)th_fs_source_glsl410;
-            desc.fs.entry = "main";
-            desc.fs.uniform_blocks[0].size = 16;
-            desc.fs.uniform_blocks[0].layout = SG_UNIFORMLAYOUT_STD140;
-            desc.fs.uniform_blocks[0].uniforms[0].name = "th_fs_params";
-            desc.fs.uniform_blocks[0].uniforms[0].type = SG_UNIFORMTYPE_FLOAT4;
-            desc.fs.uniform_blocks[0].uniforms[0].array_count = 1;
-            desc.fs.images[0].used = true;
-            desc.fs.images[0].multisampled = false;
-            desc.fs.images[0].image_type = SG_IMAGETYPE_2D;
-            desc.fs.images[0].sample_type = SG_IMAGESAMPLETYPE_FLOAT;
-            desc.fs.samplers[0].used = true;
-            desc.fs.samplers[0].sampler_type = SG_SAMPLERTYPE_FILTERING;
-            desc.fs.image_sampler_pairs[0].used = true;
-            desc.fs.image_sampler_pairs[0].image_slot = 0;
-            desc.fs.image_sampler_pairs[0].sampler_slot = 0;
-            desc.fs.image_sampler_pairs[0].glsl_name = "tex_smp";
+            desc.vertex_func.source = (const char*)th_vs_source_glsl410;
+            desc.vertex_func.entry = "main";
+            desc.fragment_func.source = (const char*)th_fs_source_glsl410;
+            desc.fragment_func.entry = "main";
+            desc.attrs[0].glsl_name = "pos";
+            desc.attrs[1].glsl_name = "uv0";
+            desc.attrs[2].glsl_name = "color0";
+            desc.uniform_blocks[0].stage = SG_SHADERSTAGE_FRAGMENT;
+            desc.uniform_blocks[0].layout = SG_UNIFORMLAYOUT_STD140;
+            desc.uniform_blocks[0].size = 16;
+            desc.uniform_blocks[0].glsl_uniforms[0].type = SG_UNIFORMTYPE_FLOAT4;
+            desc.uniform_blocks[0].glsl_uniforms[0].array_count = 1;
+            desc.uniform_blocks[0].glsl_uniforms[0].glsl_name = "th_fs_params";
+            desc.images[0].stage = SG_SHADERSTAGE_FRAGMENT;
+            desc.images[0].image_type = SG_IMAGETYPE_2D;
+            desc.images[0].sample_type = SG_IMAGESAMPLETYPE_FLOAT;
+            desc.images[0].multisampled = false;
+            desc.samplers[0].stage = SG_SHADERSTAGE_FRAGMENT;
+            desc.samplers[0].sampler_type = SG_SAMPLERTYPE_FILTERING;
+            desc.image_sampler_pairs[0].stage = SG_SHADERSTAGE_FRAGMENT;
+            desc.image_sampler_pairs[0].image_slot = 0;
+            desc.image_sampler_pairs[0].sampler_slot = 0;
+            desc.image_sampler_pairs[0].glsl_name = "tex_smp";
             desc.label = "th_shader";
         }
         return &desc;
