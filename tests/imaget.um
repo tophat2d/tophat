@@ -2,6 +2,7 @@
 import (
 	"std.um"
 	"th.um"
+	"rt.um"
 	"rect.um"
 	"image.um"
 	"input.um"
@@ -20,7 +21,7 @@ fn pixelmerge(r, g, b, a: uint8): uint32 { return r << 24 | g << 16 | b << 8 | a
 
 var (
 	img, img2, img3: image::Image
-	target: image::RenderTarget
+	target: rt::RenderTarget
 )
 
 fn init*() {
@@ -52,7 +53,7 @@ fn init*() {
 	img3.crop({ 0.5, 0.5 }, { 1, 1 })
 	img3.flipv(true)
 
-	target, err = image::createRenderTarget(th::Vf2{10, 10}, .nearest)
+	target, err = rt::mk(th::Vf2{10, 10}, .nearest)
 	std::exitif(err)
 
 	window::onFrame.register({
@@ -112,7 +113,7 @@ fn init*() {
 			img.draw(th::Transform{
 				s: th::Vf2{0.5, 0.5},
 				p: th::Vf2{0, 0}}, 0xFFFFFF99)
-		err = target.end(window::wp)
+		err = target.end()
 		std::exitif(err)
 
 		target.toImage().draw(th::Transform{s: th::Vf2{10, 10}, p: p})

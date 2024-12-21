@@ -21,7 +21,7 @@ fn init*() {
 
 	window::setup("my title", 400, 400)
 	window::setViewport(th::Vf2{400, 400})
-	f, err = font::load("etc/roboto.ttf", 16, font::Filter.nearest)
+	f, err = font::load("etc/roboto.ttf", 16, .nearest)
 	std::exitif(err)
 
 	window::onFrame.register(signal::Callback{
