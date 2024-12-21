@@ -26,8 +26,8 @@ fn init*() {
 	sound::init()
 	global::hp = 10
 
-	f, err := std::fopen("score", "r")
-	if err.code != 0 {
+	f, err := std::fopen(th::convPath("data://score"), "r")
+	if err.code == 0 {
 		fscanf(f, "%d", &global::hi)
 		std::fclose(f)
 	}
