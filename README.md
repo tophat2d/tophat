@@ -43,7 +43,7 @@ and Linux machines as well as in a web browser.
 git clone https://github.com/tophat2d/tophat --recursive
 ```
 
-2. On Linux run `make`, on Windows `msbuild.bat`.
+2. On Linux run `make`, on Windows `build.bat`.
 
 You can also download precompiled binaries [here](https://github.com/tophat2d/tophat/releases).
 
