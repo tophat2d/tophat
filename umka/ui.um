@@ -458,6 +458,38 @@ fn (gui: ^Gui) stack*(cfg: StackConfig = {}) {
 	}
 }
 
+//~~struct ButtonConfig
+// Configuration for the button.
+type ButtonConfig* = struct {
+	rect: rect::Rect
+}
+//~~
+
+//~~fn Gui.button
+// Adds a button to the gui.  The button acts like a `Stack` container, but it
+// is drawn using the pos/nexBox styles and handles clicks. If the button is
+// pressed and the gui is in the eval phase, the return value will be true.
+fn (gui: ^Gui) button*(cfg: ButtonConfig = {}): bool {
+//~~
+	gui.stack(StackConfig{ rect: cfg.rect })
+	r := gui.getContainer().getDims()
+
+	if gui.isEval {
+		if gui.hover(r) && input::isJustReleased(input::Key.mouse1) {
+			return true
+		}
+		return false
+	} else {
+		if gui.hover(r) && gui.m1Pressed {
+			gui.getStyle().negBox.draw(r)
+		} else {
+			gui.getStyle().posBox.draw(r)
+		}
+	}
+
+	return false
+}
+
 //~~struct ScrollAreaConfig
 // Configuration for the scroll area.
 type ScrollAreaConfig* = struct {
@@ -466,6 +498,8 @@ type ScrollAreaConfig* = struct {
 	speed: real32
 	// if true, scrolling will be horizontal
 	horizontal: bool
+	// if not zero, render a scroll bar with the given width/height
+	scrollBarSize: real32
 }
 //~~
 
@@ -485,11 +519,11 @@ fn (this: ^ScrollArea) pushRect(r: rect::Rect): rect::Rect {
 	if r.y == 0 { r.y = this.dm.y }
 	if this.cfg.horizontal {
 		if r.w == 0 { r.w = this.maxScroll }
-		if r.h == 0 { r.h = this.dm.h }
+		if r.h == 0 { r.h = this.dm.h - this.cfg.scrollBarSize }
 		return { r.x - this.scroll^, r.y, r.w, r.h }
 	}
 
-	if r.w == 0 { r.w = this.dm.w }
+	if r.w == 0 { r.w = this.dm.w - this.cfg.scrollBarSize }
 	if r.h == 0 { r.h = this.maxScroll }
 	return { r.x, r.y - this.scroll^, r.w, r.h }
 }
@@ -523,6 +557,37 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 		return
 	}
 
+	if this.cfg.scrollBarSize > 0 {
+		barDm := rect::Rect{}
+		if this.cfg.horizontal {
+			barDm.h = this.cfg.scrollBarSize
+			barDm.w = this.dm.w / maxScroll * this.dm.w
+			barDm.x = this.dm.x + (scroll^ / maxScroll) * this.dm.w
+			barDm.y = this.dm.getEnd().y - barDm.h
+		} else {
+			barDm.h = this.dm.h / maxScroll * this.dm.h
+			barDm.w = this.cfg.scrollBarSize
+			barDm.x = this.dm.getEnd().x - barDm.w
+			barDm.y = this.dm.y + (scroll^ / maxScroll) * this.dm.h
+		}
+
+		if gui.isEval && gui.hover(barDm) && gui.m1Pressed {
+			if this.cfg.horizontal {
+				scroll ^+= input::getMouseDelta().x
+			} else {
+				scroll ^+= input::getMouseDelta().y
+			}
+		}
+
+		if !gui.isEval {
+			if gui.hover(barDm) && gui.m1Pressed {
+				gui.getStyle().negBox.draw(barDm)
+			} else {
+				gui.getStyle().posBox.draw(barDm)
+			}
+		}
+	}
+
 	if gui.isEval && gui.hover(this.dm) {
 		v := input::getMouseScroll().y
 		if this.cfg.horizontal {
@@ -534,38 +599,6 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 		if maxScroll > dm && scroll^ >= maxScroll - dm { scroll^ = maxScroll - dm }
 		if maxScroll < dm && scroll^ >= maxScroll { scroll^ = maxScroll }
 	}
-}
-
-//~~struct ButtonConfig
-// Configuration for the button.
-type ButtonConfig* = struct {
-	rect: rect::Rect
-}
-//~~
-
-//~~fn Gui.button
-// Adds a button to the gui.  The button acts like a `Stack` container, but it
-// is drawn using the pos/nexBox styles and handles clicks. If the button is
-// pressed and the gui is in the eval phase, the return value will be true.
-fn (gui: ^Gui) button*(cfg: ButtonConfig = {}): bool {
-//~~
-	gui.stack(StackConfig{ rect: cfg.rect })
-	r := gui.getContainer().getDims()
-
-	if gui.isEval {
-		if gui.hover(r) && input::isJustReleased(input::Key.mouse1) {
-			return true
-		}
-		return false
-	} else {
-		if gui.hover(r) && gui.m1Pressed {
-			gui.getStyle().negBox.draw(r)
-		} else {
-			gui.getStyle().posBox.draw(r)
-		}
-	}
-
-	return false
 }
 
 //~~struct LabelConfig

@@ -1,0 +1,41 @@
+
+import (
+		"window.um"
+		"rect.um"
+		"ui.um"
+)
+
+var gui: ui::Gui
+var maxScroll, scroll: real32
+
+const buttonCount = 30
+const buttonHeight = 30
+
+fn init*() {
+	window::setup("Scoll Area Sample", 640, 480)
+
+	gui = ui::mk(rect::fromVf2({}, window::wp), ui::getDefaultStyle())
+
+	window::onFrame.register({
+		layout := ui::LayoutFn{
+			gui.scrollArea(&scroll, buttonHeight * buttonCount, {
+				scrollBarSize: 20
+			})
+			gui.box({
+				dimension: buttonHeight
+			})
+
+			for i:=0; i < buttonHeight; i++ {
+				if gui.qbutton(sprintf("Button %d", i)) {
+					printf("Button %d\n", i)
+				}
+			}
+
+			gui.popContainer()
+			gui.popContainer()
+		}
+
+		gui.eval(layout)
+		gui.draw(layout)
+	})
+}
