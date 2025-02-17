@@ -3,6 +3,13 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
+#ifdef _WIN32
+#include <io.h>
+#define isatty _isatty
+#define fileno _fileno
+#else
+#include <unistd.h>
+#endif
 
 #define MSG_LEN 1024
 
@@ -42,7 +49,11 @@ th_error(char *text, ...)
 #ifdef __EMSCRIPTEN__
 	fprintf(stderr, "error: ");
 #else
-	fprintf(stderr, "\x1b[1m\x1b[31merror: \x1b[0m");
+	if (isatty(fileno(stderr))) {
+		fprintf(stderr, "\x1b[1m\x1b[31merror: \x1b[0m");
+	} else {
+		fprintf(stderr, "error: ");
+	}
 #endif
 
 	va_list args;
@@ -186,13 +197,13 @@ th_print_umka_error_and_quit(int code)
 				fprintf(stderr, "\t\t...\n");
 				break;
 			}
-#ifndef _WIN32
-			fprintf(stderr, "\033[34m");
-#endif
+			if (isatty(fileno(stderr))) {
+				fprintf(stderr, "\033[34m");
+			}
 			fprintf(stderr, "\t\t%s:%06d: ", file, line);
-#ifndef _WIN32
-			fprintf(stderr, "\033[0m");
-#endif
+			if (isatty(fileno(stderr))) {
+				fprintf(stderr, "\033[0m");
+			}
 			fprintf(stderr, "%s\n", fnName);
 		}
 	}
