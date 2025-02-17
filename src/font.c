@@ -232,7 +232,7 @@ read_font_data(char *path)
 static void
 free_font(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_font *font = p[0].ptrVal;
+	th_font *font = umkaGetParam(p, 0)->ptrVal;
 	for (int i = 0; i < PACK_PAGECOUNT; ++i) {
 		if (font->pages[i]) {
 			th_image_free(&font->pages[i]->img);

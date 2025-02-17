@@ -36,7 +36,7 @@ th_image_free(th_image *img)
 static void
 th_image_free_umka(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_image_free(p[0].ptrVal);
+	th_image_free(umkaGetParam(p, 0)->ptrVal);
 }
 
 th_image *
@@ -48,7 +48,7 @@ th_image_alloc()
 static void
 th_image_free_render_target(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_render_target *t = p[0].ptrVal;
+	th_render_target *t = umkaGetParam(p, 0)->ptrVal;
 	sg_destroy_image(t->depth);
 	sg_destroy_attachments(t->attachments);
 	th_image_free(t->image);

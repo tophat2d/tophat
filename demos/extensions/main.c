@@ -20,13 +20,13 @@
 th_global *thg = NULL;
 
 void initExt(UmkaStackSlot *p, UmkaStackSlot *r) {
-	thg = (th_global *)p[1].ptrVal;
-	th_ext_set((void **)p[0].ptrVal);
+	thg = (th_global *)umkaGetParam(p, 1)->ptrVal;
+	th_ext_set((void **)umkaGetParam(p, 0)->ptrVal);
 }
 
 void add(UmkaStackSlot *p, UmkaStackSlot *r) {
-	int a = p[1].intVal;
-	int b = p[0].intVal;
+	int a = umkaGetParam(p, 1)->intVal;
+	int b = umkaGetParam(p, 0)->intVal;
 
 	r->intVal = a + b;
 }

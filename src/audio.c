@@ -16,7 +16,7 @@ int allocd = 0, freed = 0;
 static void
 sound_free(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	th_sound *s = (th_sound *)p[0].ptrVal;
+	th_sound *s = (th_sound *)umkaGetParam(p, 0)->ptrVal;
 
 	ma_sound_uninit(&s->inst);
 
