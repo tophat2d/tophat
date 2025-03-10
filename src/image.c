@@ -26,6 +26,25 @@
 
 extern th_global *thg;
 
+static inline uint32_t
+rev_endian(uint32_t value)
+{
+	return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value & 0xFF0000) >> 8) |
+	    ((value & 0xFF000000) >> 24);
+}
+
+void *
+th_image_data_reverse(uint32_t *data, th_vf2 dims)
+{
+	const size_t size = dims.x * dims.y;
+
+	for (size_t i = 0; i < size; i++) {
+		data[i] = rev_endian(data[i]);
+	}
+
+	return data;
+}
+
 void
 th_image_free(th_image *img)
 {
@@ -63,11 +82,11 @@ th_render_target_alloc()
 	return t;
 }
 
-uint32_t *
-th_image_get_data(th_image *img)
+static uint8_t *
+get_data_rgba(th_image *img)
 {
 	size_t size = sizeof(uint32_t) * img->dm.w * img->dm.h;
-	uint32_t *data = malloc(size);
+	uint8_t *data = malloc(size);
 
 	GLuint tex = th_sg_get_gl_image(img->tex);
 
@@ -87,11 +106,17 @@ th_image_get_data(th_image *img)
 	void glGetTexImage(GLenum target, GLint level, GLenum format, GLenum type, void *pixels);
 
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV, data);
+	glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	glGetError();
 #endif
 
 	return data;
+}
+
+uint32_t *
+th_image_get_data(th_image *img)
+{
+	return th_image_data_reverse((uint32_t*)get_data_rgba(img), img->dm);
 }
 
 static th_err
@@ -157,7 +182,7 @@ th_image_create_render_target(th_render_target **out, int width, int height, int
 }
 
 static th_err
-gen_tex(th_image *img, uint32_t *data)
+gen_tex(th_image *img, uint8_t *data)
 {
 	img->tex = sg_make_image(&(sg_image_desc){
 	    .width = img->dm.w,
@@ -208,7 +233,7 @@ th_load_image(th_image **out, char *path)
 	img->flipv = 0;
 	img->fliph = 0;
 
-	th_err err = gen_tex(img, (uint32_t *)data);
+	th_err err = gen_tex(img, data);
 	stbi_image_free(data);
 	if (err) {
 		umkaDecRef(thg->umka, img);
@@ -222,6 +247,8 @@ th_load_image(th_image **out, char *path)
 th_err
 th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm)
 {
+	uint8_t *data_rgba = th_image_data_reverse(data, dm);
+
 	img->dm = dm;
 	img->flipv = 0;
 	img->fliph = 0;
@@ -230,18 +257,18 @@ th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm)
 	img->channels = 4;
 	img->filter = SG_FILTER_NEAREST;
 
-	return gen_tex(img, data);
+	return gen_tex(img, data_rgba);
 }
 
 th_err
 th_image_set_filter(th_image *img, sg_filter filter)
 {
-	uint32_t *data = th_image_get_data(img);
+	uint8_t *data_rgba = get_data_rgba(img);
 	img->filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST;
 
 	th_image_free(img);
-	th_err err = gen_tex(img, data);
-	free(data);
+	th_err err = gen_tex(img, data_rgba);
+	free(data_rgba);
 
 	return err;
 }
@@ -249,10 +276,12 @@ th_image_set_filter(th_image *img, sg_filter filter)
 th_err
 th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm)
 {
+	uint8_t *data_rgba = th_image_data_reverse(data, dm);
+
 	th_image_free(img);
 
 	img->dm = dm;
-	return gen_tex(img, data);
+	return gen_tex(img, data_rgba);
 }
 
 void

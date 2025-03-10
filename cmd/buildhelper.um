@@ -127,11 +127,6 @@ fn main() {
 
 			datas := "{"
 			for i in data {
-				data[i] =
-					(data[i] >> (0*8) & 0xff) << (3*8) |
-					(data[i] >> (1*8) & 0xff) << (2*8) |
-					(data[i] >> (2*8) & 0xff) << (1*8) |
-					(data[i] >> (3*8) & 0xff) << (0*8)
 				datas += sprintf("0x%x", data[i])
 				if i < len(data) - 1 { datas += ", " }
 			}

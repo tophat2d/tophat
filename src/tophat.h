@@ -488,6 +488,8 @@ void
 th_font_deinit();
 
 // image
+void *
+th_image_data_reverse(uint32_t *data, th_vf2 dims);
 th_err
 th_load_image(th_image **out, char *path);
 void

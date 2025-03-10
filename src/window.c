@@ -188,7 +188,7 @@ th_window_set_fullscreen(bool fullscreen)
 void
 th_window_set_icon(th_image *img)
 {
-	uint32_t *pixels = th_image_get_data(img);
+	uint8_t *pixels = th_image_data_reverse(th_image_get_data(img), img->dm);
 
 	sapp_set_icon(
 	    &(sapp_icon_desc){.images = {(sapp_image_desc){.width = img->dm.x,
