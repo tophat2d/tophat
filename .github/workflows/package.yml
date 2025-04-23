@@ -16,7 +16,7 @@ jobs:
         ./build.bat
 
   linux_build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
     - name: Install packages
@@ -50,7 +50,7 @@ jobs:
         secret: ${{ secrets.UMBOX }}
 
   emscripten_build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v2
     - uses: mymindstorm/setup-emsdk@v14
