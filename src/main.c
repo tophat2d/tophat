@@ -153,7 +153,6 @@ th_init(const char *scriptpath, const char *script_src)
 		fclose(f);
 
 		free(path);
-		free(buf);
 	}
 
 	// Just check umka file
