@@ -60,9 +60,11 @@ th_error(char *text, ...)
 	va_start(args, text);
 #if defined(_WIN32) && !defined(_CONSOLE)
 #include <winuser.h>
-	char buf[4096];
-	vsnprintf(buf, 4096, text, args);
-	MessageBox(NULL, buf, "tophat error", 0x10);
+	if (!thg->check) {
+		char buf[4096];
+		vsnprintf(buf, 4096, text, args);
+		MessageBox(NULL, buf, "tophat error", 0x10);
+	}
 #endif
 	vfprintf(stderr, text, args);
 	fprintf(stderr, "\n");
@@ -76,9 +78,11 @@ th_info(char *text, ...)
 	va_start(args, text);
 #if defined(_WIN32) && !defined(_CONSOLE)
 #include <winuser.h>
-	char buf[4096];
-	vsnprintf(buf, 4096, text, args);
-	MessageBox(NULL, buf, "information", 0x40);
+	if (!thg->check) {
+		char buf[4096];
+		vsnprintf(buf, 4096, text, args);
+		MessageBox(NULL, buf, "information", 0x40);
+	}
 #endif
 	vfprintf(stderr, text, args);
 	fprintf(stderr, "\n");
