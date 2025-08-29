@@ -26,12 +26,12 @@ fn mk*(size: th::Vf2, filter: image::Filter): (RenderTarget, std::Err) {
 var wpBackup: th::Vf2
 
 fn (rt: ^RenderTarget) toImage*(): image::Image
-fn umth_image_render_target_begin(rt: RenderTarget): th::ErrCode
+fn umth_image_render_target_begin(rt: RenderTarget, clear: bool): th::ErrCode
 //~~fn RenderTarget.begin
 // Begins the render target rendering pass.
-fn (rt: ^RenderTarget) begin*(): std::Err {
+fn (rt: ^RenderTarget) begin*(clear: bool = false): std::Err {
 //~~
-	ec := umth_image_render_target_begin(rt^)
+	ec := umth_image_render_target_begin(rt^, clear)
 	if ec != .ok {
 		return th::__errFromCode(ec)
 	}

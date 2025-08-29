@@ -107,7 +107,7 @@ fn init*() {
 		canvas::drawText("render target:", p, th::black, 2)
 		p.y += 12
 
-		err = target.begin()
+		err = target.begin(true)
 		std::exitif(err)
 			canvas::drawLine(0xFF, th::Vf2{0, 0}, th::Vf2{50, 50}, 0.1)
 			img.draw(th::Transform{

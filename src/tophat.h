@@ -322,6 +322,7 @@ typedef struct
 	th_image *canvas_image;
 
 	sg_pass_action offscreen_pass_action;
+	sg_pass_action offscreen_clear_action;
 	sg_pipeline image_pip;
 
 	bool has_render_target;
@@ -521,7 +522,7 @@ th_image_deinit();
 th_err
 th_image_create_render_target(th_render_target **out, int width, int height, int filter);
 th_err
-th_image_set_as_render_target(th_render_target *t);
+th_image_set_as_render_target(th_render_target *t, bool clear);
 th_err
 th_image_remove_render_target(th_render_target *t, th_vf2 wp);
 

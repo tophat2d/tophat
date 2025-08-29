@@ -432,8 +432,9 @@ umth_image_render_target_begin(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_render_target *t = umkaGetParam(p, 0)->ptrVal;
 	if (!t)
 		return;
+	bool clear = umkaGetParam(p, 1)->uintVal;
 
-	umkaGetResult(p, r)->intVal = th_image_set_as_render_target(t);
+	umkaGetResult(p, r)->intVal = th_image_set_as_render_target(t, clear);
 }
 
 // fn umth_image_render_target_end(rt: RenderTarget, wp: th::Vf2): th::ErrCode

@@ -376,7 +376,7 @@ th_image_blit(th_image *img, th_rect src, th_rect dest, uint32_t color, float ro
 }
 
 th_err
-th_image_set_as_render_target(th_render_target *t)
+th_image_set_as_render_target(th_render_target *t, bool clear)
 {
 	if (thg->has_render_target) {
 		return th_err_already;
@@ -386,7 +386,7 @@ th_image_set_as_render_target(th_render_target *t)
 	sg_end_pass();
 
 	sg_begin_pass(&(sg_pass){
-	    .action = thg->offscreen_pass_action,
+	    .action = clear ? thg->offscreen_clear_action : thg->offscreen_pass_action,
 	    .attachments = t->attachments,
 	});
 	sg_apply_pipeline(thg->image_pip);
@@ -434,11 +434,19 @@ th_image_init()
 {
 	thg->offscreen_pass_action = (sg_pass_action){
 	    .colors[0] =
-		{
-		    .store_action = SG_STOREACTION_STORE,
-		    .load_action = SG_LOADACTION_CLEAR,
-		    .clear_value = {0, 0, 0, 0},
-		},
+			{
+			    .store_action = SG_STOREACTION_STORE,
+			    .load_action = SG_LOADACTION_LOAD
+			},
+	};
+
+	thg->offscreen_clear_action = (sg_pass_action){
+	    .colors[0] =
+			{
+			    .store_action = SG_STOREACTION_STORE,
+			    .load_action = SG_LOADACTION_CLEAR,
+			    .clear_value = {0.0f, 0.0f, 0.0f, 0.0f}
+			},
 	};
 
 	thg->image_pip = sg_make_pipeline(&(sg_pipeline_desc){
