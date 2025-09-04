@@ -48,13 +48,13 @@ fn build*(b: ^bu::Build) {
 	umka := b.addStaticLibrary("umka")
 	umka.linkLibC()
 	for i,s in umkaSources {
-		umka.addCSourceFile(b.path(s))
+		umka.addCSourceFile(b.path(s), {"-DUMKA_STATIC"})
 	}
 
 	tophat := b.addExecutable("tophat")
 	tophat.linkLibC()
 	for i,s in sources {
-		tophat.addCSourceFile(b.path(s))
+		tophat.addCSourceFile(b.path(s), {"-DUMKA_STATIC"})
 	}
 	tophat.addIncludePath(b.path("src"))
 	tophat.addIncludePath(b.path("lib/stb"))
@@ -63,12 +63,19 @@ fn build*(b: ^bu::Build) {
 	tophat.addIncludePath(b.path("lib/sokol"))
 	tophat.addIncludePath(b.path("lib/umka/src"))
 	tophat.linkSystemLibrary("m")
-	tophat.linkSystemLibrary("X11")
-	tophat.linkSystemLibrary("dl")
-	tophat.linkSystemLibrary("GL")
 	tophat.linkSystemLibrary("pthread")
-	tophat.linkSystemLibrary("Xi")
-	tophat.linkSystemLibrary("Xcursor")
+	b.forTargets({.linux, .linux_musl, .linux_glibc}, |tophat| {
+		tophat.linkSystemLibrary("X11")
+		tophat.linkSystemLibrary("dl")
+		tophat.linkSystemLibrary("GL")
+		tophat.linkSystemLibrary("Xi")
+		tophat.linkSystemLibrary("Xcursor")
+	})
+	b.forTarget(.windows, |tophat| {
+		tophat.linkSystemLibrary("opengl32")
+		tophat.linkSystemLibrary("gdi32")
+		tophat.linkSystemLibrary("opengl32")
+	})
 	tophat.linkLibrary(umka)
 	tophat.install()
 }
