@@ -1,0 +1,74 @@
+import "bu.um"
+
+umkaSources := []str {
+    "lib/umka/src/umka_api.c",
+    "lib/umka/src/umka_common.c",
+    "lib/umka/src/umka_compiler.c",
+    "lib/umka/src/umka_const.c",
+    "lib/umka/src/umka_decl.c",
+    "lib/umka/src/umka_expr.c",
+    "lib/umka/src/umka_gen.c",
+    "lib/umka/src/umka_ident.c",
+    "lib/umka/src/umka_lexer.c",
+    "lib/umka/src/umka_runtime.c",
+    "lib/umka/src/umka_stmt.c",
+    "lib/umka/src/umka_types.c",
+    "lib/umka/src/umka_vm.c"
+}
+
+sources := []str {
+	"src/atlas.c",
+	"src/audio.c",
+	"src/bindings.c",
+	"src/canvas.c",
+	"src/collisions.c",
+	"src/color.c",
+	"src/entity.c",
+	"src/font.c",
+	"src/image.c",
+	"src/input.c",
+	"src/main.c",
+	"src/miniaudio.c",
+	"src/misc.c",
+	"src/nav.c",
+	"src/particles.c",
+	"src/quad.c",
+	"src/shader.c",
+	"src/sokol.c",
+	"src/staembed.c",
+	"src/stbi.c",
+	"src/tilemap.c",
+	"src/tophat.c",
+	"src/transform.c",
+	"src/utf8.c",
+	"src/window.c"
+}
+
+fn build*(b: ^bu::Build) {
+	umka := b.addStaticLibrary("umka")
+	umka.linkLibC()
+	for i,s in umkaSources {
+		umka.addCSourceFile(b.path(s))
+	}
+
+	tophat := b.addExecutable("tophat")
+	tophat.linkLibC()
+	for i,s in sources {
+		tophat.addCSourceFile(b.path(s))
+	}
+	tophat.addIncludePath(b.path("src"))
+	tophat.addIncludePath(b.path("lib/stb"))
+	tophat.addIncludePath(b.path("lib/miniaudio"))
+	tophat.addIncludePath(b.path("lib/umprof"))
+	tophat.addIncludePath(b.path("lib/sokol"))
+	tophat.addIncludePath(b.path("lib/umka/src"))
+	tophat.linkSystemLibrary("m")
+	tophat.linkSystemLibrary("X11")
+	tophat.linkSystemLibrary("dl")
+	tophat.linkSystemLibrary("GL")
+	tophat.linkSystemLibrary("pthread")
+	tophat.linkSystemLibrary("Xi")
+	tophat.linkSystemLibrary("Xcursor")
+	tophat.linkLibrary(umka)
+	tophat.install()
+}
