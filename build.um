@@ -74,7 +74,6 @@ fn build*(b: ^bu::Build) {
 	b.forTarget(.windows, |tophat| {
 		tophat.linkSystemLibrary("opengl32")
 		tophat.linkSystemLibrary("gdi32")
-		tophat.linkSystemLibrary("opengl32")
 	})
 	tophat.linkLibrary(umka)
 	tophat.install()
