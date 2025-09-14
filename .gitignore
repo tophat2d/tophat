@@ -26,3 +26,6 @@ bin
 
 umbox/
 box.tar
+
+.zig-cache
+buum

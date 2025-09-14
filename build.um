@@ -48,13 +48,13 @@ fn build*(b: ^bu::Build) {
 	umka := b.addStaticLibrary("umka")
 	umka.linkLibC()
 	for i,s in umkaSources {
-		umka.addCSourceFile(b.path(s), {"-DUMKA_STATIC"})
+		umka.addCSourceFile(b.path(s), {"-DUMKA_STATIC", "-Wno-date-time"})
 	}
 
 	tophat := b.addExecutable("tophat")
 	tophat.linkLibC()
 	for i,s in sources {
-		tophat.addCSourceFile(b.path(s), {"-DUMKA_STATIC"})
+		tophat.addCSourceFile(b.path(s), {"-DUMKA_STATIC", "-Wno-date-time"})
 	}
 	tophat.addIncludePath(b.path("src"))
 	tophat.addIncludePath(b.path("lib/stb"))
