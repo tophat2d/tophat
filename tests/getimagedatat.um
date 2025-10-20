@@ -24,6 +24,5 @@ fn init*() {
 		printf("%x\n", d[i])
 	}
 
-	window::onFrame.register(signal::Callback{
-	})
+	exit(0)
 }

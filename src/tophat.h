@@ -104,7 +104,7 @@ typedef struct
 	th_vf2 dm;
 	uu channels;
 	sg_image tex;
-	sg_sampler smp;
+	sg_view tex_view;
 	sg_filter filter;
 	th_quad crop;
 	char flipv;
@@ -116,6 +116,8 @@ typedef struct
 {
 	sg_attachments attachments;
 	sg_image depth;
+	sg_view depth_view;
+	sg_view color_attachment_view;
 	th_image *image;
 } th_render_target;
 
@@ -321,6 +323,9 @@ typedef struct
 	sg_pipeline canvas_pip;
 	th_image *canvas_image;
 
+	sg_sampler sampler_nearest;
+	sg_sampler sampler_linear;
+
 	sg_pass_action offscreen_pass_action;
 	sg_pass_action offscreen_clear_action;
 	sg_pipeline image_pip;
@@ -509,7 +514,7 @@ void
 th_image_crop(th_image *img, th_vf2 tl, th_vf2 br);
 
 th_err
-th_image_set_filter(th_image *img, sg_filter filter);
+th_image_set_filter(th_image *img, int filter);
 th_err
 th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm);
 th_image *

@@ -2373,7 +2373,7 @@ const char *th_em_modulesrc[] = {
 "\tcase .alloc:\n"
 "\t\treturn \"failed allocation\"\n"
 "\tcase .already:\n"
-"\t\treturn \"action already performet\"\n"
+"\t\treturn \"action already performed\"\n"
 "\tcase .out_of_bounds:\n"
 "\t\treturn \"index out of bounds\"\n"
 "\t}\n"

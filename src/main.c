@@ -107,7 +107,7 @@ th_init(const char *scriptpath, const char *script_src)
 			    "  _ := window::w\n"
 			    "  mainmod::init()\n"
 			    "}\n";
-	char mainmod[sizeof(mainmod_fmt) + BUFSIZ];
+	char mainmod[BUFSIZ];
 	snprintf(mainmod, sizeof(mainmod), mainmod_fmt, scriptpath);
 
 	int umkaOK;

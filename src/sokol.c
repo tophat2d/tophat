@@ -28,5 +28,5 @@ int *th_sapp_swap_interval = &_sapp.swap_interval;
 GLuint
 th_sg_get_gl_image(sg_image img)
 {
-	return *_sg_image_at(&_sg.pools, img.id)->gl.tex;
+	return *_sg_image_at(img.id)->gl.tex;
 }
