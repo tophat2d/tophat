@@ -175,7 +175,7 @@ fn (i: ^Image) cropQuad*(q: th::Quad) {
 
 fn umth_image_get_crop_quad(img: Image): th::Quad
 //~~fn Image.getCropQuad
-// Crop an image using a quad.
+// Get image cropping quad.
 fn (i: ^Image) getCropQuad*(): th::Quad {
 //~~
 	if !i.validate() {

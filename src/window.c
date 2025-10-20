@@ -20,6 +20,9 @@ init(void)
 	sg_setup(&(sg_desc){
 	    .environment = sglue_environment(),
 	    .logger.func = slog_func,
+	    .image_pool_size = 1024,
+	    .buffer_pool_size = 1024,
+	    .view_pool_size = 1024,
 	});
 
 	thg->dpi_scale_factor = sapp_dpi_scale();
