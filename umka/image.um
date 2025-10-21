@@ -126,8 +126,17 @@ fn (i: ^Image) getDims*(): th::Vf2 {
 
 fn umth_image_crop(img: Image, tl, br: th::Vf2)
 //~~fn Image.crop
-// Crops an image. Coordinates are between 0, 0 (top left) and
-// 1, 1 (bottom right)
+// Sets the image crop. When the image is drawn, only data inside the crop
+// is drawn. Cropping doesn't affect non-draw functions like getDims or getData.
+//
+// Cropping won't destroy any data. It is possible to crop an image and then
+// restore the previous crop.
+//
+// Coordinates are between 0, 0 (top left) and 1, 1 (bottom right)
+//
+// Current crop can be obtained using `Image.getCropQuad`
+//
+// See also: `cropPx`, `cropRect`, `cropQuad`
 fn (i: ^Image) crop*(tl, br: th::Vf2) {
 //~~
 	if !i.validate() {
@@ -163,7 +172,7 @@ fn (i: ^Image) cropRect*(r: rect::Rect) {
 
 fn umth_image_crop_quad(img: Image, q: th::Quad)
 //~~fn Image.cropQuad
-// Crop an image using a quad.
+// Crop an image using a quad. See `Image.crop`.
 fn (i: ^Image) cropQuad*(q: th::Quad) {
 //~~
 	if !i.validate() {
@@ -175,7 +184,7 @@ fn (i: ^Image) cropQuad*(q: th::Quad) {
 
 fn umth_image_get_crop_quad(img: Image): th::Quad
 //~~fn Image.getCropQuad
-// Crop an image using a quad.
+// Gets the current image crop as a quad.
 fn (i: ^Image) getCropQuad*(): th::Quad {
 //~~
 	if !i.validate() {
