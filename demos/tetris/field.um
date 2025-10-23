@@ -14,12 +14,12 @@ const (
 
 colors* := [8]int{
 	/*None*/  0x000000FF,
-	/*Red*/   0xFF0000FF,
-	/*Green*/ 0x00FF00FF,
-	/*Blue*/  0x0000FFFF,
-	/*Yellow*/0xFFFF00FF,
-	/*Purple*/0xFF00FFFF,
-	/*Orange*/0xFF9900FF,
+	/*Red*/   0xFF2A47FF,
+	/*Green*/ 0x59e600FF,
+	/*Blue*/  0x113CFFFF,
+	/*Yellow*/0xf9c100FF,
+	/*Purple*/0xAC37FFFF,
+	/*Orange*/0xFF5A26FF,
 	/*Cyan*/  0x00CCFFFF}
 
 

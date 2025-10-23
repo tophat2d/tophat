@@ -34,6 +34,7 @@ fn init*() {
 	clearedText = crazytext::putText("CLEARED: 0", crazytext::lifetimeForever, false)
 	crazytext::putText("ARROW KEYS - MOVE", crazytext::lifetimeForever, false)
 	crazytext::putText("Z, X, C - ROTATE", crazytext::lifetimeForever, false)
+	crazytext::putText("SHIFT - STASH", crazytext::lifetimeForever, false)
 	crazytext::putText("M - MUTE", crazytext::lifetimeForever, false)
 
 	window::onFrame.register({

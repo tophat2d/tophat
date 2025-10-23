@@ -3,6 +3,7 @@ import (
 	"rect.um"
 	"th.um"
 	"window.um"
+	"image.um"
 	"gameplay.um"
 	"presets.um"
 	"piece.um"
@@ -21,6 +22,7 @@ type Effect = struct {
 }
 
 var (
+	brick: image::Image
 	fallingPiecePos: th::Vf2
 	offset_x : real = 0
 	offset_y : real = 0
@@ -42,6 +44,8 @@ fn init*() {
 	offset_y = (window::wp.y-reference_frame.h)/2
 	fallingPiecePos = getNextPiecePos()
 	effects = make([]Effect, 0)
+	brick = image::load("brick.png").item0
+	brick.setfilter(.linear)
 }
 
 const clearEffect* = fn(row: int) {
@@ -73,29 +77,35 @@ fn processFx() {
 		effects = newEffects
 }
 
-fn drawCell(c: uint32, r: rect::Rect) {
-	canvas::drawRect(c, r)
-	for i := 0; i < 5; i++ {
-		value := trunc((i / 5.0 * 255.0) / 8.0)
-		if (c & 0xFFFFFF00 == 0) {
-			value /= 4
-		}
+const cellOffs = 10
+const cellW = 128+cellOffs
 
-		color := value << 24 | value << 16 | value << 8 | (c & 0xFF)
-		canvas::drawRect(c | color, rect::Rect{r.x, r.y+(i / 5.0)*r.h, r.w, 3})
+fn drawCell(c: uint32, r: rect::Rect, falling: bool) {
+	r = r.shrink({-r.w*0.04, -r.h*0.04})
+
+	if !falling {
+		brick.blit({cellOffs+cellW*0, 0, cellW, cellW}, r, c)
+		brick.blit({cellOffs+cellW*1, 0, cellW, cellW}, r, 0xFFEECCAA)
 	}
-	canvas::drawRect(0xFFFFFF33, rect::Rect{r.x, r.y, r.w, 1})
+		brick.blit({cellOffs+cellW*2, 0, cellW, cellW}, r, c|0x777777FF)
 }
 
 fn cellRec(x, y: int) {
-	drawCell(field::colors[field::playfield[x][y]], rect::Rect { offset_x + x * 16, offset_y + y * 16, 15, 15 })
+	r := rect::Rect { offset_x + x * 16, offset_y + y * 16, 16, 16 }
+	if field::playfield[x][y] != 0 {
+		drawCell(field::colors[field::playfield[x][y]], r, false)
+	} else {
+		r = r.shrink({-r.w*0.05, -r.h*0.05})
+		brick.blit({cellOffs+cellW*0, 0, cellW, cellW}, r, 0xFFFFFF08)
+		brick.blit({cellOffs+cellW*2, 0, cellW, cellW}, r, 0xFFFFFF11)
+	}
 }
 
-fn drawPiece(it: piece::Piece, x, y: int, mask: int) {
+fn drawPiece(it: piece::Piece, x, y: int, mask: int, falling: bool) {
 	x_origin := x
 	for _, chr in it.data {
 		if chr == '#' {
-			drawCell(field::colors[it.color] & mask, rect::Rect { x, y, 15, 15 })
+			drawCell(field::colors[it.color] & mask, rect::Rect { x, y, 16, 16 }, falling)
 		}
 		x += 16
 		if chr == '\n' {
@@ -106,18 +116,13 @@ fn drawPiece(it: piece::Piece, x, y: int, mask: int) {
 }
 
 fn drawStash() {
-	canvas::drawRect(0xFFFFFF11, rect::Rect {16*11-1+offset_x, 1*16-1+offset_y, 16*4+1, 16*4+1})
-	for i := 0; i < 4; i += 1 {
-		for j := 0; j < 4; j += 1 {
-			drawCell(field::colors[field::None], rect::Rect{ (11+i)*16+offset_x, (1+j)*16+offset_y, 15, 15 })
-		}
-	}
+	canvas::drawText("STASH:", th::Vf2{trunc(offset_x)-16*5+256, trunc(offset_y)}, th::white, 2)
 	if gameplay::stash < 0 {
 		return 
 	}
 
 	pos := getStashPos()
-	drawPiece(presets::pieceValue(gameplay::stash, 0), round(pos.x), round(pos.y), 0xFFFFFFFF)
+	drawPiece(presets::pieceValue(gameplay::stash, 0), round(pos.x), round(pos.y), 0xFFFFFFFF, false)
 }
 
 fn drawFallingPiece() {
@@ -127,25 +132,25 @@ fn drawFallingPiece() {
 	if mul > 1.0 {
 		mul = 1.0
 	}
-	fallingPiecePos = fallingPiecePos.add(targetPos.sub(fallingPiecePos).mulf(mul))
+	fallingPiecePos = targetPos
 	val := falling_piece::pieceValue(falling_piece::rotation)
 
 	// draw ghost
 	prev := falling_piece::y
 	timerPrev := falling_piece::placeTimer
 	falling_piece::push()
-	drawPiece(val, trunc(falling_piece::x)*16+trunc(offset_x), trunc(falling_piece::y)*16+trunc(offset_y), 0x555555FF)
+	drawPiece(val, trunc(falling_piece::x)*16+trunc(offset_x), trunc(falling_piece::y)*16+trunc(offset_y), 0x555555FF, true)
 	falling_piece::y = prev
 	falling_piece::placeTimer = timerPrev
 
-	drawPiece(val, round(fallingPiecePos.x), round(fallingPiecePos.y), 0xFFFFFFFF)
+	drawPiece(val, round(fallingPiecePos.x), round(fallingPiecePos.y), 0xFFFFFFFF, false)
 }
 
 fn drawNextPiece() {
 	canvas::drawText("NEXT:", th::Vf2{trunc(offset_x)-16*5, trunc(offset_y)}, th::white, 2)
 	val := presets::pieceValue(gameplay::bag.getNextPiece(), 0)
 	pos := getNextPiecePos()
-	drawPiece(val, trunc(pos.x), trunc(pos.y), 0xFFFFFFFF)
+	drawPiece(val, trunc(pos.x), trunc(pos.y), 0xFFFFFFFF, false)
 }
 
 fn draw*() {
@@ -154,7 +159,6 @@ fn draw*() {
 
 	drawStash()
 	field_rect := rect::Rect { offset_x-1, offset_y-1, field::FieldWidth * 16+1, field::FieldHeight * 16+1 }
-	canvas::drawRect(0xFFFFFF11, field_rect)
 	
 	if gameplay::hasPlaced {
 		fallingPiecePos = getNextPiecePos()

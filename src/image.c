@@ -48,8 +48,8 @@ th_image_data_reverse(uint32_t *data, th_vf2 dims)
 void
 th_image_free(th_image *img)
 {
+	sg_destroy_view(img->tex_view);
 	sg_destroy_image(img->tex);
-	sg_destroy_sampler(img->smp);
 }
 
 static void
@@ -69,7 +69,8 @@ th_image_free_render_target(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	th_render_target *t = umkaGetParam(p, 0)->ptrVal;
 	sg_destroy_image(t->depth);
-	sg_destroy_attachments(t->attachments);
+	sg_destroy_view(t->color_attachment_view);
+	sg_destroy_view(t->depth_view);
 	th_image_free(t->image);
 }
 
@@ -116,7 +117,7 @@ get_data_rgba(th_image *img)
 uint32_t *
 th_image_get_data(th_image *img)
 {
-	return th_image_data_reverse((uint32_t*)get_data_rgba(img), img->dm);
+	return th_image_data_reverse((uint32_t *)get_data_rgba(img), img->dm);
 }
 
 static th_err
@@ -136,19 +137,25 @@ th_image_create_render_target(th_render_target **out, int width, int height, int
 		return th_err_alloc;
 
 	sg_image_desc img_desc = {
-	    .render_target = true,
+	    .usage =
+		{
+		    .color_attachment = true,
+		},
 	    .width = width,
 	    .height = height,
 	    .pixel_format = SG_PIXELFORMAT_RGBA8,
 	    .sample_count = 1,
 	};
 
-	sg_sampler_desc smp_desc = {
-	    .mag_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
-	    .min_filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST,
-	    .wrap_u = SG_WRAP_CLAMP_TO_EDGE,
-	    .wrap_w = SG_WRAP_CLAMP_TO_EDGE,
-	    .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+	sg_image_desc depth_desc = {
+	    .usage =
+		{
+		    .depth_stencil_attachment = true,
+		},
+	    .width = width,
+	    .height = height,
+	    .pixel_format = SG_PIXELFORMAT_DEPTH,
+	    .sample_count = 1,
 	};
 
 	t->image->dm.w = width;
@@ -160,20 +167,27 @@ th_image_create_render_target(th_render_target **out, int width, int height, int
 	t->image->flipv = 0;
 	t->image->fliph = 1;
 	t->image->tex = sg_make_image(&img_desc);
-	t->image->smp = sg_make_sampler(&smp_desc);
 	th_err err = assert_image(t->image);
 	if (err) {
 		umkaDecRef(thg->umka, t);
 		return err;
 	}
 
-	img_desc.pixel_format = SG_PIXELFORMAT_DEPTH;
-	t->depth = sg_make_image(&img_desc);
+	t->depth = sg_make_image(&depth_desc);
 
-	t->attachments = sg_make_attachments(&(sg_attachments_desc){
-	    .colors[0].image = t->image->tex,
-	    .depth_stencil.image = t->depth,
-	});
+	t->image->tex_view = sg_make_view(&(sg_view_desc){.texture = {
+							      .image = t->image->tex,
+							  }});
+
+	t->color_attachment_view = sg_make_view(&(sg_view_desc){.color_attachment = {
+								    .image = t->image->tex,
+								}});
+
+	t->depth_view =
+	    sg_make_view(&(sg_view_desc){.depth_stencil_attachment = {.image = t->depth}});
+
+	t->attachments =
+	    (sg_attachments){.colors[0] = t->color_attachment_view, .depth_stencil = t->depth_view};
 
 	t->image->target = true;
 
@@ -187,22 +201,15 @@ gen_tex(th_image *img, uint8_t *data)
 	img->tex = sg_make_image(&(sg_image_desc){
 	    .width = img->dm.w,
 	    .height = img->dm.h,
-	    .data.subimage[0][0] =
+	    .data.mip_levels[0] =
 		(sg_range){
 		    .ptr = data,
 		    .size = img->dm.w * img->dm.h * sizeof(uint32_t),
 		},
 	    .pixel_format = SG_PIXELFORMAT_RGBA8,
-	    .usage = SG_USAGE_IMMUTABLE,
 	});
 
-	img->smp = sg_make_sampler(&(sg_sampler_desc){
-	    .mag_filter = img->filter,
-	    .min_filter = img->filter,
-	    .wrap_u = SG_WRAP_CLAMP_TO_EDGE,
-	    .wrap_w = SG_WRAP_CLAMP_TO_EDGE,
-	    .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
-	});
+	img->tex_view = sg_make_view(&(sg_view_desc){.texture = {.image = img->tex}});
 
 	return assert_image(img);
 }
@@ -229,7 +236,7 @@ th_load_image(th_image **out, char *path)
 	img->channels = c;
 	img->filter = SG_FILTER_NEAREST;
 	img->crop =
-	    (th_quad){(th_vf2){{0, 0}}, (th_vf2){{1, 0}}, (th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
+	    (th_quad){{(th_vf2){{0, 0}}, (th_vf2){{1, 0}}, (th_vf2){{1, 1}}, (th_vf2){{0, 1}}}};
 	img->flipv = 0;
 	img->fliph = 0;
 
@@ -253,7 +260,7 @@ th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm)
 	img->flipv = 0;
 	img->fliph = 0;
 	img->crop =
-	    (th_quad){(th_vf2){{0, 0}}, (th_vf2){{1, 0}}, (th_vf2){{1, 1}}, (th_vf2){{0, 1}}};
+	    (th_quad){{(th_vf2){{0, 0}}, (th_vf2){{1, 0}}, (th_vf2){{1, 1}}, (th_vf2){{0, 1}}}};
 	img->channels = 4;
 	img->filter = SG_FILTER_NEAREST;
 
@@ -261,7 +268,7 @@ th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm)
 }
 
 th_err
-th_image_set_filter(th_image *img, sg_filter filter)
+th_image_set_filter(th_image *img, int filter)
 {
 	uint8_t *data_rgba = get_data_rgba(img);
 	img->filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST;
@@ -287,8 +294,8 @@ th_image_update_data(th_image *img, uint32_t *data, th_vf2 dm)
 void
 th_image_crop(th_image *img, th_vf2 tl, th_vf2 br)
 {
-	img->crop = (th_quad){(th_vf2){{tl.x, tl.y}}, (th_vf2){{br.x, tl.y}},
-	    (th_vf2){{br.x, br.y}}, (th_vf2){{tl.x, br.y}}};
+	img->crop = (th_quad){{(th_vf2){{tl.x, tl.y}}, (th_vf2){{br.x, tl.y}},
+	    (th_vf2){{br.x, br.y}}, (th_vf2){{tl.x, br.y}}}};
 }
 
 void
@@ -433,20 +440,13 @@ void
 th_image_init()
 {
 	thg->offscreen_pass_action = (sg_pass_action){
-	    .colors[0] =
-			{
-			    .store_action = SG_STOREACTION_STORE,
-			    .load_action = SG_LOADACTION_LOAD
-			},
+	    .colors[0] = {.store_action = SG_STOREACTION_STORE, .load_action = SG_LOADACTION_LOAD},
 	};
 
 	thg->offscreen_clear_action = (sg_pass_action){
-	    .colors[0] =
-			{
-			    .store_action = SG_STOREACTION_STORE,
-			    .load_action = SG_LOADACTION_CLEAR,
-			    .clear_value = {0.0f, 0.0f, 0.0f, 0.0f}
-			},
+	    .colors[0] = {.store_action = SG_STOREACTION_STORE,
+		.load_action = SG_LOADACTION_CLEAR,
+		.clear_value = {0.0f, 0.0f, 0.0f, 0.0f}},
 	};
 
 	thg->image_pip = sg_make_pipeline(&(sg_pipeline_desc){
@@ -474,6 +474,22 @@ th_image_init()
 		    .op_rgb = SG_BLENDOP_ADD,
 		},
 	    .label = "image-pip",
+	});
+
+	thg->sampler_linear = sg_make_sampler(&(sg_sampler_desc){
+	    .mag_filter = SG_FILTER_LINEAR,
+	    .min_filter = SG_FILTER_LINEAR,
+	    .wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+	    .wrap_w = SG_WRAP_CLAMP_TO_EDGE,
+	    .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
+	});
+
+	thg->sampler_nearest = sg_make_sampler(&(sg_sampler_desc){
+	    .mag_filter = SG_FILTER_NEAREST,
+	    .min_filter = SG_FILTER_NEAREST,
+	    .wrap_u = SG_WRAP_CLAMP_TO_EDGE,
+	    .wrap_w = SG_WRAP_CLAMP_TO_EDGE,
+	    .wrap_v = SG_WRAP_CLAMP_TO_EDGE,
 	});
 
 	return;

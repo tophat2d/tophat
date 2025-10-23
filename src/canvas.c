@@ -1,4 +1,5 @@
 #include "pixelfont.h"
+#include "sokol_gfx.h"
 #include "tophat.h"
 #include <assert.h>
 #include <math.h>
@@ -47,8 +48,11 @@ alloc_buffer()
 
 	// 3: alloc a new buffer
 	sg_buffer new_buffer = sg_make_buffer(&(sg_buffer_desc){.size = sizeof(thg->canvas_batch),
-	    .type = SG_BUFFERTYPE_VERTEXBUFFER,
-	    .usage = SG_USAGE_STREAM});
+	    .usage = {
+		.vertex_buffer = true,
+		.stream_update = true,
+		.immutable = false,
+	    }});
 
 	buffer_cache.current_buffer++;
 	buffer_cache.buffers[buffer_cache.buffers_count++] = new_buffer;
@@ -234,9 +238,10 @@ th_canvas_init()
 	uint32_t white = 0xffffffff;
 	th_image_from_data(&white_img, &white, (th_vf2){.w = 1, .h = 1});
 
-	thg->canvas_bind.images[0] = white_img.tex;
+	thg->canvas_bind.views[0] = white_img.tex_view;
 	thg->canvas_image = &white_img;
-	thg->canvas_bind.samplers[0] = white_img.smp;
+	thg->canvas_bind.samplers[0] =
+	    white_img.filter == SG_FILTER_NEAREST ? thg->sampler_nearest : thg->sampler_linear;
 }
 
 void
@@ -265,8 +270,10 @@ th_canvas_flush()
 		phase *phs = &phases[i];
 		switch (phs->scissor_stage) {
 		case SCISSOR_NONE:
-			thg->canvas_bind.images[0] = phs->img->tex;
-			thg->canvas_bind.samplers[0] = phs->img->smp;
+			thg->canvas_bind.views[0] = phs->img->tex_view;
+			thg->canvas_bind.samplers[0] = phs->img->filter == SG_FILTER_NEAREST
+			    ? thg->sampler_nearest
+			    : thg->sampler_linear;
 			// Targets are premultiplied
 			fs_params.premultiply = phs->img->target ? 0 : 1;
 			sg_apply_bindings(&thg->canvas_bind);

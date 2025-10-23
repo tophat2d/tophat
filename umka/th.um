@@ -46,7 +46,7 @@ fn (e: ^ErrCode) toStr*(): str {
 	case .alloc:
 		return "failed allocation"
 	case .already:
-		return "action already performet"
+		return "action already performed"
 	case .out_of_bounds:
 		return "index out of bounds"
 	}

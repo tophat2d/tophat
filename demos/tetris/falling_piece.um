@@ -19,6 +19,7 @@ var (
 
 	leftBtnLatch: latch::Latch
 	rightBtnLatch: latch::Latch
+	downLatch: latch::Latch
 )
 
 fn reset*(_kind: int) {
@@ -144,6 +145,8 @@ fn movePiece(dx, dy: real) {
 		x += dx;
 		if invalid() {
 			x = prev
+		} else {
+			placeTimer = 0
 		}
 	}
 
@@ -166,6 +169,7 @@ fn init*() {
 
   leftBtnLatch = latch::initLatch()
   rightBtnLatch = latch::initLatch()
+  downLatch = latch::initLatch()
 }
 
 fn update*(speed: real) {
@@ -181,21 +185,19 @@ fn update*(speed: real) {
 	}
 
 
-	if (leftBtnLatch.pass(input::isPressed(input::Key.left))) {
-		placeTimer = 0
+	if (leftBtnLatch.pass(input::isPressed(.left))) {
 		movePiece(-1, 0)
 	}
 
-	if (rightBtnLatch.pass(input::isPressed(input::Key.right))) {
-		placeTimer = 0
+	if (rightBtnLatch.pass(input::isPressed(.right))) {
 		movePiece(1, 0)
 	}
 
-	if (input::isPressed(input::Key.down)) {
-		placeTimer += th::delta/1000.0
-		prev := y
-		y += 0.01*th::delta*speed;
+	if (downLatch.pass(input::isPressed(.down))) {
+		prev = y
+		y += 1
 		if invalid() {
+			placeTimer += 0.5
 			y = prev
 		}
 	}
