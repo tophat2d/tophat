@@ -567,7 +567,7 @@ th_regularize_path(const char *path, const char *cur_folder, char *regularized_p
 void
 th_navmesh_add_quad(th_navmesh *m, th_quad *q);
 th_err
-th_navmesh_nav(th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2);
+th_navmesh_nav(th_vf2s *cameFrom, const UmkaType *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2);
 void
 th_nav_init(void);
 

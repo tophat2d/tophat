@@ -832,14 +832,13 @@ umth_ent_draw(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_ent_draw(e);
 }
 
-// fn umth_ent_getcoll(maxcolls: uint, e: ^Ent, s: ^[]^Ent, t: ^void): []Coll
+// fn umth_ent_getcoll(maxcolls: uint, e: ^Ent, s: ^[]^Ent): []Coll
 void
 umth_ent_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 	size_t maxcolls = umkaGetParam(p, 0)->uintVal;
 	th_ent *e = umkaGetParam(p, 1)->ptrVal;
 	UmkaDynArray(th_ent *) *s = umkaGetParam(p, 2)->ptrVal;
-	void *t = umkaGetParam(p, 3)->ptrVal;
 	size_t count = umkaGetDynArrayLen(s);
 	if (maxcolls == 0) {
 		maxcolls = 1;
@@ -855,7 +854,7 @@ umth_ent_getcoll(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_ent_getcoll(e, s->data, count, &collC, maxcolls, colls);
 
 	UmkaDynArray(th_coll) *result = umkaGetResult(p, r)->ptrVal;
-	umkaMakeDynArray(thg->umka, result, t, collC);
+	umkaMakeDynArray(thg->umka, result, umkaGetResultType(p, r), collC);
 	memcpy(result->data, colls, collC * sizeof(th_coll));
 
 	free(colls);
@@ -1445,14 +1444,14 @@ umth_nav_mesh_add_quad(UmkaStackSlot *p, UmkaStackSlot *r)
 	th_navmesh_add_quad(m, &q);
 }
 
-// fn umth_nav_mesh_nav(t: ^void, m: ^Mesh, p1, p2: th::Vf2): []th::Vf2
+// fn umth_nav_mesh_nav(m: ^Mesh, p1, p2: th::Vf2): []th::Vf2
 void
 umth_nav_mesh_nav(UmkaStackSlot *p, UmkaStackSlot *r)
 {
-	void *cameFromType = umkaGetParam(p, 0)->ptrVal;
-	th_navmesh *m = umkaGetParam(p, 1)->ptrVal;
-	th_vf2 p1 = *(th_vf2 *)umkaGetParam(p, 2);
-	th_vf2 p2 = *(th_vf2 *)umkaGetParam(p, 3);
+	const UmkaType *cameFromType = umkaGetResultType(p, r);
+	th_navmesh *m = umkaGetParam(p, 0)->ptrVal;
+	th_vf2 p1 = *(th_vf2 *)umkaGetParam(p, 1);
+	th_vf2 p2 = *(th_vf2 *)umkaGetParam(p, 2);
 
 	th_vf2s *cameFrom = umkaGetResult(p, r)->ptrVal;
 

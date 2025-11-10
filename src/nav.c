@@ -98,7 +98,7 @@ check_bounds(th_navmesh *m, th_vf2 p, size_t h)
 }
 
 th_err
-th_navmesh_nav(th_vf2s *cameFrom, void *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2)
+th_navmesh_nav(th_vf2s *cameFrom, const UmkaType *cameFromType, th_navmesh *m, th_vf2 p1, th_vf2 p2)
 {
 	const th_vf2 movemap[] = {{{-1, -1}}, {{+0, -1}}, {{+1, -1}}, {{-1, +0}}, {{+1, +0}},
 	    {{-1, +1}}, {{+0, +1}}, {{+1, +1}}};
