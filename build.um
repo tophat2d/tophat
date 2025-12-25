@@ -92,7 +92,7 @@ fn build*(b: ^bu::Build) {
 	umka := b.addStaticLibrary("umka")
 	umka.linkLibC()
 	for i,s in umkaSources {
-		umka.addCSourceFile(b.path(s), {"-DUMKA_STATIC", "-Wno-date-time"})
+		umka.addCSourceFile(b.path(s), {"-DUMKA_EXT_LIBS", "-DUMKA_STATIC", "-Wno-date-time"})
 	}
 
 	umkaDocs := []bu::LazyPath{}
