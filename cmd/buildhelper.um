@@ -87,58 +87,92 @@ fn strtoc(inp: str): str {
 }
 
 fn main() {
-	mode := std::argv(1)
+	i := 1
+	if std::argv(i) == "-standalone" {
+		printf("// Generated via cmd/buildhelper.um\n")
+		printf("#include \"tophat.h\"\n")
+	}
 
-	// embeds contents of a file as a string. TODO just as bytes
-	if mode == "em" {
-		printf("const char *%s[] = {\n", std::argv(2))
+	for i < std::argc() {
+		mode := std::argv(i)
+		i++
 
-		for i:=3; i < std::argc(); i++ {
-			f, err := std::fopen(std::argv(i), "rb")
-			std::exitif(err)
-			data, err := std::freadall(f)
-			std::exitif(err)
-			printf("%s\n", strtoc(str(data))+",")
-			std::fclose(f)
-		}
+		// embeds contents of a file as a string. TODO just as bytes
+		if mode == "em" {
+			printf("const char *%s[] = {\n", std::argv(i))
+			i++
 
-		printf("};\n")
-	// creates a string array with args as values
-	} else if mode == "argarr" {
-		printf("const char *%s[] = { ", std::argv(2))
-		for i:=3; i < std::argc(); i++ {
-			printf("\"%s\", ", std::argv(i))
-		}
+			for i < std::argc() {
+				if std::argv(i) == ";" {
+					break
+				}
 
-		printf(" };\n")
-		printf("int %s_count = %d;\n", std::argv(2), std::argc() - 3)
-	} else if mode == "placeholders" {
-		ws := []int{}
-		hs := []int{}
-
-		for i:=2; i < std::argc(); i++ {
-			fname := std::argv(i)
-
-
-			data, w, h, err := loadFF(fname)
-			if err > 0 { continue }
-			ws = append(ws, w)
-			hs = append(hs, h)
-
-			datas := "{"
-			for i in data {
-				datas += sprintf("0x%x", data[i])
-				if i < len(data) - 1 { datas += ", " }
+				f, err := std::fopen(std::argv(i), "rb")
+				std::exitif(err)
+				data, err := std::freadall(f)
+				std::exitif(err)
+				printf("%s\n", strtoc(str(data))+",")
+				std::fclose(f)
+				i++
 			}
-			datas += "}"
-			printf("static uint32_t th_em_placeholder_data_%d[] = %s;\n", i, datas)
-		}
 
-		printf("th_em_placeholder th_em_placeholders[] = {\n")
-		for i:=2; i < std::argc(); i++ {
-			printf("{ th_em_placeholder_data_%d, { .w = %d, .h = %d } },\n",
-				i, ws[i - 2], hs[i - 2])
+			printf("};\n")
+		// creates a string array with args as values
+		} else if mode == "argarr" {
+			name := std::argv(i)
+			printf("const char *%s[] = { ", name)
+			i++
+
+			i_save := i
+			for i < std::argc() {
+				if std::argv(i) == ";" {
+					break
+				}
+				printf("\"%s\", ", std::argv(i))
+				i++
+			}
+
+			printf(" };\n")
+			printf("int %s_count = %d;\n", name, i - i_save)
+		} else if mode == "placeholders" {
+			ws := []int{}
+			hs := []int{}
+
+			i_save := i
+			for i < std::argc() {
+				if std::argv(i) == ";" {
+					break
+				}
+
+				fname := std::argv(i)
+
+				data, w, h, err := loadFF(fname)
+				if err > 0 { continue }
+				ws = append(ws, w)
+				hs = append(hs, h)
+
+				datas := "{"
+				for j in data {
+					datas += sprintf("0x%x", data[j])
+					if j < len(data) - 1 { datas += ", " }
+				}
+				datas += "}"
+				printf("static uint32_t th_em_placeholder_data_%d[] = %s;\n", i - i_save, datas)
+				i++
+			}
+
+			printf("th_em_placeholder th_em_placeholders[] = {\n")
+			i = i_save
+			for i < std::argc() {
+				if std::argv(i) == ";" {
+					break
+				}
+
+				printf("{ th_em_placeholder_data_%d, { .w = %d, .h = %d } },\n",
+					i - i_save, ws[i - i_save], hs[i - i_save])
+				i++
+			}
+			printf("};\n")
 		}
-		printf("};\n")
 	}
 }

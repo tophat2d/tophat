@@ -35,13 +35,57 @@ sources := []str {
 	"src/quad.c",
 	"src/shader.c",
 	"src/sokol.c",
-	"src/staembed.c",
 	"src/stbi.c",
 	"src/tilemap.c",
 	"src/tophat.c",
 	"src/transform.c",
 	"src/utf8.c",
 	"src/window.c"
+}
+
+umkaModules := []str {
+	"umka/anim.um",
+	"umka/atlas.um",
+	"umka/audio.um",
+	"umka/canvas.um",
+	"umka/coll.um",
+	"umka/color.um",
+	"umka/csv.um",
+	"umka/ent.um",
+	"umka/font.um",
+	"umka/image.um",
+	"umka/input.um",
+	"umka/lerp.um",
+	"umka/misc.um",
+	"umka/nav.um",
+	"umka/particles.um",
+	"umka/placeholders.um",
+	"umka/rect.um",
+	"umka/rt.um",
+	"umka/shader.um",
+	"umka/signal.um",
+	"umka/th.um",
+	"umka/tilemap.um",
+	"umka/ui.um",
+	"umka/window.um"
+}
+
+fn trimPrefix(s, prefix: str): str {
+	if len(s) < len(prefix) {
+		return s
+	}
+
+	if slice(s, 0, len(prefix)) == prefix {
+		return slice(s, len(prefix))
+	}
+
+	return s
+}
+
+placeholders := []str{
+	"etc/test.ff",
+	"etc/icon.ff",
+	"etc/button.ff"
 }
 
 fn build*(b: ^bu::Build) {
@@ -51,11 +95,43 @@ fn build*(b: ^bu::Build) {
 		umka.addCSourceFile(b.path(s), {"-DUMKA_STATIC", "-Wno-date-time"})
 	}
 
+	umkaDocs := []bu::LazyPath{}
+	for i,m in umkaModules {
+		cmd := b.addSystemCommand("lib/umka/build/umka", "cmd/mmdoc/mmdoc.um", "-t")
+		cmd.addFileArg(b.path(m))
+		umkaDocs = append(umkaDocs, cmd.captureStdout())
+	}
+
+	cmd := b.addSystemCommand("lib/umka/build/umka")
+	cmd.addFileArg(b.path("cmd/buildhelper.um"))
+	cmd.addArgs("-standalone", "em", "th_em_modulesrc")
+	for i,m in umkaModules {
+		cmd.addFileArg(b.path(m))
+	}
+	cmd.addArgs(";", "argarr", "th_em_modulenames")
+	for i,m in umkaModules {
+		cmd.addArgs(trimPrefix(m, "umka/"))
+	}
+	cmd.addArgs(";", "em", "th_em_misc")
+	cmd.addFileArg(b.path("LICENSE"))
+	cmd.addFileArg(b.path("version"))
+	cmd.addArgs(";", "em", "th_em_moduledocs")
+	for i,p in umkaDocs {
+		cmd.addFileArg(p)
+	}
+	cmd.addArgs(";", "placeholders")
+	for i,p in placeholders {
+		cmd.addFileArg(b.path(p))
+	}
+	cmd.addArgs(";")
+	staembed := cmd.captureStdout()
+
 	tophat := b.addExecutable("tophat")
 	tophat.linkLibC()
 	for i,s in sources {
 		tophat.addCSourceFile(b.path(s), {"-DUMKA_STATIC", "-Wno-date-time"})
 	}
+	tophat.addCSourceFile(staembed, {}, .c)
 	tophat.addIncludePath(b.path("src"))
 	tophat.addIncludePath(b.path("lib/stb"))
 	tophat.addIncludePath(b.path("lib/miniaudio"))
