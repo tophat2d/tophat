@@ -97,14 +97,12 @@ fn build*(b: ^bu::Build) {
 
 	umkaDocs := []bu::LazyPath{}
 	for i,m in umkaModules {
-		cmd := b.addSystemCommand("lib/umka/build/umka", "cmd/mmdoc/mmdoc.um", "-t")
+		cmd := b.addUmkaScript(b.path("cmd/mmdoc/mmdoc.um"), "-t")
 		cmd.addFileArg(b.path(m))
 		umkaDocs = append(umkaDocs, cmd.captureStdout())
 	}
 
-	cmd := b.addSystemCommand("lib/umka/build/umka")
-	cmd.addFileArg(b.path("cmd/buildhelper.um"))
-	cmd.addArgs("-standalone", "em", "th_em_modulesrc")
+	cmd := b.addUmkaScript(b.path("cmd/buildhelper.um"), "-standalone", "em", "th_em_modulesrc")
 	for i,m in umkaModules {
 		cmd.addFileArg(b.path(m))
 	}
