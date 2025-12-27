@@ -5,8 +5,8 @@
 uint32_t
 th_color_rgb(float r, float g, float b, float a)
 {
-	return ((int)(r * 255) & 0xFF) << 24 | ((int)(g * 255) & 0xFF) << 16 |
-	    ((int)(b * 255) & 0xFF) << 8 | ((int)(a * 255) & 0xFF) << 0;
+	return ((uint32_t)(r * 255) & 0xFF) << 24 | ((uint32_t)(g * 255) & 0xFF) << 16 |
+	    ((uint32_t)(b * 255) & 0xFF) << 8 | ((uint32_t)(a * 255) & 0xFF) << 0;
 }
 
 // This function separates hue in 6 partitions:
