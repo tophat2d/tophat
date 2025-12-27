@@ -28,7 +28,6 @@ sources := []str {
 	"src/image.c",
 	"src/input.c",
 	"src/main.c",
-	"src/miniaudio.c",
 	"src/misc.c",
 	"src/nav.c",
 	"src/particles.c",
@@ -92,7 +91,7 @@ fn build*(b: ^bu::Build) {
 	umka := b.addStaticLibrary("umka")
 	umka.linkLibC()
 	for i,s in umkaSources {
-		umka.addCSourceFile(b.path(s), {"-DUMKA_EXT_LIBS", "-DUMKA_STATIC", "-Wno-date-time"})
+		umka.addCSourceFile(b.path(s), {"-DUMKA_EXT_LIBS", "-DUMKA_STATIC", "-Wno-date-time", "-fno-sanitize=undefined"})
 	}
 
 	umkaDocs := []bu::LazyPath{}
@@ -130,6 +129,7 @@ fn build*(b: ^bu::Build) {
 		tophat.addCSourceFile(b.path(s), {"-DUMKA_STATIC", "-Wno-date-time"})
 	}
 	tophat.addCSourceFile(staembed, {}, .c)
+	tophat.addCSourceFile(b.path("src/miniaudio.c"), { "-fno-sanitize=undefined" })
 	tophat.addIncludePath(b.path("src"))
 	tophat.addIncludePath(b.path("lib/stb"))
 	tophat.addIncludePath(b.path("lib/miniaudio"))
