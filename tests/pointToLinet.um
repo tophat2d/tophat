@@ -1,0 +1,34 @@
+
+import (
+	"canvas.um"
+	"th.um"
+	"coll.um"
+	"window.um"
+)
+
+fn init*() {
+	window::setup("point to line test", 640, 480)
+
+	ok := []bool{}
+	ok = append(ok, coll::pointToLine({ 0, 0 }, { 0, 0 }, { 10, 0 }))
+	ok = append(ok, coll::pointToLine({ 10, 0 }, { 0, 0 }, { 10, 0 }))
+	ok = append(ok, coll::pointToLine({ 5, 0 }, { 0, 0 }, { 10, 0 }))
+	ok = append(ok, coll::pointToLine({ 5, 5 }, { 0, 0 }, { 10, 10 }))
+	ok = append(ok, !coll::pointToLine({ 5, 5.1 }, { 0, 0 }, { 10, 10 }))
+	ok = append(ok, !coll::pointToLine({ 100, 20 }, { 0, 0 }, { 10, 10}))
+
+	window::onFrame.register(|ok| {
+		allOk := true
+		y := 5
+		for i in ok {
+			if ok[i] { continue }
+			allOk = false
+			canvas::drawText(sprintf("Failed: %d", i), { 5, y }, th::black, 4)
+			y += 5 * 5
+		}
+
+		if allOk {
+			canvas::drawText("All tests passed", { 5, y }, th::black, 4)
+		}
+	})
+}

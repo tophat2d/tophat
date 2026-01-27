@@ -1369,6 +1369,17 @@ umth_coll_line_to_line(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = th_line_to_line(b1, e1, b2, e2, ic);
 }
 
+// fn umth_coll_point_to_line(p, b, e: th::Vf2): bool
+void
+umth_coll_point_to_line(UmkaStackSlot *param, UmkaStackSlot *r)
+{
+	th_vf2 p = *(th_vf2 *)umkaGetParam(param, 0);
+	th_vf2 b = *(th_vf2 *)umkaGetParam(param, 1);
+	th_vf2 e = *(th_vf2 *)umkaGetParam(param, 2);
+
+	umkaGetResult(param, r)->intVal = th_point_to_line(p, b, e);
+}
+
 // fn umth_coll_point_to_quad(v: th::Vf2, q: th::Quad, ic: ^th::Vf2): bool
 void
 umth_coll_point_to_quad(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1605,6 +1616,7 @@ _th_umka_bind(void *umka)
 
 	// collisions
 	umkaAddFunc(umka, "umth_coll_line_to_line", &umth_coll_line_to_line);
+	umkaAddFunc(umka, "umth_coll_point_to_line", &umth_coll_point_to_line);
 	umkaAddFunc(umka, "umth_coll_point_to_quad", &umth_coll_point_to_quad);
 	umkaAddFunc(umka, "umth_coll_line_to_quad", &umth_coll_line_to_quad);
 	umkaAddFunc(umka, "umth_coll_quad_to_quad", &umth_coll_quad_to_quad);

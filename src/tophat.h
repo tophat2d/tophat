@@ -450,6 +450,8 @@ th_canvas_end_frame();
 // collisions
 int
 th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
+int
+th_point_to_line(th_vf2 p, th_vf2 b, th_vf2 e);
 uu
 th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic);
 uu

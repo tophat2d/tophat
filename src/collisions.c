@@ -25,6 +25,17 @@ th_line_to_line(th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic1)
 	return 0;
 }
 
+int
+th_point_to_line(th_vf2 p, th_vf2 b, th_vf2 e)
+{
+	float line_dist = sqrtf(fabsf((e.x - b.x) * (e.x - b.x) + (e.y - b.y) * (e.y - b.y)));
+	float b_dist = (p.x - b.x) * (p.x - b.x) + (p.y - b.y) * (p.y - b.y);
+	float e_dist = (p.x - e.x) * (p.x - e.x) + (p.y - e.y) * (p.y - e.y);
+	float check_dist = sqrtf(fabsf(b_dist)) + sqrtf(fabsf(e_dist));
+
+	return fabsf(check_dist - line_dist) < FLT_EPSILON * (line_dist + check_dist);
+}
+
 uu
 th_point_to_quad(th_vf2 p, th_quad *q, th_vf2 *ic)
 {

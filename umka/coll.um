@@ -15,6 +15,14 @@ fn lineToLine*(b1, e1, b2, e2: th::Vf2, ic: ^th::Vf2): bool {
 	return umth_coll_line_to_line(b1, e1, b2, e2, ic)
 }
 
+fn umth_coll_point_to_line(p, b, e: th::Vf2): bool
+//~~fn pointToLine
+// Checks for a collision a point and a line.
+fn pointToLine*(p, b, e: th::Vf2): bool {
+//~~
+	return umth_coll_point_to_line(p, b, e)
+}
+
 fn umth_coll_point_to_quad(p: th::Vf2, q: th::Quad, ic: ^th::Vf2): bool
 //~~fn vf2ToQuad
 // Checks for a collision between a vf2 and a quad.

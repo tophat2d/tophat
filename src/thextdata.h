@@ -21,6 +21,7 @@ THEXT(void, th_canvas_begin_scissor_rect, th_rect rect);
 THEXT(void, th_canvas_end_scissor);
 THEXT(void, th_canvas_end_frame);
 THEXT(int, th_line_to_line, th_vf2 b1, th_vf2 e1, th_vf2 b2, th_vf2 e2, th_vf2 *ic);
+THEXT(int, th_point_to_line, th_vf2 p, th_vf2 b, th_vf2 e);
 THEXT(uu, th_point_to_quad, th_vf2 p, th_quad *q, th_vf2 *ic);
 THEXT(uu, th_quad_to_quad, th_quad *q1, th_quad *q2, th_vf2 *ic);
 THEXT(uu, th_ent_to_ent, th_ent *e1, th_ent *e2, th_vf2 *ic);
