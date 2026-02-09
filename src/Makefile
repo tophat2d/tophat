@@ -27,7 +27,6 @@ UMKA_MODULES = \
 	umka/placeholders.um \
 	umka/rect.um \
 	umka/rt.um \
-	umka/shader.um \
 	umka/signal.um \
 	umka/th.um \
 	umka/tilemap.um \
