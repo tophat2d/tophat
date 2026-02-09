@@ -5,6 +5,7 @@ tophat
 tophat.exe
 tophatnc.exe
 src/umkalibs.h
+src/staembed.c
 lib/stb_image.h
 lib/miniaudio.h
 tophat-linux.zip
