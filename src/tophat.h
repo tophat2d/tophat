@@ -602,6 +602,10 @@ th_vector_normalize(float *x, float *y);
 // sokol
 uint32_t
 th_sg_get_gl_image(sg_image img);
+void
+th_sapp_hide_window();
+void
+th_sapp_show_window();
 
 // tilemap
 void
@@ -652,6 +656,8 @@ void
 th_window_set_fullscreen(bool fullscreen);
 sapp_desc
 th_window_sapp_desc();
+void
+th_window_set_hidden(bool hidden);
 
 #endif
 

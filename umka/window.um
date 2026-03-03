@@ -32,6 +32,11 @@ type Cursor* = enum {
 }
 //~~
 
+//~~Window setup options
+type WindowSetupOptions* = struct {
+	hidden: bool // hide by default
+}
+
 //~~Window dimensions
 var (
 	w*, h*: int32
@@ -50,6 +55,7 @@ var onDestroy*: signal::Signal
 //~~
 
 fn umth_window_setup(title: str, w, h: int)
+fn umth_window_set_hidden(hidden: bool)
 fn umth_window_get_dimensions(w, h: ^int32)
 
 fn umth_window_set_viewport(dm: th::Vf2)
@@ -95,10 +101,13 @@ fn umth_window_get_platform_id(): th::Platform
 
 //~~fn setup
 // Sets up the engine and opens a window.
-fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
+fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400, options: WindowSetupOptions = {}) {
 //~~
 	w, h = width, height
 	umth_window_setup(title, width, height)
+	if options.hidden {
+		umth_window_set_hidden(true)
+	}
 
 	th::platform = umth_window_get_platform_id()
 
@@ -111,6 +120,13 @@ fn setup*(title: str = "tophat game", width: int = 400, height: int32 = 400) {
 	start = std::clock() * 1000
 
 	setViewport({width, height})
+}
+
+//~~fn hide
+// Hides/shows the window.
+fn hide*(hide: bool) {
+//~~
+	umth_window_set_hidden(hide)
 }
 
 fn cycle(delta: real) {

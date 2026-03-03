@@ -11,6 +11,7 @@ import (
 
 cursorShow := true
 cursorFreeze := false
+unhideCountdown := 100
 
 fn init*() {
 	window::setup("window test", 400, 400)
@@ -19,7 +20,12 @@ fn init*() {
 	window::setDims(th::Vf2{500, 400})
 	window::setIcon(placeholders::test)
 
-	window::onFrame.register(signal::Callback{
+	window::onFrame.register({
+		unhideCountdown--
+		if unhideCountdown == 0 {
+			window::hide(false)
+		}
+
 		canvas::drawLine(th::black, th::Vf2{0, 0}, th::Vf2{100, 100}, 1)
 		canvas::drawLine(th::red, input::getMousePos(),
 			input::getMousePos().sub(input::getMouseDelta()), 1)
@@ -44,6 +50,11 @@ fn init*() {
 
 		if input::isJustPressedc('M') {
 			printf("%s\n", window::getClipboard())
+		}
+
+		if input::isJustPressedc('H') {
+			window::hide(true)
+			unhideCountdown = 100
 		}
 	})
 }

@@ -1183,6 +1183,15 @@ umth_window_set_target_fps(UmkaStackSlot *p, UmkaStackSlot *r)
 	*th_sapp_swap_interval = fps;
 }
 
+// fn umth_window_set_hidden(hidden: bool)
+void
+umth_window_set_hidden(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	bool hidden = umkaGetParam(p, 0)->intVal;
+
+	th_window_set_hidden(hidden);
+}
+
 ///////////////////////
 // canvas
 
@@ -1594,6 +1603,7 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_window_request_exit", &umth_window_request_exit);
 	umkaAddFunc(umka, "umth_window_set_target_fps", &umth_window_set_target_fps);
 	umkaAddFunc(umka, "umth_window_get_platform_id", &umth_window_get_platform_id);
+	umkaAddFunc(umka, "umth_window_set_hidden", &umth_window_set_hidden);
 
 	// canvas
 	umkaAddFunc(umka, "umth_canvas_draw_text", &umth_canvas_draw_text);

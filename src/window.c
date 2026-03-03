@@ -142,8 +142,10 @@ th_window_sapp_desc()
 	    .icon.sokol_default = true,
 	    .logger.func = slog_func,
 	    .high_dpi = thg->dpi_aware,
-	    .gl_major_version = 4,
-	    .gl_minor_version = 1,
+			.gl = (sapp_gl_desc){
+		    .major_version = 4,
+		    .minor_version = 1,
+			}
 #ifdef __EMSCRIPTEN__
 	    .html5_bubble_mouse_events = true,
 	    .html5_bubble_touch_events = true,
@@ -239,7 +241,6 @@ th_window_set_title(const char *title)
 }
 
 // ---- PLATFORM DEPENDENT CODE
-
 #ifdef _WIN32
 th_window_handle
 th_get_window_handle()
@@ -269,6 +270,12 @@ th_window_set_dims(th_vf2 dm)
 		SetWindowPos(hwnd, HWND_TOP, r.left, r.top, w, h, 0);
 	}
 }
+
+void
+th_window_set_hidden(bool hidden)
+{
+	ShowWindow(th_get_window_handle(), hidden ? SW_HIDE : SW_SHOW);
+}
 #elif __linux__
 extern Window *th_sapp_win;
 extern Display **th_sapp_dpy;
@@ -283,6 +290,15 @@ th_window_set_dims(th_vf2 dm)
 {
 	XResizeWindow(*th_sapp_dpy, *th_sapp_win, dm.x, dm.y);
 }
+
+// NOTE: copied and pasted from sokol private API
+void th_window_set_hidden(bool hidden)
+{
+	if (hidden)
+		th_sapp_hide_window();
+	else
+		th_sapp_show_window();
+}
 #elif defined(__EMSCRIPTEN__)
 th_window_handle
 th_get_window_handle()
@@ -294,6 +310,11 @@ void
 th_window_set_dims(th_vf2 dm)
 {
 	// FIXME: FAKE
+}
+
+void th_window_set_hidden(bool hidden)
+{
+	// what do we do here?
 }
 #else
 #error Unsupported platform

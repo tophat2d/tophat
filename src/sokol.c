@@ -22,6 +22,18 @@
 #include <X11/Xlib.h>
 Window *th_sapp_win = &_sapp.x11.window;
 Display **th_sapp_dpy = &_sapp.x11.display;
+
+void
+th_sapp_show_window()
+{
+	_sapp_x11_show_window();
+}
+
+void
+th_sapp_hide_window()
+{
+	_sapp_x11_hide_window();
+}
 #endif
 int *th_sapp_swap_interval = &_sapp.swap_interval;
 
