@@ -21,10 +21,6 @@ add_library(umka
 
 target_compile_definitions(umka PRIVATE -DUMKA_BUILD -DUMKA_EXT_LIBS)
 
-file(GLOB TH_SOURCE_FILES
-  "src/*.c"
-)
-
 if (MSVC)
 	execute_process(
 		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/cmd/win-buildmodules.bat
@@ -39,6 +35,9 @@ else()
 	message("staembed.c might be outdated, rebuild using makefile")
 endif()
 
+file(GLOB TH_SOURCE_FILES
+  "src/*.c"
+)
 
 add_executable(tophat ${TH_SOURCE_FILES})
 
