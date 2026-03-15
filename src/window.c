@@ -142,16 +142,18 @@ th_window_sapp_desc()
 	    .icon.sokol_default = true,
 	    .logger.func = slog_func,
 	    .high_dpi = thg->dpi_aware,
-			.gl = (sapp_gl_desc){
-		    .major_version = 4,
-		    .minor_version = 1,
-			}
+	    .gl = (sapp_gl_desc){
+	      .major_version = 4,
+	      .minor_version = 1,
+	    }
 #ifdef __EMSCRIPTEN__
-	    .html5_bubble_mouse_events = true,
-	    .html5_bubble_touch_events = true,
-	    .html5_bubble_wheel_events = true,
-	    .html5_bubble_key_events = true,
-	    .html5_bubble_char_events = true,
+	    .html5 = {
+	        .bubble_mouse_events = true,
+	        .bubble_touch_events = true,
+	        .bubble_wheel_events = true,
+	        .bubble_key_events = true,
+	        .bubble_char_events = true,
+	    }
 #endif
 	};
 }
