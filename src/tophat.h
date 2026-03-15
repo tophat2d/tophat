@@ -250,6 +250,27 @@ typedef struct
 	fu pressure;
 } th_gamepad_button;
 
+typedef enum
+{
+	th_gamepad_button_a,
+	th_gamepad_button_b,
+	th_gamepad_button_x,
+	th_gamepad_button_y,
+	th_gamepad_button_lt,
+	th_gamepad_button_rt,
+	th_gamepad_button_lb,
+	th_gamepad_button_rb,
+	th_gamepad_button_select,
+	th_gamepad_button_start,
+	th_gamepad_button_up,
+	th_gamepad_button_down,
+	th_gamepad_button_left,
+	th_gamepad_button_right,
+	th_gamepad_button_left_stick,
+	th_gamepad_button_right_stick,
+	th_gamepad_button_count,
+} th_gamepad_button_id;
+
 typedef struct
 {
 	bool connected;
