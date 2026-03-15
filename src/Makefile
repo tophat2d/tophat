@@ -2,7 +2,8 @@
 _:
 	@echo run make from repository root && false
 
-SRCS = $(shell find src/ -name \*.c -print) # lib/chew.c
+SRCS := $(wildcard src/*.c)
+SRCS += $(filter-out $(SRCS),src/staembed.c)
 OBJS = $(sort $(SRCS:.c=.o))
 DEPS = $(OBJS:.o=.d)
 
@@ -55,7 +56,7 @@ $(EM_TARGET): $(UMKA_MODULES) $(UMKA_DOCS) $(IMAGES_MOD) LICENSE version $(HELPE
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MD -o $@ -c $<
 
-$(TARGET): $(UMKA_LIBRARY) $(EM_TARGET) $(OBJS)
+$(TARGET): $(UMKA_LIBRARY) $(OBJS)
 	@echo LD $@
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LDLIBS) $(LDFLAGS)
 
@@ -63,7 +64,7 @@ src/thextdata.h:
 	@echo
 
 UMKA_SRC=lib/umka/src/umka_common.c lib/umka/src/umka_const.c lib/umka/src/umka_expr.c lib/umka/src/umka_ident.c lib/umka/src/umka_runtime.c lib/umka/src/umka_types.c lib/umka/src/umka_api.c lib/umka/src/umka_compiler.c lib/umka/src/umka_decl.c lib/umka/src/umka_gen.c lib/umka/src/umka_lexer.c lib/umka/src/umka_stmt.c lib/umka/src/umka_vm.c
-cross: $(UMKA_RUNTIME_SRC)
+cross: $(UMKA_RUNTIME_SRC) $(SRCS)
 	$(CROSS_CC) -o tophat.exe -static $(SRCS) $(UMKA_SRC) $(CFLAGS) $(CROSS_FLAGS)
 
 bulk: $(UMKA_LIB) $(UMKA_LIBRARY)
@@ -73,6 +74,7 @@ clean::
 	$(RM) $(OBJS)
 	$(RM) $(DEPS)
 	$(RM) umkalibs.h
+	$(RM) $(EM_TARGET)
 
 -include $(DEPS)
 
