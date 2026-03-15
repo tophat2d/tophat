@@ -145,7 +145,7 @@ th_window_sapp_desc()
 	    .gl = (sapp_gl_desc){
 	      .major_version = 4,
 	      .minor_version = 1,
-	    }
+	    },
 #ifdef __EMSCRIPTEN__
 	    .html5 = (sapp_html5_desc){
 	        .bubble_mouse_events = true,
