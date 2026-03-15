@@ -147,7 +147,7 @@ th_window_sapp_desc()
 	      .minor_version = 1,
 	    }
 #ifdef __EMSCRIPTEN__
-	    .html5 = {
+	    .html5 = (sapp_html5_desc){
 	        .bubble_mouse_events = true,
 	        .bubble_touch_events = true,
 	        .bubble_wheel_events = true,
