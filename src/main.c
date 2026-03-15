@@ -462,6 +462,7 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShow
 	sapp_run(&desc);
 
 	free_argv(argc, argv);
+	return 0;
 }
 #else
 int
