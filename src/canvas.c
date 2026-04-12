@@ -9,8 +9,6 @@
 
 #ifdef EMSCRIPTEN
 #include "shader-web.glsl.h"
-#elif defined (__ANDROID__)
-#include "shader-web.glsl.h"
 #else
 #include "shader.glsl.h"
 #endif

@@ -11,10 +11,6 @@
 #include <unistd.h>
 #endif
 
-#ifdef __ANDROID__
-#include <android/log.h>
-#endif
-
 #define MSG_LEN 1024
 
 extern th_global *thg;
@@ -52,8 +48,6 @@ th_error(char *text, ...)
 {
 #ifdef __EMSCRIPTEN__
 	fprintf(stderr, "error: ");
-#elif defined(__ANDROID__)
-	// No prefix
 #else
 	if (isatty(fileno(stderr))) {
 		fprintf(stderr, "\x1b[1m\x1b[31merror: \x1b[0m");
@@ -72,12 +66,8 @@ th_error(char *text, ...)
 		MessageBox(NULL, buf, "tophat error", 0x10);
 	}
 #endif
-#ifdef __ANDROID__
-    __android_log_vprint(ANDROID_LOG_ERROR, "tophat", text, args);
-#else
 	vfprintf(stderr, text, args);
 	fprintf(stderr, "\n");
-#endif
 	va_end(args);
 }
 
@@ -94,13 +84,8 @@ th_info(char *text, ...)
 		MessageBox(NULL, buf, "information", 0x40);
 	}
 #endif
-#ifdef __ANDROID__
-    __android_log_vprint(ANDROID_LOG_INFO, "tophat", text, args);
-#else
 	vfprintf(stderr, text, args);
 	fprintf(stderr, "\n");
-    fflush(stderr);
-#endif
 	va_end(args);
 }
 
@@ -204,11 +189,7 @@ th_print_umka_error_and_quit(int code)
 	if (error->code != 0 && error->msg[0]) {
 		th_error("%s (%d): %s\n", error->fileName, error->line, error->msg);
 
-#ifdef __ANDROID__
-		__android_log_print(ANDROID_LOG_ERROR, "tophat", "\tStack trace:");
-#else
 		fprintf(stderr, "\tStack trace:\n");
-#endif
 
 		for (int depth = 0; depth < 10; depth++) {
 			char fnName[MSG_LEN + 1];
@@ -217,16 +198,9 @@ th_print_umka_error_and_quit(int code)
 
 			if (!umkaGetCallStack(
 				thg->umka, depth, MSG_LEN + 1, &offset, file, fnName, &line)) {
-#ifdef __ANDROID__
-				__android_log_print(ANDROID_LOG_ERROR, "tophat", "\t\t...");
-#else
 				fprintf(stderr, "\t\t...\n");
-#endif
 				break;
 			}
-#ifdef __ANDROID__
-			__android_log_print(ANDROID_LOG_ERROR, "tophat", "\t\t%s:%06d: %s", file, line, fnName);
-#else
 			if (isatty(fileno(stderr))) {
 				fprintf(stderr, "\033[34m");
 			}
@@ -235,7 +209,6 @@ th_print_umka_error_and_quit(int code)
 				fprintf(stderr, "\033[0m");
 			}
 			fprintf(stderr, "%s\n", fnName);
-#endif
 		}
 	}
 

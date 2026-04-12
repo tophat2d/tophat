@@ -4,8 +4,6 @@
 #ifdef _WIN32
 #include <windows.h>
 #define _CRT_SECURE_NO_WARNINGS
-#elif defined(__ANDROID__)
-// Nothing to include 
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #endif
@@ -125,7 +123,7 @@ typedef struct
 
 typedef struct
 {
-    ma_sound inst;
+	ma_sound inst;
 	bool copied;
 } th_sound;
 
@@ -210,8 +208,6 @@ typedef struct
 
 #ifdef _WIN32
 typedef void *th_window_handle;
-#elif defined(__ANDROID__)
-typedef void *th_window_handle;
 #elif __linux__
 #include <X11/Xlib.h>
 typedef Window *th_window_handle;
@@ -253,6 +249,27 @@ typedef struct
 	uu just_released;
 	fu pressure;
 } th_gamepad_button;
+
+typedef enum
+{
+	th_gamepad_button_a,
+	th_gamepad_button_b,
+	th_gamepad_button_x,
+	th_gamepad_button_y,
+	th_gamepad_button_lt,
+	th_gamepad_button_rt,
+	th_gamepad_button_lb,
+	th_gamepad_button_rb,
+	th_gamepad_button_select,
+	th_gamepad_button_start,
+	th_gamepad_button_up,
+	th_gamepad_button_down,
+	th_gamepad_button_left,
+	th_gamepad_button_right,
+	th_gamepad_button_left_stick,
+	th_gamepad_button_right_stick,
+	th_gamepad_button_count,
+} th_gamepad_button_id;
 
 typedef struct
 {

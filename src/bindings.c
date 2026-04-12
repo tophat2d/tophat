@@ -724,7 +724,7 @@ umth_input_gamepad_is_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = umkaGetParam(p, 0)->intVal;
 	int button = umkaGetParam(p, 1)->intVal;
 
-	if (gamepad < 0 || gamepad >= 4) {
+	if (gamepad < 0 || gamepad >= 4 || button < 0 || button >= th_gamepad_button_count) {
 		umkaGetResult(p, r)->intVal = 0;
 		return;
 	}
@@ -739,7 +739,7 @@ umth_input_gamepad_is_just_pressed(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = umkaGetParam(p, 0)->intVal;
 	int button = umkaGetParam(p, 1)->intVal;
 
-	if (gamepad < 0 || gamepad >= 4) {
+	if (gamepad < 0 || gamepad >= 4 || button < 0 || button >= th_gamepad_button_count) {
 		umkaGetResult(p, r)->intVal = 0;
 		return;
 	}
@@ -754,7 +754,7 @@ umth_input_gamepad_is_just_released(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = umkaGetParam(p, 0)->intVal;
 	int button = umkaGetParam(p, 1)->intVal;
 
-	if (gamepad < 0 || gamepad >= 4) {
+	if (gamepad < 0 || gamepad >= 4 || button < 0 || button >= th_gamepad_button_count) {
 		umkaGetResult(p, r)->intVal = 0;
 		return;
 	}
@@ -769,7 +769,7 @@ umth_input_gamepad_pressure(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = umkaGetParam(p, 0)->intVal;
 	int button = umkaGetParam(p, 1)->intVal;
 
-	if (gamepad < 0 || gamepad >= 4) {
+	if (gamepad < 0 || gamepad >= 4 || button < 0 || button >= th_gamepad_button_count) {
 		umkaGetResult(p, r)->realVal = 0;
 		return;
 	}
@@ -784,7 +784,7 @@ umth_input_gamepad_stick(UmkaStackSlot *p, UmkaStackSlot *r)
 	int gamepad = umkaGetParam(p, 0)->intVal;
 	int stick = umkaGetParam(p, 1)->intVal;
 
-	if (gamepad < 0 || gamepad >= 4) {
+	if (gamepad < 0 || gamepad >= 4 || stick < 0 || stick >= 2) {
 		*(th_vf2 *)umkaGetResult(p, r)->ptrVal = (th_vf2){0};
 		return;
 	}
