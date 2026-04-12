@@ -4,4 +4,7 @@ copy demos\flappy\sfx\*.* android\app\src\main\assets\tophat
 
 set ANDROID_HOME=%LOCALAPPDATA%\Android\Sdk
 cd android
-gradlew assembleDebug
+call gradlew assembleDebug
+cd ..
+
+copy android\app\build\outputs\apk\debug\app-debug.apk tophat-debug.apk
