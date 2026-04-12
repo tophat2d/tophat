@@ -26,6 +26,12 @@
 #endif
 #include <sokol_app.h>
 
+#ifdef __ANDROID__
+#include <android/asset_manager.h>
+#include <android/native_activity.h>
+#include <android/log.h>
+#endif
+
 #ifndef TH_VERSION
 #define TH_VERSION ""
 #define TH_GITVER ""
@@ -42,9 +48,44 @@ extern int th_em_modulenames_count;
 static void
 warning(UmkaError *error)
 {
-	fprintf(stderr, "Warning %s (%d, %d): %s\n", error->fileName, error->line, error->pos,
-	    error->msg);
+#ifdef __ANDROID__
+    __android_log_print(ANDROID_LOG_WARN, "tophat", "Warning %s (%d, %d): %s\n", error->fileName, error->line, error->pos, error->msg);
+#else
+	fprintf(stderr, "Warning %s (%d, %d): %s\n", error->fileName, error->line, error->pos, error->msg);
+#endif
 }
+
+#ifdef __ANDROID__
+static void
+th_android_copy_dir(AAssetManager *mgr, const char *assets_folder, const char *target_folder)
+{
+	mkdir(target_folder, 0777);
+
+	AAssetDir *dir = AAssetManager_openDir(mgr, assets_folder);
+
+	const char *asset_name;
+	while ((asset_name = AAssetDir_getNextFileName(dir))) {
+		char asset_file_name[BUFSIZ], target_file_name[BUFSIZ];
+		snprintf(asset_file_name, BUFSIZ, "%s/%s", assets_folder, asset_name);
+		snprintf(target_file_name, BUFSIZ, "%s/%s", target_folder, asset_name);
+
+		AAsset *asset = AAssetManager_open(mgr, asset_file_name, AASSET_MODE_STREAMING);
+		FILE *file = fopen(target_file_name, "wb");
+		if (asset && file) {
+			const char *asset_buf = AAsset_getBuffer(asset);
+			const int asset_len = AAsset_getLength(asset);
+			if (asset_buf)
+				fwrite(asset_buf, asset_len, 1, file);
+		}
+
+		if (asset)
+			AAsset_close(asset);
+		if (file)
+			fclose(file);
+	}
+	AAssetDir_close(dir);
+}
+#endif
 
 int
 th_init(const char *scriptpath, const char *script_src)
@@ -56,6 +97,9 @@ th_init(const char *scriptpath, const char *script_src)
 		thg->res_dir[strlen(thg->res_dir) - len] = '\0';
 	}
 
+#ifdef __ANDROID__
+	thg->data_dir = strdup(thg->res_dir);
+#else
 	{
 		char *res_dir = thg->res_dir;
 #ifdef _WIN32
@@ -101,6 +145,7 @@ th_init(const char *scriptpath, const char *script_src)
 		free(abs);
 #endif
 	}
+#endif
 
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
 			    "fn __th_init*() {\n"
@@ -120,7 +165,7 @@ th_init(const char *scriptpath, const char *script_src)
 		umprofInit(thg->umka);
 
 	if (!umkaOK) {
-		printf("Could not initialize umka.\n");
+		th_error("Could not initialize Umka");
 		return 1;
 	}
 
@@ -268,8 +313,20 @@ th_main(int argc, char *argv[])
 	thg->argc = argc;
 	thg->argv = argv;
 
-	const char *scriptpath = "main.um";
+    const char *scriptpath = "main.um";
 
+#ifdef __ANDROID__
+	ANativeActivity *activity = (ANativeActivity *)sapp_android_get_native_activity();
+
+	char androidscriptpath[BUFSIZ];
+	snprintf(androidscriptpath, sizeof(androidscriptpath), "%s/tophat/main.um", activity->externalDataPath);
+    scriptpath = androidscriptpath;
+
+    char target_folder[BUFSIZ];
+    snprintf(target_folder, BUFSIZ, "%s/tophat", activity->externalDataPath);
+
+    th_android_copy_dir(activity->assetManager, "tophat", target_folder);
+#else
 	thg->argOffset = 1;
 	while ((argc - thg->argOffset) > 0) {
 		if (strcmp(argv[thg->argOffset], "-dpiaware") == 0) {
@@ -388,6 +445,7 @@ th_main(int argc, char *argv[])
 			break; // NOTE(skejeton): This is for arguments in the game itself
 		}
 	}
+#endif
 
 	char regularizedScriptPath[BUFSIZ];
 	th_regularize_path(scriptpath, "./", regularizedScriptPath, sizeof regularizedScriptPath);
@@ -462,7 +520,20 @@ WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShow
 	sapp_run(&desc);
 
 	free_argv(argc, argv);
-	return 0;
+}
+#elif defined(__ANDROID__)
+sapp_desc sokol_main(int argc, char* argv[])
+{
+    int code = th_main(argc, argv);
+    if (code != 0)
+    {
+        th_error("Could not initialize tophat");
+        exit(code);
+    }
+
+    desc = th_window_sapp_desc();
+
+	return desc;
 }
 #else
 int
