@@ -1056,12 +1056,15 @@ umth_window_get_dpi_scale(UmkaStackSlot *p, UmkaStackSlot *r)
 // 2 = windows
 // 3 = macos (unsupported currently)
 // 4 = emscripten
+// 5 = android
 // fn umth_window_get_platform_id(): th::Platform
 void
 umth_window_get_platform_id(UmkaStackSlot *p, UmkaStackSlot *r)
 {
 #ifdef _WIN32
 	umkaGetResult(p, r)->intVal = 2;
+#elif defined(__ANDROID__)
+	umkaGetResult(p, r)->intVal = 5;
 #elif __linux__
 	umkaGetResult(p, r)->intVal = 1;
 #elif defined(__EMSCRIPTEN__)

@@ -270,9 +270,14 @@ fn init*() {
 
 	// setup the x motion
 	motion = { 0.2, 0 }
+	
+	// find assets
+	gfxPath := th::platform == .android ? "res://" : "gfx/"
+	sfxPath := th::platform == .android ? "res://" : "sfx/"
+	fntPath := th::platform == .android ? "res://" : ""
 
 	// load the bird image
-	birdImage, err := image::load("gfx/bird.png")
+	birdImage, err := image::load(gfxPath + "bird.png")
 	std::exitif(err)
 	// setup bird entity
 	birdAtlas = atlas::mk(birdImage, { 2, 1 })
@@ -292,7 +297,7 @@ fn init*() {
 	pillarPrefab.c = th::red
 
 	// setup the pillar nine-patch
-	pillarImg, err = image::load("gfx/pipe.png")
+	pillarImg, err = image::load(gfxPath + "pipe.png")
 	std::exitif(err)
 	// the outer rectangle is the whole image
 	pillarImgOuter = rect::fromVf2({}, pillarImg.getDims())
@@ -300,25 +305,25 @@ fn init*() {
 	pillarImgInner = { 9, 32, 46, 1 }
 
 	// load the background image
-	backgroundImg, err = image::load("gfx/bg.png")
+	backgroundImg, err = image::load(gfxPath + "bg.png")
 	std::exitif(err)
 
 	// load and setup the button image
-	buttonImg,err  = image::load("gfx/button.png")
+	buttonImg,err  = image::load(gfxPath + "button.png")
 	std::exitif(err)
 
 	buttonImgOuter = rect::fromVf2({}, buttonImg.getDims())
 	buttonImgInner = { 4, 4, 24, 24 }
 
-	ft, err = font::load("ComicNeue-Regular.ttf", 64)
+	ft, err = font::load(fntPath + "ComicNeue-Regular.ttf", 64)
 	std::exitif(err)
 
-	jumpSound, err = audio::load("sfx/jump.wav")
+	jumpSound, err = audio::load(sfxPath + "jump.wav")
 	std::exitif(err)
 
 	jumpSound.setVol(0.1)
 
-	dieSound, err = audio::load("sfx/hitHurt.wav")
+	dieSound, err = audio::load(sfxPath + "hitHurt.wav")
 	std::exitif(err)
 
 	dieSound.setVol(0.6)
