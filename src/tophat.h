@@ -4,6 +4,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #define _CRT_SECURE_NO_WARNINGS
+#elif defined(__ANDROID__)
+// Nothing to include 
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #endif
@@ -123,7 +125,7 @@ typedef struct
 
 typedef struct
 {
-	ma_sound inst;
+    ma_sound inst;
 	bool copied;
 } th_sound;
 
@@ -207,6 +209,8 @@ typedef struct
 } th_em_placeholder;
 
 #ifdef _WIN32
+typedef void *th_window_handle;
+#elif defined(__ANDROID__)
 typedef void *th_window_handle;
 #elif __linux__
 #include <X11/Xlib.h>
