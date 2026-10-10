@@ -17,6 +17,8 @@ src/*.d
 **/th_wasm_data
 th_emscripten.a
 umka/**/*.md
+package
+.DS_Store
 
 # Windows:
 .obj

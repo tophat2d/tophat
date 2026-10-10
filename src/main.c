@@ -250,9 +250,18 @@ run_playground(const char *src)
 
 #endif
 
+bool th_set_bundle_to_cwd(void);
+
 static int
 th_main(int argc, char *argv[])
 {
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
+	if (!th_set_bundle_to_cwd()) {
+		th_error("Could not access application resources");
+		return 1;
+	}
+#endif
+	
 #ifdef _WIN32
 	// Enable colored text in Windows console
 	HANDLE hOutput = GetStdHandle(STD_OUTPUT_HANDLE);
@@ -268,7 +277,11 @@ th_main(int argc, char *argv[])
 	thg->argc = argc;
 	thg->argv = argv;
 
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
 	const char *scriptpath = "main.um";
+#else
+	const char *scriptpath = "main.um";
+#endif
 
 	thg->argOffset = 1;
 	while ((argc - thg->argOffset) > 0) {

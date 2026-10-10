@@ -26,10 +26,11 @@ in vec2 uv;
 in vec4 color;
 
 void main() {
-  frag_color = color * texture(sampler2D(tex, smp), uv);
+  frag_color = texture(sampler2D(tex, smp), uv);
   if (premultiply > 0.5) {
 		frag_color.rgb *= frag_color.a;
 	}
+	frag_color.rgba *= vec4(color.rgb * color.a, color.a);
 }
 @end
 

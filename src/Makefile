@@ -4,8 +4,16 @@ _:
 
 SRCS := $(wildcard src/*.c)
 SRCS += $(filter-out $(SRCS),src/staembed.c)
-OBJS = $(sort $(SRCS:.c=.o))
-DEPS = $(OBJS:.o=.d)
+
+ifeq ($(PLATFORM), Darwin)
+	SRCS := $(filter-out src/sokol.c,$(SRCS)) src/sokol.m
+endif
+
+OBJS := $(sort $(SRCS:.c=.o))
+OBJS := $(OBJS:.m=.o)
+DEPS := $(OBJS:.o=.d)
+
+$(info $(SRCS))
 
 HELPER_SCRIPT = cmd/buildhelper.um
 EM_TARGET = src/staembed.c
@@ -52,6 +60,10 @@ $(EM_TARGET): $(UMKA_MODULES) $(UMKA_DOCS) $(IMAGES_MOD) LICENSE version $(HELPE
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_moduledocs $(UMKA_DOCS) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) placeholders $(IMAGES) >> $(EM_TARGET)
 
+%.o: %.m
+	@echo CC $@
+	@$(CC) $(CFLAGS) -MD -o $@ -c $<
+
 %.o: %.c
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MD -o $@ -c $<
@@ -77,4 +89,3 @@ clean::
 	$(RM) $(EM_TARGET)
 
 -include $(DEPS)
-

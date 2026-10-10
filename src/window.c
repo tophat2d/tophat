@@ -116,6 +116,12 @@ event(const sapp_event *ev)
 	case SAPP_EVENTTYPE_MOUSE_UP:
 		th_input_key(ev->mouse_button + 1, ev->type == SAPP_EVENTTYPE_MOUSE_DOWN);
 		break;
+	case SAPP_EVENTTYPE_TOUCHES_BEGAN:
+	case SAPP_EVENTTYPE_TOUCHES_CANCELLED:
+	case SAPP_EVENTTYPE_TOUCHES_ENDED:
+	case SAPP_EVENTTYPE_TOUCHES_MOVED:
+		th_input_touch(ev);
+		break;
 	}
 }
 
@@ -195,6 +201,8 @@ th_window_set_fullscreen(bool fullscreen)
 void
 th_window_set_icon(th_image *img)
 {
+	// It looks bad on macOS and iOS and generally you don't want to override the icon from .app
+#if !defined(__APPLE__)
 	uint8_t *pixels = th_image_data_reverse(th_image_get_data(img), img->dm);
 
 	sapp_set_icon(
@@ -204,6 +212,7 @@ th_window_set_icon(th_image *img)
 				      .size = img->dm.x * img->dm.y * sizeof(uint32_t)}}}});
 
 	free(pixels);
+#endif
 }
 
 void
@@ -301,7 +310,7 @@ void th_window_set_hidden(bool hidden)
 	else
 		th_sapp_show_window();
 }
-#elif defined(__EMSCRIPTEN__)
+#elif defined(__EMSCRIPTEN__) || (defined(__APPLE__) && defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
 th_window_handle
 th_get_window_handle()
 {
@@ -317,6 +326,29 @@ th_window_set_dims(th_vf2 dm)
 void th_window_set_hidden(bool hidden)
 {
 	// what do we do here?
+}
+#elif defined(__APPLE__)
+// TODO: macOS placeholder
+
+th_window_handle
+th_get_window_handle()
+{
+	return sapp_macos_get_window();
+}
+
+// defined in sokol.m
+void th_sapp_set_window_dims(const void *window, int w, int h);
+void th_sapp_set_window_hidden(const void *window, bool hidden);
+
+void
+th_window_set_dims(th_vf2 dm)
+{
+	th_sapp_set_window_dims(th_get_window_handle(), dm.x, dm.y);
+}
+
+void th_window_set_hidden(bool hidden)
+{
+	th_sapp_set_window_hidden(th_get_window_handle(), hidden);
 }
 #else
 #error Unsupported platform

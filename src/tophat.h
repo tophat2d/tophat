@@ -37,6 +37,9 @@ typedef int32_t ssize_t;
 #define BATCH_LENGTH (BATCH_SIZE * BATCH_UNIT)
 #define RENDER_TARGET_MAX_SIZE 1024
 
+#define MAX_GAMEPADS 4
+#define MAX_TOUCH_FINGERS 10
+
 typedef float fu;
 typedef uint32_t uu;
 typedef int32_t iu;
@@ -213,6 +216,8 @@ typedef void *th_window_handle;
 typedef Window *th_window_handle;
 #elif defined(__EMSCRIPTEN__)
 typedef int th_window_handle;
+#elif defined(__APPLE__)
+typedef const void *th_window_handle;
 #else
 #error Unsupported platform
 #endif
@@ -304,6 +309,20 @@ typedef struct
 	float rumble_right;
 } th_generic_gamepad;
 
+typedef struct {
+	size_t id;
+
+	// relative to window top left in pixels
+	th_vf2 position;
+
+	// HACK: it needs 1 frame delay to make it possible to query just_released
+	bool pending_free;
+	bool valid;
+	bool pressed;
+	bool just_pressed;
+	bool just_released;
+} th_touch_finger;
+
 // struct holding all tophat's global variables.
 typedef struct
 {
@@ -325,8 +344,8 @@ typedef struct
 	th_vf2 mouse;
 	th_vf2 mouse_delta;
 	th_vf2 mouse_wheel;
-
-	th_generic_gamepad gamepad[4];
+	th_generic_gamepad gamepad[MAX_GAMEPADS];
+	th_touch_finger touch_fingers[MAX_TOUCH_FINGERS];
 
 	th_shader *shaders;
 	uu shader_count;
@@ -555,6 +574,8 @@ th_err
 th_image_remove_render_target(th_render_target *t, th_vf2 wp);
 
 // input
+void
+th_input_touch(const sapp_event *ev);
 void
 th_input_key(int keycode, int bDown);
 void

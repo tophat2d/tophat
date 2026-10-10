@@ -1,4 +1,5 @@
 #include "tophat.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32
@@ -11,6 +12,8 @@ extern th_global *thg;
 #define ANY_CONTROL 16
 #define ANY_SHIFT 17
 #define ANY_ALT 18
+#define ANY_SUPER 19
+#define ANY_CTRL_COMMAND 20
 
 void
 th_input_key(int keycode, int bDown)
@@ -31,6 +34,66 @@ th_input_key(int keycode, int bDown)
 	}
 
 	thg->just_pressed[keycode] = 0;
+}
+
+static th_touch_finger*
+acquire_touch_finger(size_t id) {
+	// creae if doesn't exist
+
+	for (int i = 0; i < MAX_TOUCH_FINGERS; i++) {
+		if (!thg->touch_fingers[i].valid || (thg->touch_fingers[i].valid && thg->touch_fingers[i].id == id)) {
+			memset(&thg->touch_fingers[i], 0, sizeof(th_touch_finger));
+			thg->touch_fingers[i].id = id;
+			thg->touch_fingers[i].valid = true;
+			return &thg->touch_fingers[i];
+		}
+	}
+
+	assert(false && "no free touch finger");
+	return NULL;
+}
+
+static void
+release_touch_finger(size_t id) {
+	for (int i = 0; i < MAX_TOUCH_FINGERS; i++) {
+		if (thg->touch_fingers[i].id == id) {
+			thg->touch_fingers[i].pending_free = true;
+			return;
+		}
+	}
+
+	assert(false && "releaseing invalid finger");
+}
+
+void
+th_input_touch(const sapp_event *ev)
+{
+	for (int i = 0; i < ev->num_touches; i++) {
+		th_touch_finger *finger = acquire_touch_finger(ev->touches[i].identifier);
+		finger->position.x = (ev->touches[i].pos_x - thg->offset.x) / thg->scaling;
+		finger->position.y = (ev->touches[i].pos_y - thg->offset.y) / thg->scaling;
+
+		switch (ev->type) {
+		case SAPP_EVENTTYPE_TOUCHES_BEGAN:
+			finger->just_pressed = true;
+			finger->pressed = true;
+			break;
+		case SAPP_EVENTTYPE_TOUCHES_MOVED:
+			finger->just_pressed = false;
+			break;
+		case SAPP_EVENTTYPE_TOUCHES_ENDED:
+			finger->just_released = true;
+			finger->pressed = false;
+			release_touch_finger(ev->touches[i].identifier);
+			break;
+		case SAPP_EVENTTYPE_TOUCHES_CANCELLED:
+			finger->pressed = false;
+			release_touch_finger(ev->touches[i].identifier);
+			break;
+		default:
+			assert(false && "non touch event sneaked in");
+		}
+	}
 }
 
 void
@@ -62,15 +125,28 @@ th_input_modifiers(uint32_t modifiers)
 		th_input_key(SAPP_KEYCODE_LEFT_SHIFT, false);
 		th_input_key(SAPP_KEYCODE_RIGHT_SHIFT, false);
 	}
-	if ((modifiers & SAPP_MODIFIER_ALT) == 0) {
+	if ((modifiers & SAPP_MODIFIER_ALT) == 0) { // Mac: option
 		th_input_key(SAPP_KEYCODE_LEFT_ALT, false);
 		th_input_key(SAPP_KEYCODE_RIGHT_ALT, false);
+	}
+	if ((modifiers & SAPP_MODIFIER_SUPER) == 0) { // Mac: command
+		th_input_key(SAPP_KEYCODE_LEFT_SUPER, false);
+		th_input_key(SAPP_KEYCODE_RIGHT_SUPER, false);
 	}
 
 	// Update fake keys.
 	th_input_key(ANY_CONTROL, modifiers & SAPP_MODIFIER_CTRL);
 	th_input_key(ANY_SHIFT, modifiers & SAPP_MODIFIER_SHIFT);
 	th_input_key(ANY_ALT, modifiers & SAPP_MODIFIER_ALT);
+	th_input_key(ANY_SUPER, modifiers & SAPP_MODIFIER_SUPER);
+
+	#if __APPLE__
+	th_input_key(ANY_CTRL_COMMAND, modifiers & SAPP_MODIFIER_SUPER);
+	th_input_key(ANY_CTRL_COMMAND, modifiers & SAPP_MODIFIER_SUPER);
+	#else
+	th_input_key(ANY_CTRL_COMMAND, modifiers & SAPP_MODIFIER_CTRL);
+	th_input_key(ANY_CTRL_COMMAND, modifiers & SAPP_MODIFIER_CTRL);
+	#endif
 }
 
 void
@@ -82,6 +158,19 @@ th_input_cycle()
 	memset(thg->just_pressed, 0, 512 * sizeof(uu));
 	memset(thg->just_released, 0, 512 * sizeof(uu));
 	memset(thg->press_repeat, 0, 512 * sizeof(uu));
+
+	for (int i = 0; i < MAX_TOUCH_FINGERS; i++) {
+		th_touch_finger *finger = &thg->touch_fingers[i];
+
+		if (finger->valid) {
+			if (finger->pending_free) {
+				finger->valid = false;
+			}
+
+			thg->touch_fingers[i].just_pressed = false;
+			thg->touch_fingers[i].just_released = false;
+		}
+	}
 }
 
 void
@@ -124,7 +213,7 @@ th_input_update_gamepads()
 		return;
 
 	XINPUT_STATE state;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < MAX_GAMEPADS; i++) {
 		state = (XINPUT_STATE){0};
 
 		th_generic_gamepad *gp = &thg->gamepad[i];
