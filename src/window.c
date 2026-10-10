@@ -155,7 +155,7 @@ th_window_sapp_desc()
 	    .gl = (sapp_gl_desc){
 #if defined(__ANDROID__)
 	      .major_version = 3,
-	      .minor_version = 0,
+	      .minor_version = 1,
 #else
 	      .major_version = 4,
 	      .minor_version = 1,
