@@ -820,13 +820,6 @@ umth_input_gamepad_rumble(UmkaStackSlot *p, UmkaStackSlot *r)
 	thg->gamepad[gamepad].rumble_right = right;
 }
 
-// fn umth_input_get_touches(): [10]RawTouch
-void
-umth_input_get_touches(UmkaStackSlot *p, UmkaStackSlot *r)
-{
-	memcpy(r->ptrVal, thg->touch_fingers, sizeof(th_touch_finger[MAX_TOUCH_FINGERS]));
-}
-
 ///////////////////////
 // entities
 // draws an entity
@@ -1061,7 +1054,7 @@ umth_window_get_dpi_scale(UmkaStackSlot *p, UmkaStackSlot *r)
 // 0 = other/unknown
 // 1 = linux
 // 2 = windows
-// 3 = macos or ios
+// 3 = macos 
 // 4 = emscripten
 // fn umth_window_get_platform_id(): th::Platform
 void
@@ -1570,8 +1563,6 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_input_gamepad_pressure", &umth_input_gamepad_pressure);
 	umkaAddFunc(umka, "umth_input_gamepad_stick", &umth_input_gamepad_stick);
 	umkaAddFunc(umka, "umth_input_gamepad_rumble", &umth_input_gamepad_rumble);
-
-	umkaAddFunc(umka, "umth_input_get_touches", &umth_input_get_touches);
 
 	// entities
 	umkaAddFunc(umka, "umth_ent_draw", &umth_ent_draw);

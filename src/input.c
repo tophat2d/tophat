@@ -36,66 +36,6 @@ th_input_key(int keycode, int bDown)
 	thg->just_pressed[keycode] = 0;
 }
 
-static th_touch_finger*
-acquire_touch_finger(size_t id) {
-	// creae if doesn't exist
-
-	for (int i = 0; i < MAX_TOUCH_FINGERS; i++) {
-		if (!thg->touch_fingers[i].valid || (thg->touch_fingers[i].valid && thg->touch_fingers[i].id == id)) {
-			memset(&thg->touch_fingers[i], 0, sizeof(th_touch_finger));
-			thg->touch_fingers[i].id = id;
-			thg->touch_fingers[i].valid = true;
-			return &thg->touch_fingers[i];
-		}
-	}
-
-	assert(false && "no free touch finger");
-	return NULL;
-}
-
-static void
-release_touch_finger(size_t id) {
-	for (int i = 0; i < MAX_TOUCH_FINGERS; i++) {
-		if (thg->touch_fingers[i].id == id) {
-			thg->touch_fingers[i].pending_free = true;
-			return;
-		}
-	}
-
-	assert(false && "releaseing invalid finger");
-}
-
-void
-th_input_touch(const sapp_event *ev)
-{
-	for (int i = 0; i < ev->num_touches; i++) {
-		th_touch_finger *finger = acquire_touch_finger(ev->touches[i].identifier);
-		finger->position.x = (ev->touches[i].pos_x - thg->offset.x) / thg->scaling;
-		finger->position.y = (ev->touches[i].pos_y - thg->offset.y) / thg->scaling;
-
-		switch (ev->type) {
-		case SAPP_EVENTTYPE_TOUCHES_BEGAN:
-			finger->just_pressed = true;
-			finger->pressed = true;
-			break;
-		case SAPP_EVENTTYPE_TOUCHES_MOVED:
-			finger->just_pressed = false;
-			break;
-		case SAPP_EVENTTYPE_TOUCHES_ENDED:
-			finger->just_released = true;
-			finger->pressed = false;
-			release_touch_finger(ev->touches[i].identifier);
-			break;
-		case SAPP_EVENTTYPE_TOUCHES_CANCELLED:
-			finger->pressed = false;
-			release_touch_finger(ev->touches[i].identifier);
-			break;
-		default:
-			assert(false && "non touch event sneaked in");
-		}
-	}
-}
-
 void
 th_input_repeated(int keycode, int bDown)
 {
@@ -158,19 +98,6 @@ th_input_cycle()
 	memset(thg->just_pressed, 0, 512 * sizeof(uu));
 	memset(thg->just_released, 0, 512 * sizeof(uu));
 	memset(thg->press_repeat, 0, 512 * sizeof(uu));
-
-	for (int i = 0; i < MAX_TOUCH_FINGERS; i++) {
-		th_touch_finger *finger = &thg->touch_fingers[i];
-
-		if (finger->valid) {
-			if (finger->pending_free) {
-				finger->valid = false;
-			}
-
-			thg->touch_fingers[i].just_pressed = false;
-			thg->touch_fingers[i].just_released = false;
-		}
-	}
 }
 
 void

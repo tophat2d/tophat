@@ -181,15 +181,6 @@ type Gamepad* = struct {
 	id: int
 }
 
-type TouchFinger* = struct {
-	pos: th::Vf2
-	pressed: bool
-	justPressed: bool
-	justReleased: bool
-}
-
-type Touchscreen* = map[int]TouchFinger
-
 fn toupper(c: char): int {
 	if c >= 'a' && c <= 'z' {
 		return int(c) - 32;
@@ -393,41 +384,4 @@ fn umth_input_gamepad_rumble(gamepad: int, left, right: th::fu)
 fn (g: ^Gamepad) rumble*(left, right: th::fu) {
 //~~
 	umth_input_gamepad_rumble(g.id, left, right)
-}
-
-type RawTouch = struct {
-	id: uint
-
-	// relative to window top left in pixels
-	position: th::Vf2
-
-	// HACK: it needs 1 frame delay to make it possible to query just_released
-	pending_free: bool
-	valid: bool
-	pressed: bool
-	just_pressed: bool
-	just_released: bool
-}
-
-fn umth_input_get_touches(): [10]RawTouch
-
-//~~fn touches
-// Returns the touches on the touchscreen.
-fn touches*(): Touchscreen {
-//~~
-	touches := umth_input_get_touches()
-
-	result := Touchscreen{}
-	for _, touch in touches {
-		if touch.valid {
-			result[int(touch.id)] = TouchFinger{
-				pos: touch.position,
-				pressed: touch.pressed,
-				justPressed: touch.just_pressed,
-				justReleased: touch.just_released
-			}
-		}
-	}
-
-	return result
 }

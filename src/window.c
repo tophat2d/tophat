@@ -116,12 +116,6 @@ event(const sapp_event *ev)
 	case SAPP_EVENTTYPE_MOUSE_UP:
 		th_input_key(ev->mouse_button + 1, ev->type == SAPP_EVENTTYPE_MOUSE_DOWN);
 		break;
-	case SAPP_EVENTTYPE_TOUCHES_BEGAN:
-	case SAPP_EVENTTYPE_TOUCHES_CANCELLED:
-	case SAPP_EVENTTYPE_TOUCHES_ENDED:
-	case SAPP_EVENTTYPE_TOUCHES_MOVED:
-		th_input_touch(ev);
-		break;
 	}
 }
 
@@ -310,7 +304,7 @@ void th_window_set_hidden(bool hidden)
 	else
 		th_sapp_show_window();
 }
-#elif defined(__EMSCRIPTEN__) || (defined(__APPLE__) && defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
+#elif defined(__EMSCRIPTEN__)
 th_window_handle
 th_get_window_handle()
 {
@@ -328,7 +322,9 @@ void th_window_set_hidden(bool hidden)
 	// what do we do here?
 }
 #elif defined(__APPLE__)
-// TODO: macOS placeholder
+#if defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE
+#error iOS not supported
+#endif
 
 th_window_handle
 th_get_window_handle()
