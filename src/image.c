@@ -15,6 +15,9 @@
 #include <GLES2/gl2ext.h>
 #elif defined(__APPLE__)
 #include <OpenGL/gl.h>
+#elif defined(__ANDROID__)
+#include <GLES3/gl3.h>
+#include <GLES3/gl3ext.h>
 #else
 #include <GL/gl.h>
 #endif
@@ -93,7 +96,7 @@ get_data_rgba(th_image *img)
 
 	GLuint tex = th_sg_get_gl_image(img->tex);
 
-#if defined(__EMSCRIPTEN__) || (defined(TARGET_OS_IPHONE) && TARGET_OS_IPHONE)
+#if defined(__EMSCRIPTEN__) || defined(__ANDROID__)
 	glBindTexture(GL_TEXTURE_2D, tex);
 	GLuint fbo;
 	glGenFramebuffers(1, &fbo);

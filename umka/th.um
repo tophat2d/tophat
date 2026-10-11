@@ -376,6 +376,7 @@ type Platform* = enum {
 	windows
 	macOs
 	web
+	android
 }
 //~~
 

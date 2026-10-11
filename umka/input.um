@@ -181,6 +181,33 @@ type Gamepad* = struct {
 	id: int
 }
 
+//~~enum TouchPhase
+// The lifecycle phase a `Touch` is in during the current frame.
+type TouchPhase* = enum {
+	began       // the touch started this frame
+	moved       // the touch moved this frame
+	stationary  // the touch is held without moving
+	ended       // the touch was lifted this frame
+	cancelled   // the touch was cancelled by the system this frame
+}
+//~~
+
+//~~struct Touch
+// A single touch point. `pos` is in screen space (like `getMousePos`), `delta`
+// is the movement since the last frame and `phase` describes its lifecycle this
+// frame. The stable per-finger id is the key in the map returned by `getTouches`.
+type Touch* = struct {
+	pos: th::Vf2
+	delta: th::Vf2
+	phase: TouchPhase
+}
+//~~
+
+type TouchWithId = struct {
+	id: uint
+	touch: Touch
+}
+
 fn toupper(c: char): int {
 	if c >= 'a' && c <= 'z' {
 		return int(c) - 32;
@@ -302,6 +329,47 @@ fn umth_input_get_mouse_scroll(): th::Vf2
 fn getMouseScroll*(): th::Vf2 {
 //~~
 	return umth_input_get_mouse_scroll()
+}
+
+fn umth_input_get_touches(): []TouchWithId
+//~~fn getTouches
+// Returns all touches that are currently active on the touchscreen, keyed by
+// their stable per-finger id.
+fn getTouches*(): map[uint]Touch {
+//~~
+	result := map[uint]Touch{}
+	for _, t in umth_input_get_touches() {
+		result[t.id] = t.touch
+	}
+	return result
+}
+
+//~~fn isTouched
+// Returns true while the finger with the given `id` is held on the screen.
+fn isTouched*(id: uint): bool {
+//~~
+	touches := getTouches()
+	if !validkey(touches, id) {
+		return false
+	}
+	phase := touches[id].phase
+	return phase != .ended && phase != .cancelled
+}
+
+//~~fn isJustTouched
+// Returns true if the finger with the given `id` touched the screen this frame.
+fn isJustTouched*(id: uint): bool {
+//~~
+	touches := getTouches()
+	return validkey(touches, id) && touches[id].phase == .began
+}
+
+//~~fn isJustUntouched
+// Returns true if the finger with the given `id` was lifted off the screen this frame.
+fn isJustUntouched*(id: uint): bool {
+//~~
+	touches := getTouches()
+	return validkey(touches, id) && touches[id].phase == .ended
 }
 
 fn umth_input_gamepad_get_gamepads*(): [4]int
