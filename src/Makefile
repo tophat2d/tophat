@@ -59,11 +59,13 @@ $(EM_TARGET): $(UMKA_MODULES) $(UMKA_DOCS) $(IMAGES_MOD) LICENSE version $(HELPE
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_misc LICENSE version >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) em th_em_moduledocs $(UMKA_DOCS) >> $(EM_TARGET)
 	@$(UMKA_BIN) $(HELPER_SCRIPT) placeholders $(IMAGES) >> $(EM_TARGET)
-
+	
+ifeq ($(PLATFORM), Darwin)
 %.o: %.m
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MD -o $@ -c $<
-
+endif
+	
 %.o: %.c
 	@echo CC $@
 	@$(CC) $(CFLAGS) -MD -o $@ -c $<
