@@ -4,6 +4,8 @@
 #ifdef _WIN32
 #include <windows.h>
 #define _CRT_SECURE_NO_WARNINGS
+#elif defined(__ANDROID__)
+// Nothing to include
 #elif defined(__linux__)
 #include <X11/Xlib.h>
 #endif
@@ -123,7 +125,7 @@ typedef struct
 
 typedef struct
 {
-	ma_sound inst;
+    ma_sound inst;
 	bool copied;
 } th_sound;
 
@@ -207,6 +209,8 @@ typedef struct
 } th_em_placeholder;
 
 #ifdef _WIN32
+typedef void *th_window_handle;
+#elif defined(__ANDROID__)
 typedef void *th_window_handle;
 #elif __linux__
 #include <X11/Xlib.h>
@@ -304,6 +308,30 @@ typedef struct
 	float rumble_right;
 } th_generic_gamepad;
 
+#define TH_MAX_TOUCHES SAPP_MAX_TOUCHPOINTS
+
+typedef enum
+{
+	th_touch_phase_began = 0,
+	th_touch_phase_moved,
+	th_touch_phase_stationary,
+	th_touch_phase_ended,
+	th_touch_phase_cancelled,
+} th_touch_phase;
+
+typedef struct
+{
+	th_vf2 pos;
+	th_vf2 delta;
+	int64_t phase;
+} th_touch;
+
+typedef struct
+{
+	uint64_t id;
+	th_touch touch;
+} th_touch_with_id;
+
 // struct holding all tophat's global variables.
 typedef struct
 {
@@ -325,6 +353,9 @@ typedef struct
 	th_vf2 mouse;
 	th_vf2 mouse_delta;
 	th_vf2 mouse_wheel;
+
+	th_touch_with_id touches[TH_MAX_TOUCHES];
+	int touch_count;
 
 	th_generic_gamepad gamepad[4];
 
@@ -563,6 +594,8 @@ void
 th_input_modifiers(uint32_t modifiers);
 void
 th_input_cycle();
+void
+th_input_touches(const sapp_event *ev);
 void
 th_input_reset();
 void

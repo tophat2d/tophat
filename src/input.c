@@ -82,6 +82,64 @@ th_input_cycle()
 	memset(thg->just_pressed, 0, 512 * sizeof(uu));
 	memset(thg->just_released, 0, 512 * sizeof(uu));
 	memset(thg->press_repeat, 0, 512 * sizeof(uu));
+
+	int kept_count = 0;
+	for (int i = 0; i < thg->touch_count; i++) {
+		th_touch_with_id *touch = &thg->touches[i];
+
+		if (touch->touch.phase == th_touch_phase_ended || touch->touch.phase == th_touch_phase_cancelled)
+			continue;
+
+		touch->touch.phase = th_touch_phase_stationary;
+		touch->touch.delta = (th_vf2){{0}};
+		thg->touches[kept_count++] = *touch;
+	}
+	thg->touch_count = kept_count;
+}
+
+void
+th_input_touches(const sapp_event *ev)
+{
+	for (int i = 0; i < ev->num_touches; i++) {
+		const sapp_touchpoint *raw_touch = &ev->touches[i];
+
+		th_touch_with_id *touch = NULL;
+		for (int j = 0; j < thg->touch_count; j++) {
+			if (thg->touches[j].id == raw_touch->identifier) {
+				touch = &thg->touches[j];
+				break;
+			}
+		}
+
+		if (!touch) {
+			if (ev->type == SAPP_EVENTTYPE_TOUCHES_CANCELLED || ev->type == SAPP_EVENTTYPE_TOUCHES_ENDED || thg->touch_count >= TH_MAX_TOUCHES)
+				continue;
+
+			thg->touches[thg->touch_count++] = (th_touch_with_id){
+			    .id = raw_touch->identifier,
+			    .touch = {
+			        .pos = {.x = raw_touch->pos_x, .y = raw_touch->pos_y},
+			        .delta = {{0}},
+			        .phase = th_touch_phase_began,
+			    },
+			};
+			continue;
+		}
+
+		if (!raw_touch->changed)
+			continue;
+
+		touch->touch.delta.x += raw_touch->pos_x - touch->touch.pos.x;
+		touch->touch.delta.y += raw_touch->pos_y - touch->touch.pos.y;
+		touch->touch.pos = (th_vf2){.x = raw_touch->pos_x, .y = raw_touch->pos_y};
+
+		if (ev->type == SAPP_EVENTTYPE_TOUCHES_CANCELLED)
+			touch->touch.phase = th_touch_phase_cancelled;
+		else if (ev->type == SAPP_EVENTTYPE_TOUCHES_ENDED)
+			touch->touch.phase = th_touch_phase_ended;
+		else if (touch->touch.phase != th_touch_phase_began)
+			touch->touch.phase = th_touch_phase_moved;
+	}
 }
 
 void
@@ -89,6 +147,7 @@ th_input_reset()
 {
 	th_input_cycle();
 	memset(thg->pressed, 0, 512 * sizeof(uu));
+	thg->touch_count = 0;
 }
 
 // Deadzone and drift fix

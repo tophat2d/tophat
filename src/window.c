@@ -116,6 +116,16 @@ event(const sapp_event *ev)
 	case SAPP_EVENTTYPE_MOUSE_UP:
 		th_input_key(ev->mouse_button + 1, ev->type == SAPP_EVENTTYPE_MOUSE_DOWN);
 		break;
+#ifdef __ANDROID__
+	case SAPP_EVENTTYPE_TOUCHES_BEGAN:
+	case SAPP_EVENTTYPE_TOUCHES_MOVED:
+	case SAPP_EVENTTYPE_TOUCHES_ENDED:
+	case SAPP_EVENTTYPE_TOUCHES_CANCELLED:
+		th_input_touches(ev);
+		break;
+#endif
+    default:
+        break;
 	}
 }
 
@@ -143,8 +153,13 @@ th_window_sapp_desc()
 	    .logger.func = slog_func,
 	    .high_dpi = thg->dpi_aware,
 	    .gl = (sapp_gl_desc){
+#if defined(__ANDROID__)
+	      .major_version = 3,
+	      .minor_version = 1,
+#else
 	      .major_version = 4,
 	      .minor_version = 1,
+#endif
 	    },
 #ifdef __EMSCRIPTEN__
 	    .html5 = (sapp_html5_desc){
@@ -277,6 +292,23 @@ void
 th_window_set_hidden(bool hidden)
 {
 	ShowWindow(th_get_window_handle(), hidden ? SW_HIDE : SW_SHOW);
+}
+#elif defined(__ANDROID__)
+th_window_handle
+th_get_window_handle()
+{
+	return 0;
+}
+
+void
+th_window_set_dims(th_vf2 dm)
+{
+
+}
+
+void th_window_set_hidden(bool hidden)
+{
+
 }
 #elif __linux__
 extern Window *th_sapp_win;
