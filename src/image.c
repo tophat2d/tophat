@@ -13,6 +13,8 @@
 #ifdef __EMSCRIPTEN__
 #include <GLES2/gl2.h>
 #include <GLES2/gl2ext.h>
+#elif defined(__APPLE__)
+#include <OpenGL/gl.h>
 #elif defined(__ANDROID__)
 #include <GLES3/gl3.h>
 #include <GLES3/gl3ext.h>
@@ -273,14 +275,8 @@ th_image_from_data(th_image *img, uint32_t *data, th_vf2 dm)
 th_err
 th_image_set_filter(th_image *img, int filter)
 {
-	uint8_t *data_rgba = get_data_rgba(img);
 	img->filter = filter ? SG_FILTER_LINEAR : SG_FILTER_NEAREST;
-
-	th_image_free(img);
-	th_err err = gen_tex(img, data_rgba);
-	free(data_rgba);
-
-	return err;
+	return 0;
 }
 
 th_err

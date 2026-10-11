@@ -17,7 +17,12 @@ type Key* = enum {
 
 	ctrl           = 16
 	shift          = 17
+	// Option (⌥)
 	alt            = 18
+	// Command (⌘) on Mac
+	super          = 19
+	// Command (⌘) on Mac, ctrl on Linux/Windows
+	ctrl_command   = 20
 
 	space          = 32
 	apostrophe     = 39  /* ' */
@@ -133,12 +138,12 @@ type Key* = enum {
 	kpEqual        = 336
 	leftShift      = 340
 	leftControl    = 341
-	leftAlt        = 342
-	leftSuper      = 343
+	leftAlt        = 342 // leftOption
+	leftSuper      = 343 // leftCommand
 	rightShift     = 344
 	rightControl   = 345
-	rightAlt       = 346
-	rightSuper     = 347
+	rightAlt       = 346 // rightOption
+	rightSuper     = 347 // rightCommand
 	menu           = 348
 }
 //~~

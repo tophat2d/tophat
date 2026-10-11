@@ -1,4 +1,5 @@
 #include "tophat.h"
+#include <assert.h>
 #include <stdio.h>
 #include <string.h>
 #ifdef _WIN32
@@ -11,6 +12,8 @@ extern th_global *thg;
 #define ANY_CONTROL 16
 #define ANY_SHIFT 17
 #define ANY_ALT 18
+#define ANY_SUPER 19
+#define ANY_CTRL_COMMAND 20
 
 void
 th_input_key(int keycode, int bDown)
@@ -62,15 +65,28 @@ th_input_modifiers(uint32_t modifiers)
 		th_input_key(SAPP_KEYCODE_LEFT_SHIFT, false);
 		th_input_key(SAPP_KEYCODE_RIGHT_SHIFT, false);
 	}
-	if ((modifiers & SAPP_MODIFIER_ALT) == 0) {
+	if ((modifiers & SAPP_MODIFIER_ALT) == 0) { // Mac: option
 		th_input_key(SAPP_KEYCODE_LEFT_ALT, false);
 		th_input_key(SAPP_KEYCODE_RIGHT_ALT, false);
+	}
+	if ((modifiers & SAPP_MODIFIER_SUPER) == 0) { // Mac: command
+		th_input_key(SAPP_KEYCODE_LEFT_SUPER, false);
+		th_input_key(SAPP_KEYCODE_RIGHT_SUPER, false);
 	}
 
 	// Update fake keys.
 	th_input_key(ANY_CONTROL, modifiers & SAPP_MODIFIER_CTRL);
 	th_input_key(ANY_SHIFT, modifiers & SAPP_MODIFIER_SHIFT);
 	th_input_key(ANY_ALT, modifiers & SAPP_MODIFIER_ALT);
+	th_input_key(ANY_SUPER, modifiers & SAPP_MODIFIER_SUPER);
+
+	#if __APPLE__
+	th_input_key(ANY_CTRL_COMMAND, modifiers & SAPP_MODIFIER_SUPER);
+	th_input_key(ANY_CTRL_COMMAND, modifiers & SAPP_MODIFIER_SUPER);
+	#else
+	th_input_key(ANY_CTRL_COMMAND, modifiers & SAPP_MODIFIER_CTRL);
+	th_input_key(ANY_CTRL_COMMAND, modifiers & SAPP_MODIFIER_CTRL);
+	#endif
 }
 
 void
@@ -183,7 +199,7 @@ th_input_update_gamepads()
 		return;
 
 	XINPUT_STATE state;
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < MAX_GAMEPADS; i++) {
 		state = (XINPUT_STATE){0};
 
 		th_generic_gamepad *gp = &thg->gamepad[i];

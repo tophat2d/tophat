@@ -55,6 +55,9 @@ fn onFrame(args: []any) {
 		}
 	}
 
+	if input::isJustPressed(input::Key.s) {
+		window::hide(true)
+	}
 
 	if input::isJustPressed(input::Key.enter) {
 		if th::platform == th::Platform.windows {
@@ -87,7 +90,7 @@ fn init*() {
 	lines = []str {
 		"WELCOME TO",
 		"TOPHAT",
-		"",
+		"\x10\x11\x12\x13\x14",
 		"EXAMPLES ARE IN",
 		"THE examples/",
 		"DIRECTORY",
@@ -99,4 +102,3 @@ fn init*() {
 
 	window::onFrame.register(onFrame)
 }
-

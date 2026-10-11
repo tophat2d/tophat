@@ -41,6 +41,7 @@ th_sapp_hide_window()
 	_sapp_x11_hide_window();
 }
 #endif
+
 int *th_sapp_swap_interval = &_sapp.swap_interval;
 
 GLuint

@@ -6,6 +6,7 @@
 #include <string.h>
 
 #define PACK_OVERSAMPLING 1
+#define PACK_MINRES 64
 #define PACK_MAXRES 2048
 #define PACK_CHARSPERPAGE TH_FONTPLATFORM_CHARSPERPAGE
 #define PACK_PAGECOUNT TH_FONTPLATFORM_PAGECOUNT
@@ -43,7 +44,7 @@ f_pack_atlas_page(th_font *font, uint32_t char_offset, th_font_atlas_page *out_p
 {
 	bool packed = false;
 
-	for (int size = 1; !packed && size < PACK_MAXRES; size *= 2) {
+	for (int size = PACK_MINRES; !packed && size <= PACK_MAXRES; size *= 2) {
 		uint8_t *buffer = malloc(size * size);
 
 		if (f_pack_attempt(font, char_offset, out_page, buffer, size)) {

@@ -1072,7 +1072,7 @@ umth_window_get_dpi_scale(UmkaStackSlot *p, UmkaStackSlot *r)
 // 0 = other/unknown
 // 1 = linux
 // 2 = windows
-// 3 = macos (unsupported currently)
+// 3 = macos 
 // 4 = emscripten
 // 5 = android
 // fn umth_window_get_platform_id(): th::Platform
@@ -1087,6 +1087,8 @@ umth_window_get_platform_id(UmkaStackSlot *p, UmkaStackSlot *r)
 	umkaGetResult(p, r)->intVal = 1;
 #elif defined(__EMSCRIPTEN__)
 	umkaGetResult(p, r)->intVal = 4;
+#elif defined(__APPLE__)
+	umkaGetResult(p, r)->intVal = 3;
 #else
 	umkaGetResult(p, r)->intVal = 0;
 #endif

@@ -39,6 +39,8 @@ typedef int32_t ssize_t;
 #define BATCH_LENGTH (BATCH_SIZE * BATCH_UNIT)
 #define RENDER_TARGET_MAX_SIZE 1024
 
+#define MAX_GAMEPADS 4
+
 typedef float fu;
 typedef uint32_t uu;
 typedef int32_t iu;
@@ -217,6 +219,8 @@ typedef void *th_window_handle;
 typedef Window *th_window_handle;
 #elif defined(__EMSCRIPTEN__)
 typedef int th_window_handle;
+#elif defined(__APPLE__)
+typedef const void *th_window_handle;
 #else
 #error Unsupported platform
 #endif
@@ -357,7 +361,7 @@ typedef struct
 	th_touch_with_id touches[TH_MAX_TOUCHES];
 	int touch_count;
 
-	th_generic_gamepad gamepad[4];
+	th_generic_gamepad gamepad[MAX_GAMEPADS];
 
 	th_shader *shaders;
 	uu shader_count;
