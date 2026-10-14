@@ -1,0 +1,1284 @@
+import (
+	"audio.um"
+	"canvas.um"
+	"coll.um"
+	"font.um"
+	"input.um"
+	"particles.um"
+	"rect.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+// ============================================================================
+// CONSTANTS & ENUMS
+// ============================================================================
+
+const (
+	winW = 640
+	winH = 480
+
+	// Game States
+	StateMenu = 0
+	StatePlaying = 1
+	StateFeedback = 2
+	StateGameOver = 3
+	StatePaused = 4
+
+	// Game Modes
+	ModeClassic = 0   // 3 lives, progressively harder levels, question timer
+	ModeTimeRush = 1  // 60s total clock, +2s on correct, -3s on wrong
+	ModeTrueFalse = 2 // Rapid fire true/false equations, 3 lives
+	ModePractice = 3  // Relaxed, no timer, no game over
+
+	// Colors (RGBA)
+	ColBgDark       = 0x0f172aFF // Tailwind Slate 900
+	ColHeader       = 0x1e293bFF // Slate 800
+	ColCardBg       = 0x1e293bFF // Slate 800
+	ColCardHover    = 0x334155FF // Slate 700
+	ColBorder       = 0x475569FF // Slate 600
+	ColBorderHover  = 0x38bdf8FF // Sky 400
+	ColCyan         = 0x06b6d4FF // Cyan 500
+	ColPurple       = 0xa855f7FF // Purple 500
+	ColEmerald      = 0x22c55eFF // Green 500
+	ColRose         = 0xf43f5eFF // Red 500
+	ColAmber        = 0xf59e0bFF // Amber 500
+	ColTextWhite    = 0xf8fafcFF // Slate 50
+	ColTextMuted    = 0x94a3b8FF // Slate 400
+	ColShadow       = 0x00000088
+)
+
+// ============================================================================
+// TYPES
+// ============================================================================
+
+type (
+	MathSymbol = struct {
+		charStr: str
+		pos: th::Vf2
+		vel: th::Vf2
+		size: th::fu
+		color: uint32
+	}
+
+	PopupText = struct {
+		text: str
+		pos: th::Vf2
+		color: uint32
+		scale: th::fu
+		life: th::fu
+		maxLife: th::fu
+	}
+
+	Question = struct {
+		category: str
+		prompt: str
+		displayAnswer: str
+		correctIdx: int
+		options: []int
+		optionStrs: []str
+		isTrueFalse: bool
+		isEquationTrue: bool
+	}
+
+	Button = struct {
+		r: rect::Rect
+		label: str
+		badge: str
+		color: uint32
+		hoverColor: uint32
+		textColor: uint32
+		scale: th::fu
+		isHovered: bool
+		isClicked: bool
+	}
+)
+
+// ============================================================================
+// GLOBAL STATE
+// ============================================================================
+
+var (
+	// Fonts
+	mainFont: font::Font
+	hasFont: bool
+
+	// Audio
+	sndCorrect: audio::Sound
+	sndWrong:   audio::Sound
+	sndClick:   audio::Sound
+	sndCombo:   audio::Sound
+	soundOn:    bool = true
+
+	// Background animations
+	symbols: []MathSymbol
+	emitters: []particles::Emitter
+	popups: []PopupText
+
+	// Game flow state
+	state: int = StateMenu
+	mode: int = ModeClassic
+
+	// Scoring & Progress
+	score: int = 0
+	highScores: []int
+	streak: int = 0
+	maxStreak: int = 0
+	questionsSolved: int = 0
+	totalAttempted: int = 0
+	lives: int = 3
+	level: int = 1
+
+	// Timers (in seconds)
+	questionTimer: th::fu = 10.0
+	questionMaxTime: th::fu = 10.0
+	rushClock: th::fu = 60.0
+	feedbackTimer: th::fu = 0.0
+
+	// Current active question
+	currentQ: Question
+	selectedAnswerIdx: int = -1
+	wasAnswerCorrect: bool = false
+
+	// Typed input buffer
+	typedBuffer: str = ""
+
+	// Screen shake & flash
+	shakeDuration: th::fu = 0.0
+	shakeIntensity: th::fu = 0.0
+	flashColor: uint32 = 0
+	flashAlpha: th::fu = 0.0
+)
+
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
+fn randInt(min, max: int): int {
+	if min >= max {
+		return min
+	}
+	range := max - min + 1
+	r := std::rand() % range
+	return min + r
+}
+
+fn randFloat(min, max: th::fu): th::fu {
+	return min + real32(std::frand()) * (max - min)
+}
+
+fn minf(a, b: th::fu): th::fu {
+	if a < b { return a }
+	return b
+}
+
+fn maxf(a, b: th::fu): th::fu {
+	if a > b { return a }
+	return b
+}
+
+fn playSfx(s: ^audio::Sound) {
+	if soundOn && s.validate() {
+		s.play()
+	}
+}
+
+// ============================================================================
+// TEXT & RENDERING HELPERS
+// ============================================================================
+
+fn getTextSize(text: str, scale: th::fu): th::Vf2 {
+	if hasFont {
+		return mainFont.measure(text).mulf(scale)
+	}
+	return canvas::textSize(text, scale)
+}
+
+fn drawText(text: str, pos: th::Vf2, col: uint32, scale: th::fu = 1.0) {
+	if hasFont {
+		mainFont.draw(text, pos, col, scale)
+	} else {
+		canvas::drawText(text, pos, col, scale)
+	}
+}
+
+fn drawCenteredText(text: str, cx, cy: th::fu, col: uint32, scale: th::fu = 1.0) {
+	dim := getTextSize(text, scale)
+	pos := th::Vf2{ cx - dim.x * 0.5, cy - dim.y * 0.5 }
+	drawText(text, pos, col, scale)
+}
+
+fn drawShadowRect(r: rect::Rect, col: uint32, shadowOffset: th::fu = 3.0) {
+	shadowRect := rect::mk(r.x + shadowOffset, r.y + shadowOffset, r.w, r.h)
+	canvas::drawRect(ColShadow, shadowRect)
+	canvas::drawRect(col, r)
+}
+
+fn drawButton(b: ^Button, mousePos: th::Vf2, isMouseDown: bool): bool {
+	b.isHovered = coll::vf2ToRect(mousePos, b.r)
+	b.isClicked = b.isHovered && isMouseDown
+
+	drawCol := b.color
+	borderCol := ColBorder
+	if b.isHovered {
+		drawCol = b.hoverColor
+		borderCol = ColBorderHover
+	}
+
+	drawShadowRect(b.r, drawCol, 2.0)
+	canvas::drawRectLines(borderCol, b.r, 1.5)
+
+	if b.badge != "" {
+		badgePos := th::Vf2{ b.r.x + 6, b.r.y + 4 }
+		drawText(b.badge, badgePos, ColTextMuted, 0.6)
+	}
+
+	drawCenteredText(b.label, b.r.x + b.r.w * 0.5, b.r.y + b.r.h * 0.5, b.textColor, b.scale)
+
+	return b.isClicked
+}
+
+// ============================================================================
+// PARTICLES & POPUPS
+// ============================================================================
+
+fn addPopup(text: str, pos: th::Vf2, col: uint32, scale: th::fu = 1.2) {
+	p := PopupText{
+		text: text,
+		pos: pos,
+		color: col,
+		scale: scale,
+		life: 1.0,
+		maxLife: 1.0
+	}
+	popups = append(popups, p)
+}
+
+fn spawnParticleBurst(pos: th::Vf2, isBonus: bool) {
+	var cols: []uint32
+	if isBonus {
+		cols = []uint32{ 0xffd700ff, 0xfbbf24ee, 0x38bdf8cc, 0xffffffaa }
+	} else {
+		cols = []uint32{ 0x22c55eff, 0x4ade80ee, 0xa7f3d0cc, 0xffffffaa }
+	}
+
+	e := particles::Emitter{
+		pos: pos,
+		dm: th::Vf2{8, 8},
+		gravity: th::Vf2{0, 0.08},
+		repeat: false,
+		active: true,
+		angle: th::Vf2{0, 360},
+		lifetime: 500,
+		lifetimeRandomness: 0.3,
+		velocity: 0.7,
+		velocityRandomness: 0.4,
+		size: 1.0,
+		sizeRandomness: 0.3,
+		maxSize: 4.0,
+		colors: cols
+	}
+
+	e.genParticles(th::time, 50, 0.8)
+	emitters = append(emitters, e)
+}
+
+fn updateAndDrawEffects(dt: th::fu) {
+	// Draw particles
+	activeEmitters := make([]particles::Emitter, 0)
+	for i := 0; i < len(emitters); i++ {
+		emitters[i].draw(th::time)
+		if emitters[i].active {
+			activeEmitters = append(activeEmitters, emitters[i])
+		}
+	}
+	emitters = activeEmitters
+
+	// Update & draw popups
+	activePopups := make([]PopupText, 0)
+	for i := 0; i < len(popups); i++ {
+		popups[i].pos.y -= 35.0 * dt
+		popups[i].life -= dt
+
+		if popups[i].life > 0.0 {
+			alphaVal := popups[i].life / popups[i].maxLife
+			baseCol := popups[i].color & 0xFFFFFF00
+			col := baseCol | (trunc(alphaVal * 255.0) & 0xFF)
+			drawCenteredText(popups[i].text, popups[i].pos.x, popups[i].pos.y, col, popups[i].scale)
+			activePopups = append(activePopups, popups[i])
+		}
+	}
+	popups = activePopups
+}
+
+// ============================================================================
+// QUESTION GENERATOR
+// ============================================================================
+
+fn generateDistractors(ans: int): []int {
+	opts := make([]int, 0)
+	opts = append(opts, ans)
+
+	attempts := 0
+	for len(opts) < 4 && attempts < 80 {
+		attempts++
+		var cand: int
+		r := std::rand() % 6
+		switch r {
+		case 0: cand = ans + 1
+		case 1: cand = ans - 1
+		case 2: cand = ans + randInt(2, 5)
+		case 3: cand = ans - randInt(2, 5)
+		case 4: cand = ans + 10
+		case 5: cand = ans - 10
+		default: cand = ans + randInt(6, 12)
+		}
+
+		if cand < 0 && ans >= 0 {
+			cand = ans + randInt(3, 8)
+		}
+
+		isDup := false
+		for _, v in opts {
+			if v == cand {
+				isDup = true
+				break
+			}
+		}
+
+		if !isDup {
+			opts = append(opts, cand)
+		}
+	}
+
+	for len(opts) < 4 {
+		opts = append(opts, ans + len(opts) * 3 + 1)
+	}
+
+	// Shuffle
+	for i := len(opts) - 1; i > 0; i-- {
+		j := std::rand() % (i + 1)
+		tmp := opts[i]
+		opts[i] = opts[j]
+		opts[j] = tmp
+	}
+
+	return opts
+}
+
+fn nextQuestion() {
+	var q: Question
+	q.options = make([]int, 0)
+	q.optionStrs = make([]str, 0)
+
+	// Level-based difficulty
+	calcLevel := 1
+	if mode == ModeClassic {
+		calcLevel = 1 + score / 400
+		if calcLevel > 5 { calcLevel = 5 }
+	} else if mode == ModeTimeRush {
+		calcLevel = 1 + score / 500
+		if calcLevel > 5 { calcLevel = 5 }
+	} else if mode == ModeTrueFalse {
+		calcLevel = 1 + score / 350
+		if calcLevel > 4 { calcLevel = 4 }
+	} else {
+		calcLevel = randInt(1, 4)
+	}
+	level = calcLevel
+
+	if mode == ModeTrueFalse {
+		q.isTrueFalse = true
+		q.category = "TRUE OR FALSE"
+
+		var a, b, realAns, displayedAns: int
+		var opStr: str
+
+		opType := randInt(0, calcLevel >= 3 ? 3 : (calcLevel >= 2 ? 2 : 1))
+		switch opType {
+		case 0: // Addition
+			a = randInt(5, 30 + calcLevel * 15)
+			b = randInt(5, 30 + calcLevel * 15)
+			opStr = "+"
+			realAns = a + b
+		case 1: // Subtraction
+			b = randInt(5, 25 + calcLevel * 10)
+			realAns = randInt(5, 25 + calcLevel * 10)
+			a = realAns + b
+			opStr = "-"
+		case 2: // Multiplication
+			a = randInt(2, 9 + calcLevel)
+			b = randInt(2, 9 + calcLevel)
+			opStr = "x"
+			realAns = a * b
+		default: // Division
+			b = randInt(2, 8 + calcLevel)
+			realAns = randInt(2, 9 + calcLevel)
+			a = b * realAns
+			opStr = "/"
+		}
+
+		// 50% chance true, 50% chance false
+		q.isEquationTrue = (std::rand() % 2 == 0)
+		if q.isEquationTrue {
+			displayedAns = realAns
+			q.correctIdx = 0 // TRUE is index 0
+		} else {
+			offset := randInt(1, 4)
+			if std::rand() % 2 == 0 {
+				displayedAns = realAns + offset
+			} else {
+				displayedAns = realAns - offset
+				if displayedAns < 0 { displayedAns = realAns + offset }
+			}
+			q.correctIdx = 1 // FALSE is index 1
+		}
+
+		q.prompt = sprintf("%d %s %d = %d", a, opStr, b, displayedAns)
+		q.options = append(q.options, 1)
+		q.options = append(q.options, 0)
+		q.optionStrs = append(q.optionStrs, "TRUE")
+		q.optionStrs = append(q.optionStrs, "FALSE")
+
+	} else {
+		q.isTrueFalse = false
+
+		// Choose operation type
+		var opType: int
+		if calcLevel == 1 {
+			opType = randInt(0, 1) // + or -
+		} else if calcLevel == 2 {
+			opType = randInt(0, 2) // +, -, x
+		} else if calcLevel == 3 {
+			opType = randInt(0, 3) // +, -, x, /
+		} else {
+			opType = randInt(0, 4) // +, -, x, /, or missing variable
+		}
+
+		var targetAns: int
+
+		switch opType {
+		case 0: // Addition
+			a := randInt(3, 20 + calcLevel * 15)
+			b := randInt(3, 20 + calcLevel * 15)
+			targetAns = a + b
+			q.category = "ADDITION"
+			q.prompt = sprintf("%d + %d = ?", a, b)
+
+		case 1: // Subtraction
+			b := randInt(3, 20 + calcLevel * 10)
+			targetAns = randInt(2, 25 + calcLevel * 10)
+			a := targetAns + b
+			q.category = "SUBTRACTION"
+			q.prompt = sprintf("%d - %d = ?", a, b)
+
+		case 2: // Multiplication
+			a := randInt(2, 6 + calcLevel * 2)
+			b := randInt(2, 7 + calcLevel * 2)
+			targetAns = a * b
+			q.category = "MULTIPLICATION"
+			q.prompt = sprintf("%d x %d = ?", a, b)
+
+		case 3: // Division
+			b := randInt(2, 6 + calcLevel * 2)
+			targetAns = randInt(2, 7 + calcLevel * 2)
+			a := b * targetAns
+			q.category = "DIVISION"
+			q.prompt = sprintf("%d / %d = ?", a, b)
+
+		default: // Missing variable algebra
+			subKind := randInt(0, 2)
+			if subKind == 0 {
+				b := randInt(4, 25)
+				targetAns = randInt(5, 30)
+				q.category = "FIND THE MISSING NUMBER"
+				q.prompt = sprintf("? + %d = %d", b, targetAns + b)
+			} else if subKind == 1 {
+				b := randInt(2, 9)
+				targetAns = randInt(3, 11)
+				q.category = "FIND THE FACTOR"
+				q.prompt = sprintf("? x %d = %d", b, targetAns * b)
+			} else {
+				b := randInt(3, 20)
+				targetAns = randInt(5, 25)
+				q.category = "FIND THE VALUE"
+				q.prompt = sprintf("%d - ? = %d", targetAns + b, b)
+			}
+		}
+
+		q.options = generateDistractors(targetAns)
+		for i, v in q.options {
+			q.optionStrs = append(q.optionStrs, sprintf("%d", v))
+			if v == targetAns {
+				q.correctIdx = i
+			}
+		}
+	}
+
+	currentQ = q
+	selectedAnswerIdx = -1
+	typedBuffer = ""
+
+	// Set question time limit
+	if mode == ModeClassic {
+		questionMaxTime = maxf(4.0, 10.0 - real32(calcLevel - 1) * 1.2)
+		questionTimer = questionMaxTime
+	} else if mode == ModeTrueFalse {
+		questionMaxTime = maxf(3.5, 6.0 - real32(calcLevel - 1) * 0.7)
+		questionTimer = questionMaxTime
+	} else {
+		questionMaxTime = 10.0
+		questionTimer = 10.0
+	}
+}
+
+// ============================================================================
+// GAME FLOW & LOGIC
+// ============================================================================
+
+fn startNewGame(selectedMode: int) {
+	mode = selectedMode
+	score = 0
+	streak = 0
+	maxStreak = 0
+	questionsSolved = 0
+	totalAttempted = 0
+	lives = 3
+	level = 1
+	rushClock = 60.0
+	flashAlpha = 0.0
+	shakeDuration = 0.0
+
+	nextQuestion()
+	state = StatePlaying
+}
+
+fn handleAnswerSelection(choiceIdx: int) {
+	if state != StatePlaying {
+		return
+	}
+
+	selectedAnswerIdx = choiceIdx
+	totalAttempted++
+
+	isCorrect := (choiceIdx == currentQ.correctIdx)
+	wasAnswerCorrect = isCorrect
+
+	centerPos := th::Vf2{ winW * 0.5, winH * 0.42 }
+
+	if isCorrect {
+		streak++
+		if streak > maxStreak {
+			maxStreak = streak
+		}
+		questionsSolved++
+
+		// Multiplier
+		mult := 1
+		if streak >= 15 {
+			mult = 5
+		} else if streak >= 10 {
+			mult = 4
+		} else if streak >= 6 {
+			mult = 3
+		} else if streak >= 3 {
+			mult = 2
+		}
+
+		timeBonus := 0
+		if mode == ModeClassic || mode == ModeTrueFalse {
+			timeBonus = trunc((questionTimer / questionMaxTime) * 80.0)
+		}
+
+		earnedPoints := (100 + timeBonus) * mult
+		score += earnedPoints
+
+		if mode == ModeTimeRush {
+			rushClock = minf(90.0, rushClock + 2.5) // bonus time!
+		}
+
+		// Feedback effects
+		flashColor = ColEmerald
+		flashAlpha = 0.25
+
+		if mult > 1 {
+			addPopup(sprintf("+%d (x%d)!", earnedPoints, mult), centerPos, ColAmber, 1.4)
+			if streak % 5 == 0 {
+				playSfx(&sndCombo)
+				spawnParticleBurst(centerPos, true)
+			} else {
+				playSfx(&sndCorrect)
+				spawnParticleBurst(centerPos, false)
+			}
+		} else {
+			addPopup(sprintf("+%d", earnedPoints), centerPos, ColEmerald, 1.2)
+			playSfx(&sndCorrect)
+			spawnParticleBurst(centerPos, false)
+		}
+
+	} else {
+		// Wrong answer
+		streak = 0
+		flashColor = ColRose
+		flashAlpha = 0.35
+		shakeDuration = 0.25
+		shakeIntensity = 6.0
+		playSfx(&sndWrong)
+
+		if mode == ModeTimeRush {
+			rushClock = maxf(0.0, rushClock - 3.5) // penalty!
+			addPopup("WRONG! -3.5s", centerPos, ColRose, 1.3)
+		} else if mode == ModeClassic || mode == ModeTrueFalse {
+			lives--
+			addPopup("WRONG! -1 LIFE", centerPos, ColRose, 1.3)
+		} else {
+			addPopup("INCORRECT", centerPos, ColRose, 1.2)
+		}
+	}
+
+	state = StateFeedback
+	feedbackTimer = 0.38
+}
+
+fn checkGameOverCondition(): bool {
+	if mode == ModeClassic || mode == ModeTrueFalse {
+		if lives <= 0 {
+			return true
+		}
+	} else if mode == ModeTimeRush {
+		if rushClock <= 0.0 {
+			return true
+		}
+	}
+	return false
+}
+
+fn endCurrentGame() {
+	state = StateGameOver
+	if score > highScores[mode] {
+		highScores[mode] = score
+		playSfx(&sndCombo)
+		spawnParticleBurst(th::Vf2{ winW * 0.5, 140 }, true)
+	} else {
+		playSfx(&sndWrong)
+	}
+}
+
+// ============================================================================
+// SCREENS & RENDERING
+// ============================================================================
+
+fn drawBackground(dt: th::fu) {
+	// Deep gradient base
+	canvas::drawRect(ColBgDark, rect::mk(0, 0, winW, winH))
+
+	// Animated math symbols
+	for i in symbols {
+		symbols[i].pos.y += symbols[i].vel.y * dt
+		symbols[i].pos.x += symbols[i].vel.x * dt
+
+		if symbols[i].pos.y > winH + 20 {
+			symbols[i].pos.y = -20
+			symbols[i].pos.x = randFloat(10, winW - 10)
+		}
+		if symbols[i].pos.x > winW + 20 {
+			symbols[i].pos.x = -20
+		} else if symbols[i].pos.x < -20 {
+			symbols[i].pos.x = winW + 20
+		}
+
+		drawText(symbols[i].charStr, symbols[i].pos, symbols[i].color, symbols[i].size)
+	}
+}
+
+fn drawHeader() {
+	headerRect := rect::mk(0, 0, winW, 48)
+	canvas::drawRect(ColHeader, headerRect)
+	canvas::drawRectLines(ColBorder, headerRect, 1.0)
+
+	// Mode badge
+	modeName := "CLASSIC"
+	if mode == ModeTimeRush {
+		modeName = "TIME RUSH"
+	} else if mode == ModeTrueFalse {
+		modeName = "TRUE / FALSE"
+	} else if mode == ModePractice {
+		modeName = "PRACTICE"
+	}
+
+	drawText(modeName, th::Vf2{ 16, 14 }, ColCyan, 0.9)
+
+	// Score & High score
+	scoreStr := sprintf("SCORE: %d", score)
+	drawText(scoreStr, th::Vf2{ 150, 14 }, ColTextWhite, 0.9)
+
+	hiStr := sprintf("BEST: %d", highScores[mode])
+	drawText(hiStr, th::Vf2{ 290, 14 }, ColAmber, 0.8)
+
+	// Streak indicator
+	if streak >= 3 {
+		mult := 2
+		if streak >= 15 {
+			mult = 5
+		} else if streak >= 10 {
+			mult = 4
+		} else if streak >= 6 {
+			mult = 3
+		}
+		comboStr := sprintf("%d STREAK (x%d)!", streak, mult)
+		drawText(comboStr, th::Vf2{ 410, 14 }, ColAmber, 0.85)
+	}
+
+	// Lives or Clock
+	if mode == ModeClassic || mode == ModeTrueFalse {
+		heartsStr := ""
+		for i := 0; i < 3; i++ {
+			if i < lives {
+				heartsStr += "<3 "
+			} else {
+				heartsStr += ".. "
+			}
+		}
+		drawText(heartsStr, th::Vf2{ 550, 14 }, ColRose, 0.9)
+	} else if mode == ModeTimeRush {
+		clockStr := sprintf("%02.1fs", rushClock)
+		col := ColTextWhite
+		if rushClock < 10.0 {
+			col = ColRose
+		} else if rushClock < 25.0 {
+			col = ColAmber
+		}
+		drawText(clockStr, th::Vf2{ 550, 14 }, col, 0.9)
+	}
+}
+
+fn drawPlayingScreen(mousePos: th::Vf2, isMouseDown: bool) {
+	drawHeader()
+
+	// Progress / Timer Bar
+	if mode != ModePractice {
+		var pct: th::fu = 1.0
+		if mode == ModeTimeRush {
+			pct = rushClock / 60.0
+			if pct > 1.0 { pct = 1.0 }
+		} else {
+			pct = questionTimer / questionMaxTime
+		}
+
+		barBg := rect::mk(20, 56, winW - 40, 6)
+		canvas::drawRect(ColCardHover, barBg)
+
+		barCol := ColCyan
+		if pct < 0.25 {
+			barCol = ColRose
+		} else if pct < 0.5 {
+			barCol = ColAmber
+		}
+
+		barFill := rect::mk(20, 56, (winW - 40) * pct, 6)
+		canvas::drawRect(barCol, barFill)
+	}
+
+	// Category & Level banner
+	lvlStr := sprintf("LEVEL %d - %s", level, currentQ.category)
+	drawCenteredText(lvlStr, winW * 0.5, 78, ColCyan, 0.75)
+
+	// Question Card Box
+	qCard := rect::mk(winW * 0.5 - 240, 95, 480, 105)
+	drawShadowRect(qCard, ColCardBg, 3.0)
+	canvas::drawRectLines(ColBorder, qCard, 2.0)
+
+	// Draw question prompt
+	drawCenteredText(currentQ.prompt, winW * 0.5, 147, ColTextWhite, 2.0)
+
+	// Answer Options (Buttons)
+	if currentQ.isTrueFalse {
+		// 2 large buttons: TRUE (Green) and FALSE (Red)
+		var bTrue, bFalse: Button
+
+		bTrue.r = rect::mk(winW * 0.5 - 230, 225, 215, 110)
+		bTrue.label = "TRUE"
+		bTrue.badge = "[T] / [->]"
+		bTrue.color = 0x166534FF // Dark green
+		bTrue.hoverColor = 0x15803dFF
+		bTrue.textColor = ColTextWhite
+		bTrue.scale = 1.6
+
+		bFalse.r = rect::mk(winW * 0.5 + 15, 225, 215, 110)
+		bFalse.label = "FALSE"
+		bFalse.badge = "[F] / [<-]"
+		bFalse.color = 0x991b1bFF // Dark red
+		bFalse.hoverColor = 0xb91c1cFF
+		bFalse.textColor = ColTextWhite
+		bFalse.scale = 1.6
+
+		// Highlight feedback if in Feedback state
+		if state == StateFeedback {
+			if currentQ.correctIdx == 0 {
+				bTrue.color = ColEmerald
+			} else {
+				bFalse.color = ColEmerald
+			}
+			if !wasAnswerCorrect {
+				if selectedAnswerIdx == 0 {
+					bTrue.color = ColRose
+				} else if selectedAnswerIdx == 1 {
+					bFalse.color = ColRose
+				}
+			}
+		}
+
+		if drawButton(&bTrue, mousePos, isMouseDown) && state == StatePlaying {
+			handleAnswerSelection(0)
+		}
+		if drawButton(&bFalse, mousePos, isMouseDown) && state == StatePlaying {
+			handleAnswerSelection(1)
+		}
+
+	} else {
+		// 4 multiple-choice cards in a 2x2 grid
+		cardW := th::fu(220)
+		cardH := th::fu(68)
+		startX := winW * 0.5 - 230
+		startY := th::fu(220)
+		gapX := th::fu(20)
+		gapY := th::fu(16)
+
+		badges := []str{ "[1]", "[2]", "[3]", "[4]" }
+
+		for i := 0; i < 4; i++ {
+			row := i / 2
+			col := i % 2
+
+			var b: Button
+			b.r = rect::mk(startX + col * (cardW + gapX), startY + row * (cardH + gapY), cardW, cardH)
+			b.label = currentQ.optionStrs[i]
+			b.badge = badges[i]
+			b.color = ColCardBg
+			b.hoverColor = ColCardHover
+			b.textColor = ColTextWhite
+			b.scale = 1.5
+
+			// Reveal correct & wrong answers during feedback
+			if state == StateFeedback {
+				if i == currentQ.correctIdx {
+					b.color = ColEmerald
+					b.hoverColor = ColEmerald
+				} else if i == selectedAnswerIdx && !wasAnswerCorrect {
+					b.color = ColRose
+					b.hoverColor = ColRose
+				}
+			}
+
+			if drawButton(&b, mousePos, isMouseDown) && state == StatePlaying {
+				handleAnswerSelection(i)
+			}
+		}
+	}
+
+	// Numeric typing prompt / hint footer
+	if typedBuffer != "" {
+		typePrompt := sprintf("Typing: %s  (Press ENTER)", typedBuffer)
+		drawCenteredText(typePrompt, winW * 0.5, 395, ColAmber, 0.9)
+	} else {
+		drawCenteredText("Select with Mouse, Keys [1-4], [T/F], or Type Digits + [ENTER]", winW * 0.5, 395, ColTextMuted, 0.65)
+	}
+
+	drawCenteredText("[ESC] Pause / Menu    [M] SFX Toggle", winW * 0.5, 455, ColBorder, 0.6)
+}
+
+fn drawMenuScreen(mousePos: th::Vf2, isMouseDown: bool) {
+	// Title banner
+	drawCenteredText("MATH DASH", winW * 0.5, 95, ColTextWhite, 3.2)
+	drawCenteredText("ARCADE SPEED ARITHMETIC", winW * 0.5, 142, ColCyan, 0.9)
+
+	// Mode Buttons
+	var bClassic, bRush, bTF, bPractice: Button
+
+	btnW := th::fu(320)
+	btnH := th::fu(46)
+	btnX := winW * 0.5 - btnW * 0.5
+
+	bClassic.r = rect::mk(btnX, 185, btnW, btnH)
+	bClassic.label = "1. CLASSIC SURVIVAL (3 LIVES)"
+	bClassic.color = ColCardBg
+	bClassic.hoverColor = ColCardHover
+	bClassic.textColor = ColTextWhite
+	bClassic.scale = 0.9
+
+	bRush.r = rect::mk(btnX, 240, btnW, btnH)
+	bRush.label = "2. TIME RUSH (60s SPRINT)"
+	bRush.color = ColCardBg
+	bRush.hoverColor = ColCardHover
+	bRush.textColor = ColTextWhite
+	bRush.scale = 0.9
+
+	bTF.r = rect::mk(btnX, 295, btnW, btnH)
+	bTF.label = "3. TRUE OR FALSE BLITZ"
+	bTF.color = ColCardBg
+	bTF.hoverColor = ColCardHover
+	bTF.textColor = ColTextWhite
+	bTF.scale = 0.9
+
+	bPractice.r = rect::mk(btnX, 350, btnW, btnH)
+	bPractice.label = "4. ZEN PRACTICE (UNTIMED)"
+	bPractice.color = ColCardBg
+	bPractice.hoverColor = ColPurple
+	bPractice.textColor = ColTextWhite
+	bPractice.scale = 0.9
+
+	if drawButton(&bClassic, mousePos, isMouseDown) {
+		playSfx(&sndClick)
+		startNewGame(ModeClassic)
+	}
+	if drawButton(&bRush, mousePos, isMouseDown) {
+		playSfx(&sndClick)
+		startNewGame(ModeTimeRush)
+	}
+	if drawButton(&bTF, mousePos, isMouseDown) {
+		playSfx(&sndClick)
+		startNewGame(ModeTrueFalse)
+	}
+	if drawButton(&bPractice, mousePos, isMouseDown) {
+		playSfx(&sndClick)
+		startNewGame(ModePractice)
+	}
+
+	// Instructions & Shortcuts
+	drawCenteredText("Press [1], [2], [3], [4] to launch mode | [M] Toggle Sound", winW * 0.5, 425, ColTextMuted, 0.7)
+	sfxStatus := soundOn ? "SOUND: ON" : "SOUND: MUTED"
+	drawCenteredText(sfxStatus, winW * 0.5, 452, soundOn ? ColEmerald : ColRose, 0.65)
+}
+
+fn drawGameOverScreen(mousePos: th::Vf2, isMouseDown: bool) {
+	card := rect::mk(winW * 0.5 - 200, 50, 400, 310)
+	drawShadowRect(card, ColCardBg, 4.0)
+	canvas::drawRectLines(ColBorder, card, 2.0)
+
+	title := "GAME OVER"
+	if mode == ModeTimeRush { title = "TIME'S UP!" }
+	drawCenteredText(title, winW * 0.5, 90, ColRose, 2.2)
+
+	// Score & Best
+	scoreStr := sprintf("FINAL SCORE: %d", score)
+	drawCenteredText(scoreStr, winW * 0.5, 135, ColTextWhite, 1.4)
+
+	isNewHi := (score == highScores[mode] && score > 0)
+	if isNewHi {
+		drawCenteredText("★ NEW HIGH SCORE! ★", winW * 0.5, 168, ColAmber, 1.0)
+	} else {
+		bestStr := sprintf("BEST: %d", highScores[mode])
+		drawCenteredText(bestStr, winW * 0.5, 168, ColAmber, 0.9)
+	}
+
+	// Stats
+	acc := 0
+	if totalAttempted > 0 {
+		acc = trunc((real32(questionsSolved) / real32(totalAttempted)) * 100.0)
+	}
+	stat1 := sprintf("Questions Solved: %d / %d (%d%%)", questionsSolved, totalAttempted, acc)
+	drawCenteredText(stat1, winW * 0.5, 210, ColTextMuted, 0.8)
+
+	stat2 := sprintf("Highest Streak: %d", maxStreak)
+	drawCenteredText(stat2, winW * 0.5, 235, ColTextMuted, 0.8)
+
+	// Buttons
+	var bRetry, bMenu: Button
+	bRetry.r = rect::mk(winW * 0.5 - 160, 275, 145, 42)
+	bRetry.label = "PLAY AGAIN"
+	bRetry.color = ColCyan
+	bRetry.hoverColor = 0x38bdf8FF
+	bRetry.textColor = ColBgDark
+	bRetry.scale = 0.85
+
+	bMenu.r = rect::mk(winW * 0.5 + 15, 275, 145, 42)
+	bMenu.label = "MAIN MENU"
+	bMenu.color = ColCardHover
+	bMenu.hoverColor = ColBorder
+	bMenu.textColor = ColTextWhite
+	bMenu.scale = 0.85
+
+	if drawButton(&bRetry, mousePos, isMouseDown) {
+		playSfx(&sndClick)
+		startNewGame(mode)
+	}
+	if drawButton(&bMenu, mousePos, isMouseDown) {
+		playSfx(&sndClick)
+		state = StateMenu
+	}
+
+	drawCenteredText("Press [SPACE] / [ENTER] to Play Again | [ESC] for Menu", winW * 0.5, 395, ColTextMuted, 0.7)
+}
+
+fn drawPausedScreen(mousePos: th::Vf2, isMouseDown: bool) {
+	// Dark overlay
+	canvas::drawRect(0x000000AA, rect::mk(0, 0, winW, winH))
+
+	card := rect::mk(winW * 0.5 - 150, 140, 300, 200)
+	drawShadowRect(card, ColCardBg, 4.0)
+	canvas::drawRectLines(ColBorder, card, 2.0)
+
+	drawCenteredText("GAME PAUSED", winW * 0.5, 175, ColTextWhite, 1.8)
+
+	var bResume, bQuit: Button
+	bResume.r = rect::mk(winW * 0.5 - 110, 215, 220, 40)
+	bResume.label = "RESUME"
+	bResume.color = ColCyan
+	bResume.hoverColor = 0x38bdf8FF
+	bResume.textColor = ColBgDark
+	bResume.scale = 0.85
+
+	bQuit.r = rect::mk(winW * 0.5 - 110, 270, 220, 40)
+	bQuit.label = "QUIT TO MENU"
+	bQuit.color = ColCardHover
+	bQuit.hoverColor = ColBorder
+	bQuit.textColor = ColTextWhite
+	bQuit.scale = 0.85
+
+	if drawButton(&bResume, mousePos, isMouseDown) {
+		playSfx(&sndClick)
+		state = StatePlaying
+	}
+	if drawButton(&bQuit, mousePos, isMouseDown) {
+		playSfx(&sndClick)
+		state = StateMenu
+	}
+}
+
+// ============================================================================
+// KEYBOARD & INPUT HANDLING
+// ============================================================================
+
+fn handleKeyboardInput() {
+	// Sound toggle
+	if input::isJustPressedc('M') {
+		soundOn = !soundOn
+	}
+
+	// State-specific keyboard inputs
+	if state == StateMenu {
+		if input::isJustPressed(input::Key.num1) || input::isJustPressedc('1') {
+			playSfx(&sndClick)
+			startNewGame(ModeClassic)
+		} else if input::isJustPressed(input::Key.num2) || input::isJustPressedc('2') {
+			playSfx(&sndClick)
+			startNewGame(ModeTimeRush)
+		} else if input::isJustPressed(input::Key.num3) || input::isJustPressedc('3') {
+			playSfx(&sndClick)
+			startNewGame(ModeTrueFalse)
+		} else if input::isJustPressed(input::Key.num4) || input::isJustPressedc('4') {
+			playSfx(&sndClick)
+			startNewGame(ModePractice)
+		} else if input::isJustPressed(input::Key.space) || input::isJustPressed(input::Key.enter) {
+			playSfx(&sndClick)
+			startNewGame(ModeClassic)
+		}
+
+	} else if state == StatePlaying {
+		if input::isJustPressed(input::Key.escape) {
+			state = StatePaused
+			return
+		}
+
+		if currentQ.isTrueFalse {
+			// True/False keys: T or Right Arrow for TRUE, F or Left Arrow for FALSE
+			if input::isJustPressedc('T') || input::isJustPressed(input::Key.right) {
+				handleAnswerSelection(0)
+			} else if input::isJustPressedc('F') || input::isJustPressed(input::Key.left) {
+				handleAnswerSelection(1)
+			}
+		} else {
+			// Choice keys 1..4
+			if input::isJustPressed(input::Key.num1) || input::isJustPressedc('1') {
+				handleAnswerSelection(0)
+			} else if input::isJustPressed(input::Key.num2) || input::isJustPressedc('2') {
+				handleAnswerSelection(1)
+			} else if input::isJustPressed(input::Key.num3) || input::isJustPressedc('3') {
+				handleAnswerSelection(2)
+			} else if input::isJustPressed(input::Key.num4) || input::isJustPressedc('4') {
+				handleAnswerSelection(3)
+			}
+
+			// Direct digit typing
+			digits := []char{ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9' }
+			for _, d in digits {
+				if input::isJustPressedc(d) {
+					if len(typedBuffer) < 6 {
+						typedBuffer += sprintf("%c", d)
+					}
+				}
+			}
+
+			// Backspace
+			if input::isJustPressed(input::Key.backspace) && len(typedBuffer) > 0 {
+				typedBuffer = slice(typedBuffer, 0, len(typedBuffer) - 1)
+			}
+
+			// Enter to submit typed number
+			if input::isJustPressed(input::Key.enter) && len(typedBuffer) > 0 {
+				typedVal := std::atoi(typedBuffer)
+
+				matchedIdx := -1
+				for i, v in currentQ.options {
+					if v == typedVal {
+						matchedIdx = i
+						break
+					}
+				}
+
+				if matchedIdx >= 0 {
+					handleAnswerSelection(matchedIdx)
+				} else {
+					// Answer not in options or wrong
+					totalAttempted++
+					wasAnswerCorrect = false
+					streak = 0
+					flashColor = ColRose
+					flashAlpha = 0.35
+					shakeDuration = 0.25
+					shakeIntensity = 6.0
+					playSfx(&sndWrong)
+					if mode == ModeTimeRush {
+						rushClock = maxf(0.0, rushClock - 3.5)
+					} else if mode == ModeClassic {
+						lives--
+					}
+					addPopup("NOT AN OPTION", th::Vf2{ winW * 0.5, winH * 0.42 }, ColRose, 1.2)
+					typedBuffer = ""
+				}
+			}
+		}
+
+	} else if state == StateGameOver {
+		if input::isJustPressed(input::Key.space) || input::isJustPressed(input::Key.enter) {
+			playSfx(&sndClick)
+			startNewGame(mode)
+		} else if input::isJustPressed(input::Key.escape) {
+			playSfx(&sndClick)
+			state = StateMenu
+		}
+
+	} else if state == StatePaused {
+		if input::isJustPressed(input::Key.escape) {
+			state = StatePlaying
+		}
+	}
+}
+
+// ============================================================================
+// MAIN LOOP & INIT
+// ============================================================================
+
+fn init*() {
+	window::setup("Math Dash", winW, winH)
+	window::setViewport(th::Vf2{ winW, winH })
+
+	// Init high score tracker
+	highScores = make([]int, 4)
+
+	// Load Font
+	var err: std::Err
+	f, err := font::load("font.ttf", 20)
+	if err.code == 0 && f.validate() {
+		mainFont = f
+		hasFont = true
+	}
+
+	// Load Sound Effects
+	sndCorrect, err = audio::load("sfx/correct.wav")
+	sndWrong, err   = audio::load("sfx/wrong.wav")
+	sndClick, err   = audio::load("sfx/click.wav")
+	sndCombo, err   = audio::load("sfx/combo.wav")
+
+	// Init floating background math symbols
+	symbolChars := []str{ "+", "-", "x", "/", "=", "%", "?", "!", "7", "3", "9", "4" }
+	symbols = make([]MathSymbol, 28)
+	for i in symbols {
+		sIdx := std::rand() % len(symbolChars)
+		symbols[i].charStr = symbolChars[sIdx]
+		symbols[i].pos = th::Vf2{ randFloat(10, winW - 10), randFloat(10, winH - 10) }
+		symbols[i].vel = th::Vf2{ randFloat(-8, 8), randFloat(12, 35) }
+		symbols[i].size = randFloat(1.0, 2.5)
+
+		alphaHex := uint32(randInt(25, 60))
+		symbols[i].color = 0x38bdf800 | alphaHex
+	}
+
+	// Game update and render frame callback
+	window::onFrame.register({
+		dt := real32(th::delta) / 1000.0
+		if dt > 0.1 { dt = 0.1 } // clamp large delta spikes
+
+		// Update Screen Shake
+		var camOffset: th::Vf2
+		if shakeDuration > 0.0 {
+			shakeDuration -= dt
+			camOffset.x = randFloat(-shakeIntensity, shakeIntensity)
+			camOffset.y = randFloat(-shakeIntensity, shakeIntensity)
+		}
+
+		// Input processing
+		mousePos := input::getMousePos()
+		isMouseDown := input::isJustPressed(input::Key.mouse1)
+
+		handleKeyboardInput()
+
+		// Logic updates
+		if state == StatePlaying {
+			if mode == ModeTimeRush {
+				rushClock -= dt
+				if rushClock <= 0.0 {
+					rushClock = 0.0
+					endCurrentGame()
+				}
+			} else if mode != ModePractice {
+				questionTimer -= dt
+				if questionTimer <= 0.0 {
+					// Time out counts as wrong answer
+					handleAnswerSelection(-1)
+				}
+			}
+
+		} else if state == StateFeedback {
+			feedbackTimer -= dt
+			if feedbackTimer <= 0.0 {
+				if checkGameOverCondition() {
+					endCurrentGame()
+				} else {
+					nextQuestion()
+					state = StatePlaying
+				}
+			}
+		}
+
+		// Rendering
+		window::setViewportOffset(camOffset)
+		drawBackground(dt)
+
+		switch state {
+		case StateMenu:
+			drawMenuScreen(mousePos, isMouseDown)
+		case StatePlaying, StateFeedback:
+			drawPlayingScreen(mousePos, isMouseDown)
+		case StateGameOver:
+			drawGameOverScreen(mousePos, isMouseDown)
+		case StatePaused:
+			drawPlayingScreen(mousePos, false)
+			drawPausedScreen(mousePos, isMouseDown)
+		}
+
+		// Render particle bursts & popups
+		updateAndDrawEffects(dt)
+
+		// Render Screen Flash overlay (green on correct, red on wrong)
+		if flashAlpha > 0.0 {
+			flashAlpha -= dt * 1.5
+			if flashAlpha < 0.0 { flashAlpha = 0.0 }
+			flashCol := (flashColor & 0xFFFFFF00) | (trunc(flashAlpha * 255.0) & 0xFF)
+			canvas::drawRect(flashCol, rect::mk(0, 0, winW, winH))
+		}
+
+		window::setViewportOffset({})
+	})
+}
