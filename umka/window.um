@@ -254,7 +254,7 @@ fn umth_window_freeze_cursor(freeze: bool)
 // movements.  The cursor will be automatically hidden.
 fn freezeCursor*(freeze: bool) {
 //~~
-	showCursor(freeze)
+	showCursor(!freeze)
 	umth_window_freeze_cursor(freeze)
 }
 
