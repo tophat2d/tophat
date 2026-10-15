@@ -76,6 +76,7 @@ frame(void)
 	th_input_cycle();
 	th_canvas_flush();
 	th_canvas_end_frame();
+	th_image_flush_deferred();
 	sg_end_pass();
 	sg_commit();
 }

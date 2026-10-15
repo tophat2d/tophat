@@ -581,6 +581,8 @@ void
 th_image_init();
 void
 th_image_deinit();
+void
+th_image_flush_deferred();
 
 th_err
 th_image_create_render_target(th_render_target **out, int width, int height, int filter);

@@ -80,7 +80,9 @@ struct
 	int scissor_stage;
 	th_rect scissor_rect;
 	size_t start, end;
-	th_image *img;
+	sg_view tex_view;
+	int filter;
+	bool target;
 } typedef phase;
 
 phase *phases;
@@ -119,7 +121,9 @@ push_phase(phase phs)
 		if (phases[phases_len - 1].scissor_stage == SCISSOR_NONE) {
 			phases[phases_len - 1].end = thg->canvas_batch_size;
 			if (phs.scissor_stage == SCISSOR_NONE &&
-			    phases[phases_len - 1].img == phs.img) {
+			    phases[phases_len - 1].tex_view.id == phs.tex_view.id &&
+			    phases[phases_len - 1].filter == phs.filter &&
+			    phases[phases_len - 1].target == phs.target) {
 				return;
 			}
 		}
@@ -163,7 +167,11 @@ th_canvas_end_scissor()
 static void
 push_image_phase(th_image *img)
 {
-	push_phase((phase){.img = img});
+	push_phase((phase){
+		.tex_view = img->tex_view,
+		.filter = img->filter,
+		.target = img->target,
+	});
 }
 
 // pushes the vertices onto the batch
@@ -272,12 +280,12 @@ th_canvas_flush()
 		phase *phs = &phases[i];
 		switch (phs->scissor_stage) {
 		case SCISSOR_NONE:
-			thg->canvas_bind.views[0] = phs->img->tex_view;
-			thg->canvas_bind.samplers[0] = phs->img->filter == SG_FILTER_NEAREST
+			thg->canvas_bind.views[0] = phs->tex_view;
+			thg->canvas_bind.samplers[0] = phs->filter == SG_FILTER_NEAREST
 			    ? thg->sampler_nearest
 			    : thg->sampler_linear;
 			// Targets are premultiplied
-			fs_params.premultiply = phs->img->target ? 0 : 1;
+			fs_params.premultiply = phs->target ? 0 : 1;
 			sg_apply_bindings(&thg->canvas_bind);
 			sg_apply_uniforms(0, &SG_RANGE(fs_params));
 			sg_draw(

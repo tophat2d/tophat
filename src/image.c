@@ -50,11 +50,36 @@ th_image_data_reverse(uint32_t *data, th_vf2 dims)
 	return data;
 }
 
+typedef struct {
+	sg_view view;
+	sg_image img;
+} deferred_destroy_t;
+
+static deferred_destroy_t *deferred_destroys = NULL;
+static size_t deferred_count = 0;
+static size_t deferred_cap = 0;
+
 void
 th_image_free(th_image *img)
 {
-	sg_destroy_view(img->tex_view);
-	sg_destroy_image(img->tex);
+	if (deferred_count >= deferred_cap) {
+		deferred_cap = deferred_cap == 0 ? 16 : deferred_cap * 2;
+		deferred_destroys = realloc(deferred_destroys, deferred_cap * sizeof(deferred_destroy_t));
+	}
+	deferred_destroys[deferred_count++] = (deferred_destroy_t){
+		.view = img->tex_view,
+		.img = img->tex
+	};
+}
+
+void
+th_image_flush_deferred(void)
+{
+	for (size_t i = 0; i < deferred_count; i++) {
+		sg_destroy_view(deferred_destroys[i].view);
+		sg_destroy_image(deferred_destroys[i].img);
+	}
+	deferred_count = 0;
 }
 
 static void
@@ -497,5 +522,10 @@ th_image_init()
 void
 th_image_deinit()
 {
+	th_image_flush_deferred();
+	free(deferred_destroys);
+	deferred_destroys = NULL;
+	deferred_count = 0;
+	deferred_cap = 0;
 	sg_destroy_pipeline(thg->image_pip);
 }
