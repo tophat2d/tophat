@@ -50,3 +50,27 @@ th_transform_transform(th_transform *o, th_transform t)
 	th_transform_vf2(&o->origin, t);
 	o->rot += t.rot;
 }
+
+void
+th_transform_inverse(th_transform *out, th_transform t)
+{
+	fu sx_inv = t.scale.x != 0 ? 1.0 / t.scale.x : 0.0;
+	fu sy_inv = t.scale.y != 0 ? 1.0 / t.scale.y : 0.0;
+
+	th_vf2 ro = t.origin;
+	th_rotate_point(&ro, (th_vf2){{0, 0}}, t.rot);
+
+	th_vf2 c;
+	c.x = t.origin.x - ro.x + t.pos.x;
+	c.y = t.origin.y - ro.y + t.pos.y;
+
+	th_vf2 r_inv_c = c;
+	th_rotate_point(&r_inv_c, (th_vf2){{0, 0}}, -t.rot);
+
+	out->pos.x = -r_inv_c.x * sx_inv;
+	out->pos.y = -r_inv_c.y * sy_inv;
+	out->scale.x = sx_inv;
+	out->scale.y = sy_inv;
+	out->origin = (th_vf2){{0, 0}};
+	out->rot = -t.rot;
+}

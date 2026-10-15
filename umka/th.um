@@ -258,6 +258,14 @@ fn (o: ^Transform) transformed*(t: Transform): Transform {
 	return umth_transform_transform(o^, t)
 }
 
+fn umth_transform_inverse(t: Transform): Transform
+//~~fn Transform.inverse
+// Returns the inverse of this transform.
+fn (t: ^Transform) inverse*(): Transform {
+//~~
+	return umth_transform_inverse(t^)
+}
+
 fn umth_transform_vf2(v: Vf2, t: Transform): Vf2
 //~~fn Vf2.transformed
 // Transforms a vf2 to another vf2.
