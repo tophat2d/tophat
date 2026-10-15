@@ -1,0 +1,1131 @@
+import (
+	"audio.um"
+	"canvas.um"
+	"font.um"
+	"input.um"
+	"rect.um"
+	"std.um"
+	"th.um"
+	"window.um"
+)
+
+// ============================================================================
+// CONSTANTS & ENUMS
+// ============================================================================
+
+const (
+	winW = 800
+	winH = 540
+
+	// Playback States
+	StateStopped = 0
+	StatePlaying = 1
+	StatePaused  = 2
+	StateRewind  = 3
+	StateFastFwd = 4
+
+	// Audio Modes
+	ModeTape  = 0
+	ModeRadio = 1
+
+	// Colors (RGBA 0xRRGGBBAA)
+	ColBodyDark     = 0x18181cFF
+	ColBodyMain     = 0x22242aFF
+	ColBodyLight    = 0x2d3037FF
+	ColMetalTrim    = 0x8a929aFF
+	ColMetalBright  = 0xcfd4dcFF
+	ColSpeakerRing  = 0x141518FF
+	ColSpeakerCone  = 0x1f2127FF
+	ColSpeakerCap   = 0x0c0d0fFF
+	ColCassetteDeck = 0x101114FF
+	ColCassetteCase = 0x2a2b33FF
+	ColTapeBrown    = 0x482a16FF
+	ColTapeReel     = 0xe8eaedFF
+	ColLcdBg        = 0x071b1dFF
+	ColLcdGlow      = 0x00e5ffFF
+	ColLcdText      = 0x38f8ffFF
+	ColLcdDim       = 0x0d4f54FF
+	ColLedGreen     = 0x00e676FF
+	ColLedYellow    = 0xffea00FF
+	ColLedRed       = 0xff1744FF
+	ColLedOff       = 0x263238FF
+	ColBtnNormal    = 0x363942FF
+	ColBtnHover     = 0x474c57FF
+	ColBtnActive    = 0x24262cFF
+	ColBtnText      = 0xe0e3ebFF
+	ColAccentOrange = 0xff9100FF
+	ColWhite        = 0xffffffff
+	ColShadow       = 0x000000aa
+)
+
+// ============================================================================
+// DATA STRUCTURES
+// ============================================================================
+
+type (
+	TrackInfo = struct {
+		title: str
+		artist: str
+		bpm: real32
+		duration: real32
+		filename: str
+		sound: audio::Sound
+		accentCol: uint32
+	}
+
+	RadioStation = struct {
+		freq: real32
+		name: str
+		trackIdx: int
+	}
+
+	Button = struct {
+		r: rect::Rect
+		label: str
+		icon: str
+		id: int
+	}
+
+	Slider = struct {
+		r: rect::Rect
+		val: real32 // 0.0 to 1.0
+		isDragging: bool
+		label: str
+	}
+)
+
+// ============================================================================
+// GLOBAL STATE
+// ============================================================================
+
+var (
+	mainFont: font::Font
+	hasFont: bool
+
+	tracks: [3]TrackInfo
+	curTrack: int
+
+	stations: [3]RadioStation
+
+	// Audio effects & controls
+	sndClick:  audio::Sound
+	sndEject:  audio::Sound
+	sndRewind: audio::Sound
+	sndStatic: audio::Sound
+
+	state: int
+	curMode: int
+	loopMode: bool
+	bassBoost: bool
+
+	volume: real32
+	pan: real32
+	pitch: real32
+
+	playbackTimer: real32
+	spoolAngle: real32
+	bassPulse: real32
+
+	// Radio state
+	radioFreq: real32
+	radioTuningDiff: real32
+
+	// Equalizer visualizer bars (12 bands)
+	eqHeights: [12]real32
+	eqPeaks: [12]real32
+
+	// VU meter levels
+	vuLeft: real32
+	vuRight: real32
+	vuLeftPeak: real32
+	vuRightPeak: real32
+
+	// UI Controls
+	tapeButtons: [6]Button
+	btnBassBoost: Button
+	btnModeSwitch: Button
+	btnLoop: Button
+
+	volSlider: Slider
+	panSlider: Slider
+	pitchSlider: Slider
+	tuneSlider: Slider
+	progressSlider: Slider
+
+	activeHoverId: int
+	activePressedId: int
+)
+
+// ============================================================================
+// MATH & DRAWING HELPERS
+// ============================================================================
+
+fn minf(a, b: real32): real32 { if a < b { return a }; return b }
+fn maxf(a, b: real32): real32 { if a > b { return a }; return b }
+fn clampf(v, minV, maxV: real32): real32 {
+	if v < minV { return minV }
+	if v > maxV { return maxV }
+	return v
+}
+
+fn pointInRect(p: th::Vf2, r: rect::Rect): bool {
+	return p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h
+}
+
+fn drawCircle(pos: th::Vf2, radius: th::fu, color: uint32, segments: int = 32) {
+	if radius <= 0 { return }
+	step := (2.0 * 3.14159265) / segments
+	for i := 0; i < segments; i++ {
+		a1 := i * step
+		a2 := (i + 1) * step
+		p1 := th::Vf2{pos.x + cos(a1) * radius, pos.y + sin(a1) * radius}
+		p2 := th::Vf2{pos.x + cos(a2) * radius, pos.y + sin(a2) * radius}
+		canvas::drawTrig(color, pos, p1, p2)
+	}
+}
+
+fn drawCircleOutline(pos: th::Vf2, radius: th::fu, thickness: th::fu, color: uint32, segments: int = 32) {
+	if radius <= 0 { return }
+	step := (2.0 * 3.14159265) / segments
+	for i := 0; i < segments; i++ {
+		a1 := i * step
+		a2 := (i + 1) * step
+		p1 := th::Vf2{pos.x + cos(a1) * radius, pos.y + sin(a1) * radius}
+		p2 := th::Vf2{pos.x + cos(a2) * radius, pos.y + sin(a2) * radius}
+		canvas::drawLine(color, p1, p2, thickness)
+	}
+}
+
+fn drawRectOutline(r: rect::Rect, thickness: real32, color: uint32) {
+	canvas::drawRectLines(color, r, thickness)
+}
+
+fn drawTextCentered(text: str, pos: th::Vf2, color: uint32, size: real32) {
+	if hasFont {
+		dims := mainFont.measure(text)
+		mainFont.draw(text, {pos.x - (dims.x * size * 0.5), pos.y - (dims.y * size * 0.5)}, color, size)
+	} else {
+		scale := size * 2.0
+		approxW := real32(len(text)) * 6.0 * scale
+		canvas::drawText(text, {pos.x - (approxW * 0.5), pos.y - (3.0 * scale)}, color, scale)
+	}
+}
+
+fn drawTextLeft(text: str, pos: th::Vf2, color: uint32, size: real32) {
+	if hasFont {
+		mainFont.draw(text, pos, color, size)
+	} else {
+		canvas::drawText(text, pos, color, size * 2.0)
+	}
+}
+
+// ============================================================================
+// AUDIO LOGIC
+// ============================================================================
+
+fn playClick() {
+	if sndClick.validate() {
+		sndClick.stop()
+		sndClick.seekToFrame(0)
+		sndClick.setVol(0.7)
+		sndClick.play()
+	}
+}
+
+fn playEject() {
+	if sndEject.validate() {
+		sndEject.stop()
+		sndEject.seekToFrame(0)
+		sndEject.setVol(0.8)
+		sndEject.play()
+	}
+}
+
+fn playCurrentTrack() {
+	if tracks[curTrack].sound.validate() {
+		t := &tracks[curTrack]
+		t.sound.setVol(volume)
+		t.sound.setPan(pan)
+		t.sound.setPitch(pitch)
+		t.sound.setLooping(loopMode)
+		t.sound.play()
+		state = StatePlaying
+	}
+}
+
+fn pauseCurrentTrack() {
+	if tracks[curTrack].sound.validate() {
+		tracks[curTrack].sound.stop()
+		state = StatePaused
+	}
+}
+
+fn stopTrack() {
+	if tracks[curTrack].sound.validate() {
+		tracks[curTrack].sound.stop()
+		tracks[curTrack].sound.seekToFrame(0)
+	}
+	playbackTimer = 0
+	state = StateStopped
+}
+
+fn switchTrack(newIdx: int) {
+	if newIdx < 0 { newIdx = len(tracks) - 1 }
+	if newIdx >= len(tracks) { newIdx = 0 }
+
+	wasPlaying := (state == StatePlaying)
+	stopTrack()
+	curTrack = newIdx
+	playbackTimer = 0
+
+	if wasPlaying {
+		playCurrentTrack()
+	}
+}
+
+fn applyAudioParams() {
+	effectiveVol := volume
+	if curMode == ModeRadio {
+		// Radio volume drops if off station
+		effectiveVol = volume * clampf(1.0 - (radioTuningDiff * 2.5), 0.0, 1.0)
+	}
+
+	if tracks[curTrack].sound.validate() {
+		tracks[curTrack].sound.setVol(effectiveVol)
+		tracks[curTrack].sound.setPan(pan)
+		tracks[curTrack].sound.setPitch(pitch)
+		tracks[curTrack].sound.setLooping(loopMode)
+	}
+
+	if curMode == ModeRadio && sndStatic.validate() {
+		staticVol := volume * clampf(radioTuningDiff * 1.5, 0.0, 0.8)
+		sndStatic.setVol(staticVol)
+		if !sndStatic.isPlaying() && staticVol > 0.02 {
+			sndStatic.setLooping(true)
+			sndStatic.play()
+		}
+	} else if sndStatic.validate() && sndStatic.isPlaying() {
+		sndStatic.stop()
+	}
+}
+
+
+
+fn updateSlider(s: ^Slider, mpos: th::Vf2, isDown: bool, isClick: bool): bool {
+	interacted := false
+	expandedRect := rect::Rect{s.r.x - 4, s.r.y - 6, s.r.w + 8, s.r.h + 12}
+
+	if isClick && pointInRect(mpos, expandedRect) {
+		s.isDragging = true
+		interacted = true
+	}
+
+	if s.isDragging {
+		if isDown {
+			newVal := (mpos.x - s.r.x) / s.r.w
+			s.val = clampf(newVal, 0.0, 1.0)
+			interacted = true
+		} else {
+			s.isDragging = false
+		}
+	}
+	return interacted
+}
+
+fn handleControls() {
+	mpos := input::getMousePos()
+	isClick := input::isJustPressed(input::Key.mouse1)
+	isDown := input::isPressed(input::Key.mouse1)
+
+	activeHoverId = 0
+
+	// Tape Buttons
+	for i := 0; i < len(tapeButtons); i++ {
+		btn := &tapeButtons[i]
+		if pointInRect(mpos, btn.r) {
+			activeHoverId = btn.id
+			if isClick {
+				playClick()
+				activePressedId = btn.id
+				if btn.id == 1 { // REW
+					playbackTimer = maxf(0.0, playbackTimer - 5.0)
+					if tracks[curTrack].sound.validate() {
+						frac := playbackTimer / tracks[curTrack].duration
+						frames := uint(trunc(frac * real32(tracks[curTrack].sound.frameCount())))
+						tracks[curTrack].sound.seekToFrame(frames)
+					}
+					spoolAngle -= 180.0
+				} else if btn.id == 2 { // PLAY
+					playCurrentTrack()
+				} else if btn.id == 3 { // PAUSE
+					pauseCurrentTrack()
+				} else if btn.id == 4 { // STOP
+					stopTrack()
+				} else if btn.id == 5 { // FF
+					playbackTimer = minf(tracks[curTrack].duration, playbackTimer + 5.0)
+					if tracks[curTrack].sound.validate() {
+						frac := playbackTimer / tracks[curTrack].duration
+						frames := uint(trunc(frac * real32(tracks[curTrack].sound.frameCount())))
+						tracks[curTrack].sound.seekToFrame(frames)
+					}
+					spoolAngle += 180.0
+				} else if btn.id == 6 { // EJECT
+					playEject()
+					switchTrack(curTrack + 1)
+				}
+			}
+		}
+	}
+
+	// Toggle Buttons
+	if pointInRect(mpos, btnBassBoost.r) {
+		activeHoverId = btnBassBoost.id
+		if isClick {
+			playClick()
+			bassBoost = !bassBoost
+		}
+	}
+	if pointInRect(mpos, btnModeSwitch.r) {
+		activeHoverId = btnModeSwitch.id
+		if isClick {
+			playClick()
+			if curMode == ModeTape { curMode = ModeRadio } else { curMode = ModeTape }
+		}
+	}
+	if pointInRect(mpos, btnLoop.r) {
+		activeHoverId = btnLoop.id
+		if isClick {
+			playClick()
+			loopMode = !loopMode
+		}
+	}
+
+	// Sliders Handling
+	updateSlider(&volSlider, mpos, isDown, isClick)
+	volume = volSlider.val
+
+	updateSlider(&panSlider, mpos, isDown, isClick)
+	pan = (panSlider.val - 0.5) * 2.0 // -1.0 to +1.0
+
+	updateSlider(&pitchSlider, mpos, isDown, isClick)
+	pitch = 0.5 + pitchSlider.val * 1.5 // 0.5x to 2.0x
+
+	updateSlider(&tuneSlider, mpos, isDown, isClick)
+
+	// Seek timeline scrubber
+	if updateSlider(&progressSlider, mpos, isDown, isClick) {
+		playbackTimer = progressSlider.val * tracks[curTrack].duration
+		if tracks[curTrack].sound.validate() {
+			frames := uint(trunc(progressSlider.val * real32(tracks[curTrack].sound.frameCount())))
+			tracks[curTrack].sound.seekToFrame(frames)
+		}
+	}
+
+	if !isDown {
+		activePressedId = 0
+	}
+}
+
+fn update(dt: real32) {
+	// Clamp delta time to avoid large jumps
+	if dt > 0.1 { dt = 0.1 }
+
+	// Process Keyboard Shortcuts
+	if input::isJustPressed(input::Key.space) {
+		playClick()
+		if state == StatePlaying {
+			pauseCurrentTrack()
+		} else {
+			playCurrentTrack()
+		}
+	}
+	if input::isJustPressed(input::Key.s) {
+		playClick()
+		stopTrack()
+	}
+	if input::isJustPressed(input::Key.b) {
+		playClick()
+		bassBoost = !bassBoost
+	}
+	if input::isJustPressed(input::Key.e) {
+		playEject()
+		switchTrack(curTrack + 1)
+	}
+	if input::isJustPressed(input::Key.m) {
+		playClick()
+		if curMode == ModeTape { curMode = ModeRadio } else { curMode = ModeTape }
+	}
+	if input::isJustPressed(input::Key.num1) { playClick(); switchTrack(0) }
+	if input::isJustPressed(input::Key.num2) { playClick(); switchTrack(1) }
+	if input::isJustPressed(input::Key.num3) { playClick(); switchTrack(2) }
+
+	if input::isPressed(input::Key.up) {
+		volume = clampf(volume + dt * 0.5, 0.0, 1.0)
+		volSlider.val = volume
+	}
+	if input::isPressed(input::Key.down) {
+		volume = clampf(volume - dt * 0.5, 0.0, 1.0)
+		volSlider.val = volume
+	}
+
+	// Cassette Rewind & Fast Forward Key states
+	if input::isPressed(input::Key.left) {
+		state = StateRewind
+		playbackTimer -= dt * 4.0
+		if playbackTimer < 0 { playbackTimer = 0 }
+		spoolAngle -= dt * 720.0
+	} else if input::isPressed(input::Key.right) {
+		state = StateFastFwd
+		playbackTimer += dt * 4.0
+		spoolAngle += dt * 720.0
+	}
+
+	// Update Playback Timer and Audio Loop
+	dur := tracks[curTrack].duration
+	if state == StatePlaying {
+		playbackTimer += dt * pitch
+		spoolAngle += dt * pitch * 140.0
+
+		// Track completion check
+		if playbackTimer >= dur {
+			if loopMode {
+				playbackTimer = 0.0
+				if tracks[curTrack].sound.validate() {
+					tracks[curTrack].sound.seekToFrame(0)
+				}
+			} else {
+				stopTrack()
+			}
+		}
+	}
+
+	progressSlider.val = clampf(playbackTimer / dur, 0.0, 1.0)
+
+	// Radio Tuning logic
+	if curMode == ModeRadio {
+		tuneFreq := 88.0 + tuneSlider.val * 20.0 // 88.0 to 108.0 MHz
+		radioFreq = tuneFreq
+
+		// Find closest station
+		closestDiff := real32(999.0)
+		closestIdx := 0
+		for i := 0; i < len(stations); i++ {
+			df := stations[i].freq - radioFreq
+			if df < 0 { df = -df }
+			if df < closestDiff {
+				closestDiff = df
+				closestIdx = stations[i].trackIdx
+			}
+		}
+
+		radioTuningDiff = closestDiff
+		if closestDiff < 0.35 && curTrack != closestIdx {
+			switchTrack(closestIdx)
+		}
+	}
+
+	// Bass pulse & visualizer rhythm synthesis
+	bpm := tracks[curTrack].bpm
+	beatLen := 60.0 / bpm
+	beatPhase := (playbackTimer / beatLen)
+	beatFrac := beatPhase - real32(trunc(beatPhase))
+
+	if state == StatePlaying {
+		// Kick hits on 1st & 3rd beat
+		beatNum := trunc(beatPhase) % 4
+		targetPulse := real32(0.0)
+		if beatNum == 0 || beatNum == 2 {
+			targetPulse = maxf(0.0, 1.0 - (beatFrac * 3.5))
+		} else {
+			targetPulse = maxf(0.0, 0.5 - (beatFrac * 3.0))
+		}
+
+		if bassBoost { targetPulse *= 1.45 }
+		bassPulse = bassPulse * 0.8 + targetPulse * 0.2
+	} else {
+		bassPulse = bassPulse * 0.85
+	}
+
+	// Update 12 Equalizer Spectrum Bands
+	for b := 0; b < 12; b++ {
+		targetH := real32(0.0)
+		if state == StatePlaying {
+			// Frequency distribution: low bands react to bass, middle to rhythm, high to arps
+			speedMult := real32(1.0 + b * 0.4)
+			osc := sin(playbackTimer * 6.28 * speedMult + real32(b))
+			baseReact := (bassPulse * 0.7) * (1.0 - real32(b) * 0.05)
+			targetH = clampf(baseReact + osc * 0.25 + 0.15, 0.05, 1.0)
+			if bassBoost && b < 4 { targetH = minf(1.0, targetH * 1.35) }
+		}
+		eqHeights[b] = eqHeights[b] * 0.65 + targetH * 0.35
+		if eqHeights[b] > eqPeaks[b] {
+			eqPeaks[b] = eqHeights[b]
+		} else {
+			eqPeaks[b] = maxf(0.0, eqPeaks[b] - dt * 0.6)
+		}
+	}
+
+	// VU Meters
+	targetL := (bassPulse * 0.7 + eqHeights[2] * 0.3) * volume * clampf(1.0 - pan, 0.0, 1.0)
+	targetR := (bassPulse * 0.7 + eqHeights[3] * 0.3) * volume * clampf(1.0 + pan, 0.0, 1.0)
+
+	vuLeft = vuLeft * 0.7 + targetL * 0.3
+	vuRight = vuRight * 0.7 + targetR * 0.3
+
+	if vuLeft > vuLeftPeak { vuLeftPeak = vuLeft } else { vuLeftPeak = maxf(0.0, vuLeftPeak - dt * 0.7) }
+	if vuRight > vuRightPeak { vuRightPeak = vuRight } else { vuRightPeak = maxf(0.0, vuRightPeak - dt * 0.7) }
+
+	// Handle Mouse Inputs & Controls
+	handleControls()
+
+	// Apply Volume, Pan, Pitch
+	applyAudioParams()
+}
+
+
+
+// ============================================================================
+// RENDERING
+// ============================================================================
+
+fn renderBoomboxBody() {
+	// 1. Drop Shadow
+	canvas::drawRect(ColShadow, {15, 20, 770, 500})
+
+	// 2. Main Outer Chassis (Heavy retro dark metallic finish)
+	canvas::drawRect(ColBodyDark, {20, 25, 760, 490})
+	canvas::drawRect(ColBodyMain, {26, 31, 748, 478})
+
+	// 3. Top Carrying Handle
+	canvas::drawRect(ColBodyDark, {200, 8, 400, 22})
+	canvas::drawRect(ColMetalTrim, {204, 11, 392, 16})
+	canvas::drawRect(ColBodyLight, {212, 14, 376, 10})
+	// Handle mounts
+	canvas::drawRect(ColMetalTrim, {192, 18, 14, 18})
+	canvas::drawRect(ColMetalTrim, {594, 18, 14, 18})
+
+	// 4. Chrome Screws & Corner Brackets
+	screwCoords := [][2]th::fu{
+		{36, 41}, {764, 41},
+		{36, 499}, {764, 499},
+		{224, 41}, {576, 41}
+	}
+	for i := 0; i < len(screwCoords); i++ {
+		sc := screwCoords[i]
+		pos := th::Vf2{sc[0], sc[1]}
+		drawCircle(pos, 5, ColMetalTrim, 16)
+		drawCircle(pos, 3, ColMetalBright, 16)
+		canvas::drawLine(ColBodyDark, {pos.x - 3, pos.y}, {pos.x + 3, pos.y}, 1.2)
+	}
+
+	// 5. Center Bezel (Dark inset panel for controls and cassette)
+	canvas::drawRect(ColBodyDark, {222, 50, 356, 444})
+	canvas::drawRect(ColBodyLight, {224, 52, 352, 440})
+	canvas::drawRect(ColBodyMain, {226, 54, 348, 436})
+}
+
+fn renderSpeakers() {
+	// Left Speaker Woofer Center: X = 120, Y = 280
+	// Right Speaker Woofer Center: X = 680, Y = 280
+	pulseRadius := bassPulse * 7.0
+
+	speakerCenters := [][2]th::fu{{120, 280}, {680, 280}}
+	tweeterCenters := [][2]th::fu{{120, 110}, {680, 110}}
+
+	for i := 0; i < len(speakerCenters); i++ {
+		sc := speakerCenters[i]
+		center := th::Vf2{sc[0], sc[1]}
+		isLeft := (i == 0)
+		channelPan := 1.0 + pan
+		if isLeft { channelPan = 1.0 - pan }
+		channelPanFactor := clampf(channelPan, 0.4, 1.4)
+		dynRadius := pulseRadius * channelPanFactor
+
+		// Outer speaker housing ring
+		drawCircle(center, 88, ColSpeakerRing, 48)
+		drawCircleOutline(center, 87, 2.5, ColMetalTrim, 48)
+
+		// Ribbed outer surround
+		drawCircle(center, 82, ColSpeakerRing, 48)
+		drawCircle(center, 78 + dynRadius * 0.4, ColBodyDark, 48)
+
+		// Main Cone (Pumping bass cone)
+		drawCircle(center, 72 + dynRadius * 0.6, ColSpeakerCone, 48)
+		drawCircleOutline(center, 54 + dynRadius * 0.4, 1.5, ColBodyDark, 36)
+		drawCircleOutline(center, 38 + dynRadius * 0.2, 1.5, ColSpeakerRing, 36)
+
+		// Dust Cap (Center dome that throbs forward on beats)
+		drawCircle(center, 24 + dynRadius * 0.8, ColSpeakerCap, 32)
+		drawCircle(center, 12 + dynRadius * 0.5, ColBodyDark, 24)
+
+		// Speaker label badges
+		labelPos := th::Vf2{center.x, center.y + 102}
+		badgeText := "RIGHT CHANNEL"
+		if isLeft { badgeText = "LEFT CHANNEL" }
+		drawTextCentered(badgeText, labelPos, ColMetalTrim, 0.65)
+	}
+
+	// Tweeters (High frequency small speakers)
+	for i := 0; i < len(tweeterCenters); i++ {
+		tc := tweeterCenters[i]
+		pos := th::Vf2{tc[0], tc[1]}
+		drawCircle(pos, 38, ColSpeakerRing, 32)
+		drawCircleOutline(pos, 37, 2.0, ColMetalTrim, 32)
+		drawCircle(pos, 32, ColSpeakerCone, 32)
+		drawCircle(pos, 14, ColMetalBright, 24)
+		drawCircle(pos, 6, ColSpeakerCap, 16)
+		// Tweeter acoustic lens bars
+		canvas::drawLine(ColBodyDark, {pos.x - 24, pos.y}, {pos.x + 24, pos.y}, 2.0)
+		canvas::drawLine(ColBodyDark, {pos.x, pos.y - 24}, {pos.x, pos.y + 24}, 2.0)
+	}
+}
+
+fn renderCassetteDeck() {
+	deckR := rect::Rect{236, 172, 328, 150}
+
+	// Cassette Compartment Inset
+	canvas::drawRect(ColCassetteDeck, deckR)
+	drawRectOutline(deckR, 2.0, ColMetalTrim)
+
+	// Cassette Door Window
+	windowR := rect::Rect{246, 180, 308, 134}
+	canvas::drawRect(ColBodyDark, windowR)
+
+	// Cassette Shell
+	cassetteR := rect::Rect{254, 188, 292, 118}
+	canvas::drawRect(ColCassetteCase, cassetteR)
+	drawRectOutline(cassetteR, 1.5, ColMetalTrim)
+
+	// Mixtape Sticker Label
+	stickerR := rect::Rect{270, 194, 260, 48}
+	canvas::drawRect(tracks[curTrack].accentCol, stickerR)
+	canvas::drawRect(ColWhite, {272, 196, 256, 44})
+
+	// Label Header & Track Text
+	drawTextCentered("TOPHAT STEREO CASSETTE - SIDE A", {400, 206}, ColBodyDark, 0.65)
+	drawTextCentered(tracks[curTrack].title, {400, 224}, ColBodyDark, 0.95)
+
+	// Tape View Window (Cutout where tape reels are visible)
+	viewR := rect::Rect{282, 248, 236, 48}
+	canvas::drawRect(ColCassetteDeck, viewR)
+	drawRectOutline(viewR, 1.5, ColMetalTrim)
+
+	// Left & Right Tape Spools
+	spool1Pos := th::Vf2{325, 272}
+	spool2Pos := th::Vf2{475, 272}
+
+	// Calculate Tape Winding Spool Thicknesses
+	progress := clampf(playbackTimer / tracks[curTrack].duration, 0.0, 1.0)
+	rLeftTape := real32(23.0 - (progress * 13.0)) // 23 down to 10
+	rRightTape := real32(10.0 + (progress * 13.0)) // 10 up to 23
+
+	// Brown Tape Ribbon Winding on Spools
+	drawCircle(spool1Pos, rLeftTape, ColTapeBrown, 24)
+	drawCircle(spool2Pos, rRightTape, ColTapeBrown, 24)
+
+	// Tape Ribbon passing between spools
+	canvas::drawLine(ColTapeBrown, {spool1Pos.x, spool1Pos.y + rLeftTape - 2}, {spool2Pos.x, spool2Pos.y + rRightTape - 2}, 3.0)
+
+	// White Plastic Reel Hubs
+	drawCircle(spool1Pos, 10, ColTapeReel, 24)
+	drawCircle(spool2Pos, 10, ColTapeReel, 24)
+
+	// Spool Spoke Teeth (Rotate dynamically with spoolAngle)
+	spoolPosList := [][2]th::fu{{spool1Pos.x, spool1Pos.y}, {spool2Pos.x, spool2Pos.y}}
+	for i := 0; i < len(spoolPosList); i++ {
+		sp := spoolPosList[i]
+		c := th::Vf2{sp[0], sp[1]}
+		for spoke := 0; spoke < 6; spoke++ {
+			ang := spoolAngle * 0.017453 + real32(spoke) * (3.14159 / 3.0)
+			p1 := th::Vf2{c.x + cos(ang) * 4.0, c.y + sin(ang) * 4.0}
+			p2 := th::Vf2{c.x + cos(ang) * 9.5, c.y + sin(ang) * 9.5}
+			canvas::drawLine(ColBodyDark, p1, p2, 2.0)
+		}
+		// Center spindle hole
+		drawCircle(c, 3.5, ColBodyDark, 16)
+	}
+
+	// Tape Heads & Pinch Roller (at bottom of cassette)
+	canvas::drawRect(ColMetalTrim, {388, 288, 24, 12})
+	drawCircle({360, 292}, 4, ColBodyLight, 12)
+	drawCircle({440, 292}, 4, ColBodyLight, 12)
+}
+
+fn renderDisplayAndMeters() {
+	// Top Digital LCD/VFD Screen
+	lcdR := rect::Rect{236, 62, 328, 102}
+	canvas::drawRect(ColLcdBg, lcdR)
+	drawRectOutline(lcdR, 2.0, ColMetalTrim)
+
+	// Inner grid tint
+	canvas::drawRect(0x00e5ff11, {lcdR.x + 2, lcdR.y + 2, lcdR.w - 4, lcdR.h - 4})
+
+	// Header Mode Badge & Clock
+	modeLabel := "[FM STEREO]"
+	if curMode == ModeTape { modeLabel = "[TAPE MODE]" }
+	drawTextLeft(modeLabel, {244, 70}, ColLcdGlow, 0.7)
+
+	stateStr := "STOPPED"
+	if state == StatePlaying { stateStr = "PLAYING" }
+	if state == StatePaused  { stateStr = "PAUSED" }
+	if state == StateRewind  { stateStr = "REW << " }
+	if state == StateFastFwd { stateStr = "FF >> " }
+
+	drawTextCentered(stateStr, {400, 75}, ColAccentOrange, 0.75)
+
+	// Time Counter: MM:SS
+	secs := trunc(playbackTimer)
+	min := secs / 60
+	sec := secs % 60
+	timeStr := sprintf("%02d:%02d", min, sec)
+	drawTextLeft(timeStr, {518, 70}, ColLcdGlow, 0.8)
+
+	// Track Info Ticker / Marquee
+	if curMode == ModeTape {
+		t := &tracks[curTrack]
+		drawTextCentered(sprintf("%s - %s", t.artist, t.title), {400, 94}, ColLcdText, 0.85)
+		drawTextCentered(sprintf("SPEED: %.1fx  BPM: %d", pitch, trunc(t.bpm)), {400, 110}, ColLcdDim, 0.7)
+	} else {
+		statName := "SEARCHING..."
+		if radioTuningDiff < 0.35 {
+			statName = stations[curTrack].name
+		}
+		drawTextCentered(sprintf("FREQ: %.1f MHz  STATION: %s", radioFreq, statName), {400, 96}, ColLcdText, 0.85)
+	}
+
+	// 12-Band Spectrum Analyzer inside LCD
+	specBaseY := real32(156)
+	barW := real32(8)
+	barGap := real32(4)
+	specStartX := real32(248)
+
+	for b := 0; b < 12; b++ {
+		bx := specStartX + real32(b) * (barW + barGap)
+		maxBarH := real32(32)
+		bh := eqHeights[b] * maxBarH
+
+		// Spectrum Segments (4 segments high)
+		for seg := 0; seg < 4; seg++ {
+			segY := specBaseY - real32(seg) * 8.0
+			segCol := ColLedGreen
+			if seg == 2 { segCol = ColLedYellow }
+			if seg == 3 { segCol = ColLedRed }
+
+			if bh >= real32(seg + 1) * 7.0 {
+				canvas::drawRect(segCol, {bx, segY - 6, barW, 5})
+			} else {
+				canvas::drawRect(ColLcdDim, {bx, segY - 6, barW, 5})
+			}
+		}
+
+		// Peak indicator dot
+		peakY := specBaseY - (eqPeaks[b] * maxBarH)
+		canvas::drawRect(ColLcdGlow, {bx, peakY - 3, barW, 2})
+	}
+
+	// Dual VU Meters (Right side of LCD screen)
+	drawTextLeft("L", {404, 126}, ColLcdDim, 0.65)
+	drawTextLeft("R", {404, 142}, ColLcdDim, 0.65)
+
+	vuStartX := real32(420)
+	vuSegW := real32(12)
+	vuSegGap := real32(3)
+
+	for seg := 0; seg < 8; seg++ {
+		sx := vuStartX + real32(seg) * (vuSegW + vuSegGap)
+		segCol := ColLedGreen
+		if seg >= 5 { segCol = ColLedYellow }
+		if seg >= 7 { segCol = ColLedRed }
+
+		threshold := real32(seg + 1) / 8.0
+
+		// Left channel bar
+		if vuLeft >= threshold {
+			canvas::drawRect(segCol, {sx, 124, vuSegW, 10})
+		} else {
+			canvas::drawRect(ColLcdDim, {sx, 124, vuSegW, 10})
+		}
+
+		// Right channel bar
+		if vuRight >= threshold {
+			canvas::drawRect(segCol, {sx, 140, vuSegW, 10})
+		} else {
+			canvas::drawRect(ColLcdDim, {sx, 140, vuSegW, 10})
+		}
+	}
+}
+
+fn renderSliderKnob(sl: ^Slider) {
+	// Track groove
+	canvas::drawRect(ColBodyDark, sl.r)
+	drawRectOutline(sl.r, 1.0, ColBodyLight)
+
+	// Thumb knob
+	thumbX := sl.r.x + sl.val * sl.r.w
+	thumbRect := rect::Rect{thumbX - 6, sl.r.y - 4, 12, sl.r.h + 8}
+	canvas::drawRect(ColMetalTrim, thumbRect)
+	canvas::drawRect(ColMetalBright, {thumbRect.x + 2, thumbRect.y + 2, thumbRect.w - 4, thumbRect.h - 4})
+	canvas::drawLine(ColBodyDark, {thumbX, thumbRect.y + 3}, {thumbX, thumbRect.y + thumbRect.h - 3}, 1.5)
+
+	// Label text
+	labelY := sl.r.y + 19
+	valText := sprintf("%.0f%%", sl.val * 100.0)
+	if sl.label == "PAN" {
+		if pan < -0.1 {
+			valText = sprintf("L %.0f%%", -pan * 100.0)
+		} else if pan > 0.1 {
+			valText = sprintf("R %.0f%%", pan * 100.0)
+		} else {
+			valText = "CENTER"
+		}
+	} else if sl.label == "SPEED" {
+		valText = sprintf("%.1fx", pitch)
+	}
+	drawTextCentered(sprintf("%s: %s", sl.label, valText), {sl.r.x + sl.r.w * 0.5, labelY}, ColMetalTrim, 0.65)
+}
+
+fn renderSliders() {
+	// Progress Bar Scrubber
+	p := &progressSlider
+	canvas::drawRect(ColBodyDark, p.r)
+	fillW := p.r.w * p.val
+	canvas::drawRect(tracks[curTrack].accentCol, {p.r.x, p.r.y, fillW, p.r.h})
+	drawRectOutline(p.r, 1.0, ColMetalTrim)
+	// Scrub handle
+	drawCircle({p.r.x + fillW, p.r.y + p.r.h * 0.5}, 6, ColMetalBright, 16)
+
+	// Radio Tuner Slider (Visible only in Radio Mode)
+	if curMode == ModeRadio {
+		tr := &tuneSlider
+		canvas::drawRect(ColLcdBg, tr.r)
+		drawRectOutline(tr.r, 1.5, ColMetalTrim)
+		// Frequency tick marks
+		for tk := 0; tk < 11; tk++ {
+			tx := tr.r.x + (real32(tk) / 10.0) * tr.r.w
+			canvas::drawLine(ColLcdDim, {tx, tr.r.y}, {tx, tr.r.y + tr.r.h}, 1.0)
+		}
+		// Red Needle indicator
+		needleX := tr.r.x + tr.val * tr.r.w
+		canvas::drawLine(ColLedRed, {needleX, tr.r.y - 2}, {needleX, tr.r.y + tr.r.h + 2}, 2.5)
+	}
+
+	// Knob Sliders: Volume, Pan, Pitch
+	renderSliderKnob(&volSlider)
+	renderSliderKnob(&panSlider)
+	renderSliderKnob(&pitchSlider)
+}
+
+fn renderToggleButton(btn: ^Button, active: bool, ledCol: uint32) {
+	isHover := (activeHoverId == btn.id)
+	btnCol := ColBtnNormal
+	if isHover { btnCol = ColBtnHover }
+
+	canvas::drawRect(btnCol, btn.r)
+	drawRectOutline(btn.r, 1.5, ColMetalTrim)
+
+	// LED indicator
+	ledPos := th::Vf2{btn.r.x + 12, btn.r.y + btn.r.h * 0.5}
+	c := ColLedOff
+	if active { c = ledCol }
+	drawCircle(ledPos, 4, c, 16)
+	if active {
+		drawCircleOutline(ledPos, 5.5, 1.0, ColWhite, 16)
+	}
+
+	drawTextLeft(btn.label, {btn.r.x + 24, btn.r.y + 7}, ColBtnText, 0.65)
+}
+
+fn renderButtons() {
+	// Cassette Piano Keys
+	for i := 0; i < len(tapeButtons); i++ {
+		btn := &tapeButtons[i]
+		isHover := (activeHoverId == btn.id)
+		isPressed := (activePressedId == btn.id) || (btn.id == 2 && state == StatePlaying)
+
+		btnCol := ColBtnNormal
+		if isHover { btnCol = ColBtnHover }
+		if isPressed { btnCol = ColBtnActive }
+
+		// Key 3D shadow & surface
+		yOffset := real32(0.0)
+		if isPressed { yOffset = 2.0 }
+
+		btnSurface := rect::Rect{btn.r.x, btn.r.y + yOffset, btn.r.w, btn.r.h - yOffset}
+		canvas::drawRect(btnCol, btnSurface)
+		drawRectOutline(btnSurface, 1.5, ColMetalTrim)
+
+		// Top chrome highlight
+		canvas::drawLine(ColMetalBright, {btnSurface.x + 2, btnSurface.y + 2}, {btnSurface.x + btnSurface.w - 2, btnSurface.y + 2}, 1.5)
+
+		// Icon & label
+		drawTextCentered(btn.icon, {btnSurface.x + btnSurface.w * 0.5, btnSurface.y + 12}, ColBtnText, 0.8)
+		drawTextCentered(btn.label, {btnSurface.x + btnSurface.w * 0.5, btnSurface.y + 24}, ColMetalTrim, 0.6)
+	}
+
+	// Toggle Buttons: BASS BOOST, MODE, AUTO LOOP
+	renderToggleButton(&btnBassBoost, bassBoost, ColLedRed)
+	renderToggleButton(&btnModeSwitch, (curMode == ModeRadio), ColLedYellow)
+	renderToggleButton(&btnLoop, loopMode, ColLedGreen)
+}
+
+fn renderInstructions() {
+	// Bottom status / keyboard help banner
+	infoText := "HOTKEYS: [SPACE] Play/Pause | [S] Stop | [LEFT/RIGHT] Rewind/FF | [UP/DOWN] Vol | [B] Bass | [E] Eject | [M] Tape/Radio | [1,2,3] Tracks"
+	drawTextCentered(infoText, {winW * 0.5, winH - 12}, ColMetalTrim, 0.65)
+}
+
+// ============================================================================
+// MAIN FRAME HANDLER
+// ============================================================================
+
+fn frame() {
+	dt := real32(th::delta) / 1000.0
+	if dt <= 0.0 { dt = 0.016 }
+
+	// 1. Update Game/Audio Simulation
+	update(dt)
+
+	// 2. Render Graphics
+	renderBoomboxBody()
+	renderSpeakers()
+	renderCassetteDeck()
+	renderDisplayAndMeters()
+	renderSliders()
+	renderButtons()
+	renderInstructions()
+}
+
+// ============================================================================
+// INITIALIZATION
+// ============================================================================
+
+fn fileExists(path: str): bool {
+	f, err := std::fopen(path, "rb")
+	if err.code == 0 && f != null {
+		std::fclose(f)
+		return true
+	}
+	return false
+}
+
+fn loadSoundPath(path: str): audio::Sound {
+	if fileExists(path) {
+		snd, err := audio::load(path)
+		if err.code == 0 && snd.validate() {
+			return snd
+		}
+	}
+	demoPath := "demos/boombox/" + path
+	if fileExists(demoPath) {
+		snd, err := audio::load(demoPath)
+		if err.code == 0 && snd.validate() {
+			return snd
+		}
+	}
+	return audio::Sound{}
+}
+
+fn init*() {
+	window::setup("Tophat Boombox - Retro Cassette & Audio Station", winW, winH)
+
+	// Load Font (with fallback for running from repo root or demos dir)
+	fontPath := ""
+	if fileExists("demos/boombox/font.ttf") {
+		fontPath = "demos/boombox/font.ttf"
+	} else if fileExists("font.ttf") {
+		fontPath = "font.ttf"
+	} else if fileExists("etc/roboto.ttf") {
+		fontPath = "etc/roboto.ttf"
+	}
+
+	if len(fontPath) > 0 {
+		f, err := font::load(fontPath, 16)
+		if err.code == 0 && f.validate() {
+			mainFont = f
+			hasFont = true
+		}
+	}
+
+	// Setup Tracks
+	tracks[0] = TrackInfo{
+		title: "NEON NIGHTS",
+		artist: "SYNTHWAVE '84",
+		bpm: 120.0,
+		duration: 32.0,
+		filename: "audio/track1_neon.wav",
+		accentCol: 0x00e5ffFF,
+	}
+	tracks[1] = TrackInfo{
+		title: "CYBER GROOVE",
+		artist: "DISCO CHIP 2000",
+		bpm: 128.0,
+		duration: 30.0,
+		filename: "audio/track2_groove.wav",
+		accentCol: 0xff9100FF,
+	}
+	tracks[2] = TrackInfo{
+		title: "MIDNIGHT CASSETTE",
+		artist: "LO-FI LOUNGE",
+		bpm: 86.0,
+		duration: 44.6,
+		filename: "audio/track3_chill.wav",
+		accentCol: 0xb388ffFF,
+	}
+
+	// Load Audio Tracks
+	for i := 0; i < len(tracks); i++ {
+		tracks[i].sound = loadSoundPath(tracks[i].filename)
+	}
+
+	// Load SFX
+	sndClick = loadSoundPath("audio/click.wav")
+	sndEject = loadSoundPath("audio/eject.wav")
+	sndRewind = loadSoundPath("audio/rewind.wav")
+	sndStatic = loadSoundPath("audio/static.wav")
+
+	// Radio Stations
+	stations[0] = RadioStation{ freq: 89.5,  name: "SYNTH FM", trackIdx: 0 }
+	stations[1] = RadioStation{ freq: 97.2,  name: "GROOVE 97", trackIdx: 1 }
+	stations[2] = RadioStation{ freq: 104.8, name: "CHILL WAVE", trackIdx: 2 }
+
+	// Default Parameters
+	curTrack = 0
+	state = StateStopped
+	curMode = ModeTape
+	loopMode = true
+	bassBoost = true
+	volume = 0.85
+	pan = 0.0
+	pitch = 1.0
+	radioFreq = 89.5
+
+	// Setup UI Controls
+	keyW := real32(46)
+	keyH := real32(34)
+	keyGap := real32(8)
+	startX := real32(236)
+	startY := real32(382)
+
+	tapeButtons[0] = Button{ r: {startX + 0 * (keyW + keyGap), startY, keyW, keyH}, label: "REW", icon: "<<", id: 1 }
+	tapeButtons[1] = Button{ r: {startX + 1 * (keyW + keyGap), startY, keyW, keyH}, label: "PLAY", icon: ">", id: 2 }
+	tapeButtons[2] = Button{ r: {startX + 2 * (keyW + keyGap), startY, keyW, keyH}, label: "PAUSE", icon: "||", id: 3 }
+	tapeButtons[3] = Button{ r: {startX + 3 * (keyW + keyGap), startY, keyW, keyH}, label: "STOP", icon: "[]", id: 4 }
+	tapeButtons[4] = Button{ r: {startX + 4 * (keyW + keyGap), startY, keyW, keyH}, label: "FF", icon: ">>", id: 5 }
+	tapeButtons[5] = Button{ r: {startX + 5 * (keyW + keyGap), startY, keyW, keyH}, label: "EJECT", icon: "^", id: 6 }
+
+	btnBassBoost = Button{ r: {236, 432, 95, 26}, label: "MEGA BASS", id: 7 }
+	btnModeSwitch = Button{ r: {340, 432, 100, 26}, label: "TAPE / FM", id: 8 }
+	btnLoop = Button{ r: {449, 432, 95, 26}, label: "AUTO LOOP", id: 9 }
+
+	// Sliders
+	volSlider      = Slider{ r: {236, 482, 115, 14}, val: volume, label: "VOL" }
+	panSlider      = Slider{ r: {362, 482, 85, 14}, val: 0.5, label: "PAN" }
+	pitchSlider    = Slider{ r: {458, 482, 86, 14}, val: 0.5, label: "SPEED" }
+	progressSlider = Slider{ r: {236, 354, 308, 10}, val: 0.0, label: "SEEK" }
+	tuneSlider     = Slider{ r: {236, 332, 308, 12}, val: 0.2, label: "TUNER" }
+
+	// Start playing immediately!
+	window::onFrame.register({
+		frame()
+	})
+}
