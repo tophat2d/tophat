@@ -87,6 +87,10 @@ phase *phases;
 size_t phases_len;
 size_t phases_cap;
 
+th_image **image_refs = NULL;
+size_t image_refs_len = 0;
+size_t image_refs_cap = 0;
+
 static void
 finalize_last_phase()
 {
@@ -161,8 +165,23 @@ th_canvas_end_scissor()
 }
 
 static void
+push_image_ref(th_image *img)
+{
+	if (img == NULL)
+		return;
+
+	if (image_refs_len + 1 > image_refs_cap)
+		image_refs = realloc(image_refs,
+		    sizeof(image_refs[0]) * (image_refs_cap = 2 * (image_refs_cap + 1)));
+
+	umkaIncRef(thg->umka, img);
+	image_refs[image_refs_len++] = img;
+}
+
+static void
 push_image_phase(th_image *img)
 {
+	push_image_ref(img);
 	push_phase((phase){.img = img});
 }
 
@@ -257,6 +276,10 @@ th_canvas_deinit()
 void
 th_canvas_end_frame()
 {
+	for (size_t i = 0; i < image_refs_len; i++)
+		umkaDecRef(thg->umka, image_refs[i]);
+	image_refs_len = 0;
+
 	buffer_cache_reset();
 }
 
