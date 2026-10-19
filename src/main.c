@@ -148,16 +148,11 @@ th_init(const char *scriptpath, const char *script_src)
 #endif
 
 	const char *basename = strrchr(scriptpath, '/');
-#ifdef _WIN32
-	const char *bs = strrchr(scriptpath, '\\');
-	if (bs && (!basename || bs > basename))
-		basename = bs;
-#endif
 	basename = basename ? basename + 1 : scriptpath;
 
 	for (int i = 0; i < th_em_modulenames_count; i++) {
 		if (strcmp(basename, th_em_modulenames[i]) == 0) {
-			th_error("Cannot name the main module \"%s\": collides with builtin Tophat module \"%s\"\n",
+			th_error("Cannot name the main module \"%s\": collides with builtin Tophat module \"%s\"",
 			    scriptpath, th_em_modulenames[i]);
 			return 1;
 		}
