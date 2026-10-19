@@ -86,6 +86,7 @@ THEXT(void, th_transform_rect, th_quad *q, th_transform t, th_rect r);
 THEXT(void, th_transform_quad, th_quad *q, th_transform t);
 THEXT(void, th_transform_vf2, th_vf2 *v, th_transform t);
 THEXT(void, th_transform_transform, th_transform *o, th_transform t);
+THEXT(void, th_transform_inverse, th_transform *out, th_transform t);
 THEXT(void, th_rotate_point, th_vf2 *p, th_vf2 o, fu rot);
 THEXT(void, th_vector_normalize, float *x, float *y);
 THEXT(uint32_t, th_sg_get_gl_image, sg_image img);
