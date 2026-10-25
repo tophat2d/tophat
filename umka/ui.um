@@ -97,6 +97,9 @@ type Gui* = struct {
 	m1Pressed: bool
 	m2Pressed: bool
 	m3Pressed: bool
+	m1PressPos: th::Vf2
+	m2PressPos: th::Vf2
+	m3PressPos: th::Vf2
 
 	style: []Style
 	container: []Container
@@ -198,15 +201,28 @@ fn (this: ^Gui) hover(r: rect::Rect): bool {
 	return coll::vf2ToRect(input::getMousePos(), r)
 }
 
+fn (this: ^Gui) hoverm1(r: rect::Rect): bool {
+	return this.hover(r) && coll::vf2ToRect(this.m1PressPos, r)
+}
+
 //~~fn Gui.eval
 // Runs the evaluation phase on `layout`.
 fn (this: ^Gui) eval*(layout: LayoutFn) {
 //~~
-	if input::isJustPressed(input::Key.mouse1) { this.m1Pressed = true }
+	if input::isJustPressed(input::Key.mouse1) {
+		this.m1Pressed = true
+		this.m1PressPos = input::getMousePos()
+	}
 	if input::isJustReleased(input::Key.mouse1) { this.m1Pressed = false }
-	if input::isJustPressed(input::Key.mouse2) { this.m2Pressed = true }
+	if input::isJustPressed(input::Key.mouse2) {
+		this.m2Pressed = true
+		this.m2PressPos = input::getMousePos()
+	}
 	if input::isJustReleased(input::Key.mouse2) { this.m2Pressed = false }
-	if input::isJustPressed(input::Key.mouse3) { this.m3Pressed = true }
+	if input::isJustPressed(input::Key.mouse3) {
+		this.m3Pressed = true
+		this.m3PressPos = input::getMousePos()
+	}
 	if input::isJustReleased(input::Key.mouse3) { this.m3Pressed = false }
 
 	this.idx = 0
@@ -475,12 +491,12 @@ fn (gui: ^Gui) button*(cfg: ButtonConfig = {}): bool {
 	r := gui.getContainer().getDims()
 
 	if gui.isEval {
-		if gui.hover(r) && input::isJustReleased(input::Key.mouse1) {
+		if gui.hoverm1(r) && input::isJustReleased(input::Key.mouse1) {
 			return true
 		}
 		return false
 	} else {
-		if gui.hover(r) && gui.m1Pressed {
+		if gui.hoverm1(r) && gui.m1Pressed {
 			gui.getStyle().negBox.draw(r)
 		} else {
 			gui.getStyle().posBox.draw(r)
@@ -571,7 +587,7 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 			barDm.y = this.dm.y + (scroll^ / maxScroll) * this.dm.h
 		}
 
-		if gui.isEval && gui.hover(barDm) && gui.m1Pressed {
+		if gui.isEval && gui.hoverm1(barDm) && gui.m1Pressed {
 			if this.cfg.horizontal {
 				scroll ^+= input::getMouseDelta().x
 			} else {
@@ -580,7 +596,7 @@ fn (gui: ^Gui) scrollArea*(scroll: ^real32, maxScroll: real32, cfg: ScrollAreaCo
 		}
 
 		if !gui.isEval {
-			if gui.hover(barDm) && gui.m1Pressed {
+			if gui.hoverm1(barDm) && gui.m1Pressed {
 				gui.getStyle().negBox.draw(barDm)
 			} else {
 				gui.getStyle().posBox.draw(barDm)
