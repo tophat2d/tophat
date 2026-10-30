@@ -147,6 +147,17 @@ th_init(const char *scriptpath, const char *script_src)
 	}
 #endif
 
+	const char *basename = strrchr(scriptpath, '/');
+	basename = basename ? basename + 1 : scriptpath;
+
+	for (int i = 0; i < th_em_modulenames_count; i++) {
+		if (strcmp(basename, th_em_modulenames[i]) == 0) {
+			th_error("Cannot name the main module \"%s\": collides with builtin Tophat module \"%s\"",
+			    scriptpath, th_em_modulenames[i]);
+			return 1;
+		}
+	}
+
 	char *mainmod_fmt = "import (mainmod = \"%s\"; \"window.um\")\n"
 			    "fn __th_init*() {\n"
 			    "  _ := window::w\n"
