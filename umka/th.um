@@ -260,7 +260,10 @@ fn (o: ^Transform) transformed*(t: Transform): Transform {
 
 fn umth_transform_inverse(t: Transform): Transform
 //~~fn Transform.inverse
-// Returns the inverse of this transform.
+// Returns the inverse of this transform: transforming by t and then by
+// t.inverse() gives back the original value. It is exact only when the scale
+// is uniform or the rotation is 0; otherwise the inverse can't be expressed
+// as a Transform. A zero scale component inverts to 0.
 fn (t: ^Transform) inverse*(): Transform {
 //~~
 	return umth_transform_inverse(t^)
