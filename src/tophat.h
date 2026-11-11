@@ -650,6 +650,8 @@ void
 th_transform_vf2(th_vf2 *v, th_transform t);
 void
 th_transform_transform(th_transform *o, th_transform t);
+void
+th_transform_inverse(th_transform *out, th_transform t);
 
 // vector
 void

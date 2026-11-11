@@ -1,0 +1,101 @@
+// Test for Transform.inverse(). For every type with transform support, transforming
+// a value by t and then by t.inverse() must give back the original value.
+// Transform applies scale, then rotation, then translation. With non-uniform scale
+// and a non-zero rotation, the inverse is not representable as a Transform,
+// so those cases are not included.
+import (
+	"rect.um"
+	"th.um"
+)
+
+var failures: int
+
+fn near(a, b: th::fu): bool {
+	d := a - b
+	if d < 0 {
+		d = -d
+	}
+	return d < 0.01
+}
+
+fn nearVf2(a, b: th::Vf2): bool {
+	return near(a.x, b.x) && near(a.y, b.y)
+}
+
+fn nearQuad(a, b: th::Quad): bool {
+	for i := 0; i < 4; i++ {
+		if !nearVf2(a[i], b[i]) {
+			return false
+		}
+	}
+	return true
+}
+
+fn nearTransform(a, b: th::Transform): bool {
+	return nearVf2(a.p, b.p) && nearVf2(a.s, b.s) && nearVf2(a.o, b.o) && near(a.r, b.r)
+}
+
+fn report(name: str, ok: bool) {
+	if ok {
+		printf("PASS %s\n", name)
+	} else {
+		printf("FAIL %s\n", name)
+		failures++
+	}
+}
+
+fn init*() {
+	transforms := []th::Transform{
+		th::mkTransform(th::Vf2{0, 0}),
+		th::mkTransform(th::Vf2{10, -5}),
+		th::mkTransform(th::Vf2{3, 4}, th::Vf2{2, 3}),
+		th::mkTransform(th::Vf2{-7, 12}, th::Vf2{1, 1}, th::Vf2{0, 0}, 0.7),
+		th::mkTransform(th::Vf2{5, 5}, th::Vf2{2, 2}, th::Vf2{4, -3}, 1.9),
+		th::mkTransform(th::Vf2{5, 5}, th::Vf2{0.5, 2}, th::Vf2{4, -3}, 0),
+		th::mkTransform(th::Vf2{100, 50}, th::Vf2{3, 3}, th::Vf2{10, 10}, -2.4),
+	}
+	points := []th::Vf2{
+		th::Vf2{0, 0},
+		th::Vf2{1, 0},
+		th::Vf2{-3, 7},
+		th::Vf2{12.5, -4},
+	}
+
+	for ti := 0; ti < len(transforms); ti++ {
+		t := transforms[ti]
+		inv := t.inverse()
+
+		// Vf2
+		for pi := 0; pi < len(points); pi++ {
+			v := points[pi]
+			back := v.transformed(t)
+			back = back.transformed(inv)
+			report(sprintf("vf2 t%d p%d", ti, pi), nearVf2(back, points[pi]))
+		}
+
+		// Quad
+		q := th::Quad{points[0], points[1], points[2], points[3]}
+		qback := q.transformed(t)
+		qback = qback.transformed(inv)
+		report(sprintf("quad t%d", ti), nearQuad(qback, q))
+
+		// Rect, which goes through the quad conversion
+		r := rect::mk(2, 3, 20, 10)
+		rquad := r.transformed(t)
+		rback := rquad.transformed(inv)
+		report(sprintf("rect t%d", ti), nearQuad(rback, r.transformed(th::mkTransform(th::Vf2{0, 0}))))
+
+		// Transform
+		o := th::mkTransform(th::Vf2{1, 2}, th::Vf2{1.5, 0.75}, th::Vf2{3, -2}, 0.4)
+		oback := o.transformed(t)
+		oback = oback.transformed(inv)
+		report(sprintf("transform t%d", ti), nearTransform(oback, o))
+	}
+
+	if failures > 0 {
+		printf("%d checks failed\n", failures)
+		exit(1)
+	}
+	printf("all transform inverse checks passed\n")
+	exit(0)
+}

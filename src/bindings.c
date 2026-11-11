@@ -1359,6 +1359,18 @@ umth_transform_transform(UmkaStackSlot *p, UmkaStackSlot *r)
 	*(th_transform *)umkaGetResult(p, r)->ptrVal = o;
 }
 
+// fn umth_transform_inverse(t: Transform): Transform
+void
+umth_transform_inverse(UmkaStackSlot *p, UmkaStackSlot *r)
+{
+	th_transform t = *(th_transform *)umkaGetParam(p, 0);
+	th_transform out;
+
+	th_transform_inverse(&out, t);
+
+	*(th_transform *)umkaGetResult(p, r)->ptrVal = out;
+}
+
 // fn umth_quad_max(q: Quad): Vf2
 void
 umth_quad_max(UmkaStackSlot *p, UmkaStackSlot *r)
@@ -1647,6 +1659,7 @@ _th_umka_bind(void *umka)
 	umkaAddFunc(umka, "umth_transform_quad", &umth_transform_quad);
 	umkaAddFunc(umka, "umth_transform_vf2", &umth_transform_vf2);
 	umkaAddFunc(umka, "umth_transform_transform", &umth_transform_transform);
+	umkaAddFunc(umka, "umth_transform_inverse", &umth_transform_inverse);
 
 	// collisions
 	umkaAddFunc(umka, "umth_coll_line_to_line", &umth_coll_line_to_line);
